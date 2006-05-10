@@ -1,0 +1,1723 @@
+/*--------------------------------*-C-*----------------------------------------*
+ * File:	macros.c (used to be hotkeys.c)
+ *-----------------------------------------------------------------------------*
+ *
+ * All portions of code are copyright by their respective author/s.
+ *
+ *	Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+ * Ave, Cambridge, MA 02139, USA.
+ *----------------------------------------------------------------------------*/
+
+#include "../config.h"
+#include "rxvt.h"
+
+#ifdef DEBUG_VERBOSE
+#define DEBUG_LEVEL 1
+#else 
+#define DEBUG_LEVEL 0
+#endif
+
+
+#if DEBUG_LEVEL
+#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
+#else
+#define DBG_MSG(d,x)
+#endif
+
+#if 0 /* {{{ OBSOLETE HOTKEY CODE */
+hotkeys_handler_t	hk_handlers[NUM_HKFUNCS];
+#endif /* }}} */
+
+/*
+ * Must sync these to values for macro_t.type in rxvtlib.h.
+ */
+static const char *const macroNames[] =
+{
+	"Dummy",				/* Delete macro */
+	"Esc",					/* Escape sequence to send to mrxvt */
+	"Str",					/* String to send to child process */
+	"NewTab",				/* Open a new tab, and exec a program in it. */
+	"Close",				/* Close tab(s) */
+	"GotoTab",				/* Switch to tab */
+	"MoveTab",				/* Move tab */
+	"Scroll",				/* Scroll up/down */
+	"Copy",					/* Copy selection */
+	"Paste",				/* Paste selection */
+	"ToggleSubwin",			/* Toggle subwindows (scroll / menu / tabbar) */
+	"ResizeFont",			/* Resize terminal font */
+	"ToggleVeryBold",		/* Toggle use of bold font for colored text */
+#ifdef TRANSPARENT
+	"ToggleTransparency",	/* Toggle pseudo transparency */
+#endif
+	"ToggleBroadcast",		/* Toggle broadcasting of input */
+	"ToggleHold",			/* Toggle holding of completed tabs */
+	"SetTitle",				/* Set title of active tab to selection */
+	"PrintScreen",			/* Dump screen to file / printer */
+	"SaveConfig",			/* Save config to file */
+	"ToggleMacros"			/* Toggle using keyboard macros */
+};
+
+
+/******************************************************************************\
+* 					   BEGIN INTERNAL ROUTINE PROTOTYPES					   *
+\******************************************************************************/
+int		macro_cmp		( const void*, const void*);
+int		rxvt_add_macro	( rxvt_t*, KeySym, int, char*, Bool);
+/******************************************************************************\
+*						END INTERNAL ROUTINE PROTOTYPES						   *
+\******************************************************************************/
+
+
+/* {{{ OBSOLETE HOTKEY CODE
+ *
+ * The "macro" feature extends functionality of hotkeys (and is smaller).
+ */
+#if 0
+/* INTPROTO */
+int
+rxvt_hotkey_dummy (rxvt_t* r, XKeyEvent* ev)
+{
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_change_title (rxvt_t* r, XKeyEvent* ev)
+{
+	if (NULL != r->selection.text)	{
+		rxvt_tabbar_set_title (r, ATAB(r), (const unsigned char TAINTED*) r->selection.text);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_new_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_append_page (r, NULL, NULL);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_kill_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	/* do not kill the last tab */
+	if (0 == LTAB(r)) return 0;
+
+	/* kill a tab if protected-secondary-screen flag is not set */
+	if (!(r->Options2 & Opt2_protectSecondary) ||
+		((r->Options2 & Opt2_protectSecondary) &&
+		 (PRIMARY == AVTS(r)->current_screen)))
+	{
+		rxvt_kill_page (r, ATAB(r));
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_close_window (rxvt_t *r, __attribute__((unused)) XKeyEvent *ev) {
+
+	if( r->Options2 & Opt2_protectSecondary ) {
+		int i, dontExit = 0;
+
+		for( i=0; i <= LTAB(r); i++) {
+			if( PVTS(r, i)->current_screen == SECONDARY ) {
+				dontExit = 1;
+				if( i != ATAB(r) ) rxvt_tabbar_highlight_tab( r, i, False);
+			}
+		}
+
+		if( dontExit ) {
+			XBell( r->Xdisplay, 0);
+			return 0;
+		}
+	}
+
+	rxvt_clean_exit(r);
+	return 1; /* not reached */
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_prev_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	if (0 != ATAB(r))	{
+		rxvt_activate_page (r, ATAB(r)-1);
+		return 1;
+	}
+	else if (0 != LTAB(r))	{
+		rxvt_activate_page (r, LTAB(r));
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_next_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	if (ATAB(r) != LTAB(r))	{
+		rxvt_activate_page (r, ATAB(r)+1);
+		return 1;
+	}
+	else if (0 != LTAB(r))	{
+		rxvt_activate_page (r, 0);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_prev_atab (rxvt_t* r, XKeyEvent* ev)
+{
+	if (PTAB(r) != ATAB(r))	{
+		rxvt_activate_page (r, PTAB(r));
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_1 (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_activate_page (r, 0);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_2 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 1)	{
+		rxvt_activate_page (r, 1);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_3 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 2)	{
+		rxvt_activate_page (r, 2);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_4 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 3)	{
+		rxvt_activate_page (r, 3);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_5 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 4)	{
+		rxvt_activate_page (r, 4);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_6 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 5)	{
+		rxvt_activate_page (r, 5);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_7 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 6)	{
+		rxvt_activate_page (r, 6);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_8 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 7)	{
+		rxvt_activate_page (r, 7);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_9 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 8)	{
+		rxvt_activate_page (r, 8);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_10 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 9)	{
+		rxvt_activate_page (r, 9);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_11 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 10)	{
+		rxvt_activate_page (r, 10);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_tab_12 (rxvt_t* r, XKeyEvent* ev)
+{
+	if (LTAB(r) >= 11)	{
+		rxvt_activate_page (r, 11);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_lmove_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_tabbar_move_tab (r, 0);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_rmove_tab (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_tabbar_move_tab (r, 1);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_dump_screen (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef PRINTPIPE
+	int		shft = (ev->state & ShiftMask);
+	int		ctrl = (ev->state & ControlMask);
+	rxvt_scr_printscreen (r, ATAB(r), ctrl | shft);
+	return 1;
+#endif
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_inc_opacity (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef TRANSPARENT
+	if( r->Options & Opt_transparent ) {
+		/*
+		 * Change the shading degree.
+		 */
+		r->TermWin.shade +=
+			r->h->rs[Rs_opacityDegree] ? r->TermWin.opacity_degree : 5;
+		if( r->TermWin.shade > 100) r->TermWin.shade = 100;
+
+		r->h->bgGrabbed = 0;
+		gettimeofday( &r->h->lastCNotify, NULL);
+
+		DBG_MSG( 1, ( stderr, "New shade level %d\n", r->TermWin.shade));
+		return 1;
+	}
+	else
+#endif
+	if (None != r->h->xa[XA_NET_WM_WINDOW_OPACITY] &&
+		r->TermWin.opacity > 0)	{
+		if (r->h->rs[Rs_opacityDegree])	{
+			r->TermWin.opacity -= r->TermWin.opacity_degree;
+			if (r->TermWin.opacity < 0)
+				r->TermWin.opacity = 0;
+		}
+		else
+			r->TermWin.opacity --;
+		rxvt_set_opacity (r);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_dec_opacity (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef TRANSPARENT
+	if( r->Options & Opt_transparent) {
+		r->TermWin.shade -=
+			r->h->rs[Rs_opacityDegree] ? r->TermWin.opacity_degree : 5;
+		if( r->TermWin.shade < 0) r->TermWin.shade = 0;
+
+		r->h->bgGrabbed = 0;
+		gettimeofday( &r->h->lastCNotify, NULL);
+
+		DBG_MSG( 1, ( stderr, "New shade level %d\n", r->TermWin.shade));
+		return 1;
+	}
+#endif
+	if (None != r->h->xa[XA_NET_WM_WINDOW_OPACITY] &&
+		r->TermWin.opacity < 100) {
+		if (r->h->rs[Rs_opacityDegree])	{
+			r->TermWin.opacity += r->TermWin.opacity_degree;
+			if (r->TermWin.opacity > 100)
+				r->TermWin.opacity = 100;
+		}
+		else
+			r->TermWin.opacity ++;
+		rxvt_set_opacity (r);
+		return 1;
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_transparency (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef TRANSPARENT
+	rxvt_toggle_transparency (r);
+	return 1;
+#endif
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hide_tabbar (rxvt_t* r, XKeyEvent* ev)
+{
+	if (rxvt_tabbar_visible (r))	{
+		if (rxvt_tabbar_hide (r))	{
+			rxvt_resize_on_subwin (r, HIDE_TABBAR);
+			return 1;
+		}
+	}
+	else	{
+		if (rxvt_tabbar_show (r))	{
+			rxvt_resize_on_subwin (r, SHOW_TABBAR);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hide_scrollbar (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef HAVE_SCROLLBARS
+	if (rxvt_scrollbar_visible (r))	{
+		if (rxvt_scrollbar_hide (r))	{
+			rxvt_resize_on_subwin (r, HIDE_SCROLLBAR);
+			return 1;
+		}
+	}
+	else	{
+		if (rxvt_scrollbar_show (r))	{
+			rxvt_resize_on_subwin (r, SHOW_SCROLLBAR);
+			return 1;
+		}
+	}
+#endif
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hide_menubar (rxvt_t* r, XKeyEvent* ev)
+{
+#ifdef HAVE_MENUBAR
+	if (rxvt_menubar_visible (r))	{
+		if (rxvt_menubar_hide (r))	{
+			rxvt_resize_on_subwin (r, HIDE_MENUBAR);
+			return 1;
+		}
+	}
+	else	{
+		if (rxvt_menubar_show (r))	{
+			rxvt_resize_on_subwin (r, SHOW_MENUBAR);
+			return 1;
+		}
+	}
+#endif
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hide_button (rxvt_t* r, XKeyEvent* ev)
+{
+	if (r->Options2 & Opt2_hideButtons)
+		r->Options2 &= ~Opt2_hideButtons;
+	else
+		r->Options2 |= Opt2_hideButtons;
+	rxvt_tabbar_set_visible_tabs (r, False);
+	if( r->tabBar.win != None)
+		XClearArea( r->Xdisplay, r->tabBar.win,
+				0, 0, 0, 0, True);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_verybold (rxvt_t* r, XKeyEvent* ev)
+{
+	if (r->Options2 & Opt2_veryBold)
+		r->Options2 &= ~Opt2_veryBold;
+	else
+		r->Options2 |= Opt2_veryBold;
+	rxvt_scr_touch (r, ATAB(r), True);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hold_exit (rxvt_t* r, XKeyEvent* ev)
+{
+	if (r->Options2 & Opt2_holdExit)	{
+		register int	k;
+		for (k = LTAB(r); k>= 0; k --)
+			if (PVTS(r, k)->dead && PVTS(r, k)->hold > 1)
+				rxvt_remove_page (r, k);
+		r->Options2 &= ~Opt2_holdExit;
+	}
+	else
+		r->Options2 |= Opt2_holdExit;
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_broadcast (rxvt_t* r, XKeyEvent* ev)
+{
+	if (r->Options2 & Opt2_broadcast)
+		r->Options2 &= ~Opt2_broadcast;
+	else
+		r->Options2 |= Opt2_broadcast;
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_small_font (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_resize_on_font (r, FONT_DN);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_large_font (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_resize_on_font (r, FONT_UP);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_up (rxvt_t* r, XKeyEvent* ev)
+{
+	if (AVTS(r)->saveLines)	{
+		rxvt_scr_page (r, ATAB(r), UP, 1);
+		return 1;
+	}
+	else return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_down (rxvt_t* r, XKeyEvent* ev)
+{
+	if (AVTS(r)->saveLines)	{
+		rxvt_scr_page (r, ATAB(r), DN, 1);
+		return 1;
+	}
+	else return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_pgup (rxvt_t* r, XKeyEvent* ev)
+{
+	if (AVTS(r)->saveLines)	{
+#ifdef PAGING_CONTEXT_LINES
+		int		lnsppg = r->TermWin.nrow - PAGING_CONTEXT_LINES;
+#else
+		int		lnsppg = r->TermWin.nrow * 4 / 5;
+#endif
+
+		rxvt_scr_page (r, ATAB(r), UP, lnsppg);
+		return 1;
+	}
+	else return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_pgdown (rxvt_t* r, XKeyEvent* ev)
+{
+	if (AVTS(r)->saveLines)	{
+#ifdef PAGING_CONTEXT_LINES
+		int		lnsppg = r->TermWin.nrow - PAGING_CONTEXT_LINES;
+#else
+		int		lnsppg = r->TermWin.nrow * 4 / 5;
+#endif
+
+		rxvt_scr_page (r, ATAB(r), DN, lnsppg);
+		return 1;
+	}
+	else return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_home (rxvt_t *r, XKeyEvent *ev)
+{
+	/*
+	 * Always gobble this hotkey since if the user is already at the beginning
+	 * of the buffer, not gobbling it will cause some output in the vt which
+	 * might make mrxvt scroll back to the bottom of the buffer.
+	 */
+	rxvt_scr_move_to( r, ATAB(r), 0, 1);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_scroll_end (rxvt_t *r, XKeyEvent *ev)
+{
+	return rxvt_scr_move_to( r, ATAB(r), 1, 0);
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_save_config (rxvt_t* r, XKeyEvent* ev)
+{
+	char	cfile[PATH_MAX] = "";
+
+	if (NULL != r->h->rs[Rs_confFileSave])	{
+		STRNCPY (cfile, r->h->rs[Rs_confFileSave], PATH_MAX-1);
+		cfile[PATH_MAX-1] = (char) 0;
+	}
+	else	{
+		char*	home = getenv ("HOME");
+
+		if (NULL == home) return 0;
+
+		snprintf (cfile, PATH_MAX-1, "%s/%s", home, ".mrxvtrc.save");
+		cfile[PATH_MAX-1] = (char) 0;
+	}
+
+	return rxvt_save_options (r, cfile);
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_copy_sel (rxvt_t* r, XKeyEvent* ev)
+{
+	/*
+	 * TODO: Write code
+	 */
+	return 0;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_paste_sel (rxvt_t* r, XKeyEvent* ev)
+{
+	rxvt_selection_request (r, ATAB(r), ev->time, 0, 0);
+	return 1;
+}
+
+/* INTPROTO */
+int
+rxvt_hotkey_hard_reset (rxvt_t* r, XKeyEvent *ev)
+{
+	rxvt_scr_poweron (r, ATAB(r));
+	return 0;
+}
+
+/* EXTPROTO */
+void
+rxvt_init_hotkey_handlers (rxvt_t* r)
+{
+	hk_handlers[HKF_DUMMY].handler			= rxvt_hotkey_dummy;
+	hk_handlers[HKF_CHANGE_TITLE].handler	= rxvt_hotkey_change_title;
+	hk_handlers[HKF_NEW_TAB	].handler		= rxvt_hotkey_new_tab;
+	hk_handlers[HKF_KILL_TAB].handler		= rxvt_hotkey_kill_tab;
+	hk_handlers[HKF_CLOSE_WINDOW].handler	= rxvt_hotkey_close_window;
+	hk_handlers[HKF_PREV_TAB].handler		= rxvt_hotkey_prev_tab;
+	hk_handlers[HKF_NEXT_TAB].handler		= rxvt_hotkey_next_tab;
+	hk_handlers[HKF_PREV_ATAB].handler		= rxvt_hotkey_prev_atab;
+	hk_handlers[HKF_TAB_1].handler			= rxvt_hotkey_tab_1;
+	hk_handlers[HKF_TAB_2].handler			= rxvt_hotkey_tab_2;
+	hk_handlers[HKF_TAB_3].handler			= rxvt_hotkey_tab_3;
+	hk_handlers[HKF_TAB_4].handler			= rxvt_hotkey_tab_4;
+	hk_handlers[HKF_TAB_5].handler			= rxvt_hotkey_tab_5;
+	hk_handlers[HKF_TAB_6].handler			= rxvt_hotkey_tab_6;
+	hk_handlers[HKF_TAB_7].handler			= rxvt_hotkey_tab_7;
+	hk_handlers[HKF_TAB_8].handler			= rxvt_hotkey_tab_8;
+	hk_handlers[HKF_TAB_9].handler			= rxvt_hotkey_tab_9;
+	hk_handlers[HKF_TAB_10].handler			= rxvt_hotkey_tab_10;
+	hk_handlers[HKF_TAB_11].handler			= rxvt_hotkey_tab_11;
+	hk_handlers[HKF_TAB_12].handler			= rxvt_hotkey_tab_12;
+	hk_handlers[HKF_LMOVE_TAB].handler		= rxvt_hotkey_lmove_tab;
+	hk_handlers[HKF_RMOVE_TAB].handler		= rxvt_hotkey_rmove_tab;
+	hk_handlers[HKF_DUMP_SCREEN].handler	= rxvt_hotkey_dump_screen;
+	hk_handlers[HKF_INC_OPACITY].handler	= rxvt_hotkey_inc_opacity;
+	hk_handlers[HKF_DEC_OPACITY].handler	= rxvt_hotkey_dec_opacity;
+	hk_handlers[HKF_TRANSPARENCY].handler	= rxvt_hotkey_transparency;
+	hk_handlers[HKF_HIDE_TABBAR].handler	= rxvt_hotkey_hide_tabbar;
+	hk_handlers[HKF_HIDE_SCROLLBAR].handler	= rxvt_hotkey_hide_scrollbar;
+	hk_handlers[HKF_HIDE_MENUBAR].handler	= rxvt_hotkey_hide_menubar;
+	hk_handlers[HKF_HIDE_BUTTON].handler	= rxvt_hotkey_hide_button;
+	hk_handlers[HKF_VERYBOLD].handler		= rxvt_hotkey_verybold;
+	hk_handlers[HKF_HOLD_EXIT].handler		= rxvt_hotkey_hold_exit;
+	hk_handlers[HKF_BROADCAST].handler		= rxvt_hotkey_broadcast;
+	hk_handlers[HKF_SMALL_FONT].handler		= rxvt_hotkey_small_font;
+	hk_handlers[HKF_LARGE_FONT].handler		= rxvt_hotkey_large_font;
+	hk_handlers[HKF_SCROLL_UP].handler		= rxvt_hotkey_scroll_up;
+	hk_handlers[HKF_SCROLL_DOWN].handler	= rxvt_hotkey_scroll_down;
+	hk_handlers[HKF_SCROLL_PGUP].handler	= rxvt_hotkey_scroll_pgup;
+	hk_handlers[HKF_SCROLL_PGDOWN].handler	= rxvt_hotkey_scroll_pgdown;
+	hk_handlers[HKF_SCROLL_HOME].handler	= rxvt_hotkey_scroll_home;
+	hk_handlers[HKF_SCROLL_END].handler		= rxvt_hotkey_scroll_end;
+	hk_handlers[HKF_SAVE_CONFIG].handler	= rxvt_hotkey_save_config;
+	hk_handlers[HKF_COPY_SEL].handler		= rxvt_hotkey_copy_sel;
+	hk_handlers[HKF_PASTE_SEL].handler		= rxvt_hotkey_paste_sel;
+	hk_handlers[HKF_HARD_RESET].handler		= rxvt_hotkey_hard_reset;
+
+	hk_handlers[HKF_DUMMY].res			= "hotkey*Dummy";
+	hk_handlers[HKF_CHANGE_TITLE].res	= "hotkey*ChangeTitle";
+	hk_handlers[HKF_NEW_TAB	].res		= "hotkey*NewTab";
+	hk_handlers[HKF_KILL_TAB].res		= "hotkey*KillTab";
+	hk_handlers[HKF_CLOSE_WINDOW].res	= "hotkey*CloseWindow";
+	hk_handlers[HKF_PREV_TAB].res		= "hotkey*PrevTab";
+	hk_handlers[HKF_NEXT_TAB].res		= "hotkey*NextTab";
+	hk_handlers[HKF_PREV_ATAB].res		= "hotkey*PrevActiveTab";
+	hk_handlers[HKF_TAB_1].res			= "hotkey*Tab1";
+	hk_handlers[HKF_TAB_2].res			= "hotkey*Tab2";
+	hk_handlers[HKF_TAB_3].res			= "hotkey*Tab3";
+	hk_handlers[HKF_TAB_4].res			= "hotkey*Tab4";
+	hk_handlers[HKF_TAB_5].res			= "hotkey*Tab5";
+	hk_handlers[HKF_TAB_6].res			= "hotkey*Tab6";
+	hk_handlers[HKF_TAB_7].res			= "hotkey*Tab7";
+	hk_handlers[HKF_TAB_8].res			= "hotkey*Tab8";
+	hk_handlers[HKF_TAB_9].res			= "hotkey*Tab9";
+	hk_handlers[HKF_TAB_10].res			= "hotkey*Tab10";
+	hk_handlers[HKF_TAB_11].res			= "hotkey*Tab11";
+	hk_handlers[HKF_TAB_12].res			= "hotkey*Tab12";
+	hk_handlers[HKF_LMOVE_TAB].res		= "hotkey*LeftMoveTab";
+	hk_handlers[HKF_RMOVE_TAB].res		= "hotkey*RightMoveTab";
+	hk_handlers[HKF_DUMP_SCREEN].res	= "hotkey*DumpScreen";
+	hk_handlers[HKF_INC_OPACITY].res	= "hotkey*IncOpacity";
+	hk_handlers[HKF_DEC_OPACITY].res	= "hotkey*DecOpacity";
+	hk_handlers[HKF_TRANSPARENCY].res	= "hotkey*Transparency";
+	hk_handlers[HKF_HIDE_TABBAR].res	= "hotkey*HideTabbar";
+	hk_handlers[HKF_HIDE_SCROLLBAR].res	= "hotkey*HideScrollbar";
+	hk_handlers[HKF_HIDE_MENUBAR].res	= "hotkey*HideMenubar";
+	hk_handlers[HKF_HIDE_BUTTON].res	= "hotkey*HideButton";
+	hk_handlers[HKF_VERYBOLD].res		= "hotkey*VeryBold";
+	hk_handlers[HKF_HOLD_EXIT].res		= "hotkey*HoldExit";
+	hk_handlers[HKF_BROADCAST].res		= "hotkey*Broadcast";
+	hk_handlers[HKF_SMALL_FONT].res		= "hotkey*SmallFont";
+	hk_handlers[HKF_LARGE_FONT].res		= "hotkey*LargeFont";
+	hk_handlers[HKF_SCROLL_UP].res		= "hotkey*ScrollUp";
+	hk_handlers[HKF_SCROLL_DOWN].res	= "hotkey*ScrollDown";
+	hk_handlers[HKF_SCROLL_PGUP].res	= "hotkey*ScrollPageUp";
+	hk_handlers[HKF_SCROLL_PGDOWN].res	= "hotkey*ScrollPageDown";
+	hk_handlers[HKF_SCROLL_HOME].res	= "hotkey*ScrollHome";
+	hk_handlers[HKF_SCROLL_END].res		= "hotkey*ScrollEnd";
+	hk_handlers[HKF_SAVE_CONFIG].res	= "hotkey*SaveConfig";
+	hk_handlers[HKF_COPY_SEL].res		= "hotkey*CopySel";
+	hk_handlers[HKF_PASTE_SEL].res		= "hotkey*PasteSel";
+	hk_handlers[HKF_HARD_RESET].res		= "hotkey*HardReset";
+}
+
+
+/*
+** If it is a valid hotkey, and we have consumed, return 1;
+** otherwise return 0 so that the caller can process it.
+*/
+/* EXTPROTO */
+int
+rxvt_process_hotkeys (rxvt_t* r, KeySym keysym, XKeyEvent* ev)
+{
+	register int	i;
+	unsigned short	flag = 0;
+	int				ctrl = 0, meta = 0, shft = 0;
+
+
+	/* get keyboard masks */
+	shft = (ev->state & ShiftMask);
+	ctrl = (ev->state & ControlMask);
+	meta = (ev->state & r->h->ModMetaMask);
+
+	/* optimization, quick bypass normal characters */
+	if (!ctrl && !meta && shft)	{
+		/* ignore Shift+ASCII printable non-space characters */
+		if (keysym < 128 && isgraph (keysym))
+			return 0;
+	}
+
+	if (ctrl != 0)
+		HK_SET_CTRL(flag);
+	if (meta != 0)
+		HK_SET_META(flag);
+	if (shft != 0)
+		HK_SET_SHFT(flag);
+
+	for (i = 0; i < MAX_HOTKEYS; i ++)	{
+		if (HKF_DUMMY == r->hotkeys[i].func)
+			break;		/* meet last valid hotkey */
+		if (keysym != r->hotkeys[i].keysym)
+			continue;	/* keysym does not match */
+		if (flag != (r->hotkeys[i].flag & HK_MASK))
+			continue;	/* ctrl/meta/shft status does not match */
+
+		/* if hotkey is only effective on primary screen */
+		if (HK_IS_PRIMARY(r->hotkeys[i].flag) &&
+			PRIMARY != AVTS(r)->current_screen)
+			return 0;
+
+		/*
+		** Now we have found a hotkey and try to process it. Notice
+		** that if we process the hotkey, we must return 1.
+		** TODO: what if we do not process the hotkey?
+		*/
+		return (hk_handlers[r->hotkeys[i].func].handler) (r, ev);
+	}
+	return 0;	/* not hotkey, or not processed */
+}
+#endif
+/* }}} */
+
+/*
+ * 2006-02-23 gi1242: New macro code. This should extend the hotkey aproach
+ * without causing code bloat. The idea is that defining "macros" can also
+ * enable the user to communicate with mrxvt using escape sequences!
+ */
+/* {{{ Macro action functions (called from rxvt_dispatch_action) */
+/* EXTPROTO */
+void
+rxvt_toggle_verybold( rxvt_t *r )
+{
+	if (r->Options2 & Opt2_veryBold) r->Options2 &= ~Opt2_veryBold;
+	else r->Options2 |= Opt2_veryBold;
+
+	rxvt_scr_touch (r, ATAB(r), True);
+}
+
+/*
+ * str = [+-][s|t|m|b]
+ *
+ *		'+' means show. '-' means hide. Neither means toggle.
+ *
+ *		s, t, m, b are the scroll tab and menubars respectively. 'b' is tabbar
+ *		buttons.
+ *
+ * 2006-02-23 gi1242 TODO: Permit hiding / showing more than one sub window at
+ * one time. Currently calls to resize_on_subwin must be followed by
+ * ConfigureNotify event (which we process) to correct the sizeHint (otherwise
+ * we end up having the wrong size).
+ */
+/* EXTPROTO */
+void
+rxvt_toggle_subwin( rxvt_t *r, const unsigned char *str)
+{
+	if(	str == NULL || *str == '\0' ||
+			STRCHR( str, 't') || STRCHR( str, 'T' ) )
+	{
+		/*
+		 * Backward compatibility -- If str is NULL or empty, then toggle the
+		 * tabbar visibility.
+		 */
+		if( rxvt_tabbar_visible (r) && ( str == NULL || *str != '+' ))
+		{
+			/*
+			 * If the tabbar is visible, and we are not forced to show it then
+			 * hide it.
+			 */
+			if( rxvt_tabbar_hide(r) ) rxvt_resize_on_subwin (r, HIDE_TABBAR);
+		}
+		else if( !rxvt_tabbar_visible( r ) && ( str == NULL || *str != '-' ))
+		{
+			/*
+			 * If the tabbar is hidden, and we are not forced to hide it, then
+			 * show the tabbar.
+			 */
+			if( rxvt_tabbar_show(r)) rxvt_resize_on_subwin (r, SHOW_TABBAR);
+		}
+
+		return;
+	}
+
+	/*
+	 * The remainder of this function assumes a non-empty string.
+	 */
+	if( STRCHR( str, 'b') || STRCHR( str, 'B') )
+	{
+		/* Toggle tabbar buttons */
+		switch( *str )
+		{
+			case '+':
+				/* Show buttons */
+				r->Options2 &= ~Opt2_hideButtons;
+				break;
+
+			case '-':
+				/* Hide buttons */
+				r->Options2 |= Opt2_hideButtons;
+				break;
+
+			default:
+				/* Toggle buttons */
+				r->Options2 ^= Opt2_hideButtons;
+		}
+
+		/* Refresh tabbar */
+		rxvt_tabbar_set_visible_tabs (r, False);
+		if( r->tabBar.win != None)
+			XClearArea( r->Xdisplay, r->tabBar.win, 0, 0, 0, 0, True);
+
+		return;
+	}
+
+
+#ifdef HAVE_SCROLLBARS
+	if( STRCHR( str, 's') || STRCHR( str, 'S' ) )
+	{
+		if( rxvt_scrollbar_visible (r) && *str != '+' )
+		{
+			if( rxvt_scrollbar_hide(r) )
+				rxvt_resize_on_subwin (r, HIDE_SCROLLBAR);
+		}
+		else if( !rxvt_scrollbar_visible( r ) && *str != '-' )
+		{
+			if( rxvt_scrollbar_show(r) )
+				rxvt_resize_on_subwin (r, SHOW_SCROLLBAR);
+		}
+
+		return;
+	}
+#endif
+
+#ifdef HAVE_MENUBAR
+	if( STRCHR( str, 'm') || STRCHR( str, 'M' ) )
+	{
+		if( rxvt_menubar_visible (r) && *str != '+' )
+		{
+			if( rxvt_menubar_hide(r) )
+				rxvt_resize_on_subwin (r, HIDE_MENUBAR);
+		}
+		else if( !rxvt_menubar_visible( r ) && *str != '-' )
+		{
+			if( rxvt_menubar_show(r) )
+				rxvt_resize_on_subwin (r, SHOW_MENUBAR);
+		}
+
+		return;
+	}
+#endif
+}
+/* }}} */
+
+/*
+ * Functions to parse macros (add them to our list), and exec actions.
+ */
+/* {{{1 macro_cmp()
+ *
+ * Used by bsearch and qsort for macro comparison.
+ */
+int
+macro_cmp( const void *p1, const void *p2)
+{
+	const macros_t	*macro1 = p1,
+			 		*macro2 = p2;
+
+	/* First compare keysyms, then modflags. Ignore the "Primary" modifier */
+	return	(macro1->keysym == macro2->keysym)					?
+				(macro1->modFlags & ~MACRO_PRIMARY)
+						- (macro2->modFlags & ~MACRO_PRIMARY)	:
+				macro1->keysym - macro2->keysym;
+}
+
+/* {{{1 rxvt_parse_macros(str, arg): Parse macro from arguments
+ *
+ * str and arg can be as follows:
+ *
+ * 		1. str = keyname,					arg = argument.
+ * 		2. str = macro.keyname: argument,	arg = NULL
+ *
+ * A valid macro is found, it is added to our list (r->macros) of macros.
+ */
+/* EXTPROTO */
+#define NEWARGLIM	500	/* `reasonable' size */
+int
+rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
+{
+	char	newarg[NEWARGLIM],
+			keyname[ NEWARGLIM],
+			*keyname_nomods;
+	int		modFlags = 0;
+	KeySym	keysym;
+
+	if (arg == NULL)
+	{
+		char *keyend;
+		int		n;
+
+		/*
+		 * Need to split str into keyname and argument.
+		 */
+		if ((n = rxvt_str_match(str, "macro.")) == 0)
+			return 0;
+		str += n;		/* skip `macro.' */
+
+		if( (keyend = STRCHR( str, ':' )) == NULL ) return -1;
+
+		n = min( keyend - str, NEWARGLIM - 1);
+
+		STRNCPY( keyname, str, n);
+		keyname[n] = 0;
+
+		STRNCPY(newarg, keyend + 1, NEWARGLIM - 1);
+	}
+	else
+	{
+		/*
+		 * Keyname is already in str. Copy arg into newarg.
+		 */
+		STRNCPY( keyname, str, NEWARGLIM - 1);
+		keyname[ NEWARGLIM - 1] = '\0';
+
+		STRNCPY( newarg, arg, NEWARGLIM - 1);
+	}
+
+	/* Null terminate and strip leading / trailing spaces */
+	newarg[NEWARGLIM - 1] = '\0';
+	rxvt_str_trim( newarg);
+
+	DBG_MSG( 1, ( stderr, "Got macro '%s' -- '%s'\n", keyname, newarg));
+
+	/*
+	 * Breakup keyname into a keysym and modifier flags.
+	 */
+	if( (keyname_nomods = STRRCHR( keyname, '+' )) == NULL )
+	{
+		/* No modifiers specified */
+#ifdef UNSHIFTED_MACROS
+		keyname_nomods = keyname;
+#else
+		return -1;
+#endif
+	}
+	else
+	{
+		*(keyname_nomods++) = 0;
+
+		/*
+		 * keyname is now a null terminated string containing only the
+		 * modifiers, and keyname_nomods is a null terminated string containing
+		 * only the key name.
+		 */
+		if( STRCASESTR( keyname, "ctrl" ) ) modFlags |= MACRO_CTRL;
+		if( STRCASESTR( keyname, "meta" ) || STRCASESTR( keyname, "alt"))
+				modFlags |= MACRO_META;
+		if( STRCASESTR( keyname, "shift") ) modFlags |= MACRO_SHIFT;
+		if( STRCASESTR( keyname, "primary"))modFlags |= MACRO_PRIMARY;
+	}
+
+	/*
+	 * Always store the keysym as lower case. That way we can treat shift
+	 * correctly even when Caps Lock is pressed.
+	 */
+	keysym = tolower( XStringToKeysym( keyname_nomods ) );
+
+	if( keysym == None )
+	{
+		rxvt_print_error( "Invalid keysym %s. Skipping macro.",
+				keyname_nomods);
+		return -1;
+	}
+
+	return rxvt_add_macro( r, keysym, modFlags, newarg, noReplace) ? 1 : -1;
+}
+
+/* {{{1 rxvt_add_macro( keysym, modFlags, astring, noreplace)
+ *
+ * Add a macro to our list of macros (r->macros) if astring describes a valid
+ * macro.
+ *
+ * If noReplace is true, don't replace existing macros. Required when reading
+ * the system config file so that we don't replace existing user macros.
+ */
+/* INTPROTO */
+int
+rxvt_add_macro( rxvt_t *r, KeySym keysym, int modFlags, char *astring,
+		Bool noReplace)
+{
+	const unsigned nmacros_increment = 64;	/* # extra macros to alloc space for
+											   when we need to enlarge our list
+											   of macros. A large number here is
+											   not wasteful as we clean it up
+											   after initialization */
+	unsigned short	i;
+	action_t		action;
+
+	assert( astring ); /* Don't pass NULL pointers */
+
+	DBG_MSG( 3, ( stderr, "Adding macro (%lx, %d, %s)\n",
+				keysym, modFlags, astring));
+	/*
+	 * Check to see if macro already exists.
+	 */
+	for( i=0; i < r->nmacros; i++ )
+	{
+		if(
+				r->macros[i].keysym == keysym
+				&& (r->macros[i].modFlags & ~MACRO_PRIMARY)
+						== (modFlags & ~MACRO_PRIMARY)
+		  )
+		{
+			/*
+			 * Macro for key already exists. If noReplace is set, don't touch
+			 * this macro.
+			 */
+			if( noReplace )
+				return 1; /* Claim to have succeded so that caller will not
+							 complain about "Failing to add a ... macro". */
+			
+			/*
+			 * 2006-03-06 gi1242: Don't delete "Dummy" macros here. If we do
+			 * that then the user will have no way to delete macros defined in
+			 * the system /etc/mrxvt/mrxvtrc file. "Dummy" macros will be
+			 * deleted after init.
+			 */
+#if 0 /* {{{ */
+			/*
+			 * Now this macro needs to be replaced. If astring is "Dummy" or
+			 * null, delete it.
+			 */
+			if( *astring == '\0' || !STRCMP( astring, "Dummy") ) {
+				/*
+				 * Delete the current macro.
+				 */
+				unsigned short j;
+
+				DBG_MSG( 2, ( stderr, "Removing macro %hu of %hu. "
+							"Type %s, len %hu, args '%s'.\n",
+							i, r->maxMacros,
+							macroNames[ r->macros[i].action.type ],
+							r->macros[i].action.len,
+							(r->macros[i].action.type == MacroFnStr ||
+									r->macros[i].action.type == MacroFnEsc) ?
+								"(escaped string)" :
+								((r->macros[i].action.str == NULL) ?
+									"(nil)" : r->macros[i].action.str)));
+
+				/* Free memory taken up by the macro action string */
+				free( r->macros[i].action.str );
+
+				/* Move subsequent macro entries up one */
+				for( j=i; j < r->nmacros; j++ )
+					r->macros[j] = r->macros[j+1];
+
+				/*
+				 * If our list of macros is much smaller than the allocated
+				 * space, then shrink the allocated space.
+				 */
+				if( --r->nmacros < r->maxMacros - 8 ) {
+					r->maxMacros -= nmacros_increment;
+					if( r->maxMacros > 0 ) {
+						r->macros = (macros_t *) rxvt_realloc( r->macros,
+										r->maxMacros * sizeof( macros_t ) );
+					}
+					else {
+						free( r->macros );
+						r->macros = NULL;
+					}
+				}
+				return 1; /* Success */
+			}
+#endif /* }}} */
+			/* 
+			 * Break out of the loop so that this macro will get replaced from
+			 * the list.
+			 */
+			break;
+		}
+	} /* for */
+
+	action.str = NULL;	/* Make sure rxvt_set_action won't free non-existent
+						   memory */
+	if( !rxvt_set_action( &action, astring) )
+		/* Failed setting action (probabaly unrecognized action type) */
+		return 0; /* Failure */
+
+	/*
+	 * Add action to the list of macros (making it bigger if necessary).
+	 */
+	if( i == r->nmacros )
+	{
+		if( r->nmacros == r->maxMacros )
+		{
+			/* Get space for more macros*/
+			r->maxMacros += nmacros_increment;
+			r->macros = (macros_t *) rxvt_realloc( r->macros,
+							r->maxMacros * sizeof(macros_t));
+		}
+
+		r->nmacros++;
+	}
+	else
+	{
+		/* Macro action string needs to be freed (as it will be replaced) */
+		free( r->macros[i].action.str );
+	}
+
+	/*
+	 * Save macro values in our global macro list.
+	 */
+	r->macros[i].keysym		= keysym;
+	r->macros[i].modFlags	= modFlags;
+	r->macros[i].action		= action;
+
+	DBG_MSG( 2, ( stderr, "Added macro %hu of %hu. "
+					"Type %s, len %hu, args '%s'.\n",
+				i, r->maxMacros,
+				macroNames[ action.type ], action.len,
+				(action.type == MacroFnStr || action.type == MacroFnEsc) ?
+					"(escaped string)" :
+					((action.str == NULL) ? "(nil)" : (char*) action.str)));
+
+	return 1;	/* Success */
+}
+
+/* {{{1 rxvt_cleanup_macros()
+ *
+ * Delete all "Dummy" macros from our list of macros, and free space alloced for
+ * extra macros
+ */
+void
+rxvt_cleanup_macros( rxvt_t *r )
+{
+	unsigned i, nDummyMacros = 0;
+
+	if( r->nmacros == 0 ) return; /* Nothing to be done */
+
+	for( i = 0; i < r->nmacros; i++)
+	{
+		if( r->macros[i].action.type == MacroFnDummy )
+		{
+			/*
+			 * Dummy macro needs to be deleted. Make sure this macro comes first
+			 * in the macro list.
+			 *
+			 * 2006-03-06 gi1242: Would be more efficient if we made sure that
+			 * this macro was last in the list, however that would involve
+			 * knowing what the max keysym value is. Could be different on
+			 * different architectures.
+			 */
+			r->macros[i].keysym		= 0;
+			r->macros[i].modFlags	= 0;
+
+			free( r->macros[i].action.str );
+			r->macros[i].action.str	= NULL; /* Probably unnecessary */
+
+			nDummyMacros++;
+		}
+	} /* for */
+
+	/*
+	 * The macro list now needs to be sorted on keysym. When we look for macros,
+	 * we assume the macro list is sorted, so we can use a binary search to
+	 * lookup macros quickly.
+	 */
+	qsort( r->macros, r->nmacros, sizeof( macros_t ), macro_cmp);
+
+	/* Remove dummy macros from our list */
+	MEMMOVE( r->macros, r->macros + nDummyMacros,
+			(r->nmacros - nDummyMacros) * sizeof( macros_t ) );
+	r->nmacros -= nDummyMacros;
+
+	/* Shrink our macros list */
+	if( r->nmacros < r->maxMacros )
+	{
+		r->macros = rxvt_realloc( r->macros, r->nmacros * sizeof( macros_t ));
+		r->maxMacros = r->nmacros;
+	}
+
+	DBG_MSG( 3, ( stderr, "Read %d macros. (Have space for %d macros)\n",
+				r->nmacros, r->maxMacros));
+#if 0	/* {{{ Debug info */
+	for( i=0; i < r->nmacros; i++)
+	{
+		DBG_TMSG( 3, ( stderr,
+					"%2d. Keysym %lx, Modifiers %hd, Type %hu, Action len %hu\n",
+					i, r->macros[i].keysym, r->macros[i].modFlags,
+					r->macros[i].action.type, r->macros[i].action.len));
+	}
+#endif	/* }}} */
+}
+
+/* {{{1 rxvt_set_action( action, astring)
+ *
+ * Check what action is specified by astring, and assign respective values in
+ * action.
+ * 
+ * The string astring might be modified, but can be freed immediately after
+ * calling this function (regardless of wether it succeeds or not).
+ */
+/* EXTPROTO */
+Bool
+rxvt_set_action		(action_t *action, char *astring)
+{
+	unsigned short type, len;
+
+	DBG_MSG( 2, ( stderr, "Setting action '%s'\n", astring));
+	/*
+	 * Match head of "astring" to a name in macroNames to figure out the macro
+	 * type.
+	 */
+	for( type = 0; type < NMACRO_FUNCS; type++)
+	{
+		if( (len = rxvt_str_match( astring, macroNames[type])) )
+		{
+			/* Matched a macroName at the start of astring */
+			if( astring[len] && !isspace( astring[len] ) )
+				/* Not delimited by a space */
+				continue;
+
+			/* Skip macroName and delimiting spaces */
+			astring += len;
+			while( *astring && isspace( *astring ) ) astring++;
+
+			/* Exit for loop early */
+			break;
+		}
+	}
+
+	if( type == NMACRO_FUNCS )
+	{
+		rxvt_print_error( "Action %s is not of known type", astring);
+		return False; /* Failure: No matching macro name */
+	}
+
+	/*
+	 * Setup values in action
+	 */
+	action->type		= type;
+
+	/*
+	 * Interpolate escape sequences into action. XXX: Should we only do this for
+	 * MacroFnStr and MacroFnEsc?.
+	 */
+	len	= rxvt_str_escaped( astring );
+
+	/* All macros exept MacroFnStr and MacroFnEsc have null terminated string */
+	if( type != MacroFnStr && type != MacroFnEsc && len > 0 && astring[len-1] )
+		astring[ len++ ] = 0;	/* Since astring was null terminated, astring[len]
+								   is certainly part of the memory in astring. */
+
+	action->len		= len;
+
+	/* Set action->str. If any data is previously there, realloc it. */
+	if( len > 0 )
+	{
+		action->str = (unsigned char *) rxvt_realloc( action->str,
+												len * sizeof(unsigned char));
+		MEMCPY( action->str, astring, len);
+	}
+	else
+	{
+		free( action->str );
+		action->str = NULL;
+	}
+	return True;
+}
+
+/* {{{1 rxvt_process_macros( keysym, ev)
+ *
+ * Check to see if a macro key was pressed. If yes, exec the action and return
+ * 1. Else return 0.
+ *
+ * 2006-02-24 gi1242: Take both a keysym, and a XKeyEvent argument because, the
+ * caller might have modified keysym based on XIM.
+ */
+/* EXTPROTO */
+int
+rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
+{
+	macros_t	ck,				/* Storing the keysym and mods of the current
+								   key that's pressed. */
+				*macro;			/* Macro we find in our saved list corresponding
+								   to the current key press */
+
+	/* Copy the modifier mask and keysym into ck */
+	ck.modFlags = 0;
+	if (ev->state & ShiftMask)				ck.modFlags |= MACRO_SHIFT;
+	if (ev->state & ControlMask)			ck.modFlags |= MACRO_CTRL;
+	if (ev->state & r->h->ModMetaMask)		ck.modFlags |= MACRO_META;
+
+	/* Use lowercase version so we can ignore caps lock */
+	ck.keysym = tolower( keysym );
+
+	/* Check if macro ck is in our list of macros. */
+	macro = bsearch( &ck, r->macros, r->nmacros, sizeof( macros_t ),
+				macro_cmp);
+	if (
+			/*
+			 * No macro found.
+			 */
+			macro == NULL
+			|| (
+				/*
+				 * Primary only macro in secondary screen.
+				 */
+				(macro->modFlags & MACRO_PRIMARY)
+				&& AVTS(r)->current_screen != PRIMARY
+			   )
+			|| (
+				/*
+				 * When macros are disabled, only the toggle macros macro should
+				 * work.
+				 */
+				( r->Options2 & Opt2_disableMacros )
+				&& macro->action.type != MacroFnToggleMacros
+			   )
+	   )
+		return 0;	/* No macro processed */
+
+	DBG_MSG( 3, ( stderr, "Processing macro %p\n", macro));
+	return rxvt_dispatch_action( r, &(macro->action), (XEvent *) ev);
+}
+
+/* {{{1 rxvt_dispatch_action( action, ev)
+ *
+ * Exec the macro / menu action with type "type" and action "action". Returns 1
+ * on success, -1 on failure.
+ */
+/* EXTPROTO */
+int
+rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
+{
+	switch( action->type )
+	{
+		case MacroFnEsc:
+			/* Send action to rxvt */
+			rxvt_cmd_write( r, ATAB(r), action->str, action->len);
+			break;
+
+		case MacroFnStr:
+			/* Send action to child process */
+			rxvt_tt_write( r, ATAB(r), action->str, action->len);
+			break;
+
+		case MacroFnNewTab:
+			if( action->str != NULL )
+			{
+				/*
+				 * If the first word is quoted, use that as the title. Don't be
+				 * fancy and check for nested quotes. That's probably
+				 * unnecessary.
+				 *
+				 * Everything after the first quoted word is the command. If
+				 * command starts with "!", then the shell is exec'ed before
+				 * running command.
+				 */
+
+				const int	MaxMacroTitle = 80;	/* Longest title we will have */
+				char		title[MaxMacroTitle];
+				char		*command = (char *) action->str;
+
+				if( *command == '"' )
+				{
+					int i;
+
+					/* Copy everything until first " into title */
+					for(
+						  i=0, command++;
+						  i < MaxMacroTitle - 2 && *command && *command != '"';
+						  i++, command++
+					   )
+						title[i] = *command;
+					title[i] = '\0'; /* Null terminate title */
+
+					/* Skip spaces after title */
+					if( *command ) command++;
+					while( isspace( *command ) ) command++;
+					// while( *command && isspace( *(++command) ));
+
+					if( *command )
+						rxvt_append_page( r, title, command);
+					else
+						rxvt_append_page( r, title, NULL);
+				}
+				else rxvt_append_page( r, NULL, command);
+			}
+			else
+				rxvt_append_page( r, NULL, NULL);
+
+			break;
+
+		case MacroFnClose:
+			if( action->len > 0 && *(action->str) )
+			{
+				/* Close tab specified by str */
+				int tabno = atoi( (char*) action->str) - 1;
+
+				if( tabno == -1 ) tabno = ATAB(r);
+
+				if (
+					  tabno >=0 && tabno <=LTAB(r)
+					  && (
+						   !(r->Options2 & Opt2_protectSecondary)
+						   || PVTS(r, tabno)->current_screen == PRIMARY
+						 )
+				   )
+				{
+					rxvt_kill_page (r, tabno);
+				}
+			}
+			else
+				rxvt_exit_request( r );
+
+			break;
+
+		case MacroFnGoto:
+		{
+			/* Goto tab in position action->str */
+			int tabno;
+			
+			if( action->str != NULL && *(action->str) )
+			{
+				tabno = atoi( (char*) action->str );
+
+				if( *(action->str)  == '+' || *(action->str) == '-' )
+				{
+					/*
+					 * Relative movement of tabs
+					 */
+					tabno += ATAB(r);
+
+					/* Wrap around */
+					tabno = tabno % (LTAB(r) + 1);
+					if( tabno < 0 ) tabno += LTAB(r) + 1;
+				}
+				else if( tabno == 0 )
+				{
+					/*
+					 * Previous active tab
+					 */
+					tabno = PTAB(r);
+				}
+				else if( --tabno > LTAB(r) )
+				{
+					/*
+					 * Absolute tab number. If we're too far to the right,
+					 * activate the last tab.
+					 */
+					tabno = LTAB(r);
+				}
+			}
+			else tabno = PTAB(r);
+
+			rxvt_activate_page( r, tabno);
+			break;
+		}
+
+		case MacroFnMove:
+			/* Move active tab to position in action->str */
+			if( action->len > 0 && *(action->str) )
+			{
+				short tabno = atoi( (char*) action->str );
+
+				if( *(action->str) == '+' || *(action->str) == '-' )
+					rxvt_tabbar_move_tab( r, tabno + ATAB(r));
+				else
+					rxvt_tabbar_move_tab( r, tabno-1 );
+			}
+			break;
+
+		case MacroFnScroll:
+			/* Scroll by an ammount specified in action->str */
+			if( action->len > 1 )
+			{
+				int				amount		= abs( atoi( (char*) action->str ));
+				enum page_dirn	direction	= (*(action->str) == '-' ? UP : DN);
+
+				if( tolower( action->str[ action->len - 2] ) == 'p' )
+					/* scroll pages */
+					amount *=
+#ifdef PAGING_CONTEXT_LINES
+								r->TermWin.nrow - PAGING_CONTEXT_LINES
+#else
+								r->TermWin.nrow * 4 / 5
+#endif
+					;
+
+				rxvt_scr_page( r, ATAB(r), direction, amount);
+			}
+			break;
+
+#if 0
+		case MacroFnCopy:
+#endif
+		case MacroFnPaste:
+			if( ev != NULL )
+				rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
+			break;
+
+		case MacroFnToggleSubwin:
+			rxvt_toggle_subwin( r, action->str);
+			break;
+
+		case MacroFnFont:
+		{
+			const int MaxFontLen = 8;	/* Only need space for "#+xx" */
+
+			char fontname[MaxFontLen];
+			if( action->len >= MaxFontLen - 1 ) break;	/* Remember that
+														   action->len includes
+														   the trailing null
+														   char */
+
+			fontname[0] = FONT_CMD;						/* Internal prefix */
+			STRNCPY( fontname + 1, action->str, MaxFontLen - 1);
+			fontname[MaxFontLen - 1] = '\0';	/* Null terminate */
+
+			rxvt_resize_on_font( r, fontname );
+			break;
+		}
+
+		case MacroFnToggleVeryBold:
+			rxvt_toggle_verybold(r);
+			break;
+
+#ifdef TRANSPARENT
+		case MacroFnToggleTransp:
+			rxvt_toggle_transparency(r);
+			break;
+#endif
+
+		case MacroFnToggleBcst:
+			r->Options2 ^= Opt2_broadcast;
+			break;
+
+		case MacroFnToggleHold:
+			if (r->Options2 & Opt2_holdExit)
+			{
+				int	k;
+				for (k = LTAB(r); k>= 0; k --)
+					if (PVTS(r, k)->dead && PVTS(r, k)->hold > 1)
+						rxvt_remove_page (r, k);
+				r->Options2 &= ~Opt2_holdExit;
+			}
+			else
+				r->Options2 |= Opt2_holdExit;
+			break;
+
+		case MacroFnSetTitle:
+			if( action->str != NULL )
+				rxvt_tabbar_set_title( r, ATAB(r),
+						(unsigned char*) action->str);
+			else if( r->selection.text != NULL )
+				rxvt_tabbar_set_title( r, ATAB(r),
+						(const unsigned char TAINTED*) r->selection.text);
+			break;
+
+		case MacroFnPrintScreen:
+			/* If arguments are given, print the whole scroll back */
+			rxvt_scr_printscreen (r, ATAB(r), action->str != NULL);
+			break;
+
+		case MacroFnSaveConfig:
+			{
+				char	cfile[PATH_MAX] = "";
+
+				if( action->str != NULL )
+					STRNCPY (cfile, action->str, PATH_MAX-1);
+				else if( r->h->rs[Rs_confFileSave] != NULL )
+					STRNCPY (cfile, r->h->rs[Rs_confFileSave], PATH_MAX-1);
+				else
+				{
+					char*	home = getenv ("HOME");
+
+					if (NULL == home) return -1; /* Failure */
+
+					snprintf (cfile, PATH_MAX-1, "%s/%s", home,
+							".mrxvtrc.save");
+				}
+				cfile[PATH_MAX-1] = (char) 0;	/* Null terminate */
+
+				return rxvt_save_options (r, cfile) ? 1 : -1;
+				/* Not reached */
+			}
+
+		case MacroFnToggleMacros:
+			r->Options2 ^= Opt2_disableMacros;
+			break;
+
+		default:
+			assert( action->type < sizeof( macroNames ) / sizeof( char ** ) );
+
+			rxvt_print_error( "Macro type '%s' not implemented yet",
+					macroNames[action->type]);
+			return -1;
+	}
+	return 1;
+}
+/* }}} */
+
+/*----------------------- end-of-file (C source) -----------------------*/

@@ -1,0 +1,85 @@
+# ---------------------------------*-menu-*-------------------------------------
+#  File:	submenus.menu
+# ------------------------------------------------------------------------------
+# 
+#  All portions of code are copyright by their respective author/s.
+#
+#		Copyright (c) 2005-2006		Gautam Iyer <gi1242@users.sourceforge.net>
+# 
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU General Public License as published by the Free
+#  Software Foundation; either version 2 of the License, or (at your option)
+#  any later version.
+# 
+#  This program is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+#  more details.
+# 
+#  You should have received a copy of the GNU General Public License along with
+#  this program; if not, write to the Free Software Foundation, Inc., 675 Mass
+#  Ave, Cambridge, MA 02139, USA.
+# ------------------------------------------------------------------------------
+
+# This file contains the basic menu blocks for mrxvt. The idea is that when
+# defining menus, all one needs to do is add a line containing
+#
+#		[read:submenus.menu;<submenu_name>]
+#
+# to have the appropriate submenus read in.
+
+# Submenu containing generic tab operations
+[menu:tabsmenu]
+./Tabs/*
+./New/*
+{Shell}{Ctrl-Shift-t}				NewTab "Shell"
+{Mutt}								NewTab !mutt
+{Vim}								NewTab !vim
+{Shell (root)}						NewTab "su" su -
+{-}
+{Mrxvt Man page}{Ctrl-Shift-F1}		NewTab man mrxvt
+../
+{Close tab}{Ctrl-Shift-w}			Close 0
+{-}
+{Show previous tab}{Ctrl-Tab}		GotoTab 0
+{Show left tab}{Ctrl-Shift-h}		GotoTab -1
+{Show right tab}{Ctrl-Shift-l}		GotoTab +1
+./Switch to tab/*
+../
+{-}
+{Move tab left}{Ctrl-Shift-<}		MoveTab -1
+{Move tab right}{Ctrl-Shift->}		MoveTab +1
+{-}
+{Save config}						SaveConfig
+{Exit}{Ctrl-shift-q}				Close
+../
+[done:tabsmenu]
+
+# Transparency related options
+[menu:transparent]
+./Transparency/*
+{Toggle}{Ctrl-Shift-r}				Esc \e]76;\a
+{-}
+{Increase shading}{Ctrl-Shift-j}	Esc \e]67;+5\a
+{Decrease shading}{Ctrl-Shift-k}	Esc \e]67;-5\a
+{-}
+./Tint background/*
+{Black}								Esc \e]66;#000000\a
+{Red}								Esc \e]66;#200000\a
+{Green}								Esc \e]66;#002000\a
+{Yellow}							Esc \e]66;#202000\a
+{Blue}								Esc \e]66;#000020\a
+{Magenta}							Esc \e]66;#200020\a
+{Cyan}								Esc \e]66;#002020\a
+{Grey}								Esc \e]66;#202020\a
+../
+../
+[done:transparent]
+
+# Translucency related options
+[menu:translucent]
+./Translucency/*
+{Increase}{Ctrl-Shift-o}			Esc \e]70;+5\a
+{Decrease}{Ctrl-Shift-u}			Esc \e]70;-5\a
+../
+[done:translucent]
