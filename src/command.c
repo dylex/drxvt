@@ -3929,6 +3929,17 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 				rect.height	= ev->xgraphicsexpose.height;
 			}
 
+			/*
+			 * BUG#???. We sometimes receive expose events when the window
+			 * contents are not completely cleared.
+			 *
+			 * If this does not fix the bug, then we will have to issue an
+			 * XClearArea() regardless of weather send_event is true or false.
+			 */
+			if( ev->xexpose.send_event )
+				XClearArea( r->Xdisplay, win, rect.x, rect.y,
+						rect.width, rect.height, False );
+
 			XUnionRectWithRegion( &rect, r->h->refreshRegion,
 					r->h->refreshRegion);
 			rxvt_scr_expose(r, page,
