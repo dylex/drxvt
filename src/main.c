@@ -1314,6 +1314,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	 * Failure opening prop fonts can be handled gracefully: Fall back to the
 	 * usual font.
 	 */
+#ifdef MULTICHAR_SET
 	if (
 		  r->TermWin.xftpfont == NULL
 		  && isDoubleWidthFont( r->Xdisplay, r->TermWin.xftfont )
@@ -1333,6 +1334,7 @@ rxvt_init_font_xft (rxvt_t* r)
 		r->TermWin.xftpfont = r->TermWin.xftfont;
 		r->TermWin.xftPfont = r->TermWin.xftfont;
 	}
+#endif /* MULTICHAR_SET */
 
 	if( r->TermWin.xftpfont )
 	{
