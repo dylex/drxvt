@@ -8,7 +8,7 @@
 Name:      mrxvt
 Summary:   A lightweight multi-tabbed X terminal
 #Requires:  qt >= 2.3.0
-Version:   0.4.1
+Version:   0.5.1
 Release:   2
 License:   GPL
 Vendor:    The mrxvt team <http://materm.sourceforge.net/>
