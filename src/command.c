@@ -3930,7 +3930,7 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 			}
 
 			/*
-			 * BUG#???. We sometimes receive expose events when the window
+			 * BUG# 1473987: We sometimes receive expose events when the window
 			 * contents are not completely cleared.
 			 *
 			 * If this does not fix the bug, then we will have to issue an
