@@ -68,14 +68,14 @@ typedef struct _DeadKeyChar	{
 
 static DeadKeyChar	dkc_tab[] = {
 	{XK_A, XK_grave,		XK_Agrave},
-	{XK_A, XK_acute,		XK_Acute},
+	{XK_A, XK_acute,		XK_Aacute},
 	{XK_A, XK_apostrophe,	XK_Aacute},
 	{XK_A, XK_asciicircum,	XK_Acircumflex},
 	{XK_A, XK_asciitilde,	XK_Atilde},
 	{XK_A, XK_quotedbl,		XK_Adiaeresis},
 
 	{XK_a, XK_grave,		XK_agrave},
-	{XK_a, XK_acute,		XK_acute},
+	{XK_a, XK_acute,		XK_aacute},
 	{XK_a, XK_apostrophe,	XK_aacute},
 	{XK_a, XK_asciicircum,	XK_acircumflex},
 	{XK_a, XK_asciitilde,	XK_atilde},

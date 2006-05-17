@@ -5,7 +5,7 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		1. Compile error at rxvt_free_clipping (screen.c) when XFT
 		   support is not enabled.
 		2. Fix typo in acute acent. Thanks to Benedikt Magnusson
-		   for the but report.
+		   for the bug report.
 
 Gautam Iyer <gi1242@users.sourceforge.net>
 	* Bug Fixes:
