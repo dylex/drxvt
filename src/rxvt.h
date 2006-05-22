@@ -1048,6 +1048,7 @@ enum {
 
 #ifndef NO_BOLDFONT
     Rs_boldFont,
+	_Rs_boldFont = Rs_boldFont + MAX_NFONTS - 1,
 #endif
 #ifdef GREEK_SUPPORT
     Rs_greek_keyboard,

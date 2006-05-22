@@ -3116,6 +3116,10 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 		r->TermWin.focus = 0;
 		r->h->want_refresh = 1; /* Cursor needs to be refreshed */
 
+#ifdef CURSOR_BLINK
+		r->h->hidden_cursor = 0;
+#endif
+
 #ifdef USE_XIM
 		if (r->h->Input_Context != NULL)
 			XUnsetICFocus(r->h->Input_Context);

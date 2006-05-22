@@ -2752,6 +2752,8 @@ rxvt_create_termwin(rxvt_t* r, int page, const char TAINTED * title)
 	if (NULL == t || !*t)
 		t = (char*) r->h->rs[Rs_tabtitleAll];
 	if (NULL == t || !*t)
+		t = (char*) r->h->rs[Rs_title];
+	if (NULL == t || !*t)
 		t = g_default_tab_title;
 	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP(t, MAX_TAB_TXT);
 #ifdef HAVE_PUTENV
@@ -3395,6 +3397,7 @@ rxvt_run_command(rxvt_t* r, int page, const char** argv)
 	{
 		case -1:
 			rxvt_print_error("can't fork");
+			close (cfd);
 			return -1;
 
 		case 0:
@@ -3418,6 +3421,7 @@ rxvt_run_command(rxvt_t* r, int page, const char** argv)
 			for (i = STDERR_FILENO + 1; i < r->num_fds; i ++)
 				if (i != PVTS(r, page)->tty_fd)
 					close (i);
+			close (cfd);
 
 			if( rxvt_control_tty( PVTS(r, page)->tty_fd,
 						PVTS(r, page)->ttydev) < 0)

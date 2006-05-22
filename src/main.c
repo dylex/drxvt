@@ -1530,10 +1530,10 @@ rxvt_init_font_x11 (rxvt_t *r)
 	if (ckfont)
 	{
 		/* try to load boldFont, fail silently */
-		if (NULL != r->h->rs[Rs_boldFont])
+		if (NULL != r->h->rs[Rs_boldFont+idx])
 		{
-			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont]));
-			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont]);
+			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
+			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
 		}
 
 		if (NULL != bfont)
@@ -1994,11 +1994,16 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	bfont = NULL;
 	if (ckfont)
 	{
+		if (r->TermWin.bfont)	{
+			XFreeFont (r->Xdisplay, r->TermWin.bfont);
+			r->TermWin.bfont = NULL;
+		}
+
 		/* try to load boldFont, fail silently */
-		if (NULL == r->TermWin.bfont && NULL != r->h->rs[Rs_boldFont])
+		if (NULL == r->TermWin.bfont && NULL != r->h->rs[Rs_boldFont+idx])
 		{
-			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont]));
-			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont]);
+			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
+			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
 		}
 
 		if (bfont)
@@ -2011,8 +2016,6 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 #endif
 			if (fw <= r->TermWin.fwidth && fh <= r->TermWin.fheight)
 			{
-				if (r->TermWin.bfont)
-					XFreeFont (r->Xdisplay, r->TermWin.bfont);
 				r->TermWin.bfont = bfont;
 				if (fw == r->TermWin.fwidth)
 					r->TermWin.propfont &= ~PROPFONT_NORMAL;

@@ -465,11 +465,11 @@
 
 /* Width of the term internal border */
 #define DEFAULT_INTERNALBORDERWIDTH	(0)
-#define MAX_INTERNALBORDERWIDTH		(10)
+#define MAX_INTERNALBORDERWIDTH		(20)
 
 /* Width of the term external border */
 #define DEFAULT_EXTERNALBORDERWIDTH	(0)
-#define MAX_EXTERNALBORDERWIDTH		(10)
+#define MAX_EXTERNALBORDERWIDTH		(20)
 
 /* Default number of extra dots between lines */
 #define DEFAULT_LINESPACE			(0)
@@ -512,7 +512,7 @@
 #define DEFAULT_XFT_PFONT_NAME		"Sans"
 
 /* Default cursor blinking time (ms) */
-#define MIN_BLINK_TIME				(300)
+#define MIN_BLINK_TIME				(100)
 #define DEFAULT_BLINK_TIME			(500)
 #define MAX_BLINK_TIME				(5000)
 

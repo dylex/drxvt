@@ -330,6 +330,27 @@ static const struct {
 
 #ifndef NO_BOLDFONT
 	STRG(Rs_boldFont, "boldFont", "fb", "fontname", "bold text font", 0),
+# if MAX_NFONTS > 1
+	RSTRG(Rs_boldFont + 1, "boldFont1", "fontname", 0),
+#endif
+# if MAX_NFONTS > 2
+	RSTRG(Rs_boldFont + 2, "boldFont2", "fontname", 0),
+#endif
+# if MAX_NFONTS > 3
+	RSTRG(Rs_boldFont + 3, "boldFont3", "fontname", 0),
+#endif
+# if MAX_NFONTS > 4
+	RSTRG(Rs_boldFont + 4, "boldFont4", "fontname", 0),
+#endif
+# if MAX_NFONTS > 5
+	RSTRG(Rs_boldFont + 5, "boldFont5", "fontname", 0),
+#endif
+# if MAX_NFONTS > 6
+	RSTRG(Rs_boldFont + 6, "boldFont6", "fontname", 0),
+#endif
+# if MAX_NFONTS > 7
+	RSTRG(Rs_boldFont + 7, "boldFont7", "fontname", 0),
+#endif
 #endif
 
 	STRG(Rs_font + 0, "font", "fn", "fontname", "normal text font", 0),

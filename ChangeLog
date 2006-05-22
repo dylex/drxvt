@@ -6,6 +6,17 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   support is not enabled.
 		2. Fix typo in acute acent. Thanks to Benedikt Magnusson
 		   for the bug report.
+		3. Fix file descriptor leakage - we should close /dev/ptmx
+		   after forking. Thanks to Edgar Toernig for the report
+		   and patch.
+		4. Always show cursor while mrxvt loses focus. Thanks to
+		   Edgar Toernig for the patch.
+		5. Adjust several limits, e.g., max border width and min
+		   blink time according to Edgar Toernig's patch.
+
+	* Enhancements:
+		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
+		   the patch.
 
 Gautam Iyer <gi1242@users.sourceforge.net>
 	* Bug Fixes:
