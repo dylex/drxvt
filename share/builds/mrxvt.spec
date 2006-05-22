@@ -2,14 +2,13 @@
 # RPM spec file for mrxvt-0.4.0
 #
 # Copyright  (c)  2004-2005  Jingyu Zhou <jzhou@cs.ucsb.edu>
-# Copyright  (c)  2005       Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+# Copyright  (c)  2005-2006  Jingmin Zhou <jimmyzhou@users.sourceforge.net>
 #
 
 Name:      mrxvt
 Summary:   A lightweight multi-tabbed X terminal
-#Requires:  qt >= 2.3.0
-Version:   0.5.1
-Release:   2
+Version:   0.5.0
+Release:   1
 License:   GPL
 Vendor:    The mrxvt team <http://materm.sourceforge.net/>
 Packager:  Jingyu Zhou <jzhou@cs.ucsb.edu>
@@ -28,13 +27,15 @@ and independent from the GNOME and KDE desktop environment.
 %setup -q
 
 %build
-./configure --prefix=/usr --enable-everything --with-save-lines=600 --with-encoding=noenc --disable-ourstrings --disable-debug
+./configure --prefix=/usr --sysconfdir=/etc --enable-everything --with-save-lines=600 --with-encoding=noenc --disable-ourstrings --disable-debug
 make
 
 %install
 #make install
-mkdir -p %buildroot/share/doc
-mkdir -p %buildroot/bin
+mkdir -p %buildroot/usr/share/doc/mrxvt
+mkdir -p %buildroot/usr/share/pixmaps
+mkdir -p %buildroot/usr/bin
+mkdir -p %buildroot/etc/mrxvt
 make DESTDIR=%buildroot install
 
 %clean
@@ -50,15 +51,22 @@ rm -rf %buildroot
 #/usr/share/doc/mrxvt
 
 /usr/bin/mrxvt
-/usr/man/man1/mrxvt.1.gz
-/usr/share/doc/mrxvt/README.greek
-/usr/share/doc/mrxvt/README.menu
-/usr/share/doc/mrxvt/README.xvt
-/usr/share/doc/mrxvt/TIPS
-/usr/share/doc/mrxvt/mrxvt.vbs
-/usr/share/doc/mrxvt/xdefaults-sample.txt
-/usr/share/doc/mrxvt/xterm.seq
-/usr/share/doc/mrxvt/mrxvtset.pl
+/etc/mrxvt/default.menu
+/etc/mrxvt/mrxvtrc
+/etc/mrxvt/mrxvtrc.sample
+/etc/mrxvt/submenus.menu
+/usr/man/man1/mrxvt.1
+/usr/share/doc/mrxvt/behind_mrxvt.txt.bz2
+/usr/share/doc/mrxvt/hack-mrxvt.txt.bz2
+/usr/share/doc/mrxvt/mrxvt_seq.txt.bz2
+/usr/share/doc/mrxvt/README.greek.bz2
+/usr/share/doc/mrxvt/README.menu.bz2
+/usr/share/doc/mrxvt/README.xvt.bz2
+/usr/share/doc/mrxvt/rxvtRef.txt.bz2
+/usr/share/doc/mrxvt/scripts/mrxvt.vbs
+/usr/share/doc/mrxvt/scripts/mrxvtset.pl
+/usr/share/doc/mrxvt/scripts/settitle.c
+/usr/share/doc/mrxvt/xterm-ctlseqs.txt.bz2
 /usr/share/pixmaps/mrxvt-csh.png
 /usr/share/pixmaps/mrxvt-csh.xpm
 /usr/share/pixmaps/mrxvt-root.png
@@ -67,7 +75,11 @@ rm -rf %buildroot
 /usr/share/pixmaps/mrxvt.xpm
 
 
+
 %changelog
+* Sun May 21 2005 Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+- Fix configure script for 0.5.x branch
+
 * Sun Feb 27 2005 Jingmin Zhou <jimmyzhou@users.sourceforge.net>
 - Update configure script
 

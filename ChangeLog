@@ -13,6 +13,11 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   Edgar Toernig for the patch.
 		5. Adjust several limits, e.g., max border width and min
 		   blink time according to Edgar Toernig's patch.
+		6. Fix rpmbuild (Sourceforge Bug #1482311)
+
+	* Enhancements:
+		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
+		   the patch.
 
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
