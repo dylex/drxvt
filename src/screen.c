@@ -3142,17 +3142,6 @@ rxvt_restore_bold_font (rxvt_t* r)
 # endif	/* NO_BOLDFONT */
 #endif	/* XFT_SUPPORT */
 
-/*
-#if defined (NO_BRIGHTCOLOR) || defined (VERYBOLD)
-# define MONO_BOLD(x)		((x) & (RS_Bold|RS_Blink))
-# define MONO_BOLD_FG(x, fg)	MONO_BOLD(x)
-#else
-# define MONO_BOLD(x)						\
-	(((x) & (RS_Bold | RS_fgMask)) == (RS_Bold | Color_fg))
-# define MONO_BOLD_FG(x, fg)	(((x) & RS_Bold) && (fg) == Color_fg)
-#endif
-*/
-/* Synchronize the macros to thai.c!!! */
 #ifdef NO_BRIGHTCOLOR
 # define MONO_BOLD(x)		((x) & (RS_Bold|RS_Blink))
 # define MONO_BOLD_FG(x, fg)	MONO_BOLD(x)
@@ -3228,10 +3217,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	text_t*		dtp;		/* drawn-text pointer */
 	text_t*		stp;		/* screen-text-pointer */
 	char*		buffer;		/* local copy of r->h->buffer */
-#ifdef THAI
-	int			thaicol_stp_offset = 0;
-	int			thaicol_dtp_offset = 0;
-#endif	/* THAI */
 	/*
 	int			(*drawfunc) () = XDrawString;
 	int			(*image_drawfunc) () = XDrawImageString;
@@ -3357,16 +3342,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 			DBG_MSG( 3, ( stderr, "Setting solid cursor\n"));
 
-#ifdef THAI
-			if (
-				  (r->Options & Opt_thai)
-				  && FONT_WIDTH(r->TermWin.font,
-					  		PSCR(r, page).text[currow][CURCOL]) <= 0
-			   )
-				*srp ^= RS_Bold;
-			else if (!(r->Options & Opt_thai))
-#endif	/* THAI */
-				*srp ^= RS_RVid;
+			*srp ^= RS_RVid;
 
 #ifndef NO_CURSORCOLOR
 			cc1 = *srp & (RS_fgMask | RS_bgMask);
@@ -3559,9 +3535,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						/* y offset for top of drawing */
 						ypixelc;
 		unsigned long	gcmask;	 /* Graphics Context mask */
-#ifdef THAI
-		char*			thai_update = NULL;
-#endif	/* THAI */
 
 
 		stp = PSCR(r, page).text[row + row_offset];
@@ -3569,37 +3542,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		dtp = PVTS(r, page)->drawn_text[row];
 		drp = PVTS(r, page)->drawn_rend[row];
 
-
-#ifdef THAI
-		if (r->Options & Opt_thai)
-		{
-			/* possible integer overflow? */
-			assert (r->TermWin.ncol > 0);
-			thai_update = (char*) rxvt_malloc (r->TermWin.ncol);
-			/* compare drawn_text and screen.text and check which to update */
-			ThaiUpdateMap (PSCR(r, page).text[row + row_offset],
-				PVTS(r, page)->drawn_text[row],
-				PSCR(r, page).rend[row + row_offset],
-				PVTS(r, page)->drawn_rend[row],
-				thai_update, r->TermWin.ncol);
-			/* TODO: Change this algo to scalefont compatible */
-			thaicol_stp_offset = 0; /* records how many col deficit */
-			thaicol_dtp_offset = r->TermWin.ncol - Thai_ColMaxPaint (dtp, r->TermWin.ncol);
-			/* clean strings before redraw */
-			for (col = 0; col < r->TermWin.ncol; col ++)
-			{
-				if (!ThaiIsMiddleLineCh (stp[col]))
-					thaicol_stp_offset ++;
-			}
-			ypixelc = (int)Row2Pixel(row);
-			if (thaicol_stp_offset > thaicol_dtp_offset)
-			{
-				CLEAR_CHARS( r, page, already_cleared,
-					Col2Pixel (r->TermWin.ncol - thaicol_stp_offset), ypixelc,
-					thaicol_stp_offset);
-			}
-		}
-#endif	/* THAI */
 
 #ifndef NO_PIXEL_DROPPING_AVOIDANCE
 		/*
@@ -3728,33 +3670,24 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 							/* rendition value */
 			rend_t			rend;
 
-			/* compare new text with old - if exactly the same then
-			** continue
-			*/
 			/* screen rendition (target rendtion) */
 			rend = srp[col];
+
+			/*
+			 * compare new text with old - if exactly the same then continue
+			 */
 			if (
-#ifdef THAI
-				((r->Options & Opt_thai) && !thai_update[col])
-				|| (
-					!(r->Options & Opt_thai) &&
-#endif	/* THAI */
-					/* Must match characters to skip. */
-					(
-					 stp[col] == dtp[col] &&
-						/* Either rendition the same or   */
-						(
-						 rend == drp[col] ||
-							/* space w/ no background change  */
-							(
-							 stp[col] == ' ' &&
-								GET_BGATTR(rend) == GET_BGATTR(drp[col])
-							)
-						)
-					)
-#ifdef THAI
+				 /* Must match characters to skip. */
+				 stp[col] == dtp[col] &&
+				 /* Either rendition the same or   */
+				 (
+				   rend == drp[col] ||
+				   /* space w/ no background change  */
+				   (
+				     stp[col] == ' ' &&
+				     	 GET_BGATTR(rend) == GET_BGATTR(drp[col])
 				   )
-#endif	/* THAI */
+				 )
 			   )	/* if */
 			{
 				if (!IS_MULTI1(rend))
@@ -3776,21 +3709,13 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 			fontdiff = 0;
 			len = 0;
-#ifdef THAI
-			if (!(r->Options & Opt_thai))
-#endif	/* THAI */
 			buffer[len++] = dtp[col] = stp[col];
 			drp[col] = rend;
-#ifdef THAI
-			if (r->Options & Opt_thai)
-				xpixel = ThaiCol2Pixel (r, col, PSCR(r, page).text[row + row_offset]);
-			else
-#endif	/* THAI */
 			xpixel = Col2Pixel(col);
 
 			/*
-			** Find out the longest string we can write out at once
-			*/
+			 * Find out the longest string we can write out at once
+			 */
 #ifndef NO_BOLDFONT
 			if (MONO_BOLD(rend) && r->TermWin.bfont != NULL)
 				fprop = (r->TermWin.propfont & PROPFONT_BOLD);
@@ -4061,21 +3986,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			 * foreground untouched. Done last so that RV-BD text will have
 			 * Color_BD background if set (like in XTerm).
 			 */
-			if (
-#ifdef THAI
-				  (
-				     rvid && (r->Options & Opt_thai)
-				     && (FONT_WIDTH(wf, stp[col]) > 0)
-				  )
-				  ||
-				  (
-				     !(r->Options & Opt_thai) &&
-#endif	/* THAI */
-					 rvid
-#ifdef THAI
-				  )	/* match the bracket */
-#endif	/* THAI */
-			   )
+			if( rvid )
 			{
 #ifndef NO_BOLD_UNDERLINE_REVERSE
 				if (
@@ -4199,18 +4110,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			*/
 			if (back == Color_bg && must_clear)
 			{
-#ifdef THAI
-				if ((r->Options & Opt_thai) && FONT_WIDTH(wf, stp[col]) > 0)
-				{
-					CLEAR_CHARS( r, page, already_cleared,
-							xpixel, ypixelc, len);
-				}
-				else if (!(r->Options & Opt_thai))
-#endif	/* THAI */
-				{
-					CLEAR_CHARS( r, page, already_cleared,
-							xpixel, ypixelc, len);
-				}
+				CLEAR_CHARS( r, page, already_cleared,
+						xpixel, ypixelc, len);
 				for (i = 0; i < len; i++)
 					/* don't draw empty strings */
 					if (buffer[i] != ' ')
@@ -4307,25 +4208,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	} /* for (row....) */
 	/* End of E */
 
-#ifdef THAI
-	if (r->Options & Opt_thai)
-	{
-		for (row = 0; row < r->TermWin.nrow; row ++)
-		{
-			stp = PSCR(r, page).text[row + row_offset];
-			srp = PSCR(r, page).rend[row + row_offset];
-			dtp = PVTS(r, page)->drawn_text[row];
-			drp = PVTS(r, page)->drawn_rend[row];
-
-			for (col = 0; col < r->TermWin.ncol; col++)
-			{
-				dtp[col] = stp[col];
-				drp[col] = srp[col];
-			}
-		}
-	}
-#endif	/* THAI */
-
 
 	/*
 	** G: cleanup cursor and display outline cursor in necessary
@@ -4336,12 +4218,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		{
 			int		currow = CURROW + SVLINES;
 			srp = &(PSCR(r, page).rend[currow][CURCOL]);
-#ifdef THAI
-			if ((r->Options & Opt_thai) &&
-				FONT_WIDTH(wf, PSCR(r, page).text[currow][CURCOL]) <= 0)
-				*srp ^= RS_Bold;
-			else if (!(r->Options & Opt_thai))
-#endif	/* THAI */
 			*srp ^= RS_RVid;
 
 #ifndef NO_CURSORCOLOR
@@ -4373,27 +4249,12 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			}
 #endif
 
-#ifdef THAI
-			if (r->Options & Opt_thai)
-			{
-				XDrawRectangle(r->Xdisplay, drawBuffer, r->TermWin.gc,
-					ThaiCol2Pixel (r, h->oldcursor.col + morecur,
-						PSCR(r, page).text[CURROW + SVLINES]),
-					Row2Pixel(h->oldcursor.row),
-					(unsigned int)(Width2Pixel(1 + (morecur?1:0)) - 1),
-					(unsigned int)(Height2Pixel(1)
-					/* - r->TermWin.lineSpace*/ - 1));
-			}
-			else
-#endif	/* THAI */
-			{
-				XDrawRectangle(r->Xdisplay, drawBuffer, r->TermWin.gc,
-					Col2Pixel(h->oldcursor.col + morecur),
-					Row2Pixel(h->oldcursor.row),
-					(unsigned int)(Width2Pixel(1 + (morecur?1:0)) - 1),
-					(unsigned int)(Height2Pixel(1)
-					/* - r->TermWin.lineSpace*/ - 1));
-			}
+			XDrawRectangle(r->Xdisplay, drawBuffer, r->TermWin.gc,
+				Col2Pixel(h->oldcursor.col + morecur),
+				Row2Pixel(h->oldcursor.row),
+				(unsigned int)(Width2Pixel(1 + (morecur?1:0)) - 1),
+				(unsigned int)(Height2Pixel(1)
+				/* - r->TermWin.lineSpace*/ - 1));
 
 #ifndef NO_CURSORCOLOR
 			if (gcmask)		/* restore normal colours */
@@ -5131,11 +4992,6 @@ rxvt_selection_click(rxvt_t* r, int page, int clicks, int x, int y)
 	clicks = ((clicks - 1) % 3) + 1;
 	SEL(r).clicks = clicks;	/* save clicks so extend will work */
 
-#ifdef THAI
-	if (r->Options & Opt_thai)
-		rxvt_selection_start_colrow(r, page, ThaiPixel2Col(r, page, x,y), Pixel2Row(y));
-	else
-#endif	/* THAI */
 	rxvt_selection_start_colrow(r, page, Pixel2Col(x), Pixel2Row(y));
 
 	if (clicks == 2 || clicks == 3)
@@ -5293,11 +5149,6 @@ rxvt_selection_extend(rxvt_t* r, int page, int x, int y, int flag)
 {
 	int			 col, row;
 
-#ifdef THAI
-	if (r->Options & Opt_thai)
-		col = ThaiPixel2Col(r, page, x, y);
-	else
-#endif	/* THAI */
 	col = Pixel2Col(x);
 	row = Pixel2Row(y);
 	MAX_IT(row, 0);
@@ -5718,12 +5569,6 @@ rxvt_selection_rotate(rxvt_t* r, int page, int x, int y)
 {
 	SEL(r).clicks = SEL(r).clicks % 3 + 1;
 
-#ifdef THAI
-	if (r->Options & Opt_thai)
-		rxvt_selection_extend_colrow(r, page,
-			ThaiPixel2Col (r, page, x, y), Pixel2Row (y), 1, 0, 1);
-	else
-#endif	/* THAI */
 	rxvt_selection_extend_colrow (r, page, Pixel2Col(x),
 		Pixel2Row(y), 1, 0, 1);
 }
@@ -5851,11 +5696,6 @@ rxvt_process_selectionrequest (rxvt_t* r, int page, const XSelectionRequestEvent
 void
 rxvt_pixel_position(rxvt_t* r, int *x, int *y)
 {
-#ifdef THAI
-	if (r->Options & Opt_thai)
-		*x = ThaiPixel2Col(r, ATAB(r), *x, *y);
-	else
-#endif	/* THAI */
 	*x = Pixel2Col(*x);
 /* MAX_IT(*x, 0); MIN_IT(*x, (int)r->TermWin.ncol - 1); */
 	*y = Pixel2Row(*y);

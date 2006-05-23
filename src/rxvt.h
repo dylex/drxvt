@@ -1069,9 +1069,6 @@ enum {
 	Rs_xftpfn,	/* Propotionally spaced Xft font (for tabbar / menubar) */
 	Rs_xftpsz,	/* Size of propotionally spaced Xft font */
 #endif
-#ifdef THAI
-	Rs_thai,
-#endif
     Rs_loginShell,
     Rs_jumpScroll,
 #ifdef HAVE_SCROLLBARS

@@ -314,9 +314,6 @@ typedef enum {
 #ifdef XFT_SUPPORT
 # define Opt_xft					(1LU<<27)
 #endif
-#ifdef THAI
-# define Opt_thai					(1LU<<28)
-#endif
 #define DEFAULT_OPTIONS		\
 	(Opt_scrollBar | Opt_jumpScroll)
 

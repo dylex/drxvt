@@ -121,12 +121,6 @@ else
 GREEK_SRC = 
 endif
 
-if THAI
-THAI_SRC = thai.c
-else
-THAI_SRC = 
-endif
-
 if SESSION_SUPPORT
 SESSION_SRC = session.c
 else
@@ -149,7 +143,6 @@ mrxvt_SOURCES +=	$(SCROLLBAR_PLAIN_SRC)		\
 					$(SCROLLBAR_SGI_SRC)		\
 					$(UTMP_SRC)					\
 					$(GREEK_SRC)				\
-					$(THAI_SRC)					\
 					$(JPEG_SRC)					\
 					$(PNG_SRC)					\
 					$(SESSION_SRC)				\
@@ -207,7 +200,6 @@ scrollbar.o:		$(MRXVT_H) 							scrollbar.c
 session.o:			$(MRXVT_H) 							session.c
 strings.o:			$(MRXVT_H) 							strings.c
 tabbar.o:			$(MRXVT_H) $(MRXVT_PIXMAPS)			tabbar.c
-thai.o:				$(MRXVT_H) 							thai.c
 xdefaults.o:		$(MRXVT_H) 							xdefaults.c
 transparent.o:		$(MRXVT_H) 							transparent.c
 xftacs.o:						xftacs.h				xftacs.c

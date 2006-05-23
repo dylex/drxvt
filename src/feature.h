@@ -4,7 +4,8 @@
  *
  * All portions of code are copyright by their respective author/s.
  * Copyright (c) 1997-1998   Oezguer Kesim <kesim@math.fu-berlin.de>
- * Copyright (c) 2005        William P. Y. Hadisoeseno <williampoetra@users.sourceforge.net>
+ * Copyright (c) 2005        William P. Y. Hadisoeseno
+ * 										<williampoetra@users.sourceforge.net>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gautam@math.uchicago.edu>
  *

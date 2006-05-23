@@ -445,20 +445,6 @@ void             rxvt_tabbar_highlight_tab      __PROTO((rxvt_t*, short, Bool));
 void             rxvt_tabbar_move_tab           __PROTO((rxvt_t*, short));
 /* Begin prototypes of tabbar.c */
 
-
-/* Begin prototypes of thai.c */
-#ifdef THAI
-int              ThaiIsMiddleLineCh             __PROTO((char ch));
-int              ThaiPixel2Col                  __PROTO((rxvt_t* r, int page, int x, int y));
-int              ThaiCol2Pixel                  __PROTO((rxvt_t* r, int col, char* start));
-int              ThaiUpdateMap2                 __PROTO((rxvt_t* r, text_t* stp, text_t* dtp, rend_t* srp, rend_t* drp, char* map, int len));
-int              ThaiUpdateMap                  __PROTO((text_t* stp, text_t* dtp, rend_t* srp, rend_t* drp, char* map, int len));
-int              Thai_CursorArea                __PROTO((char* stp, char* map, int len, int col));
-int              Thai_ColMaxPaint               __PROTO((text_t* str, int len));
-#endif	/* THAI */
-/* End prototypes of thai.c */
-
-
 /* Begin prototypes of session.c */
 #ifdef HAVE_X11_SM_SMLIB_H
 void            rxvt_process_ice_msgs          __PROTO((rxvt_t* r));

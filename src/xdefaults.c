@@ -457,10 +457,6 @@ static const struct {
 		"input style = OverTheSpot|OffTheSpot|Root", 0),
 #endif				/* USE_XIM */
 
-#ifdef THAI
-	BOOL(Rs_thai, "thai", "thai", Opt_thai, "enable thai support", 0),
-#endif
-
 #ifdef GREEK_SUPPORT
 	STRG(Rs_greek_keyboard, "greek_keyboard", "grk", "mode",
 		"greek keyboard mapping mode = iso|ibm", 0),
@@ -704,9 +700,6 @@ static const char optionsstring[] = "Options: "
 	","
 #ifdef XFT_SUPPORT
 	"xft,"
-#endif
-#ifdef THAI
-	"thai,"
 #endif
 #if defined(GREEK_SUPPORT)
 	"Greek,"
