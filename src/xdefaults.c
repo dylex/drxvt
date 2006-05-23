@@ -1248,6 +1248,12 @@ rxvt_extract_resources (
 
 	rxvt_get_xdefaults(r, fd, name);
 	rxvt_get_xdefaults(r, fd, APL_SUBCLASS);
+	rxvt_get_xdefaults(r, fd, APL_CLASS);
+#if 0
+	rxvt_get_xdefaults(r, fd, "");	/* partial match */
+#endif
+	if (fd != NULL)
+		fclose(fd);
 
 #  if defined(XAPPLOADDIR) && defined(USE_XAPPLOADDIR)
 	{
@@ -1260,16 +1266,18 @@ rxvt_extract_resources (
 		if (ad != NULL)
 		{
 			rxvt_get_xdefaults(r, ad, APL_SUBCLASS);
+#if 0
+			/*
+			 * 2006-05-23 gi1242: If we don't use the X resource database, we
+			 * don't have to match the empty class.
+			 */
 			rxvt_get_xdefaults(r, ad, "");
+#endif
 			fclose(ad);
 		}
 	}
 #  endif			/* XAPPLOADDIR */
 
-	rxvt_get_xdefaults(r, fd, APL_CLASS);
-	rxvt_get_xdefaults(r, fd, "");	/* partial match */
-	if (fd != NULL)
-		fclose(fd);
 
 	/*
 	 * Now read config from system wide config file.

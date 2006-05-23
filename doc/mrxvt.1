@@ -49,17 +49,22 @@ The primary features of
 .Nm
 include (but are not limited to) multiple tabs, dynamically changeable tab titles, customisable command for each tab, input broadcasting, true translucent window, fast pseudo transparency with tinting, user supplied background images (XPM, JPEG, PNG), off-focus fading, text shadow, multiple style (NeXT, Rxvt, Xterm, SGI, Plain) scrollbars, XIM, multi-language support (Chinese, Korean, Japanese), freetype font and logging.
 .Pp
+.
+The default
 .Nm
-can be configured with a resource file. By default the configuration file
+behaviour can be set using the resource configuration file
+.Pa ~/.mrxvtrc .
+For backward compatibility, if
 .Pa ~/.mrxvtrc
-is used if found. Otherwise the files
+is not found,
+.Nm
+tries to load configuration settings from the files
 .Pa ~/.Xdefaults
-and
-.Pa ~/.Xresources
-are used. Configuration
-files specified using the command line option 
+or
+.Pa ~/.Xresources .
+Alternately, you can specify which config file to load using the
 .Fl cf
-override the X resources of standard files, and command line options override X resources found in files.
+command line option.
 .Ed
 .\" {{{1 Options
 .Sh OPTIONS
@@ -70,13 +75,15 @@ accepts. To disable an option, prefix it with an
 .Sq Em +
 instead of a
 .Sq Em -
-Most options also have a corresponding X resource, listed in brackets as
-.Op Cm resource_name .
-The resource names can be used in your
+Most options can be set from your
 .Pa ~/.mrxvtrc
-file or from the command line by prefixing it with
-.Sq Em -- .
-For example
+file using the option name listed in brackets as
+.Op Cm option_name .
+The option name can also be used as a "long option" from the command line (i.e. by prefixing it with 
+.Sq Em --
+or
+.Sq Em ++
+as appropriate. For example
 .Vb
 mrxvt -tr -shade 85 +trt
 .Ve
@@ -84,7 +91,17 @@ is the same as
 .Vb
 mrxvt --transparent --shading 85 ++transparentTabbar
 .Ve
-All options and resources are case sensitive. Some options are similar to those of other terminals, so if you find the explanation given here insufficient, we strongly recommend you look in the
+which is the same as putting the lines
+.Vb
+Mrxvt.transparent:		True
+Mrxvt.shading:			85
+Mrxvt.transaprentTabbar:	False
+.Ve
+in your
+.Pa ~/.mrxvtrc .
+.Pp
+.
+All options are case sensitive. Some options are similar to those of other terminals, so if you find the explanation given here insufficient, we strongly recommend you look in the
 .Xr rxvt 1
 and
 .Xr xterm 1
@@ -879,127 +896,104 @@ enable X session management
 .
 .El
 .Ed
-.\" {{{1 resources
-.Sh "RESOURCES"
-.Bd -filled
-In addition to the resources listed in the
-.Sx OPTIONS
-section,
-.Nm
-accepts the resources listed in this section. Remember that all resources can be used on the command line by prefixing them with
-.Sq Cm -- .
-.No When specifying resources in your Pa ~/.mrxvtrc No or using the X resource manager, Nm No accepts both
-.Sq Em XTerm
-and
-.Sq Em Mrxvt
-as the class name, and application name
-.Sq Em mrxvt
-.No (or whatever value was supplied by the Fl name No argument). Thus you can use Em Mrxvt No (or Em XTerm ) No for resources which are common to all sessions of Nm Ns , and use a different string (say Em FullScreen No ) specified by the Fl name No argument for special sessions.
-.Pp
-The first letter of the class components is capitalized and the
-first letter of the name component is in lowercase. For example,
-.Vb
-XTerm.Foreground
-.Ve
-is a class component and
-.Vb
-mrxvt.foreground
-.Ve
-is a name component. The resources which were
-.Sy not
-described in the
-.Sx OPTIONS
-section are described below:
 .\" {{{2 resource option list
+.Ss Long options
+.Bd -filled
+.
+The following options do not have a
+.Dq short
+form. If these options are to be used on the command line, they must be prefixed with a
+.Sq Em --
+(or
+.Sq Em ++
+for boolean options). They can of course be used in the
+.Nm
+configuration file.
+.
+.
 .Bl -tag -width 4n
-.It Cm answerBackString : Ar string
+.It Cm answerBackString Ar string
 Specify the reply
 .Nm
 sends to the shell when an ENQ (control-E) character is passed through. It may contain escape values as described in the entry on
 .Cm keysym
 following.
 .
-.It Cm backspaceKey : Ar string
+.It Cm backspaceKey Ar string
 The string to send when the backspace key is pressed. If set to DEC or unset it will send Delete (code 127) or, if shifted, Backspace (code 8) - which can be reversed with the appropriate DEC private mode escape sequence.
 .
-.It Cm bgRefreshInterval : Ar delay
+.It Cm bgRefreshInterval Ar delay
 Specify the delay (ms) to wait before refreshing the background in pseudo-transparency. Generally tinting and refreshing the background is slow (especially with XRender), and causes lags while dragging the window. This delay causes enables the window to be dragged smoothly. If you have a fast system, you can reduce or disable this (by setting it to 0). The default value is 100ms.
 .
-.It Cm color Ns Ar N : Ar color
+.It Cm boldFont Ns Ar N Ar font
+Specifies bold font to use along with fontset
+.Ar N .
+.
+.It Cm color Ns Ar N Ar color
 Use the specified colour for the colour value
 .Ar N ,
 where 0-7 corresponds to low-intensity (normal) colours and 8-15 corresponds to high-intensity colours.
-.It Cm colorBD : Ar color
+.It Cm colorBD Ar color
 Color to use to display bold text. If unspecified, the text will be displayed using a bold font / overstrike.
 .
-.It Cm colorRV : Ar color
+.It Cm colorRV Ar color
 Color to use to display reverse video text. If unspecified, the text will be displayed as reverse video.
 .
-.It Cm colorUL : Ar color
+.It Cm colorUL Ar color
 Color to use to display underlined text. If unspecified, the text will be displayed as underlined.
 .
-.It Cm cursorColor2 : Ar color
+.It Cm cursorColor2 Ar color
 Second color of cursor.
 .
-.It Cm cutChars : Ar string
+.It Cm cutChars Ar string
 String containing all characters to be treated as one word for double click selection. If you want double clicks to select URL's, then set this to a string containing all letters (both upper and lower case), digits and punctuation you find in urls.
 .
-.It Cm deleteKey : Ar string
+.It Cm deleteKey Ar string
 The string to send when the delete key (not the keypad delete key) is pressed. If unset it will send the sequence traditionally associated with the
 .Sy Execute
 key.
 .
-.It Cm font Ns Ar N : Ar font
+.It Cm font Ns Ar N Ar font
 Specify the alternative font
 .Ar n . n No can be 1, 2, 3, 4 or 5.
 .
-.It Cm greektoggle_key : Ar keysym
+.It Cm greektoggle_key Ar keysym
 Key to toggle into greek keyboard mapping. See
 .Pa README.greek
 for details.
 .
-.It Cm highlightColor : Ar color
+.It Cm highlightColor Ar color
 Color to use for selection. If not specified, reverse video is used. (Note blinking text is also displayed with this color).
 .
-.It Cm keysym. Ns Ar sym : Ar keysym
-Associate
-.Ar string
-with keysym
-.Ar sym ( Sy 0xFF00 No - Sy 0xFFFF ) .
-It may contain escape values (\\a: bell, \\b: backspace, \\e, \\E: escape, \\n: newline, \\r: return, \\t: tab, \\000: octal number) or control characters (^?: delete, ^@: null, ^A ...) and may enclosed with double quotes so that it can start or end with whitespace. The intervening resource name
-.Sq Cm keysym.
-cannot be omitted. This resource is only available when compiled with
-.Tn KEYSYM_RESOURCE .
-.
-.It Cm mapAlert : Ar True Ns | Ns Ar False
+.It Cm mapAlert Ar True Ns | Ns Ar False
 If true, de-iconifies the window when a bell is received.
 .
-.It Cm mfont Ns Ar n : font
+.It Cm mfont Ns Ar n font
 Specify alternative multiple character font
 .Ar n .
 .
-.It Cm pointerBlankDelay : Ar delay
+.It Cm pointerBlankDelay Ar delay
 Delay (ms) to blank pointer after.
 .
-.It Cm printPipe : Ar cmd
+.It Cm printPipe Ar cmd
 Specify a command pipe for vt100 printer.
 .
-.It Cm scrollColor : Ar color
+.It Cm scrollColor Ar color
 Color of scrollbar (see also
 .Cm troughColor ) .
 .
-.It Cm selectStyle : Ar mode
+.It Cm selectStyle Ar mode
 Set mouse selection style to
 .Cm old
 which is 2.20,
 .Cm oldword
 which is xterm style with 2.20 old word selection, or anything else which gives xterm style selection.
 .
-.It Cm smartResize : Ar True Ns | Ns Ar False
+.It Cm smartResize Ar True Ns | Ns Ar False
 Enable / disable smart resize. When the tabbar is shown, or font size is increased, the resize terminal window could be partially off screen. If
 .Cm smartResize No is enabled, then Nm No tries to move the terminal window to stay on  screen.
 .
-.It Cm smoothResize : Ar True Ns | Ns Ar False
+.It Cm smoothResize Ar True Ns | Ns Ar False
 .No Enable / disable smooth resize. If enabled, then the Nm No window is resized in pixel increments (instead of character increments). This is useful if you want a full screen / maximized Nm No window that covers the entire screen (without leaving an annoying few pixel wide strip uncovered).
 .
 .It Cm troughColor
@@ -1007,6 +1001,43 @@ Color of scrollbar trough (see also
 .Cm scrollColor ) .
 .
 .El
+.Ed
+.\" CONFIGURATION FILE SYNTAX {{{1
+.Sh CONFIGURATION FILE SYNTAX
+.Bd -filled
+.
+.
+A line in the config file generally looks like this
+.Vb
+ClassName.OptionName:	Value
+.Ve
+Blank lines, and lines beginning with
+.Sq Em #
+are ignored (comments).
+.Pp
+.
+The ClassName is the name specified via the
+.Fl name
+option (by default
+.Sq Em mrxvt ) .
+When
+.Nm
+starts up, it ONLY reads options with ClassName
+.Sq Em Mrxvt ,
+.Sq Em XTerm ,
+or the class specified via the
+.Fl name
+option. See
+.Pa /etc/mrxvt/mrxvtrc.sample
+for how this feature can be used.
+.Pp
+.
+The OptionName is the long name of the option you want to set. It can be any long option (listed under the
+.Sx "Long Options"
+sub section), or is specified in brackets as
+.Op Cm option_name
+alongside regular options in this man page. Finally Value is the value of this option.
+.Pp
 .Ed
 .\" {{{2 Example
 .Ss Example
@@ -1025,9 +1056,9 @@ Mrxvt.vt2.tabTitle:         term3
 Mrxvt.vt0.saveLines:        600
 Mrxvt.vt1.saveLines:        600
 Mrxvt.vt2.saveLines:        600
-!Mrxvt.vt0.Pixmap:          /home/images/vt0bg.xpm
-!Mrxvt.vt1.Pixmap:          /home/images/vt1bg.xpm
-!Mrxvt.vt2.Pixmap:          /home/images/vt2bg.xpm
+# Mrxvt.vt0.Pixmap:         /home/images/vt0bg.xpm
+# Mrxvt.vt1.Pixmap:         /home/images/vt1bg.xpm
+# Mrxvt.vt2.Pixmap:         /home/images/vt2bg.xpm
 Mrxvt.scrollbarStyle:       next
 Mrxvt.initTermNumber:       3
 Mrxvt.transparent:          True
@@ -1526,6 +1557,10 @@ and
 are not found, try this one.
 .It Pa /etc/mrxvt
 System wide directory in which to look for user menu and image files.
+.It Pa /etc/mrxvt/default.menu
+Default menu file read on startup.
+.It Pa /etc/mrxvt/mrxvtrc
+System wide configuration file. (By default this file only defines the default keyboard macros)
 .It Pa /etc/utmp
 System file for login records.
 .It Pa /usr/lib/X11/rgb.txt 
