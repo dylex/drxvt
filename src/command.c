@@ -3940,7 +3940,13 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 			 * If this does not fix the bug, then we will have to issue an
 			 * XClearArea() regardless of weather send_event is true or false.
 			 */
+#if 0
+			/*
+			 * 2006-05-20 gi1242: This did not fix the bug, so we comment out
+			 * the test for send_event.
+			 */
 			if( ev->xexpose.send_event )
+#endif
 				XClearArea( r->Xdisplay, win, rect.x, rect.y,
 						rect.width, rect.height, False );
 
