@@ -179,9 +179,6 @@ rxvt_init(int argc, const char *const *argv)
 	r->global_argv = (char**) argv;
 
 	rxvt_init_secondary(r);
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	rxvt_init_hotkeys (r);
-#endif /* }}} */
 	cmd_argv = rxvt_init_resources(r, argc, argv);
 
 	rxvt_create_show_windows(r, argc, argv);

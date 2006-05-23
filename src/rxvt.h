@@ -1177,15 +1177,6 @@ enum {
 	Rs_smClientID,
 	Rs_init_term_num,
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/*
-	**********************************************************
-	** hotkey resources 
-	**********************************************************
-	*/
-	Rs_hotkey,
-	_Rs_hotkey = Rs_hotkey + NUM_HKFUNCS - 1,
-#endif /* }}} */
 
 	/*
 	**********************************************************
@@ -1226,10 +1217,6 @@ enum {
 	Rs2_holdExit,
 	Rs2_broadcast,
 	Rs2_veryBold,
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	Rs2_disableHotkeys,
-	Rs2_disableDefaultHotkeys,
-#endif /* }}} */
 	Rs2_noSysConfig,		/* Replacement for disableDefaultHotkeys */
 	Rs2_disableMacros,		/* Replacement for disableHotkeys */
 #ifdef HAVE_X11_SM_SMLIB_H
@@ -1648,9 +1635,6 @@ struct rxvt_hidden {
 	unsigned char*	v_bufend;
 	*/
 	char*			newfont[MAX_NFONTS];
-#ifdef KEYSYM_RESOURCE
-    unsigned char*	Keysym_map[256];
-#endif
     const char*		rs[NUM_RESOURCES];
 	/* command input buffering */
 	/*

@@ -341,10 +341,6 @@ typedef enum {
 #define Opt2_broadcast				(1LU<<16)
 #define Opt2_hideButtons			(1LU<<17)
 #define Opt2_veryBold				(1LU<<18)
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-#define Opt2_disableHotkeys			(1LU<<19)
-#define Opt2_disableDefaultHotkeys	(1LU<<20)
-#endif /* }}} */
 #define Opt2_noSysConfig			(1LU<<19)
 #define Opt2_disableMacros			(1LU<<20)
 #ifdef HAVE_X11_SM_SMLIB_H
@@ -684,92 +680,6 @@ typedef struct {
 } term_t;
 
 
-#if 0 /* {{{ Obsolete hotkey code */
-typedef enum {
-	HKF_DUMMY = 0,			/* dummy hotkey, not used */
-	HKF_CHANGE_TITLE,		/* change tab title */
-	HKF_NEW_TAB,			/* create new tab */
-	HKF_KILL_TAB,			/* kill current tab */
-	HKF_CLOSE_WINDOW,		/* close all tabs and exit */
-	HKF_PREV_TAB,			/* activate previous tab */
-	HKF_NEXT_TAB,			/* activate next tab */
-	HKF_PREV_ATAB,			/* activate previous active tab */
-	HKF_TAB_1,				/* activate tab 1 */
-	HKF_TAB_2,				/* activate tab 2 */
-	HKF_TAB_3,				/* activate tab 3 */
-	HKF_TAB_4,				/* activate tab 4 */
-	HKF_TAB_5,				/* activate tab 5 */
-	HKF_TAB_6,				/* activate tab 6 */
-	HKF_TAB_7,				/* activate tab 7 */
-	HKF_TAB_8,				/* activate tab 8 */
-	HKF_TAB_9,				/* activate tab 9 */
-	HKF_TAB_10,				/* activate tab 10 */
-	HKF_TAB_11,				/* activate tab 11 */
-	HKF_TAB_12,				/* activate tab 12 */
-	HKF_LMOVE_TAB,			/* move active tab to left */
-	HKF_RMOVE_TAB,			/* move active tab to right */
-	HKF_DUMP_SCREEN,		/* dump screen of current tab */
-	HKF_INC_OPACITY,		/* increase opacity */
-	HKF_DEC_OPACITY,		/* decrease opacity */
-	HKF_TRANSPARENCY,		/* toggle transparency */
-	HKF_HIDE_TABBAR,		/* hide/show tabbar */
-	HKF_HIDE_SCROLLBAR,		/* hide/show scrollbar */
-	HKF_HIDE_MENUBAR,		/* hide/show menubar */
-	HKF_HIDE_BUTTON,		/* hide/show tabbar buttons */
-	HKF_VERYBOLD,			/* toggle verybold font */
-	HKF_HOLD_EXIT,			/* toggle hold exit */
-	HKF_BROADCAST,			/* toggle input broadcasting */
-	HKF_SMALL_FONT,			/* use smaller font */
-	HKF_LARGE_FONT,			/* use large font */
-	HKF_SCROLL_UP,			/* scroll up one line */
-	HKF_SCROLL_DOWN,		/* scroll down one line */
-	HKF_SCROLL_PGUP,		/* scroll up one page */
-	HKF_SCROLL_PGDOWN,		/* scroll down one page */
-	HKF_SCROLL_HOME,		/* scroll to beginning of scrollback buffer */
-	HKF_SCROLL_END,			/* scroll to end of scrollback buffer */
-	HKF_SAVE_CONFIG,		/* save configuration */
-	HKF_COPY_SEL,			/* copy selection to clipboard */
-	HKF_PASTE_SEL,			/* paste selection */
-	HKF_HARD_RESET,			/* hard reset */
-	NUM_HKFUNCS,
-} hk_funcs_t;	/* hotkey functions */
-
-#define HK_CTRL		((unsigned short) (1<<0))
-#define HK_META		((unsigned short) (1<<1))
-#define HK_SHFT		((unsigned short) (1<<2))
-/* whether the hotkey should only work on primary screen */
-#define HK_PRIMARY	((unsigned short) (1<<14))
-/* whether the hotkey is an internal defined one */
-#define HK_INTERNAL	((unsigned short) (1<<15))
-#define HK_MASK		(HK_CTRL|HK_META|HK_SHFT)
-
-#define HK_SET_CTRL(F)		((F) |= HK_CTRL)
-#define HK_SET_META(F)		((F) |= HK_META)
-#define HK_SET_SHFT(F)		((F) |= HK_SHFT)
-#define HK_SET_PRIMARY(F)	((F) |= HK_PRIMARY)
-#define HK_SET_INTERNAL(F)	((F) |= HK_INTERNAL)
-
-#define HK_IS_CTRL(F)		((F) & HK_CTRL)
-#define HK_IS_META(F)		((F) & HK_META)
-#define HK_IS_SHFT(F)		((F) & HK_SHFT)
-#define HK_IS_PRIMARY(F)	((F) & HK_PRIMARY)
-#define HK_IS_INTERNAL(F)	((F) & HK_INTERNAL)
-
-typedef struct hotkeys {
-	unsigned short	func;			/* hotkey function */
-	unsigned short	flag;			/* meta-key flags */
-	KeySym			keysym;			/* key symbol pressed */
-} hotkeys_t;
-
-typedef struct hotkeys_handler {
-	unsigned short	func;			/* hotkey function */
-	int				(*handler) ();	/* function handler */
-	char*			res;			/* X resource name */
-} hotkeys_handler_t;
-
-extern hotkeys_handler_t   hk_handlers[];
-#endif /* }}} */
-
 /* Possible values for macros.modFlags */
 #define MACRO_CTRL		(1U << 0)
 #define MACRO_META		(1U << 1)
@@ -818,15 +728,6 @@ typedef struct {
 	action_t			action;
 } macros_t;
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-/*
- * Maximal number of hotkeys. Now we make it a fix number, which is 4 times of
- * hotkey functions. It may waste certain memory, but is easy to handle. BTW,
- * who wants to define 4 hotkeys for just one function? ;-)
- */
-#define MAX_HOTKEYS		((unsigned long) (NUM_HKFUNCS << 2))
-#endif /* }}} */
-
 
 typedef struct rxvt_vars {
 	/*
@@ -859,11 +760,6 @@ typedef struct rxvt_vars {
 	unsigned long   Options;
 	unsigned long   Options2;
 	XSizeHints      szHint;
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/* hotkeys */
-	hotkeys_t*		hotkeys;
-#endif /* }}} */
 
 	/* macros */
 	macros_t		*macros;	/* array of all user defind macros */

@@ -188,43 +188,6 @@
  */
 #define NUMLOCK_ALWAYS_IGNORES_SHIFT
 
-/* {{{1 Obsolete keysym / hotkey resources */
-/*
- * Enable the keysym resource which allows you to define strings associated
- * with various KeySyms (0xFF00 - 0xFFFF).
- * Only works with the default hand-rolled resources.
- *
- * 2006-02-24 gi1242: This can also be done using macros (using keynames
- * instead), so we disable it by default.
- */
-#ifndef NO_RESOURCES
-/* # define KEYSYM_RESOURCE */
-#endif
-
-/*
- * Choose one of these values to be the `hotkey' for changing font. This has
- * been superceded and is only for you older users.
- *
- * 2006-02-24 gi1242: This has now been completely removed from the code. You
- * can now use macros to resize your font with your favourite modifiers.
- * Defining the macros below will do nothing :).
- */
-/* #define HOTKEY_CTRL */
-/* #define HOTKEY_META */
-
-/*
- * Allow unshifted Next/Prior keys to scroll forward/back
- * (in addition to shift+Next/shift+Prior)       --pjh
- *
- * 2006-02-24 gi1242: This is now obsolete, and has been commented in mrxvt's
- * code. If you really want to use it, uncomment the relent parts of mrxvt's
- * code (in command.c), and define the macro below.
- *
- * Sane people will use the UNSHIFTED_MACROS feature instead.
- */
-/* #define UNSHIFTED_SCROLLKEYS */
-/* }}} */
-
 /*
  * If defined, macros will be allowed to be "UNSHIFTED" (i.e. your macros don't
  * necessarily need a modifier key).

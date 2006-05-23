@@ -70,10 +70,6 @@ int              greek_xlat                       __PROTO((char* s, int num_char
 /* End prototypes of grkelot.c */
 
 /* Begin prototypes of macros.c */
-#if 0 /* OBSOLETE HOTKEY CODE */
-int              rxvt_process_hotkeys          	  __PROTO((rxvt_t*, KeySym, XKeyEvent*));
-void             rxvt_init_hotkey_handlers        __PROTO((rxvt_t*));
-#endif
 int				 rxvt_parse_macros				  __PROTO((rxvt_t*, const char *, const char *, Bool noReplace));
 void			 rxvt_cleanup_macros			  __PROTO((rxvt_t*));
 Bool			 rxvt_set_action				  __PROTO((action_t*, char*));
@@ -87,10 +83,6 @@ void			 rxvt_toggle_subwin				  __PROTO((rxvt_t*, const unsigned char *));
 /* Begin prototypes of init.c */
 int              rxvt_init_vars                   __PROTO((rxvt_t* r));
 void             rxvt_init_secondary              __PROTO((rxvt_t* r));
-#if 0 /* OBSOLETE HOTKEY CODE */
-void             rxvt_init_hotkeys                __PROTO((rxvt_t* r));
-void             rxvt_toggle_hotkeys              __PROTO((rxvt_t* r, int enable));
-#endif
 const char    ** rxvt_init_resources              __PROTO((rxvt_t* r, int argc, const char* const *argv));
 unsigned long    rxvt_fade_color                  __PROTO((rxvt_t* r, unsigned long));
 void             rxvt_switch_fgbg_color           __PROTO((rxvt_t* r, int page));

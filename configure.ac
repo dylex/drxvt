@@ -152,7 +152,6 @@ support_xft=no
 support_xim=no
 support_greek=no
 support_cjk=no
-support_thai=no
 support_ttygid=yes
 support_backspace_key=yes
 support_delete_key=yes
@@ -208,7 +207,6 @@ if test "x$support_everything" = "xyes"; then
     support_xim=yes
     support_greek=yes
     support_cjk=yes
-    support_thai=yes
     support_ttygid=yes
     support_backspace_key=yes
     support_delete_key=yes
@@ -263,7 +261,6 @@ if test "x$support_minimal" = "xyes"; then
     support_xim=no
     support_greek=no
     support_cjk=no
-    support_thai=no
     support_ttygid=yes
     support_backspace_key=yes
     support_delete_key=yes
@@ -637,17 +634,6 @@ AC_ARG_ENABLE(
     AC_HELP_STRING([--enable-cjk],[enable CJK multichar language support [[no]]]),
     [support_cjk=$enableval]
 )
-
-
-AC_ARG_ENABLE(
-    thai,
-    AC_HELP_STRING([--enable-thai],[enable thai support [[no]]]),
-    [support_thai=$enableval]
-)
-if test "x$support_thai" = "xyes"; then
-    AC_DEFINE(THAI, [], [set thai support])
-fi
-AM_CONDITIONAL(THAI, test "x$support_thai" = "xyes")
 
 
 AC_ARG_ENABLE(
@@ -1497,7 +1483,6 @@ echo "CJK multichar language      : $support_cjk"
 if test "x$support_cjk" = "xyes"; then
     echo "Default encoding method     : $encoding_option"
 fi
-echo "Thai support                : $support_thai"
 echo
 echo "System features:"
 echo "TTY/PTY type                : $rxvt_cv_ptys"

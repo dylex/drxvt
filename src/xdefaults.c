@@ -47,14 +47,6 @@
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
 #ifndef NO_RESOURCES
-# ifdef KEYSYM_RESOURCE
-Bool  rxvt_define_key (XrmDatabase*, XrmBindingList, XrmQuarkList, XrmRepresentation*, XrmValue*, XPointer);
-int   rxvt_parse_keysym (rxvt_t*, const char*, const char*);
-# endif
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-void  rxvt_parse_hotkeys (rxvt_t*, int, char*);
-void  rxvt_delete_default_hotkeys (rxvt_t*);
-#endif /* }}} */
 void  rxvt_get_xdefaults (rxvt_t*, FILE*, const char*);
 #endif
 /*--------------------------------------------------------------------*
@@ -528,62 +520,6 @@ static const struct {
 	RSTRG(Rs_print_pipe, "printPipe", "string", 0),
 #endif
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/*
-	 * Begin of hotkey resources. It MUST be synchronized to the definition of
-	 * HK_FUNCS!!!
-	 */
-	RSTRG(Rs_hotkey + HKF_DUMMY, "hotkey.Dummy", "string", 0),
-	RSTRG(Rs_hotkey + HKF_CHANGE_TITLE, "hotkey.ChangeTitle", "string", 0),
-	RSTRG(Rs_hotkey + HKF_NEW_TAB, "hotkey.NewTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_KILL_TAB, "hotkey.KillTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_CLOSE_WINDOW, "hotkey.CloseWindow", "string", 0),
-	RSTRG(Rs_hotkey + HKF_PREV_TAB, "hotkey.PrevTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_NEXT_TAB, "hotkey.NextTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_PREV_ATAB, "hotkey.PrevActiveTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_1, "hotkey.Tab1", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_2, "hotkey.Tab2", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_3, "hotkey.Tab3", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_4, "hotkey.Tab4", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_5, "hotkey.Tab5", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_6, "hotkey.Tab6", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_7, "hotkey.Tab7", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_8, "hotkey.Tab8", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_9, "hotkey.Tab9", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_10, "hotkey.Tab10", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_11, "hotkey.Tab11", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TAB_12, "hotkey.Tab12", "string", 0),
-	RSTRG(Rs_hotkey + HKF_LMOVE_TAB, "hotkey.LeftMoveTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_RMOVE_TAB, "hotkey.RightMoveTab", "string", 0),
-	RSTRG(Rs_hotkey + HKF_DUMP_SCREEN, "hotkey.DumpScreen", "string", 0),
-	RSTRG(Rs_hotkey + HKF_INC_OPACITY, "hotkey.IncOpacity", "string", 0),
-	RSTRG(Rs_hotkey + HKF_DEC_OPACITY, "hotkey.DecOpacity", "string", 0),
-	RSTRG(Rs_hotkey + HKF_TRANSPARENCY, "hotkey.Transparency", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HIDE_TABBAR, "hotkey.HideTabbar", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HIDE_SCROLLBAR, "hotkey.HideScrollbar", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HIDE_MENUBAR, "hotkey.HideMenubar", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HIDE_BUTTON, "hotkey.HideButton", "string", 0),
-	RSTRG(Rs_hotkey + HKF_VERYBOLD, "hotkey.VeryBold", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HOLD_EXIT, "hotkey.HoldExit", "string", 0),
-	RSTRG(Rs_hotkey + HKF_BROADCAST, "hotkey.Broadcast", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SMALL_FONT, "hotkey.SmallFont", "string", 0),
-	RSTRG(Rs_hotkey + HKF_LARGE_FONT, "hotkey.LargeFont", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_UP, "hotkey.ScrollUp", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_DOWN, "hotkey.ScrollDown", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_PGUP, "hotkey.ScrollPageUp", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_PGDOWN, "hotkey.ScrollPageDown", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_HOME, "hotkey.ScrollHome", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SCROLL_END, "hotkey.ScrollEnd", "string", 0),
-	RSTRG(Rs_hotkey + HKF_SAVE_CONFIG, "hotkey.SaveConfig", "string", 0),
-	RSTRG(Rs_hotkey + HKF_COPY_SEL, "hotkey.CopySel", "string", 0),
-	RSTRG(Rs_hotkey + HKF_PASTE_SEL, "hotkey.PasteSel", "string", 0),
-	RSTRG(Rs_hotkey + HKF_HARD_RESET, "hotkey.HardReset", "string", 0),
-	/* end of hotkey resources */
-	BOOL(Rs2_disableHotkeys, "disableHotkeys", "dh",
-		Opt2_disableHotkeys, "disabling all keyboard shortcuts", 0),
-	BOOL(Rs2_disableDefaultHotkeys, "disableDefaultHotkeys", "ddh",
-		Opt2_disableDefaultHotkeys, "disabling default keyboard shortcuts", 0),
-#endif /* }}} */
 	BOOL(Rs2_noSysConfig, "noSysConfig", "nsc",
 		Opt2_noSysConfig, "reading /etc/mrxvt/mrxvtrc.", 0),
 	BOOL(Rs2_disableMacros, "disableMacros", "dm",
@@ -830,9 +766,6 @@ rxvt_usage(int type)
 						!optList_isBool(i) ? optList[i].arg : "boolean",
 						optList[i].desc ? optList[i].desc : "NullDsc",
 						optList[i].multiple);
-# ifdef KEYSYM_RESOURCE
-				fprintf( stdout, "%2d. NullKW	keysym.sym	keysym	NullDsc	0\n", i);
-# endif
 
 #else
 			for (i = 0; i < optList_size(); i++)
@@ -841,11 +774,6 @@ rxvt_usage(int type)
 						optList[i].kw,
 						(INDENT - STRLEN(optList[i].kw)), "", /* XXX */
 						(optList_isBool(i) ? "boolean" : optList[i].arg));
-# ifdef KEYSYM_RESOURCE
-			fprintf(stdout, "  " "keysym.sym" ": %*s%s\n",
-				(INDENT - sizeof("keysym.sym") + 1), "", /* XXX */
-				"keysym");
-# endif
 #endif
 			fprintf(stdout, "\n  -help to list options");
 			break;
@@ -857,10 +785,6 @@ rxvt_usage(int type)
 }
 /*}}} */
 
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-extern hotkeys_handler_t   hk_handlers[NUM_HKFUNCS];
-#endif /* }}} */
 
 /* EXTPROTO */
 int
@@ -899,12 +823,6 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 			int		bval;
 			char*	OnOff[2] = {"False", "True"};
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-			/* do not save internal features */
-			if (Rs2_disableDefaultHotkeys == optList[i].doff)
-				continue;
-#endif /* }}} */
-
 			if (optList[i].doff < Rs_options2)
 				bval = (r->Options & optList[i].flag) ? 1 : 0;
 			else
@@ -921,69 +839,9 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 		}
 	}
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/* parse all hotkeys */
-	for (i = 0; i < MAX_HOTKEYS; i ++)	{
-		char		buf[64] = "";
-		hotkeys_t*	phk;
-
-		if ((r->Options2 & Opt2_disableHotkeys) && 0 == i)
-			phk = &(r->hotkeys[MAX_HOTKEYS]);
-		else
-			phk = &(r->hotkeys[i]);
-		if (HKF_DUMMY == phk->func)
-			break;		/* find last valid entry */
-		if (HK_IS_INTERNAL (phk->flag))
-			continue;	/* ignore internal keyboards */
-
-		if (HK_IS_CTRL (phk->flag))
-			STRCAT (buf, "ctrl+");
-		if (HK_IS_META (phk->flag))
-			STRCAT (buf, "meta+");
-		if (HK_IS_SHFT (phk->flag))
-			STRCAT (buf, "shift+");
-		if (HK_IS_PRIMARY (phk->flag))
-			STRCAT (buf, "primary+");
-		STRNCAT (buf, XKeysymToString (phk->keysym),
-			sizeof(buf) - 1 - STRLEN(buf));
-		buf[sizeof(buf) - 1] = (char) 0;
-
-		/* find the first hotkey resource entry */
-		fprintf (pf, "%s*%s:\t\t\t%s\n", APL_NAME,
-			hk_handlers[phk->func].res, buf);
-	}
-#endif /* }}} */
-
 	fclose (pf);
 	return 1;
 }
-
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-/* INTPROTO */
-void
-rxvt_delete_default_hotkeys (rxvt_t* r)
-{
-	register int	i, beg;
-
-	for (i = 0, beg = 0; i < MAX_HOTKEYS; i ++)	{
-		if (HKF_DUMMY == r->hotkeys[i].func)
-			break;	/* find last valid hotkey */
-
-		if (HK_IS_INTERNAL (r->hotkeys[i].flag))
-			continue;	/* skip internal hotkey */
-		else /* this is not an internal hotkey, move it forward */
-			r->hotkeys[beg++] = r->hotkeys[i];
-	}
-
-	/* clear the empty slots */
-	for (; beg < i; beg ++)	{
-		r->hotkeys[beg].func = HKF_DUMMY;
-		r->hotkeys[beg].flag = 0;
-		r->hotkeys[beg].keysym = 0;
-	}
-}
-#endif /* }}} */
 
 
 /*{{{ get command-line options before getting resources */
@@ -1130,17 +988,6 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 		}
 		else
 		{
-#ifdef KEYSYM_RESOURCE
-			/* if (!STRNCMP(opt, "keysym.", sizeof("keysym.") - 1)) */
-			if (rxvt_str_match(opt, "keysym."))
-			{
-				const char	 *str = argv[++i];
-
-				if (str != NULL)
-					rxvt_parse_keysym(r, opt+sizeof("keysym.")-1, str);
-			}
-			else
-#endif
 			if ( rxvt_str_match( opt, "macro."))
 			{
 				const char	*str = argv[++i];
@@ -1180,12 +1027,6 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 	if (bad_option)
 		rxvt_usage(0);
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/* clear default hotkeys */
-	if (r->Options2 & Opt2_disableDefaultHotkeys)
-		rxvt_delete_default_hotkeys (r);
-#endif /* }}} */
 }
 
 /*}}} */
@@ -1193,229 +1034,6 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 #ifndef NO_RESOURCES
 /*----------------------------------------------------------------------*/
-
-# ifdef KEYSYM_RESOURCE
-/*
- * Define key from XrmEnumerateDatabase.
- *   quarks will be something like
- *	  "rxvt" "keysym" "0xFF01"
- *   value will be a string
- */
-/* ARGSUSED */
-/* INTPROTO */
-Bool
-rxvt_define_key(XrmDatabase *database __attribute__((unused)), XrmBindingList bindings __attribute__((unused)), XrmQuarkList quarks, XrmRepresentation *type __attribute__((unused)), XrmValue *value, XPointer closure __attribute__((unused)))
-{
-	int			 last;
-	rxvt_t		 *r = rxvt_get_r();
-
-	/* look for last quark in list */
-	for (last = 0; quarks[last] != NULLQUARK; last++)
-		;
-	last--;
-	rxvt_parse_keysym(r, XrmQuarkToString(quarks[last]),
-		(char *)value->addr);
-	return False;
-}
-
-
-/*
- * look for something like this (XK_Delete)
- * rxvt*keysym.0xFFFF: "\177"
- *
- * arg will be
- *	  NULL for ~/.Xdefaults and
- *	  non-NULL for command-line options (need to allocate)
- */
-#define NEWARGLIM	500	/* `reasonable' size */
-/* INTPROTO */
-int
-rxvt_parse_keysym(rxvt_t *r, const char *str, const char *arg)
-{
-	int			n, sym;
-	char		*key_string, *newarg = NULL;
-	char		newargstr[NEWARGLIM];
-
-	DBG_MSG( 2, ( stderr, "rxvt_parse_keysym( %s, %s)\n",
-				str, arg ? arg : "nil"));
-
-	if (arg == NULL)
-	{
-		if ((n = rxvt_str_match(str, "keysym.")) == 0)
-			return 0;
-		str += n;		/* skip `keysym.' */
-	}
-
-	/* some scanf() have trouble with a 0x prefix */
-	if (isdigit((int) str[0]))
-	{
-		if (str[0] == '0' && toupper((int) str[1]) == 'X')
-			str += 2;
-
-		if (arg)
-		{
-			if (sscanf(str, (STRCHR(str, ':') ? "%x:" : "%x"), &sym) != 1)
-			return -1;
-		}
-		else
-		{
-			if (sscanf(str, "%x:", &sym) != 1)
-				return -1;
-
-			/* cue to ':', it's there since sscanf() worked */
-			STRNCPY(newargstr, STRCHR(str, ':') + 1, NEWARGLIM - 1);
-			newargstr[NEWARGLIM - 1] = '\0';
-			newarg = newargstr;
-		}
-	}
-	else
-	{
-		/*
-		 * convert keysym name to keysym number
-		 */
-		STRNCPY(newargstr, str, NEWARGLIM - 1);
-		newargstr[NEWARGLIM - 1] = '\0';
-		if (arg == NULL)
-		{
-			if ((newarg = STRCHR(newargstr, ':')) == NULL)
-				return -1;
-			*newarg++ = '\0';	/* terminate keysym name */
-		}
-		if ((sym = XStringToKeysym(newargstr)) == None)
-			return -1;
-	}
-
-	/* we only do extended keys */
-	if (sym < 0xFF00 || sym > 0xFFFF)
-		return -1;
-	sym &= 0xFF;
-	if (r->h->Keysym_map[sym] != NULL)	/* already set ? */
-		return -1;
-
-	if (newarg == NULL)
-	{
-		STRNCPY(newargstr, arg, NEWARGLIM - 1);
-		newargstr[NEWARGLIM - 1] = '\0';
-		newarg = newargstr;
-	}
-	rxvt_str_trim(newarg);
-	if (*newarg == '\0' || (n = rxvt_str_escaped(newarg)) == 0)
-		return -1;
-	MIN_IT(n, 255);
-	assert (n > 0);	/* possible integer overflow */
-	key_string = rxvt_malloc((n + 1) * sizeof(char));
-
-	key_string[0] = n;
-	STRNCPY(key_string + 1, newarg, n);
-	r->h->Keysym_map[sym] = (unsigned char *)key_string;
-
-	return 1;
-}
-
-# endif				/* KEYSYM_RESOURCE */
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-/* INTPROTO */
-void
-rxvt_parse_hotkeys (rxvt_t* r, int res, char* oldkeystr)
-{
-	short			flag = 0;
-	short			func;
-	KeySym			keysym;
-	char*			keystr;
-	char*			ptr;
-	register int	i;
-
-
-	assert (res >= Rs_hotkey && res <= _Rs_hotkey);
-	assert (NULL != oldkeystr);
-
-	func = res - Rs_hotkey;
-
-	/* convert keystr to lower case */
-	keystr = STRDUP (oldkeystr);
-	for (ptr = keystr; *ptr; ptr++)
-		*ptr = (char) tolower ((int) *ptr);
-
-	if (NULL != STRSTR (keystr, "ctrl"))
-		HK_SET_CTRL (flag);
-	if (NULL != STRSTR (keystr, "meta") ||
-		NULL != STRSTR (keystr, "alt"))
-		HK_SET_META (flag);
-	if (NULL != STRSTR (keystr, "shft") ||
-		NULL != STRSTR (keystr, "shift"))
-		HK_SET_SHFT (flag);
-
-	if (!flag) /* no ctrl/meta/shft key */
-		goto TheEnd;
-
-	/* look for primary flag, but must do it after the check of 
-	   ctrl/meta/shft key */
-	if (NULL != STRSTR (keystr, "primary"))
-		HK_SET_PRIMARY (flag);
-
-	ptr = STRRCHR (oldkeystr, (int) '+');
-	if (NULL == ptr)		/* no '+' is specified */
-		goto TheEnd;
-
-	ptr ++;	/* skip '+' */
-	if ((char) 0 == *ptr)	/* no keysym is specified */
-		goto TheEnd;
-
-	/* get the keysym */
-	keysym = XStringToKeysym (ptr);
-
-	if (None == keysym)		/* no valid keysym is specified */
-		goto TheEnd;
-
-	/* ignore Shift+ASCII printable non-space char */
-	if (!HK_IS_CTRL(flag) &&
-		!HK_IS_META(flag) &&
-		HK_IS_SHFT(flag) &&
-		keysym < 128 &&
-		isgraph (keysym))
-		goto TheEnd;
-
-	/* when shift is pressed, convert keysym to upper case */
-	if (HK_IS_SHFT(flag))
-		keysym = toupper (keysym);
-
-	for (i = 0; i < MAX_HOTKEYS; i ++)	{
-		if (keysym == r->hotkeys[i].keysym &&
-			flag == (r->hotkeys[i].flag & HK_MASK))	{
-			/* replace an existing hotkey */
-			r->hotkeys[i].func = func;
-			r->hotkeys[i].flag = flag;	/* clear flag HK_INTERNAL */
-			break;
-		}
-		if (HKF_DUMMY == r->hotkeys[i].func)	{
-			/* replace a dummy hotkey */
-			r->hotkeys[i].func = func;
-			r->hotkeys[i].flag = flag;
-			r->hotkeys[i].keysym = keysym;
-			break;
-		}
-	}
-
-	/*
-	** if func is a dummy one, we are actually removing an
-	** existing entry, so move everything after that forward
-	*/
-	if (HKF_DUMMY == func)	{
-		for (; i < MAX_HOTKEYS - 1; i ++)	{
-			r->hotkeys[i] = r->hotkeys[i+1];
-			/* reach the area of dummy functions */
-			if (HKF_DUMMY == r->hotkeys[i].func)
-				break;
-		}
-	}
-
-TheEnd:
-	/* free duplicate string */
-	free (keystr);
-}
-#endif /* }}} */
-
 
 /*{{{ rxvt_get_xdefaults() */
 /*
@@ -1466,12 +1084,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 			}
 		}
 
-		if (
-			!rxvt_parse_macros( r, str, NULL, noReplace)
-# ifdef KEYSYM_RESOURCE
-			&& !rxvt_parse_keysym(r, str, NULL)
-# endif
-		   )
+		if( !rxvt_parse_macros( r, str, NULL, noReplace) )
 		{
 			for (entry = 0; entry < optList_size(); entry++)
 			{
@@ -1505,16 +1118,6 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 					rxvt_str_trim(str);
 					n = STRLEN(str);
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-					if (n &&
-						optList[entry].doff+multiple >= Rs_hotkey &&
-						optList[entry].doff+multiple <= _Rs_hotkey)	{
-						/* parse hotkey resource */
-						assert (0 == multiple);
-						rxvt_parse_hotkeys (r, optList[entry].doff,str);
-					}
-					else
-#endif /* }}} */
 					if (n && !r->h->rs[optList[entry].doff+multiple])
 					{
 						/* not already set */
@@ -1731,22 +1334,6 @@ rxvt_extract_resources (
 			r->h->ks_greekmodeswith = sym;
 	}
 #endif				/* GREEK_SUPPORT */
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/*
-	 * It does not hurt (performance?) to re-delete hotkeys because a careful
-	 * user may use X resource instead of command line option to disable all
-	 * default hotkeys. This is an undocumented feature because its behaviour
-	 * actually is different from command line option: if the user defines too
-	 * many hotkeys, some of the definitions may be ineffective because the
-	 * hotkey array is full under the situation that he tries to disable default
-	 * hotkeys from X resource.
-	 */
-	if (r->Options2 & Opt2_disableDefaultHotkeys)
-		rxvt_delete_default_hotkeys (r);
-	if (r->Options2 & Opt2_disableHotkeys)
-		rxvt_toggle_hotkeys (r, 0);
-#endif /* }}} */
 }
 
 /*}}} */

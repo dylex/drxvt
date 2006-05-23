@@ -668,15 +668,6 @@ rxvt_init_vars(rxvt_t *r)
 		r->vts[i] = NULL;
 	}
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-	/*
-	 * hotkeys[MAX_HOTKEYS] is a valid entry!!! it will be used to
-	 * save the first hotkey entry if we toggle disableHotkeys
-	 */
-	r->hotkeys = (hotkeys_t*) rxvt_malloc(
-		sizeof(hotkeys_t) * (MAX_HOTKEYS + 1));
-#endif /* }}} */
-
 	r->PixColors = (unsigned long*) rxvt_malloc(
 		sizeof(unsigned long) * (TOTAL_COLORS + 2 * MAX_PAGES));
 #ifdef OFF_FOCUS_FADING
@@ -687,18 +678,15 @@ rxvt_init_vars(rxvt_t *r)
 	r->XftColors = (XftColor*) rxvt_malloc (
 		sizeof (XftColor) * (TOTAL_COLORS + 2 * MAX_PAGES));
 #endif
-	if (NULL == r->h || 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-		NULL == r->hotkeys ||
-#endif /* }}} */
-		NULL == r->PixColors
+	if(
+		 NULL == r->h || NULL == r->PixColors
 #ifdef OFF_FOCUS_FADING
-		|| NULL == r->PixColorsUnfocus
+		 || NULL == r->PixColorsUnfocus
 #endif
 #ifdef XFT_SUPPORT
-		|| NULL == r->XftColors
+		 || NULL == r->XftColors
 #endif
-		)
+	  )
 		return -1;
 
 
@@ -920,146 +908,6 @@ rxvt_init_secondary(rxvt_t *r)
 	r->num_fds = 7 + 1;
 #endif
 }
-
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-/* INTPROTO */
-hotkeys_t
-make_hotkeys_t (unsigned short func, unsigned short flag, KeySym keysym)
-{
-	hotkeys_t	value;
-	value.func = func;
-	value.flag = flag;
-	value.keysym = keysym;
-	return (value);
-}
-
-
-/* EXTPROTO */
-void
-rxvt_init_hotkeys (rxvt_t* r)
-{
-	register int	i = 0;
-	hotkeys_t*		hk;
-
-
-	/* initialize hotkey handlers */
-	rxvt_init_hotkey_handlers (r);
-
-	assert (NULL != r->hotkeys);
-	hk = r->hotkeys;
-
-	/* if shft is 1, keysym must be upper case!!! */
-
-	/* gnome-terminal hotkeys */
-	hk[i++] = make_hotkeys_t (HKF_NEW_TAB,		(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_T);
-	hk[i++] = make_hotkeys_t (HKF_KILL_TAB,		(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_W);
-	hk[i++] = make_hotkeys_t (HKF_CLOSE_WINDOW,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_Q);
-	hk[i++] = make_hotkeys_t (HKF_PREV_TAB,		(HK_INTERNAL|HK_CTRL), XK_Prior);
-	hk[i++] = make_hotkeys_t (HKF_NEXT_TAB,		(HK_INTERNAL|HK_CTRL), XK_Next);
-	hk[i++] = make_hotkeys_t (HKF_TAB_1,		(HK_INTERNAL|HK_META), XK_1);
-	hk[i++] = make_hotkeys_t (HKF_TAB_2,		(HK_INTERNAL|HK_META), XK_2);
-	hk[i++] = make_hotkeys_t (HKF_TAB_3,		(HK_INTERNAL|HK_META), XK_3);
-	hk[i++] = make_hotkeys_t (HKF_TAB_4,		(HK_INTERNAL|HK_META), XK_4);
-	hk[i++] = make_hotkeys_t (HKF_TAB_5,		(HK_INTERNAL|HK_META), XK_5);
-	hk[i++] = make_hotkeys_t (HKF_TAB_6,		(HK_INTERNAL|HK_META), XK_6);
-	hk[i++] = make_hotkeys_t (HKF_TAB_7,		(HK_INTERNAL|HK_META), XK_7);
-	hk[i++] = make_hotkeys_t (HKF_TAB_8,		(HK_INTERNAL|HK_META), XK_8);
-	hk[i++] = make_hotkeys_t (HKF_TAB_9,		(HK_INTERNAL|HK_META), XK_9);
-	hk[i++] = make_hotkeys_t (HKF_SMALL_FONT,	(HK_INTERNAL|HK_CTRL), XK_minus);
-	hk[i++] = make_hotkeys_t (HKF_LARGE_FONT,	(HK_INTERNAL|HK_CTRL), XK_equal);
-	hk[i++] = make_hotkeys_t (HKF_SMALL_FONT,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_underscore);
-	hk[i++] = make_hotkeys_t (HKF_LARGE_FONT,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_plus);
-
-	/* konsole hotkeys */
-	hk[i++] = make_hotkeys_t (HKF_LMOVE_TAB,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_Left);
-	hk[i++] = make_hotkeys_t (HKF_RMOVE_TAB,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_Right);
-	hk[i++] = make_hotkeys_t (HKF_NEW_TAB,		(HK_INTERNAL|HK_CTRL|HK_META), XK_n);
-	hk[i++] = make_hotkeys_t (HKF_NEW_TAB,		(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_N);
-	hk[i++] = make_hotkeys_t (HKF_PREV_TAB,		(HK_INTERNAL|HK_SHFT), XK_Left);
-	hk[i++] = make_hotkeys_t (HKF_NEXT_TAB,		(HK_INTERNAL|HK_SHFT), XK_Right);
-	hk[i++] = make_hotkeys_t (HKF_CHANGE_TITLE,	(HK_INTERNAL|HK_CTRL|HK_META), XK_s);
-
-	/* vi-like hotkeys */
-	hk[i++] = make_hotkeys_t (HKF_PREV_TAB,		(HK_INTERNAL|HK_CTRL|HK_META), XK_h);
-	hk[i++] = make_hotkeys_t (HKF_NEXT_TAB,		(HK_INTERNAL|HK_CTRL|HK_META), XK_l);
-	
-	/* screen-like hotkeys */
-	hk[i++] = make_hotkeys_t (HKF_PREV_ATAB,	(HK_INTERNAL|HK_CTRL|HK_META), XK_p);
-
-	/* our own default hotkeys */
-	hk[i++] = make_hotkeys_t (HKF_CHANGE_TITLE,	(HK_INTERNAL|HK_SHFT), XK_Delete);
-	hk[i++] = make_hotkeys_t (HKF_PREV_ATAB,	(HK_INTERNAL|HK_CTRL), XK_Tab);
-	hk[i++] = make_hotkeys_t (HKF_KILL_TAB,		(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_K);
-	hk[i++] = make_hotkeys_t (HKF_TAB_1,		(HK_INTERNAL|HK_CTRL|HK_META), XK_1);
-	hk[i++] = make_hotkeys_t (HKF_TAB_2,		(HK_INTERNAL|HK_CTRL|HK_META), XK_2);
-	hk[i++] = make_hotkeys_t (HKF_TAB_3,		(HK_INTERNAL|HK_CTRL|HK_META), XK_3);
-	hk[i++] = make_hotkeys_t (HKF_TAB_4,		(HK_INTERNAL|HK_CTRL|HK_META), XK_4);
-	hk[i++] = make_hotkeys_t (HKF_TAB_5,		(HK_INTERNAL|HK_CTRL|HK_META), XK_5);
-	hk[i++] = make_hotkeys_t (HKF_TAB_6,		(HK_INTERNAL|HK_CTRL|HK_META), XK_6);
-	hk[i++] = make_hotkeys_t (HKF_TAB_7,		(HK_INTERNAL|HK_CTRL|HK_META), XK_7);
-	hk[i++] = make_hotkeys_t (HKF_TAB_8,		(HK_INTERNAL|HK_CTRL|HK_META), XK_8);
-	hk[i++] = make_hotkeys_t (HKF_TAB_9,		(HK_INTERNAL|HK_CTRL|HK_META), XK_9);
-	hk[i++] = make_hotkeys_t (HKF_LMOVE_TAB,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_less);
-	hk[i++] = make_hotkeys_t (HKF_RMOVE_TAB,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_greater);
-	hk[i++] = make_hotkeys_t (HKF_DUMP_SCREEN,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_Z);
-	hk[i++] = make_hotkeys_t (HKF_INC_OPACITY,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_O);
-	hk[i++] = make_hotkeys_t (HKF_DEC_OPACITY,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_U);
-	hk[i++] = make_hotkeys_t (HKF_TRANSPARENCY,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_R);
-	hk[i++] = make_hotkeys_t (HKF_HIDE_TABBAR,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_H);
-	hk[i++] = make_hotkeys_t (HKF_HIDE_SCROLLBAR,(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_S);
-	hk[i++] = make_hotkeys_t (HKF_HIDE_MENUBAR,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_M);
-	hk[i++] = make_hotkeys_t (HKF_HIDE_BUTTON,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_A);
-	hk[i++] = make_hotkeys_t (HKF_VERYBOLD,		(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_F);
-	hk[i++] = make_hotkeys_t (HKF_HOLD_EXIT,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_E);
-	hk[i++] = make_hotkeys_t (HKF_BROADCAST,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_B);
-	hk[i++] = make_hotkeys_t (HKF_SAVE_CONFIG,	(HK_INTERNAL|HK_CTRL|HK_SHFT), XK_X);
-#if 0
-	/* Are better used for scrolling to beginning / end of scrollback buffer */
-	hk[i++] = make_hotkeys_t (HKF_LARGE_FONT,	(HK_INTERNAL|HK_SHFT), XK_Home);
-	hk[i++] = make_hotkeys_t (HKF_SMALL_FONT,	(HK_INTERNAL|HK_SHFT), XK_End);
-#endif
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_UP,	(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_Up);
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_DOWN,	(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_Down);
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_PGUP,	(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_Prior);
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_PGDOWN,(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_Next);
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_HOME,	(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_Home);
-	hk[i++] = make_hotkeys_t (HKF_SCROLL_END,	(HK_INTERNAL|HK_PRIMARY|HK_SHFT), XK_End);
-
-	/* rxvt/xterm hotkeys */
-
-	assert (i <= MAX_HOTKEYS);
-
-	/*
-	** hotkeys[MAX_HOTKEYS] is a valid entry!!! it will be used to
-	** save the first hotkey entry if we toggle disableHotkeys
-	*/
-	for (; i <= MAX_HOTKEYS; i ++)
-	{
-		hk[i] = make_hotkeys_t (HKF_DUMMY, 0, 0);
-	}
-}
-
-
-/* EXTPROTO */
-void
-rxvt_toggle_hotkeys (rxvt_t* r, int enable)
-{
-	if (enable)
-	{
-		if (HKF_DUMMY != r->hotkeys[0].func)	/* already enabled */
-			return;
-
-		SWAP_IT (r->hotkeys[0], r->hotkeys[MAX_HOTKEYS], hotkeys_t);
-	}
-	else	{
-		if (HKF_DUMMY == r->hotkeys[0].func)	/* already disabled */
-			return;
-
-		SWAP_IT (r->hotkeys[0], r->hotkeys[MAX_HOTKEYS], hotkeys_t);
-	}
-}
-#endif /* }}} */
 
 
 /* INTPROTO */

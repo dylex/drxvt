@@ -38,9 +38,6 @@
 
 #include "../config.h"
 #include "rxvt.h"
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-#include "hotkeys.h"
-#endif /* }}} */
 
 #ifdef DEBUG_VERBOSE
 # define DEBUG_LEVEL 1
@@ -1086,93 +1083,14 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 
 		DBG_MSG(2, (stderr, "bypass rxvt_process_macros\n"));
 
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-		/* process hotkeys */
-		if (ctrl || meta || shft)
-		{
-			/*
-			 * Optimization: Only check hotkyes when atleast one modifier is
-			 * pressed.
-			 */
-			if (rxvt_process_hotkeys (r, keysym, ev)) return;
-		}
-#endif /* }}} */
-
 		/*
-		 * 2006-02-24 gi1242: Scrolling (even with unshifted keys) can be done
-		 * with mrxvt's macros, so don't duplicate code here.
+		 * 2006-02-24 gi1242: If you want to "hard code" a few macros into
+		 * mrxvt, do them here. The code for unshifted-scrollkeys etc used to be
+		 * here, and has now been removed.
+		 *
+		 * Rather than hardcode macros in, it is better to use the macro feature
+		 * and define your macros in the system wide config file.
 		 */
-#if 0 /* {{{ Unnecessary compiled in macros for scrolling */
-#ifdef UNSHIFTED_SCROLLKEYS
-		if (
-				AVTS(r)->saveLines && AVTS(r)->current_screen == PRIMARY
-				&& !ctrl && !meta
-				&& (keysym == XK_Prior || keysym == XK_Next)
-		   )
-		{
-			int			 lnsppg;
-
-#ifdef PAGING_CONTEXT_LINES
-			lnsppg = r->TermWin.nrow - PAGING_CONTEXT_LINES;
-#else
-			lnsppg = r->TermWin.nrow * 4 / 5;
-#endif	/* PAGING_CONTEXT_LINES */
-
-			rxvt_scr_page(r, ATAB(r), keysym == XK_Prior ? UP : DN, lnsppg);
-			return;
-		}
-#endif /* UNSHIFTED_SCROLLKEYS */
-#endif /* }}} */
-
-		/*
-		 * 2006-02-24 gi1242: Again, remapping the function keys, pasting the
-		 * selection or resizing the font can be done using mrxvt's macros or
-		 * keysym resources. So we don't need the following code.
-		 */
-#if 0	/* {{{ Unnecessary compiled in macros */
-		if (shft)
-		{
-			/* Shift + F1 - F10 generates F11 - F20 */
-			if (keysym >= XK_F1 && keysym <= XK_F10)
-			{
-				keysym += (XK_F11 - XK_F1);
-				shft = 0;	/* turn off Shift */
-			}
-			else if (
-						!ctrl && !meta
-						&& (AVTS(r)->PrivateModes & PrivMode_ShiftKeys)
-					)
-			{
-				switch (keysym)
-				{
-					/* normal XTerm key bindings */
-					case XK_Insert:
-						/* Shift+Insert = paste mouse selection */
-						rxvt_selection_request(r, ATAB(r), ev->time, 0, 0);
-						return;
-
-					/* rxvt extras */
-					case XK_KP_Add:
-						/* Shift+KP_Add = bigger font */
-						rxvt_resize_on_font (r, FONT_UP);
-						return;
-					case XK_KP_Subtract:
-						/* Shift+KP_Subtract = smaller font */
-						rxvt_resize_on_font (r, FONT_DN);
-						return;
-				}
-			}
-		}
-
-#ifdef PRINTPIPE
-		if (keysym == XK_Print)
-		{
-			rxvt_scr_printscreen(r, ATAB(r), ctrl | shft);
-			return;
-		}
-#endif	/* PRINTPIPE */
-
-#endif	/* }}} */
 
 #ifdef GREEK_SUPPORT
 		if (keysym == r->h->ks_greekmodeswith)
@@ -1212,35 +1130,13 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		 */
 		if (keysym >= 0xff00 && keysym <= 0xffff)
 		{
-#ifdef KEYSYM_RESOURCE/*{{{*/
-			if (!(shft | ctrl) && r->h->Keysym_map[keysym & 0xFF] != NULL)
-			{
-				unsigned int	l;
-				const unsigned char *kbuf0;
-				const unsigned char ch = C0_ESC;
-
-				kbuf0 = (r->h->Keysym_map[keysym & 0xFF]);
-				l = (unsigned int)*kbuf0++;
-
-				/* escape prefix */
-				if (meta)
-# ifdef META8_OPTION
-					if (r->h->meta_char == C0_ESC)
-# endif	/* META8_OPTION */
-						rxvt_tt_write(r, ATAB(r), &ch, 1);
-				rxvt_tt_write(r, ATAB(r), kbuf0, l);
-				return;
-			}
-			else
-#endif	/* KEYSYM_RESOURCE *//*}}}*/
-			{
-				int		newlen = rxvt_0xffxx_keypress (r, keysym,
-									ctrl, meta, shft, kbuf);
-				if (-1 != newlen)
-					len = newlen;
-			}
+			int		newlen = rxvt_0xffxx_keypress (r, keysym,
+								ctrl, meta, shft, kbuf);
+			if (-1 != newlen)
+				len = newlen;
 	
-#if 0 /* was ifdef META8_OPTION */	/* NO. Use modifier instead */
+#if 0 /* was ifdef META8_OPTION. */
+			/* 2006-05-23 gi1242 Better to use modifier instead */
 			/*
 			 * Pass meta for all function keys, if 'meta' option set
 			 */
@@ -5650,6 +5546,10 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 		 * code bloat :).
 		 *
 		 * Only the local user should be able to create / close / move tabs.
+		 *
+		 * NOTE: The disabled code uses the old hotkey code (from mrxvt-0.4.2).
+		 * To enable the escape sequences below, you have to uncomment the code
+		 * below AND port it to use the macro feature from 0.5.0 upward.
 		 */
 #if 0 /* {{{ DISABLED FOR SECURITY REASONS */
 		case Xterm_hide:
@@ -5849,21 +5749,6 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			break;
 # endif	/* TINTING_SUPPORT */
 #endif	/* TRANSPARENT || BACKGROUND_IMAGE */
-
-#if 0 /* {{{ OBSOLETE HOTKEY CODE */
-		case Xterm_hotkeys:
-			if (r->Options2 & Opt2_disableHotkeys)
-			{
-				r->Options2 &= ~Opt2_disableHotkeys;
-				rxvt_toggle_hotkeys (r, 1);
-			}
-			else
-			{
-				r->Options2 |= Opt2_disableHotkeys;
-				rxvt_toggle_hotkeys (r, 0);
-			}
-			break;
-#endif /* }}} */
 
 		case Xterm_termenv:
 			PVTS(r, page)->termenv = rxvt_get_termenv ((const char*) str);
