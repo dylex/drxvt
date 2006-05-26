@@ -527,15 +527,14 @@ struct mouse_event {
 
 #define MAX_IT(current, other)	if ((other) > (current)) (current) = (other)
 #define MIN_IT(current, other)	if ((other) < (current)) (current) = (other)
-#define SWAP_IT(one, two, typeof)					\
-    do {								\
-	typeof          swapittmp;					\
-	(swapittmp) = (one); (one) = (two); (two) = (swapittmp);	\
-    } while (/* CONSTCOND */ 0)
-#define BOUND_POSITIVE_INT16(val)			\
-    (RINT16T)((val) <= 0				\
-	      ? 0					\
-	      : min((val), (((RUINT16T)-1)>>1)))
+#define SWAP_IT(one, two, typeof)									\
+    {																\
+		typeof          swapittmp;									\
+		(swapittmp) = (one); (one) = (two); (two) = (swapittmp);	\
+    }
+
+#define BOUND_POSITIVE_INT16(val)									\
+    (RINT16T)( (val) <= 0 ? 0 : min( (val), (((RUINT16T)-1)>>1) )  )
 
 /*
  *****************************************************************************
@@ -1020,9 +1019,6 @@ enum {
 #endif
     Rs_name,
     Rs_title,
-    Rs_tabtitleAll,
-    Rs_tabtitle,
-    _Rs_tabtitle = Rs_tabtitle + MAX_PAGES - 1,
 	Rs_maxTabWidth,
 	Rs_minVisibleTabs,
 #if defined (BACKGROUND_IMAGE) || defined(HAVE_MENUBAR)
@@ -1030,12 +1026,11 @@ enum {
 #endif
 
 #ifdef BACKGROUND_IMAGE
-    Rs_backgroundPixmapAll,/* terminal background pixmap for all tabs */
-    Rs_backgroundPixmap,/* terminal background pixmap for each tab */
-    _Rs_backgroundPixmap = Rs_backgroundPixmap + MAX_PAGES - 1,
 	Rs_tabbarPixmap,	/* tabbar background pixmap */
 	Rs_tabPixmap,		/* use tabbar bg pixmap for tabs */
+# if 0 /* appicon not yet implemented */
 	Rs_appIcon,			/* use pixmap as application icon */
+# endif
 #endif
 
 #ifdef HAVE_MENUBAR
@@ -1084,9 +1079,6 @@ enum {
     Rs_scrollTtyOutputInhibit,
     Rs_scrollTtyKeypress,
     Rs_scrollWithBuffer,
-    Rs_saveLinesAll,
-    Rs_saveLines,
-    _Rs_saveLines = Rs_saveLines + MAX_PAGES - 1,
 
 	Rs_tabfg,	/* active tab foreground */
 	Rs_tabbg,	/* active tab background */
@@ -1172,17 +1164,29 @@ enum {
     Rs_cursorBlinkInterval,
     Rs_pointerBlank,
     Rs_pointerBlankDelay,
-	Rs_command,
-	_Rs_command = Rs_command + MAX_PAGES - 1,
 	Rs_smClientID,
 	Rs_init_term_num,
 
+	/*
+	 * Options for multiple profiles.
+	 */
+#ifdef BACKGROUND_IMAGE
+    Rs_backgroundPixmap,/* terminal background pixmap for each tab */
+    _Rs_backgroundPixmap = Rs_backgroundPixmap + MAX_PROFILES - 1,
+#endif
+    Rs_tabtitle,		_Rs_tabtitle = Rs_tabtitle + MAX_PROFILES - 1,
+	Rs_command,			_Rs_command = Rs_command + MAX_PROFILES - 1,
+    Rs_saveLines,		_Rs_saveLines = Rs_saveLines + MAX_PROFILES - 1,
+
+	Rs_foreground,		_Rs_foreground = Rs_foreground + MAX_PROFILES - 1,
+	Rs_background,		_Rs_background = Rs_background + MAX_PROFILES - 1,
 
 	/*
-	**********************************************************
-	** beginning of the secondary options
-	**********************************************************
-	*/
+	 * Secondary boolean options (stored in r->Options2).
+	 *
+	 * TODO 2006-05-23 gi1242: Make r->Options an array, and define macros to
+	 * set / clear these boolean options.
+	 */
 	Rs_options2,
 	Rs2_protectSecondary,
 	Rs2_tabShell,

@@ -634,7 +634,6 @@ const char *const xa_names[NUM_XA] = {
 	"CLIPBOARD"
 };
 
-/*----------------------------------------------------------------------*/
 /* substitute system functions */
 #if defined(OS_SVR4) && ! defined(_POSIX_VERSION)
 /* INTPROTO */
@@ -647,7 +646,8 @@ rxvt_getdtablesize(void)
 	return rlim.rlim_cur;
 }
 #endif
-/*----------------------------------------------------------------------*/
+
+
 /* EXTPROTO */
 int
 rxvt_init_vars(rxvt_t *r)
@@ -927,7 +927,6 @@ rxvt_xerror_handler(const Display *display __attribute__((unused)), const XError
 }
 
 
-
 #ifdef TEXT_SHADOW
 /* INTPROTO */
 void
@@ -1020,8 +1019,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	rs[Rs_name] = rxvt_r_basename(argv[0]);
 
 	/*
-	** Open display, get options/resources and create the window
-	*/
+	 * Open display, get options/resources and create the window
+	 */
 	if ((rs[Rs_display_name] = getenv("DISPLAY")) == NULL)
 		rs[Rs_display_name] = ":0";
 
@@ -1092,12 +1091,6 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 			rs[Rs_iconName] = rs[Rs_name];
 	}
 
-	if (rs[Rs_saveLinesAll])
-	{
-		register int	tmp = atoi(rs[Rs_saveLinesAll]);
-		r->TermWin.saveLines = (tmp >=0 && tmp <= MAX_SAVELINES) ?
-										tmp : DEFAULT_SAVELINES;
-	}
 
 	if (rs[Rs_maxTabWidth])	
 	{
@@ -1338,12 +1331,14 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 		if (!rs[Rs_color + Color_bg])
 			rs[Rs_color + Color_bg] = def_colorName[Color_fg];
 
-		for (i = 0; i < MAX_PAGES; i++)
+		for (i = 0; i < MAX_PROFILES; i++)
 		{
-			int		vtfg = Rs_color + TOTAL_COLORS + i;
-			int		vtbg = Rs_color + TOTAL_COLORS + MAX_PAGES + i;
+			int		vtfg = Rs_foreground + i;
+			int		vtbg = Rs_background + i;
+
 			char*	fg = (char*) rs[vtfg];
 			char*	bg = (char*) rs[vtbg];
+
 			/* foreground color of i terminal */
 			if (ISSET_VTFG(r, i))
 				rs[vtfg] = ISSET_VTBG(r, i) ? bg :
@@ -1365,16 +1360,17 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	if (r->Options & Opt_reverseVideo)
 	{
 		SWAP_IT(rs[Rs_color + Color_fg], rs[Rs_color + Color_bg], const char *);
-		for (i = 0; i < MAX_PAGES; i++)
+
+		for (i = 0; i < MAX_PROFILES; i++)
 		{
-			int		vtfg = Rs_color + TOTAL_COLORS + i;
-			int		vtbg = Rs_color + TOTAL_COLORS + MAX_PAGES + i;
+			int		vtfg = Rs_foreground + i;
+			int		vtbg = Rs_background + i;
 			SWAP_IT(rs[vtfg], rs[vtbg], const char*);
 		}
 	}
 #endif
 
-/* convenient aliases for setting fg/bg to colors */
+	/* convenient aliases for setting fg/bg to colors */
 	rxvt_color_aliases(r, Color_fg);
 	rxvt_color_aliases(r, Color_bg);
 #ifndef NO_CURSORCOLOR
@@ -1399,6 +1395,23 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 	/* Cleanup the macro list */
 	rxvt_cleanup_macros( r );
+
+
+	/*
+	 * Profile settings.
+	 */
+	for( i=0; i < MAX_PROFILES; i++ )
+	{
+		if( rs[ Rs_saveLines+i ] )
+		{
+			int	tmp = atoi( rs[ Rs_saveLines+i ] );
+
+			r->profile[i].saveLines = (tmp >=0 && tmp <= MAX_SAVELINES) ?
+											tmp : DEFAULT_SAVELINES;
+		}
+		else
+			r->profile[i].saveLines = DEFAULT_SAVELINES;
+	}
 
 	return cmd_argv;
 }
@@ -1607,19 +1620,6 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
 
 	act.sa_handler	= rxvt_Child_signal;
 	sigaction (SIGCHLD, &act, NULL);
-
-#if 0 /* {{{ Old signal handling code */
-	signal(SIGHUP, rxvt_Exit_signal);
-#ifndef OS_SVR4
-	signal(SIGINT, rxvt_Exit_signal);
-#endif
-	signal(SIGQUIT, rxvt_Exit_signal);
-	signal(SIGTERM, rxvt_Exit_signal);
-	signal(SIGCHLD, rxvt_Child_signal);
-
-	/* need to trap SIGURG for SVR4 (Unixware) rlogin */
-	/* signal (SIGURG, SIG_DFL); */
-#endif /*}}}*/
 }
 
 
@@ -1720,14 +1720,91 @@ rxvt_switch_pix_color (rxvt_t* r)
 #endif
 
 
+/*
+ * XXX 2006-05-24 gi1242: Should allocate Xft colors only if Opt_xft is set. In
+ * that case we should avoid allocating XColors, since we can always access them
+ * through xftcolor.pixel.
+ */
 /* INTPROTO */
 void
-rxvt_init_colors (rxvt_t *r)
+rxvt_init_colors( rxvt_t *r )
 {
 	register int	i;
 
+	/* Initialize fg/bg colors for each profile */
+	for (i = 0; i < MAX_PROFILES; i++)
+	{
+		XColor		xcol;
+		int			vtfg = Rs_foreground + i;
+		int			vtbg = Rs_background + i;
 
-	for (i = 0; i < (XDEPTH <= 2 ? 2 : NRS_COLORS); i++)
+		if( !ISSET_VTFG( r, i ) )
+			r->h->rs[vtfg] =  ISSET_VTFG( r, 0 ) ?
+					r->h->rs[Rs_foreground] : def_colorName[ Color_fg ];
+		if( !ISSET_VTBG( r, i ) )
+			r->h->rs[vtbg] = ISSET_VTBG( r, 0 ) ?
+					r->h->rs[Rs_background] : def_colorName[ Color_bg ];
+
+		if( (r->Options & Opt_reverseVideo) )
+			SWAP_IT( r->h->rs[vtfg], r->h->rs[vtbg], typeof(r->h->rs[vtfg]) );
+
+		/* foreground color of i terminal */
+		if( rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtfg]) )
+		{
+			VTFG(r, i) = xcol.pixel;
+#ifdef XFT_SUPPORT
+			rxvt_alloc_xft_color (r, VTFG(r, i), &(VTXFTFG(r, i)));
+#endif
+		}
+		else
+		{
+			rxvt_print_error( "Could not alloc foreground color of profile %d",
+					i );
+			if( i == 0 )
+				/* Need default fg/bg */
+				exit( EXIT_FAILURE );
+
+			/* Use foreground from profie 0 */
+			VTFG( r, i ) = VTFG( r, 0 );
+#ifdef XFT_SUPPORT
+			VTXFTFG( r, i ) = VTXFTFG( r, 0 );
+#endif
+		}
+
+		/* background color of i terminal */
+		if( rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtbg]) )
+		{
+			VTBG(r, i) = xcol.pixel;
+#ifdef XFT_SUPPORT
+			rxvt_alloc_xft_color( r, VTBG(r, i), &(VTXFTBG(r, i)) );
+#endif
+		}
+		else
+		{
+			rxvt_print_error( "Could not alloc background color of profile %d",
+					i );
+			if( i == 0 )
+				/* Need default fg/bg */
+				exit( EXIT_FAILURE );
+
+			/* Use foreground from profie 0 */
+			VTBG( r, i ) = VTBG( r, 0 );
+#ifdef XFT_SUPPORT
+			VTXFTBG( r, i ) = VTXFTBG( r, 0 );
+#endif
+		}
+	}
+
+	/* Set foreground / background colors */
+	r->PixColors[ Color_fg ] = VTFG( r, 0 );
+	r->PixColors[ Color_bg ] = VTBG( r, 0 );
+#ifdef XFT_SUPPORT
+	r->XftColors[ Color_fg ] = VTXFTFG( r, 0 );
+	r->XftColors[ Color_bg ] = VTXFTBG( r, 0 );
+#endif
+
+
+	for (i = minCOLOR; i < (XDEPTH <= 2 ? 2 : NRS_COLORS); i++)
 	{
 		XColor			xcol;
 
@@ -1751,21 +1828,26 @@ rxvt_init_colors (rxvt_t *r)
 			{
 				switch (i)
 				{
+#if 0 /* Get fg / bg from profiles instead */
+
 					case Color_fg:
 					case Color_bg:
 						/* fatal: need bg/fg color */
 						rxvt_print_error("aborting");
-						exit(EXIT_FAILURE);
-						/* NOTREACHED */
-						break;
+						exit( EXIT_FAILURE );
+						/* NOT REACHED */
+#endif
+
 #ifndef NO_CURSORCOLOR
 					case Color_cursor2:
 						xcol.pixel = r->PixColors[Color_fg];
 						break;
-#endif				/* ! NO_CURSORCOLOR */
+#endif /* !NO_CURSORCOLOR */
+
 					case Color_pointer:
 						xcol.pixel = r->PixColors[Color_fg];
 						break;
+
 					default:
 						xcol.pixel = r->PixColors[Color_bg];	/* None */
 						break;
@@ -1809,38 +1891,6 @@ rxvt_init_colors (rxvt_t *r)
 	r->h->global_xftbg = r->XftColors[Color_bg];
 #endif
 
-
-	/* Initialize fg/bg colors for individual terminals */
-	for (i = 0; i < MAX_PAGES; i++)
-	{
-		XColor		xcol;
-		int			vtfg = Rs_color + TOTAL_COLORS + i;
-		int			vtbg = Rs_color + TOTAL_COLORS + MAX_PAGES + i;
-
-		/* foreground color of i terminal */
-		if (
-			  ISSET_VTFG(r, i)
-			  && rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtfg])
-		   )
-		{
-			VTFG(r, i) = xcol.pixel;
-#ifdef XFT_SUPPORT
-			rxvt_alloc_xft_color (r, VTFG(r, i), &(VTXFTFG(r, i)));
-#endif
-		}
-
-		/* background color of i terminal */
-		if (
-			  ISSET_VTBG(r, i)
-			  && rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtbg])
-		   )
-		{
-			VTBG(r, i) = xcol.pixel;
-#ifdef XFT_SUPPORT
-			rxvt_alloc_xft_color (r, VTBG(r, i), &(VTXFTBG(r, i)));
-#endif
-		}
-	}
 
 
 	/*
@@ -1917,7 +1967,7 @@ rxvt_init_colors (rxvt_t *r)
 /* color aliases, fg/bg bright-bold */
 /* INTPROTO */
 void
-rxvt_color_aliases(rxvt_t* r, int idx)
+rxvt_color_aliases( rxvt_t *r, int idx )
 {
 	if (r->h->rs[Rs_color + idx] && isdigit((int) *(r->h->rs[Rs_color + idx])))
 	{
@@ -1939,7 +1989,7 @@ rxvt_color_aliases(rxvt_t* r, int idx)
 
 /* INTPROTO */
 void
-rxvt_init_win_size (rxvt_t* r)
+rxvt_init_win_size( rxvt_t *r )
 {
 	int				flags = 0;	/* must initialize to 0!!! */
 	short			recalc_x = 0, recalc_y = 0,
@@ -2091,7 +2141,7 @@ rxvt_init_win_size (rxvt_t* r)
  */
 /* INTPROTO */
 void
-rxvt_get_ourmods(rxvt_t *r)
+rxvt_get_ourmods( rxvt_t *r )
 {
 	int					i, j, k;
 	int					requestedmeta, realmeta, realalt;
@@ -2168,7 +2218,7 @@ rxvt_get_ourmods(rxvt_t *r)
 
 /* EXTPROTO */
 char**
-rxvt_string_to_argv (const char* string, int* argc)
+rxvt_string_to_argv( const char *string, int *argc )
 {
 	register int	i;
 	char**			pret;
@@ -2313,7 +2363,7 @@ NotMatch:
 
 /* EXTPROTO */
 void
-rxvt_switch_fgbg_color (rxvt_t* r, int page)
+rxvt_switch_fgbg_color( rxvt_t *r, int page )
 {
 	/* Restore bg/ufbg color */
 	rxvt_restore_ufbg_color (r);
@@ -2323,29 +2373,28 @@ rxvt_switch_fgbg_color (rxvt_t* r, int page)
 #endif
 
 	/*
-	** Set fg/bg color of individual terminal
-	*/
-	r->PixColors[Color_fg] = *(PVTS(r, page)->p_fg);
-	r->PixColors[Color_bg] = *(PVTS(r, page)->p_bg);
+	 * Set fg/bg color of individual terminal
+	 */
+	r->PixColors[Color_fg] = PVTS(r, page)->p_fg;
+	r->PixColors[Color_bg] = PVTS(r, page)->p_bg;
 #ifdef XFT_SUPPORT
-	r->XftColors[Color_fg] = *(PVTS(r, page)->p_xftfg);
-	r->XftColors[Color_bg] = *(PVTS(r, page)->p_xftbg);
+	r->XftColors[Color_fg] = PVTS(r, page)->p_xftfg;
+	r->XftColors[Color_bg] = PVTS(r, page)->p_xftbg;
 #endif	/* XFT_SUPPORT */
 
 	/*
-	** Set foreground/background color for GC. This is necessary.
-	** Since all VTs share the same GC, if we do not set the color
-	** here, color from other VTs will be used to draw the following
-	** text till there is a color change.
-	*/
-	XSetForeground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_fg]);
-	XSetBackground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_bg]);
+	 * Set foreground/background color for GC. This is necessary. Since all VTs
+	 * share the same GC, if we do not set the color here, color from other VTs
+	 * will be used to draw the following text till there is a color change.
+	 */
+	XSetForeground( r->Xdisplay, r->TermWin.gc, r->PixColors[Color_fg] );
+	XSetBackground( r->Xdisplay, r->TermWin.gc, r->PixColors[Color_bg] );
 }
 
 
 /* INTPROTO */
 termenv_t
-rxvt_get_termenv (const char* env)
+rxvt_get_termenv( const char *env )
 {
 	if (NULL == env)
 		return (TERMENV_XTERM);
@@ -2368,29 +2417,33 @@ rxvt_get_termenv (const char* env)
 
 /* INTPROTO */
 void
-rxvt_init_vts (rxvt_t* r, int page)
+rxvt_init_vts( rxvt_t *r, int page, int profile )
 {
 #ifdef TTY_GID_SUPPORT
-	struct group*	gr = getgrnam("tty");
+	struct group*	gr = getgrnam( "tty" );
 #endif
 	struct tms		tp;
 	register int	i;
 
 
-	assert (page < MAX_PAGES);
+	assert( page < MAX_PAGES );
 
 	/* look for an unused term_t structure */
-	for (i = 0; i < MAX_PAGES; i ++)
-		if (-1 == r->vterm[i].vts_idx)
+	for( i = 0; i < MAX_PAGES; i ++ )
+		if( -1 == r->vterm[i].vts_idx )
 			break;
-	assert (i != MAX_PAGES);
-	DBG_MSG(1, (stderr, "Find vterm[%d] for pointer vts[%d]\n", i, page));
+	assert( i != MAX_PAGES );
+	DBG_MSG( 1, (stderr, "Find vterm[%d] for pointer vts[%d]\n", i, page) );
 
 	/* clear the term_t structure */
 	r->vts[page] = &(r->vterm[i]);
-	MEMSET (r->vts[page], 0, sizeof (r->vterm[0]));
+	MEMSET( r->vts[page], 0, sizeof( r->vterm[0] ) );
+
 	/* set vts_idx for the vterm */
 	PVTS(r, page)->vts_idx = i;
+
+	/* Set the profile number */
+	PVTS(r, page)->profileNum	= profile;
 
 #ifdef TTY_GID_SUPPORT
 	/* change group ownership of tty to "tty" */
@@ -2405,23 +2458,7 @@ rxvt_init_vts (rxvt_t* r, int page)
 	}
 
 	/* Initialize term_t (vts) structure */
-	/*
-	** How to get saveLines? Try the following sequence:
-	** . individual saveLines in .Xdefaults or command line option
-	** . saveLines for all tabs in .Xdefaults or command line option
-	** . Default saveLines
-	*/
-	if (r->h->rs[Rs_saveLines+page])
-	{
-		register int	tmp = atoi(r->h->rs[Rs_saveLines+page]);
-		PVTS(r, page)->saveLines = (tmp >=0 && tmp <= MAX_SAVELINES) ?  tmp : DEFAULT_SAVELINES;
-	}
-	else if (r->h->rs[Rs_saveLinesAll])
-	{
-		PVTS(r, page)->saveLines = r->TermWin.saveLines;
-	}
-	else
-		PVTS(r, page)->saveLines = (SAVELINES >= 0 && SAVELINES <= MAX_SAVELINES) ? SAVELINES : DEFAULT_SAVELINES;
+	PVTS( r, page )->saveLines = r->profile[profile].saveLines;
 
 	/* will be set in rxvt_create_termwin */
 	PVTS(r, page)->vt = None;
@@ -2452,10 +2489,12 @@ rxvt_init_vts (rxvt_t* r, int page)
 	PVTS(r, page)->termenv = rxvt_get_termenv (
 		r->h->rs[Rs_term_name] ? r->h->rs[Rs_term_name] : TERMENV);
 
+#if 0
 	/* get command argv from resources */
 	PVTS(r, page)->command_argv = rxvt_string_to_argv (
 				(char*) r->h->rs[Rs_command+i],
 				&(PVTS(r, page)->command_argc));
+#endif
 
 	/* Initialize PrivateModes and SavedModes */
 	PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
@@ -2486,15 +2525,15 @@ rxvt_init_vts (rxvt_t* r, int page)
 #endif
 
 	/* Now set VT fg/bg color */
-	PVTS(r, page)->p_fg = ISSET_VTFG(r, page) ?
-			&(VTFG(r, page)) : &(r->h->global_fg);
-	PVTS(r, page)->p_bg = ISSET_VTBG(r, page) ?
-			&(VTBG(r, page)) : &(r->h->global_bg);
+	PVTS(r, page)->p_fg = ISSET_VTFG(r, profile) ?
+								VTFG(r, profile) : r->h->global_fg;
+	PVTS(r, page)->p_bg = ISSET_VTBG(r, profile) ?
+								VTBG(r, profile) : r->h->global_bg;
 #ifdef XFT_SUPPORT
-	PVTS(r, page)->p_xftfg = ISSET_VTFG(r, page) ?
-			&(VTXFTFG(r, page)) : &(r->h->global_xftfg);
-	PVTS(r, page)->p_xftbg = ISSET_VTBG(r, page) ?
-			&(VTXFTBG(r, page)) : &(r->h->global_xftbg);
+	PVTS(r, page)->p_xftfg = ISSET_VTFG(r, profile) ?
+								VTXFTFG(r, profile) : r->h->global_xftfg;
+	PVTS(r, page)->p_xftbg = ISSET_VTBG(r, profile) ?
+								VTXFTBG(r, profile) : r->h->global_xftbg;
 #endif
 
 	/* Initialize input buffer */
@@ -2520,10 +2559,11 @@ rxvt_init_vts (rxvt_t* r, int page)
 /* rxvt_destroy_termwin() - destroy a terminal window */
 /* EXTPROTO */
 void
-rxvt_destroy_termwin(rxvt_t* r, int page)
+rxvt_destroy_termwin( rxvt_t *r, int page )
 {
 	assert (page < MAX_PAGES);
 
+#if 0
 	/* free command argv */
 	if (PVTS(r, page)->command_argv && PVTS(r, page)->command_argc)
 	{
@@ -2534,6 +2574,7 @@ rxvt_destroy_termwin(rxvt_t* r, int page)
 		PVTS(r, page)->command_argv = NULL;
 		PVTS(r, page)->command_argc = 0;
 	}
+#endif
 
 	assert (PVTS(r, page)->tab_title);
 	free (PVTS(r, page)->tab_title);
@@ -2570,40 +2611,34 @@ rxvt_destroy_termwin(rxvt_t* r, int page)
 
 
 
-char*	g_default_tab_title = "Terminal";
 /* rxvt_create_termwin() - create a terminal window */
 /* EXTPROTO */
 void
-rxvt_create_termwin(rxvt_t* r, int page, const char TAINTED * title)
+rxvt_create_termwin( rxvt_t *r, int page, int profile,
+		const char TAINTED * title )
 {
 #ifdef DEBUG_X
 	char			vt_name[32];
 #endif
 	long			vt_emask;
-	char TAINTED *	t;
+	const char TAINTED *	t;
 
 
-	assert (page < MAX_PAGES);
+	assert( page < MAX_PAGES );
 
-	rxvt_init_vts (r, page);
+	rxvt_init_vts( r, page, profile );
 
 	/*
-	** How to get the tab title? Try the following steps in sequence:
-	** . runtime supplied tab title (e.g., escape sequence)
-	** . individual tab title in .Xdefaults or command line option
-	** . tab title for all tabs in .Xdefaults or command line option
-	** . default tab title
-	*/
-	t = (char TAINTED *) title;
-	if (NULL == t || !*t)
-		t = (char*) r->h->rs[Rs_tabtitle+page];
-	if (NULL == t || !*t)
-		t = (char*) r->h->rs[Rs_tabtitleAll];
-	if (NULL == t || !*t)
-		t = (char*) r->h->rs[Rs_title];
-	if (NULL == t || !*t)
-		t = g_default_tab_title;
+	 * Set the tab title
+	 */
+	t = getProfileOption( r, profile, Rs_tabtitle );
+	if( t == NULL || *t == '\0' )
+		t = getProfileOption( r, profile, Rs_command );
+	if( t == NULL || *t == '\0' )
+		t = DEFAULT_TAB_TITLE;
+
 	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP(t, MAX_TAB_TXT);
+
 #ifdef HAVE_PUTENV
 	/* Set environment variable of tab title */
 	sprintf (r->h->env_tabtitle, TABTITLEENV "%s", PVTS(r, page)->tab_title);
@@ -2619,14 +2654,16 @@ rxvt_create_termwin(rxvt_t* r, int page, const char TAINTED * title)
 	rxvt_switch_fgbg_color (r, page);
 
 	/* create the terminal window */
-	DBG_MSG (1, (stderr, "Create VT %d (%dx%d+%dx%d)\n", page, r->h->window_vt_x, r->h->window_vt_y, VT_WIDTH(r), VT_HEIGHT(r)));
-	PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay,
-						r->TermWin.parent,
-						r->h->window_vt_x, r->h->window_vt_y,
-						VT_WIDTH(r), VT_HEIGHT(r),
-						0,
-						r->PixColors[Color_fg],
-						r->PixColors[Color_bg]);
+	DBG_MSG (1, (stderr, "Create VT %d (%dx%d+%dx%d)\n",
+				page, r->h->window_vt_x, r->h->window_vt_y,
+				VT_WIDTH(r), VT_HEIGHT(r)));
+
+	PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
+								r->h->window_vt_x, r->h->window_vt_y,
+								VT_WIDTH(r), VT_HEIGHT(r),
+								0,
+								r->PixColors[Color_fg],
+								r->PixColors[Color_bg]);
 	assert (None != PVTS(r, page)->vt);
 #ifdef XFT_SUPPORT
 	if (r->Options & Opt_xft)
@@ -2667,43 +2704,56 @@ rxvt_create_termwin(rxvt_t* r, int page, const char TAINTED * title)
 #endif
 
 	/*
-	** Load the background image for terminal window when not
-	** transparent
-	*/
+	 * Load the background image for terminal window when not transparent
+	 */
 #ifdef BACKGROUND_IMAGE
 # ifdef TRANSPARENT
-	if (!(r->Options & Opt_transparent))
+	if( !(r->Options & Opt_transparent) )
 # endif
-	if ( r->h->rs[Rs_backgroundPixmap+page] || r->h->rs[Rs_backgroundPixmapAll])
 	{
-		/* Load pixmap for each individual tab */
-		const char*	pf = r->h->rs[Rs_backgroundPixmap+page];
-		const char*	p;
-		/*
-		** If each individual pixmap is unset, load pixmap for all
-		** tabs
-		*/
-		if (NULL == pf)
-			pf = r->h->rs[Rs_backgroundPixmapAll];
-
-		p = pf;
-		if ((p = STRCHR(p, ';')) != NULL)
+		const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
+		if( pf != NULL )
 		{
-			p++;
-			rxvt_scale_pixmap(r, page, p);
+			/* Load pixmap for each individual tab */
+			const char *p = pf;
+
+			if( (p = STRCHR(p, ';')) != NULL )
+			{
+				p++;
+				rxvt_scale_pixmap(r, page, p);
+			}
+			rxvt_load_bg_pixmap(r, page, pf);
+			/* rxvt_scr_touch(r, page, True); */
 		}
-		rxvt_load_bg_pixmap(r, page, pf);
-		/* rxvt_scr_touch(r, page, True); */
-	}
+	} /* if( !(r->Options & Opt_transparent) ) */
 #endif
 
 	XMapWindow (r->Xdisplay, PVTS(r, page)->vt);
 }
 
 
+/*
+ * Return the value of an option with profile number "profile". This function
+ * should only be called for profile options.
+ *
+ * The string returned is one of r->h->rs[], so should not be freed.
+ */
+const char *
+getProfileOption( rxvt_t *r, int profile, int resource )
+{
+	assert( profile < 0 || profile >= MAX_PROFILES );
+
+	/*
+	 * Profile 0 is default, so if the profile option is unset, fall back to
+	 * profile 0.
+	 */
+	return (r->h->rs[resource + profile] != NULL) ?
+		r->h->rs[resource + profile] : r->h->rs[resource];
+}
+
 /* INTPROTO */
 void
-rxvt_set_borderless (rxvt_t* r)
+rxvt_set_borderless( rxvt_t *r )
 {
 	Atom		prop;
 	CARD32		hints;		/* KDE/GNOME hints */
@@ -2771,7 +2821,7 @@ ewmh_message( Display *dpy, Window root_win, Window client_win,
 
 /* INTPROTO */
 void
-rxvt_set_desktop (rxvt_t* r, CARD32 desktop)
+rxvt_set_desktop( rxvt_t* r, CARD32 desktop )
 {
 	/* GNOME compatible WM */
 	if (desktop >= 0 && desktop <= 64 &&
@@ -2791,7 +2841,7 @@ rxvt_set_desktop (rxvt_t* r, CARD32 desktop)
 
 /* EXTPROTO */
 CARD32
-rxvt_get_desktop (rxvt_t* r)
+rxvt_get_desktop( rxvt_t* r )
 {
 	int		result;
 	Atom	ret_type;
@@ -2826,7 +2876,7 @@ rxvt_get_desktop (rxvt_t* r)
 /* rxvt_create_show_windows() - Open and map the window */
 /* EXTPROTO */
 void
-rxvt_create_show_windows(rxvt_t* r, int argc, const char *const *argv)
+rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 {
 	XClassHint				class_hint;
 	XWMHints				wm_hint;
@@ -3189,7 +3239,7 @@ rxvt_create_show_windows(rxvt_t* r, int argc, const char *const *argv)
  */
 /* EXTPROTO */
 int
-rxvt_run_command(rxvt_t* r, int page, const char** argv)
+rxvt_run_command(rxvt_t *r, int page, const char **argv)
 {
 	int			cfd, er;
 	int			i;
@@ -3364,20 +3414,20 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	/* DBG_MSG(1,(stderr, "argv = %x\n", argv)); */
 
 	/* init terminal attributes */
-	SET_TTYMODE(STDIN_FILENO, &(PVTS(r, page)->tio));
+	SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
 
-	if (r->Options & Opt_console)		/* be virtual console, fail silently */
+	if( r->Options & Opt_console )		/* be virtual console, fail silently */
 	{
 #ifdef TIOCCONS
 		unsigned int	on = 1;
 		ioctl(STDIN_FILENO, TIOCCONS, &on);
 #elif defined (SRIOCSREDIR)
 		int			fd;
-		fd = open(CONSOLE, O_WRONLY, 0);
+		fd = open( CONSOLE, O_WRONLY, 0 );
 		if (fd >= 0)
 		{
-			if (ioctl(fd, SRIOCSREDIR, NULL) < 0)
-			close(fd);
+			if( ioctl( fd, SRIOCSREDIR, NULL ) < 0 )
+			close( fd );
 		}
 #endif	/* SRIOCSREDIR */
 	}
@@ -3385,27 +3435,27 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	/* reset signals and spin off the command interpreter */
 	deflt.sa_handler = SIG_DFL;
 	deflt.sa_flags = 0;
-	sigemptyset (&deflt.sa_mask);
+	sigemptyset( &deflt.sa_mask );
 
-	sigaction (SIGINT,	&deflt, NULL);
-	sigaction (SIGQUIT, &deflt, NULL);
-	sigaction (SIGTERM, &deflt, NULL);
-	sigaction (SIGHUP,	&deflt, NULL);
-	sigaction (SIGPIPE,	&deflt, NULL);
-	sigaction (SIGCHLD, &deflt, NULL);
+	sigaction( SIGINT,	&deflt, NULL );
+	sigaction( SIGQUIT, &deflt, NULL );
+	sigaction( SIGTERM, &deflt, NULL );
+	sigaction( SIGHUP,	&deflt, NULL );
+	sigaction( SIGPIPE,	&deflt, NULL );
+	sigaction( SIGCHLD, &deflt, NULL );
 
 	/*
 	 * Mimick login's behavior by disabling the job control signals a shell that
 	 * wants them can turn them back on
 	 */
 #ifdef SIGTSTP
-	ignore.sa_handler = SIG_IGN;
-	ignore.sa_flags = 0;
-	sigemptyset (&ignore.sa_mask);
+	ignore.sa_handler	= SIG_IGN;
+	ignore.sa_flags		= 0;
+	sigemptyset( &ignore.sa_mask );
 
-	sigaction (SIGTSTP, &ignore, NULL);
-	sigaction (SIGTTIN, &ignore, NULL);
-	sigaction (SIGTTOU, &ignore, NULL);
+	sigaction( SIGTSTP, &ignore, NULL );
+	sigaction( SIGTTIN, &ignore, NULL );
+	sigaction( SIGTTOU, &ignore, NULL );
 # if 0
 	signal(SIGTSTP, SIG_IGN);
 	signal(SIGTTIN, SIG_IGN);
@@ -3414,11 +3464,11 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 #endif	/* SIGTSTP */
 
 	/* set window size */
-	rxvt_tt_winsize(STDIN_FILENO, r->TermWin.ncol, r->TermWin.nrow, 0);
+	rxvt_tt_winsize( STDIN_FILENO, r->TermWin.ncol, r->TermWin.nrow, 0 );
 
 #ifndef __QNX__
 	/* command interpreter path */
-	if (argv != NULL)
+	if( argv != NULL )
 	{
 # ifdef DEBUG_VERBOSE
 		int			i;
@@ -3432,15 +3482,16 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	{
 		const char	 *argv0, *shell;
 
-		if (NULL == (shell = getenv("SHELL")) || ((char) 0 == *shell))
+		if( NULL == (shell = getenv("SHELL")) || ((char) 0 == *shell) )
 		{
 # ifdef HAVE_GETPWUID
-			struct passwd* pwent = getpwuid (getuid ());
+			struct passwd* pwent = getpwuid( getuid () );
 
-			if (	(NULL == pwent) ||
-					(NULL == (shell = pwent->pw_shell)) ||
-					((char) 0 == *shell)
-			   )
+			if(
+				 (NULL == pwent)
+				 || ( NULL == (shell = pwent->pw_shell) )
+				 || *shell == '\0'
+			  )
 # endif	/* HAVE_GETPWUID */
 				shell = "/bin/sh";
 		}
@@ -3458,7 +3509,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 			login[l-1] = (char) 0;
 			argv0 = login;
 		}
-		execlp(shell, argv0, NULL);
+		execlp( shell, argv0, NULL );
 		/* no error message: STDERR is closed! */
 	}
 #else				/* __QNX__ uses qnxspawn() */

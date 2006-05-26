@@ -714,9 +714,26 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 				 */
 
 				const int	MaxMacroTitle = 80;	/* Longest title we will have */
-				char		title[MaxMacroTitle];
+				char		titlestring[MaxMacroTitle];
 				char		*command = (char *) action->str;
+				char		*title = NULL;
 
+				int			profile = 0;
+
+				/* See if a profile is specified */
+				if( *command == '-' )
+				{
+					profile = (int) ( *(++command) - '0' );
+
+					if( profile < 0 || profile >= MAX_PROFILES )
+						profile = AVTS(r)->profileNum;
+
+					/* Skip spaces */
+					if( *command  ) command++;
+					while( isspace( *command ) ) command++;
+				}
+
+				/* See if a title is specified */
 				if( *command == '"' )
 				{
 					int i;
@@ -727,23 +744,22 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 						  i < MaxMacroTitle - 2 && *command && *command != '"';
 						  i++, command++
 					   )
-						title[i] = *command;
-					title[i] = '\0'; /* Null terminate title */
+						titlestring[i] = *command;
+					titlestring[i] = '\0'; /* Null terminate title */
+					title = titlestring;
 
 					/* Skip spaces after title */
 					if( *command ) command++;
 					while( isspace( *command ) ) command++;
-					// while( *command && isspace( *(++command) ));
-
-					if( *command )
-						rxvt_append_page( r, title, command);
-					else
-						rxvt_append_page( r, title, NULL);
 				}
-				else rxvt_append_page( r, NULL, command);
+
+				/* Add page */
+				rxvt_append_page( r, profile, title,
+									*command ? command : NULL );
 			}
 			else
-				rxvt_append_page( r, NULL, NULL);
+				rxvt_append_page( r, 0, NULL, NULL);
+
 
 			break;
 

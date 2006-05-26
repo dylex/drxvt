@@ -113,7 +113,6 @@ typedef struct {
 	RUINT16T		mapped; 	/* TermWin is mapped? */
 	RUINT16T		int_bwidth; /* internal border width */
 	RUINT16T		ext_bwidth; /* external border width */
-    RUINT16T		saveLines;	/* number of lines to save for all tabs */
 
 	RUINT16T		maxTabWidth,	/* max width of tab title to display */
 					minVisibleTabs;	/* Minimum number of tabs to try and keep
@@ -543,13 +542,14 @@ typedef enum {
 struct term_t;
 typedef struct {
 	/*
-	** Index to vts. If it's -1, then this term_t structure is not
-	** used. Otherwise, it is used by pointer vts[vts_idx]. This
-	** is to improve destroy performance so that we only need to
-	** do (i = page..ltab) vts[i] = vts[i+1] instead of vterm[i] =
-	** vterm[i+1].
-	*/
+	 * Index to vts. If it's -1, then this term_t structure is not used.
+	 * Otherwise, it is used by pointer vts[vts_idx]. This is to improve destroy
+	 * performance so that we only need to do (i = page..ltab) vts[i] = vts[i+1]
+	 * instead of vterm[i] = vterm[i+1].
+	 */
 	short			vts_idx;
+
+	unsigned char	profileNum;	/* Profile used to init settings */
 
 	/* moved from TermWin_t */
     RUINT16T		saveLines;	/* number of lines to save */
@@ -572,11 +572,11 @@ typedef struct {
 #endif
 
 	/* Apparently, people like fg/bg colors for individual terminal */
-	unsigned long*	p_fg;
-	unsigned long*	p_bg;
+	unsigned long	p_fg;
+	unsigned long	p_bg;
 #ifdef XFT_SUPPORT
-    XftColor*		p_xftfg;
-    XftColor*		p_xftbg;
+    XftColor		p_xftfg;
+    XftColor		p_xftbg;
 #endif
 
 	/* moved from rxvt_t */
@@ -635,8 +635,10 @@ typedef struct {
 	unsigned char	next_utmp_action;
 #endif
 
+#if 0
 	char**			command_argv;
 	int				command_argc;
+#endif
 
 	/* move from rxvt_hidden */
 	ttymode_t		tio;
@@ -728,6 +730,26 @@ typedef struct {
 	action_t			action;
 } macros_t;
 
+/*
+ * profile_t structure. Contains information about each profile (formerly the
+ * vt%d.xx resources.
+ */
+typedef struct _profile_t
+{
+	unsigned long		fg, bg;
+#ifdef XFT_SUPPORT
+	XftColor			xftfg, xftbg;
+#endif
+
+	int					saveLines;
+
+	/*
+	 * Each profile also has a tab title, and command associated to it. However
+	 * since that's already stored in our resource options, we don't need
+	 * pointers for it here.
+	 */
+} profile_t;
+
 
 typedef struct rxvt_vars {
 	/*
@@ -783,6 +805,8 @@ typedef struct rxvt_vars {
 #endif
 	short			numPixColors;	/* TOTAL_COLORS */
 
+	profile_t		profile[MAX_PROFILES];
+
 	Cursor			term_pointer; /* cursor for vt window */
 	int				Xdepth;
 	int				sb_shadow;	/* scrollbar shadow width */
@@ -823,6 +847,7 @@ typedef enum {
 
 
 /* MACROS for colors of individual terminals */
+#if 0
 #define VTFG(R, P)		\
 	((R)->PixColors[TOTAL_COLORS + (P)])
 #define VTBG(R, P)		\
@@ -837,6 +862,23 @@ typedef enum {
 	(NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + (P)]))
 #define ISSET_VTBG(R, P)	\
 	(NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + MAX_PAGES + (P)]))
+#endif
+
+#define VTFG(R, P)		\
+	((R)->profile[(P)].fg)
+#define VTBG(R, P)		\
+	((R)->profile[(P)].bg)
+#ifdef XFT_SUPPORT
+# define VTXFTFG(R, P)		\
+	((R)->profile[(P)].xftfg)
+# define VTXFTBG(R, P)		\
+	((R)->profile[(P)].xftbg)
+#endif	/* XFT_SUPPORT */
+#define ISSET_VTFG(R, P)	\
+	(NULL != ((R)->h->rs[Rs_foreground + (P)] ) )
+#define ISSET_VTBG(R, P)	\
+	(NULL != ((R)->h->rs[Rs_background + (P)] ) )
+
 
 
 /* MACROS for tab/page number */

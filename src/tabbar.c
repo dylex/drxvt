@@ -75,8 +75,8 @@
 /* margin around the text of the tab */
 #define TXT_MARGIN		((int) 3)
 /*
-** Parameters to draw top tabbar
-*/
+ * Parameters to draw top tabbar
+ */
 /* space between top window border and tab top */
 #define TAB_TOPOFF		((int) 0)
 /* Extra height of the active tab */
@@ -150,9 +150,9 @@ extern char **cmd_argv;
 
 
 /*
-** Width between two tabs:
-** From the left of the first tab to the right of the second tab
-*/
+ * Width between two tabs:
+ * From the left of the first tab to the right of the second tab
+ */
 /* INTPROTO */
 static int
 width_between (rxvt_t* r, int start, int end)
@@ -167,10 +167,10 @@ width_between (rxvt_t* r, int start, int end)
 
 
 /*
-** Find most left tab within specified distance. Note that the
-** distance does not include the width of tab[start]. It means
-** distance = (beginning of tab[start] - 0)
-*/
+ * Find most left tab within specified distance. Note that the
+ * distance does not include the width of tab[start]. It means
+ * distance = (beginning of tab[start] - 0)
+ */
 /* INTPROTO */
 static int
 find_left_tab (rxvt_t* r, int start, int distance)
@@ -198,10 +198,10 @@ find_left_tab (rxvt_t* r, int start, int distance)
 
 
 /*
-** Find most right tab within specified distance. Note that the
-** distance does not include the width of tab[start]. It means
-** distance = (beginning of first button - end of tab[start])
-*/
+ * Find most right tab within specified distance. Note that the
+ * distance does not include the width of tab[start]. It means
+ * distance = (beginning of first button - end of tab[start])
+ */
 /* INTPROTO */
 static int
 find_right_tab (rxvt_t* r, int start, int distance)
@@ -474,7 +474,8 @@ draw_string (rxvt_t* r, Region clipRegion,
  */
 /* INTPROTO */
 static void
-draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum, Region region)
+draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
+		Region region)
 {
 	Region		clipRegion = None;
 	char		str[MAX_DISPLAY_TAB_TXT + 1];
@@ -674,13 +675,13 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 		return;
 
 	/* Sanatization */
-	assert (LTAB(r) >= 0);
-	assert (FVTAB(r) >= 0);
-	assert (FVTAB(r) <= LTAB(r));
-	assert (LVTAB(r) >= 0);
-	assert (LVTAB(r) <= LTAB(r));
-	assert (ATAB(r) >= FVTAB(r));
-	assert (ATAB(r) <= LVTAB(r));
+	assert( LTAB(r)  >= 0		 );
+	assert( FVTAB(r) >= 0		 );
+	assert( FVTAB(r) <= LTAB(r)	 );
+	assert( LVTAB(r) >= 0		 );
+	assert( LVTAB(r) <= LTAB(r)	 );
+	assert( ATAB(r)  >= FVTAB(r) );
+	assert( ATAB(r)  <= LVTAB(r) );
 
 
 	if( region != None )
@@ -786,9 +787,11 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				 * This misses the bottom of the ATAB, so we should color it
 				 * ourselves.
 				 *
-				 * 2006-02-14 gi1242: Drawing with XDrawLine is not enough. For some
-				 * reason a thin line below is still missed. Be super safe and
-				 * XFillRectangle it.
+				 * 2006-02-14 gi1242: Drawing with XDrawLine is not enough. For
+				 * some reason a thin line below is still missed. Be super safe
+				 * and XFillRectangle it.
+				 *
+				 * 2006-05-26 gi1242: The thin line looks kinda nice actually...
 				 */
 #if 0
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
@@ -1071,10 +1074,9 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 }
 
 
-
 /*
-** Initialize global data structure of all tabs
-*/
+ * Initialize global data structure of all tabs
+ */
 /* INTPROTO */
 static void
 init_tabbar (rxvt_t* r)
@@ -1104,7 +1106,6 @@ init_tabbar (rxvt_t* r)
 }
 
 
-
 /* INTPROTO */
 void
 rxvt_kill_page (rxvt_t* r, short page)
@@ -1119,15 +1120,21 @@ rxvt_kill_page (rxvt_t* r, short page)
  */
 /* EXTPROTO */
 void
-rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
+rxvt_append_page( rxvt_t* r, int profile,
+		const char TAINTED * title, const char *command )
 {
+	DBG_MSG( 2, ( stderr, "rxvt_append_page( r, %d, %s, %s )\n",
+				profile, title ? title : "(nil)",
+				command ? command : "(nil)" ) );
+
+
 	int		num_fds,
 			num_cmd_args = 0; /* Number of args we got from parsing command */
 	char**	argv;
 
 
-	/* Sanatization */
-	assert (LTAB(r) < MAX_PAGES);
+	/* Sanitization */
+	assert( LTAB(r) < MAX_PAGES );
 
 	if (LTAB(r) == MAX_PAGES-1)
 	{
@@ -1142,40 +1149,34 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 	/* indicate that we add a new tab */
 	LTAB(r)++;
 
-	rxvt_create_termwin (r, LTAB(r),
-			title == NULL ? command : title);
+	rxvt_create_termwin( r, LTAB(r), profile, title == NULL ? command : title );
 	DBG_MSG(1, (stderr, "last page is %d\n", LTAB(r)) );
 
-	/* load tab command */
-	if( command != NULL && *command != '!')
+	/* -e command specified */
+	if( LTAB(r)== 0 && cmd_argv )
 	{
-		/* If "command" starts with '!', we should run it in the shell. */
-		argv = rxvt_string_to_argv( command, &num_cmd_args);
+		argv = cmd_argv;
+		command = NULL;		/* Reset, so that we don't accidentally run it in
+							   the shell if it begins with "!". */
 	}
 	else
 	{
-		argv = LVTS(r)->command_argv;
+		/* load tab command if necessary*/
+		if( command == NULL )
+			command = getProfileOption( r, profile, Rs_command );
 
-		if ( (
-				(0 == LTAB(r)) &&					/* Is the first tab */
-				(NULL == argv || NULL != cmd_argv)	/* Either no tab command
-													   defined, or user has
-													   supplied command */
-			 ) || (
-				(r->Options2 & Opt2_cmdAllTabs)		/* use -e command for all
-													   tab commands */
-				&& cmd_argv != NULL					/* Only use it if user
-													   specified a command
-													   using -e */
-			 )
-		   )
-			argv = cmd_argv;
-
-		else if (r->Options2 & Opt2_tabShell)		/* if run shell for all tab
-													   commands, set argv to
-													   NULL */
+		if( command != NULL && *command != '!')
+		{
+			/* If "command" starts with '!', we should run it in the shell. */
+			argv = rxvt_string_to_argv( command, &num_cmd_args );
+		}
+		else
 			argv = NULL;
 	}
+
+	DBG_MSG( 2, ( stderr, "Forking command=%s, argv[0]=%s\n",
+				command ? command : "(nil)",
+				argv && argv[0] ? argv[0] : "(nil)" ) );
 
 	/*
 	 * Run the child process.
@@ -1189,13 +1190,13 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 		 * Attempt to spawn child process in the working directory of the
 		 * current tab.
 		 */
-		char *cwd = getcwd( NULL, PATH_MAX),
+		char *cwd = getcwd( NULL, PATH_MAX ),
 			 proc_cwd[32],
 			 atab_pwd[PATH_MAX];
 		int len;
 
-		sprintf( proc_cwd, "/proc/%d/cwd", AVTS(r)->cmd_pid);
-		if( (len = readlink( proc_cwd, atab_pwd, PATH_MAX-1)) > 0 )
+		sprintf( proc_cwd, "/proc/%d/cwd", AVTS(r)->cmd_pid );
+		if( (len = readlink( proc_cwd, atab_pwd, PATH_MAX-1) ) > 0 )
 			/* readlink does not null terminate */
 			atab_pwd[len] = 0;
 
@@ -1208,7 +1209,7 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 
 			/* Run command in this new directory. */
 			LVTS(r)->cmd_fd =
-				rxvt_run_command (r, LTAB(r), (const char**) argv);
+				rxvt_run_command( r, LTAB(r), (const char**) argv );
 
 			/* Restore old working directory. */
 			chdir( cwd );
@@ -1219,7 +1220,7 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 			DBG_MSG( 2, ( stderr, "Running child in original directory\n"));
 
 			LVTS(r)->cmd_fd =
-				rxvt_run_command (r, LTAB(r), (const char**) argv);
+				rxvt_run_command( r, LTAB(r), (const char**) argv );
 		}
 
 		/* Glibc extension to getcwd: When passed a null pointer it allocates
@@ -1230,7 +1231,7 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 		LVTS(r)->cmd_fd = rxvt_run_command (r, LTAB(r), (const char**) argv);
 
 	/*
-	 * Incase we alloced memory for argv using rxvt_string_to_argv (because a
+	 * In case we allocated memory for argv using rxvt_string_to_argv (because a
 	 * command was specified), then free it.
 	 */
 	if( num_cmd_args > 0)
@@ -1244,7 +1245,7 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 	/*
 	 * If run command failed, rollback
 	 */
-	assert (-1 != LVTS(r)->cmd_fd);
+	assert( -1 != LVTS(r)->cmd_fd );
 	if (-1 == LVTS(r)->cmd_fd)
 	{
 		rxvt_destroy_termwin (r, LTAB(r));
@@ -1256,13 +1257,13 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 	/*
 	 * Reduce r->num_fds so that select() is more efficient
 	 */
-	num_fds = max(STDERR_FILENO, LVTS(r)->cmd_fd);
-	MAX_IT(num_fds, r->Xfd);
-	MAX_IT(num_fds, r->num_fds-1);
+	num_fds = max( STDERR_FILENO, LVTS(r)->cmd_fd );
+	MAX_IT( num_fds, r->Xfd );
+	MAX_IT( num_fds, r->num_fds-1 );
 /* #ifdef __sgi */
 #ifdef OS_IRIX
 	/* Alex Coventry says we need 4 & 7 too */
-	MAX_IT(num_fds, 7);
+	MAX_IT( num_fds, 7 );
 #endif
 	r->num_fds = num_fds + 1;	/* counts from 0 */
 	DBG_MSG(1, (stderr, "Adjust num_fds to %d\n", r->num_fds));
@@ -1277,39 +1278,12 @@ rxvt_append_page (rxvt_t* r, const char TAINTED * title, const char *command)
 	 * Now we actually execute the command after executing shell, but we need
 	 * careful check first.
 	 */
-	if ( (command != NULL && *command == '!') ||		/* Shell command
-														   specified in call to
-														   this function. */
-		 (
-			command == NULL &&							/* No prog specified in
-														   call to this fn */
-			(r->Options2 & Opt2_tabShell) &&
-			!(r->Options2 & Opt2_cmdAllTabs) &&			/* the user is not using
-														   -e command for all
-														   tabs */
-			(NULL != r->h->rs[Rs_command+LTAB(r)]) &&	/* the user has
-														   specified the tab
-														   command */
-			!((r->Options2 & Opt2_cmdInitTabs) &&
-			  (NULL == LVTS(r)->command_argv))			/* if tab command is
-														   only used in
-														   initialization, we
-														   are not after the
-														   initialization */
-		 )
-	   )
+	if( command != NULL && *command == '!' )
 	{
-		const char *cmd;
-
-		if( command )
-			/* Run the shell program specified in the call to this function */
-			cmd = command + 1;
-		else
-			/* Run the shell program specified by resources */
-			cmd = r->h->rs[Rs_command+LTAB(r)];
-
-		rxvt_tt_write (r, LTAB(r), (const unsigned char*) cmd, STRLEN(cmd));
-		rxvt_tt_write (r, LTAB(r), (const unsigned char*) "\n", 1);
+		command++;	/* Skip leading '!' */
+		rxvt_tt_write( r, LTAB(r), (const unsigned char*) command,
+				STRLEN(command) );
+		rxvt_tt_write( r, LTAB(r), (const unsigned char*) "\n", 1 );
 	}
 
 	/*
@@ -1480,8 +1454,8 @@ rxvt_remove_page (rxvt_t* r, short page)
 
 
 /*
-** Set new title for a tab
-*/
+ * Set new title for a tab
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
@@ -1494,8 +1468,8 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
 
 	n_title = STRNDUP (str, MAX_TAB_TXT);
 	/*
-	** If strdup succeeds, set new title
-	*/
+	 * If strdup succeeds, set new title
+	 */
 	if (NULL != n_title)
 	{
 		free (PVTS(r, page)->tab_title);
@@ -1528,8 +1502,8 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
 
 
 /*
-** Activate a page terminal
-*/
+ * Activate a page terminal
+ */
 /* EXTPROTO */
 void
 rxvt_activate_page (rxvt_t* r, short index)
@@ -1581,8 +1555,8 @@ rxvt_activate_page (rxvt_t* r, short index)
 
 
 /*
-** Change the width of the tab bar
-*/
+ * Change the width of the tab bar
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_resize (rxvt_t* r)
@@ -1614,8 +1588,8 @@ rxvt_tabbar_resize (rxvt_t* r)
 
 
 /*
-** Determine the position of pointer click and dispatch the event
-*/
+ * Determine the position of pointer click and dispatch the event
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
@@ -1712,7 +1686,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 				break;
 
 			case 3 : /* create a new vt*/
-				rxvt_append_page (r, NULL, NULL);
+				rxvt_append_page (r, 0, NULL, NULL);
 				break;
 
 			default :
@@ -1813,8 +1787,8 @@ rxvt_tabbar_visible (rxvt_t* r)
 
 
 /*
-** Expose handler for tabbar
-*/
+ * Expose handler for tabbar
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_expose (rxvt_t* r, XEvent *ev)
@@ -1850,10 +1824,9 @@ rxvt_tabbar_expose (rxvt_t* r, XEvent *ev)
 }
 
 
-
 /*
-** Hide the tabbar
-*/
+ * Hide the tabbar
+ */
 /* EXTPROTO */
 int
 rxvt_tabbar_hide (rxvt_t* r)
@@ -1869,10 +1842,9 @@ rxvt_tabbar_hide (rxvt_t* r)
 }
 
 
-
 /*
-** Show the tabbar
-*/
+ * Show the tabbar
+ */
 /* EXTPROTO */
 int
 rxvt_tabbar_show (rxvt_t* r)
@@ -1888,10 +1860,9 @@ rxvt_tabbar_show (rxvt_t* r)
 }
 
 
-
 /*
-** Create the tab bar window
-*/
+ * Create the tab bar window
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_create (rxvt_t* r)
@@ -1904,10 +1875,9 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef HAVE_LIBXPM
 	XpmAttributes	xpm_attr;
 	/*
-	** Make sure symbol `background' exists in all .xpm files!
-	** This elimate the background color so that the buttons
-	** look transparent.
-	*/
+	 * Make sure symbol `background' exists in all .xpm files! This elimate the
+	 * background color so that the buttons look transparent.
+	 */
 	XpmColorSymbol	xpm_color_sym = {"background", NULL, 0};
 #endif
 
@@ -1957,39 +1927,43 @@ rxvt_tabbar_create (rxvt_t* r)
 		/* r->tabBar.delimit = r->PixColors[Color_Grey25]; */
 
 		/* create the inactive tab foreground color */
-		if (r->h->rs[Rs_itabfg] &&
-			rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_itabfg]))
+		if(
+			 r->h->rs[Rs_itabfg]
+			 && rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_itabfg])
+		  )
 			r->tabBar.ifg = color.pixel;
 		else
 			r->tabBar.ifg = r->PixColors[Color_Black];
 
 		/* create the inactive tab background color */
-		if (r->h->rs[Rs_itabbg] &&
-			rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_itabbg]))
+		if(
+			 r->h->rs[Rs_itabbg]
+			 && rxvt_parse_alloc_color( r, &color, r->h->rs[Rs_itabbg] )
+		  )
 			r->tabBar.ibg = color.pixel;
 		else
 		{
-			color.red = 0xa100;
+			color.red	= 0xa100;
 			color.green = 0xa100;
-			color.blue = 0xac00;
-			if (rxvt_alloc_color (r, &color, "Inactive_Tab_Bg"))
+			color.blue	= 0xac00;
+			if( rxvt_alloc_color( r, &color, "Inactive_Tab_Bg" ) )
 				r->tabBar.ibg = color.pixel;
 			else
 				r->tabBar.ibg = r->PixColors[Color_bg];
 		}
 
-		/* create the delimit color (average of 3fg & bg) */
+		/* create the delimit color (average of 3*fg & bg) */
 		color.pixel		= r->PixColors[Color_fg];
-		XQueryColor( r->Xdisplay, XCMAP, &color);
+		XQueryColor( r->Xdisplay, XCMAP, &color );
 
 		bgcolor.pixel	= r->PixColors[Color_bg];
-		XQueryColor( r->Xdisplay, XCMAP, &bgcolor);
+		XQueryColor( r->Xdisplay, XCMAP, &bgcolor );
 
-		color.red	= ( bgcolor.red		+ 3 * color.red) / 4;
-		color.green = ( bgcolor.green	+ 3 * color.green) / 4;
-		color.blue	= ( bgcolor.blue	+ 3 * color.blue) / 4;
+		color.red	= ( bgcolor.red		+ 3 * color.red		) / 4;
+		color.green = ( bgcolor.green	+ 3 * color.green	) / 4;
+		color.blue	= ( bgcolor.blue	+ 3 * color.blue	) / 4;
 
-		if (rxvt_alloc_color (r, &color, "Tab_Delimit"))
+		if( rxvt_alloc_color( r, &color, "Tab_Delimit" ) )
 			r->tabBar.delimit = color.pixel;
 		else
 			r->tabBar.delimit = r->PixColors[Color_fg];
@@ -2014,16 +1988,17 @@ rxvt_tabbar_create (rxvt_t* r)
 #endif
 	if (r->Options2 & Opt2_bottomTabbar)
 		sy += VT_HEIGHT(r);
-	/* create the window of the tabbar. Use ifg and ibg for the background of
-	 * the tabBar so that the active tab stands out better. */
-	r->tabBar.win = XCreateSimpleWindow(
-		r->Xdisplay, r->TermWin.parent,
-		sx, sy, TWIN_WIDTH(r), rxvt_tabbar_rheight (r),
-		0, r->tabBar.ifg, r->tabBar.ibg);
-	assert (None != r->tabBar.win);
+	/*
+	 * create the window of the tabbar. Use ifg and ibg for the background of
+	 * the tabBar so that the active tab stands out better.
+	 */
+	r->tabBar.win = XCreateSimpleWindow( r->Xdisplay, r->TermWin.parent,
+						sx, sy, TWIN_WIDTH(r), rxvt_tabbar_rheight( r ),
+						0, r->tabBar.ifg, r->tabBar.ibg );
+	assert( None != r->tabBar.win );
 
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if( r->Options & Opt_xft )
 	{
 		r->tabBar.xftwin = XftDrawCreate (r->Xdisplay, r->tabBar.win,
 								XVISUAL, XCMAP);
@@ -2152,8 +2127,8 @@ rxvt_tabbar_create (rxvt_t* r)
 
 
 /*
-** Create the tab bar window
-*/
+ * Create the tab bar window
+ */
 /* EXTPROTO */
 void
 rxvt_tabbar_clean_exit (rxvt_t* r)
@@ -2227,7 +2202,6 @@ rxvt_tabbar_rheight (rxvt_t* r)
 {
 	return (r->TermWin.FHEIGHT + 2*TXT_MARGIN + 2*TAB_BORDER + ATAB_EXTRA);
 }
-
 
 
 /* EXTPROTO */

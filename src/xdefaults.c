@@ -106,31 +106,23 @@ static const struct {
 	const char*		opt;		/* option */
 	const char*		arg;		/* argument */
 	const char*		desc;		/* description */
-	const char		multiple;	/* multiple values for VTs */
+	const char		multiple;	/* multiple values for profiles */
 } optList[] = {
 #ifdef BACKGROUND_IMAGE
-	STRG(Rs_backgroundPixmap, "vt%d.Pixmap", "vt%d.pixmap", "file[;geom]", "background image for a tab", 1),
+	STRG(Rs_backgroundPixmap, "profile%d.Pixmap", "profile%d.pixmap", "file[;geom]", "background image for a tab", 1),
 #endif
-	STRG(Rs_tabtitle, "vt%d.tabTitle", "vt%d.tt", "string", "title name for tab", 1),
-	STRG(Rs_saveLines, "vt%d.saveLines", "vt%d.sl", "number", "number of scrolled lines to save for tab", 1),
-	STRG(Rs_command, "vt%d.command", "vt%d.e", "string", "command to execute for a tab", 1),
-	STRG(Rs_color + TOTAL_COLORS, "vt%d.foreground",
-		"vt%d.fg", "color", "foreground color for a tab", 1),
-	STRG(Rs_color + TOTAL_COLORS + MAX_PAGES, "vt%d.background",
-		"vt%d.bg", "color", "background color for a tab", 1),
+	STRG(Rs_tabtitle, "profile%d.tabTitle", "profile%d.tt", "string", "title name for tab", 1),
+	STRG(Rs_saveLines, "profile%d.saveLines", "profile%d.sl", "number", "number of scrolled lines to save for tab", 1),
+	STRG(Rs_command, "profile%d.command", "profile%d.e", "string", "command to execute for a tab", 1),
+	STRG( Rs_foreground, "profile%d.foreground",
+		"profile%d.fg", "color", "foreground color for a tab", 1),
+	STRG( Rs_background, "profile%d.background",
+		"profile%d.bg", "color", "background color for a tab", 1),
 
-#ifdef BACKGROUND_IMAGE
-	/* Default pixmap for all tabs */
-	STRG(Rs_backgroundPixmapAll, "Pixmap", "pixmap", "file[;geom]", "background image for all tabs", 1),
-#endif
-	/* Default tab title for all tabs */
-	STRG(Rs_tabtitleAll, "tabTitle", "tt", "string", "title name for all tabs", 0),
 	STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
 	STRG(Rs_minVisibleTabs, "minVisibleTabs", "mvt", "number", "minimum # of tabs to keep visible (requires xftpfn)", 0),
 	BOOL(Rs2_hlTabOnBell, "highlightTabOnBell", "htb", 
 		Opt2_hlTabOnBell, "highlighting inactive tabs only when bell sounds", 0),
-	/* Default save lines for all tabs */
-	STRG(Rs_saveLinesAll, "saveLines", "sl", "number", "number of scrolled lines to save for all tabs", 0),
 	BOOL(Rs2_syncTabTitle, "syncTabTitle", "stt",
 		Opt2_syncTabTitle, "synchronizing terminal title with tab title", 0),
 	BOOL(Rs2_hideTabbar, "hideTabbar", "ht",
@@ -226,7 +218,9 @@ static const struct {
 #ifdef BACKGROUND_IMAGE
 	STRG(Rs_tabbarPixmap, "tabbarPixmap", "tbpixmap", "file[;geom]", "tabbar background image", 0),
 	BOOL(Rs_tabPixmap, "tabUsePixmap", "tupixmap", Opt_tabPixmap, "use tabbar background image for tabs", 0),
-	STRG(Rs_appIcon, "appIcon", "ic", "file[;geom]", "application icon file", 1),
+# if 0 /* App icon not yet implemented */
+	STRG(Rs_appIcon, "appIcon", "ic", "file[;geom]", "application icon file", 0),
+#endif
 #endif	/* BACKGROUND_IMAGE */
 
 	BOOL(Rs_utmpInhibit, "utmpInhibit", "ut", Opt_utmpInhibit,
@@ -257,8 +251,6 @@ static const struct {
 #ifndef NO_FRILLS
 	BOOL(Rs_tripleclickwords, "tripleclickwords", "tcw", Opt_tripleclickwords, "triple click word selection", 0),
 #endif
-	STRG(Rs_color + Color_bg, "background", "bg", "color", "background color", 0),
-	STRG(Rs_color + Color_fg, "foreground", "fg", "color", "foreground color", 0),
 	STRG(Rs_color + Color_ufbg, "ufBackground", "ufbg", "color", "unfocused background color", 0),
 #ifdef TEXT_SHADOW
 	STRG(Rs_textShadow, "textShadow", "ts", "color", "text shadow color", 0),
@@ -433,8 +425,6 @@ static const struct {
 		Opt2_tabShell, "running shell command for all tabs", 0),
 	BOOL(Rs2_cmdAllTabs, "cmdAllTabs", "at",
 		Opt2_cmdAllTabs, "running -e command for all tabs", 0),
-	BOOL(Rs2_cmdInitTabs, "cmdInitTabs", "it",
-		Opt2_cmdInitTabs, "loading tab command only on initialization", 0),
 	BOOL(Rs2_protectSecondary, "protectSecondary", "ps",
 		Opt2_protectSecondary, "protecting tab that uses the secondary screen from being closed", 0),
 
@@ -676,7 +666,7 @@ static const char optionsstring[] = "Options: "
 #if defined(NO_RESOURCES)
 	"NoResources"
 #else
-	".Xdefaults"
+	"Resources"
 #endif
 	"\nUsage: ";		/* Usage */
 
@@ -684,8 +674,9 @@ static const char optionsstring[] = "Options: "
 #define INDENT 24
 
 
-/*{{{ usage: */
-/*----------------------------------------------------------------------*/
+/*
+ * Print usage and exit.
+ */
 /* EXTPROTO */
 void
 rxvt_usage(int type)
@@ -783,7 +774,6 @@ rxvt_usage(int type)
 	exit(EXIT_FAILURE);
 	/* NOTREACHED */
 }
-/*}}} */
 
 
 /* EXTPROTO */
@@ -803,6 +793,7 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 		if (-1 == optList[i].doff)
 			continue;
 
+		/* TODO PROFILES */
 		if (
 				optList[i].multiple
 				&& rxvt_str_match( optList[i].kw, "vt%d." )
@@ -844,11 +835,15 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 }
 
 
-/*{{{ get command-line options before getting resources */
+/*
+ * Process command line options.
+ */
 /* EXTPROTO */
 void
 rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 {
+	DBG_MSG( 2, (stderr, "rxvt_get_options()\n") );
+
 	int			 i, bad_option = 0;
 	static const char On[3] = "ON", Off[4] = "OFF";
 
@@ -856,10 +851,10 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	{
 		unsigned int	entry, longopt = 0;
 		const char		*flag, *opt;
-		int				multiple;
+		int				profileNum;
 
 		opt = argv[i];
-		multiple = 0;	/* initialize multiple to 0 by default */
+		profileNum = 0;	/* initialize profileNum to 0 by default */
 
 		DBG_MSG(1, (stderr, "argv[%d] = %s: ", i, opt));
 		if (*opt == '-')
@@ -893,33 +888,88 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 			char			bufshort[128];
 
 			/* initialize it to empty string */
-			buflong[0] = (char) 0;
-			bufshort[0] = (char) 0;
+			buflong[0]	= '\0';
+			bufshort[0] = '\0';
 
-			if ( optList[entry].multiple && rxvt_str_match (opt, "vt") )
+			/*
+			 * Get the long option name in buflong, or the short option name in
+			 * bufshort.
+			 */
+			if ( optList[entry].multiple )
 			{
-				multiple = atoi (opt+2);
-				if (multiple < 0 || multiple >= MAX_PAGES)
+				int offset = 0;
+
+				/*
+				 * For backward compatibility, accept vt%d style options.
+				 */
+				offset = rxvt_str_match( opt, "vt" );
+				if( offset )
+					rxvt_print_error( "Obsolete style profile option %s", opt );
+				else
+					offset = rxvt_str_match( opt, "profile" );
+
+				if( offset )
 				{
-					entry = optList_size();
-					break;	/* out of range, jump to bad option */
+					char 	*s;
+
+					profileNum = atoi( opt + offset );
+					if( profileNum < 0 || profileNum >= MAX_PROFILES )
+					{
+						entry = optList_size();
+						break;	/* out of range, jump to bad option */
+					}
+
+					s = STRCHR( optList[entry].kw, '.' ) + 1;
+					assert( s != 1 );
+					snprintf( buflong, sizeof(buflong)-1,
+							"%.*s%d.%s", offset, opt, profileNum, s );
+					buflong[sizeof(buflong)-1] = '\0';
+
+					s = STRCHR( optList[entry].opt, '.' ) + 1;
+					assert( s != 1 );
+					snprintf( bufshort, sizeof(bufshort)-1,
+							"%.*s%d.%s", offset, opt, profileNum, s );
+					bufshort[sizeof(bufshort)-1] = '\0';
+
+					DBG_MSG( 3, ( stderr,
+								"Matched profile=%d buflong=%s bufshort=%s\n",
+								profileNum, buflong, bufshort ) );
 				}
-				snprintf (buflong, sizeof(buflong)-1,
-					optList[entry].kw, multiple);
-				buflong[sizeof(buflong)-1] = (char) 0;
-				snprintf (bufshort, sizeof(bufshort)-1,
-					optList[entry].opt, multiple);
-				bufshort[sizeof(bufshort)-1] = (char) 0;
+
+				/* If no profile number is specified, use 0 by default */
+				else
+				{
+					/*
+					 * Strip the profile%d from optList, and copy into buflong /
+					 * bufshort.
+					 */
+
+					char *s = STRCHR( optList[entry].kw, '.' );
+					assert(s); /* Should not happen */
+					STRNCPY( buflong, s+1, sizeof(buflong) - 1 );
+					buflong[ sizeof(buflong)-1 ] = '\0';
+
+					s = STRCHR( optList[entry].opt, '.' );
+					assert(s); /* Should not happen */
+					STRNCPY( bufshort, s+1, sizeof(bufshort) - 1 );
+					bufshort[ sizeof(bufshort)-1 ] = '\0';
+
+					profileNum = 0;
+
+					DBG_MSG( 3, ( stderr,
+								"Matched default buflong=%s bufshort=%s\n",
+								buflong, bufshort ) );
+				}
 			}
 			else if (optList[entry].kw)
 			{
 				STRNCPY (buflong, optList[entry].kw, sizeof(buflong)-1);
-				buflong[sizeof(buflong)-1] = (char) 0;
+				buflong[sizeof(buflong)-1] = '\0';
 				if (optList[entry].opt)
 				{
 					STRNCPY (bufshort, optList[entry].opt,
 						sizeof(bufshort)-1);
-					bufshort[sizeof(bufshort)-1] = (char) 0;
+					bufshort[sizeof(bufshort)-1] = '\0';
 				}
 			}
 			else if (optList[entry].opt)
@@ -927,20 +977,25 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				/* here NULL == optList[entry].kw */
 				STRNCPY (bufshort, optList[entry].opt,
 					sizeof(bufshort)-1);
-				bufshort[sizeof(bufshort)-1] = (char) 0;
+				bufshort[sizeof(bufshort)-1] = '\0';
 			}
 
+
+			/* Check to see if option matches */
 			if ((optList[entry].kw && !STRCMP(opt, buflong)) ||
 				(!longopt && optList[entry].opt &&
 				 !STRCASECMP(opt, bufshort)))
 				break;
-		}
+		} /* for */
 
+		/* Found option */
 		if (entry < optList_size())
 		{
 			if (optList_isReverse(entry))
 				flag = (flag == On) ? Off : On;
-			if (optList_STRLEN(entry))			/* string value */
+
+			/* string value */
+			if (optList_STRLEN(entry))
 			{
 				const char	 *str = argv[++i];
 
@@ -951,11 +1006,11 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				if (flag == On && str && (optList[entry].doff != -1))
 				{
 					DBG_MSG(2, (stderr, "\"%s\"\n", str));
-					r->h->rs[optList[entry].doff+multiple] = str;
+					r->h->rs[optList[entry].doff + profileNum] = str;
 					/*
-					 * special cases are handled in main.c:main() to
-					 * allow X resources to set these values before
-					 * we settle for default values
+					 * special cases are handled in main.c:main() to allow X
+					 * resources to set these values before we settle for
+					 * default values
 					 */
 				}
 #ifdef DEBUG_VERBOSE
@@ -963,11 +1018,13 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 					DBG_MSG(2, (stderr, "???\n"));
 #endif
 			}
-			else				/* boolean value */
+
+			/* boolean value */
+			else
 			{
 				DBG_MSG(2, (stderr, "boolean (%s,%s) = %s\n",
 					optList[entry].opt, optList[entry].kw, flag));
-				if ((optList[entry].doff+multiple) < Rs_options2)
+				if ((optList[entry].doff+profileNum) < Rs_options2)
 				{
 					if (flag == On)
 						r->Options |= (optList[entry].flag);
@@ -982,10 +1039,12 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 						r->Options2 &= ~(optList[entry].flag);
 				}
 
-				if ((optList[entry].doff+multiple) != -1)
-					r->h->rs[optList[entry].doff+multiple] = flag;
+				if ((optList[entry].doff+profileNum) != -1)
+					r->h->rs[optList[entry].doff+profileNum] = flag;
 			}
 		}
+
+		/* No option found */
 		else
 		{
 			if ( rxvt_str_match( opt, "macro."))
@@ -1027,22 +1086,21 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 	if (bad_option)
 		rxvt_usage(0);
-}
 
-/*}}} */
+	DBG_MSG( 2, (stderr, "rxvt_get_options() done.\n") );
+}
 
 
 #ifndef NO_RESOURCES
-/*----------------------------------------------------------------------*/
-
-/*{{{ rxvt_get_xdefaults() */
 /*
- * the matching algorithm used for memory-save fake resources
+ * Read resources from a file. "name" is the class name to use.
  */
 /* INTPROTO */
 void
 rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 {
+	DBG_MSG( 2, ( stderr, "rxvt_get_xdefaults()\n" ) );
+
 	unsigned int	len;
 	char TAINTED *	str;
 	char			buffer[256];
@@ -1065,10 +1123,10 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 		while (*str && isspace((int) *str))
 			str++;		/* leading whitespace */
 
-		if (
-			  (str[len] != '*' && str[len] != '.')
-			  || (len && STRNCMP(str, name, len))
-		   )
+		if(
+			(str[len] != '*' && str[len] != '.')
+			|| (len && STRNCMP(str, name, len))
+		  )
 			continue;
 		str += (len + 1);	/* skip `name*' or `name.' */
 
@@ -1090,24 +1148,59 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 			{
 				/* const char*	kw = optList[entry].kw; */
 				char	kw[256];
-				int		multiple = 0;	/* default is no offset */
+				int		profileNum = 0;	/* default is no offset */
 
 				if (optList[entry].kw == NULL)
 					continue;
 				STRNCPY (kw, optList[entry].kw, sizeof(kw)-1);
 				kw[sizeof(kw)-1] = (char) 0;
 
-				if ( optList[entry].multiple && rxvt_str_match(str, "vt") )
+				if( optList[entry].multiple )
 				{
-					char	buf[256];
+					int offset = 0;
 
-					multiple = atoi (str+2);
-					if (multiple < 0 || multiple >= MAX_PAGES)
-						continue;	/* out of range */
-					snprintf (buf, sizeof(buf)-1, kw, multiple);
-					buf[sizeof(buf)-1] = (char) 0;
-					STRNCPY (kw, buf, sizeof(kw)-1);
-					kw[sizeof(kw)-1] = (char) 0;
+					/*
+					 * For backward compatibility, accept vt%d style options.
+					 */
+					offset = rxvt_str_match( str, "vt" );
+					if( offset )
+						rxvt_print_error( "Obsolete style profile option %s",
+								str );
+					else
+						offset = rxvt_str_match( str, "profile" );
+
+					if( offset )
+					{
+						char	buf[256];
+						char	*s;
+
+						profileNum = atoi( str + offset );
+						if (profileNum < 0 || profileNum >= MAX_PROFILES)
+							continue;	/* out of range */
+
+						s = STRCHR( kw, '.' ) + 1;
+						assert( s != 1 );
+						snprintf( buf, sizeof(buf)-1,
+								"%.*s%d.%s", offset, str, profileNum, s );
+						buf[sizeof(buf)-1] = '\0';
+
+						STRNCPY (kw, buf, sizeof(kw)-1);
+						kw[sizeof(kw)-1] = '\0';
+
+						DBG_MSG( 3, ( stderr, "Matched profile=%d kw=%s\n",
+								profileNum, kw) );
+					}
+					else
+					{
+						char *s = STRCHR( kw, '.' );
+						assert(s);
+
+						profileNum = 0;
+						STRNCPY( kw, s+1, sizeof(kw) - 1 );
+						kw[ sizeof(kw)-1 ] = '\0';
+
+						DBG_MSG( 3, ( stderr, "Matched default kw=%s\n", kw) );
+					}
 				}
 
 				n = STRLEN(kw);
@@ -1118,13 +1211,13 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 					rxvt_str_trim(str);
 					n = STRLEN(str);
 
-					if (n && !r->h->rs[optList[entry].doff+multiple])
+					if (n && !r->h->rs[optList[entry].doff+profileNum])
 					{
 						/* not already set */
 						int		s;
 						char*	p = STRDUP(str);
 
-						r->h->rs[optList[entry].doff+multiple] = p;
+						r->h->rs[optList[entry].doff+profileNum] = p;
 						if (optList_isBool(entry))
 						{
 							s = STRCASECMP(str, "true") == 0 ||
@@ -1134,7 +1227,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 							if (optList_isReverse(entry))
 								s = !s;
 
-							if ((optList[entry].doff+multiple) < Rs_options2)
+							if ((optList[entry].doff+profileNum) < Rs_options2)
 							{
 								if (s)
 									r->Options |= (optList[entry].flag);
@@ -1156,22 +1249,21 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 		}	/* if( !rxvt_parse_macros ... ) */
 	}	/* while() */
 
-	rewind(stream);
+	rewind( stream );
 }
-
-/*}}} */
 #endif				/* NO_RESOURCES */
 
 
-/*{{{ read the resources files */
-
+/*
+ * Open resource files and call rxvt_get_xdefaults() for each one in turn.
+ */
 /* ARGSUSED */
 /* EXTPROTO */
 void
 rxvt_extract_resources (
-		rxvt_t *r,
-		Display *display __attribute__((unused)),
-		const char *name )
+		rxvt_t		*r,
+		Display		*display __attribute__((unused)),
+		const char	*name )
 {
 #ifndef NO_RESOURCES
 
@@ -1343,6 +1435,4 @@ rxvt_extract_resources (
 	}
 #endif				/* GREEK_SUPPORT */
 }
-
-/*}}} */
 /*----------------------- end-of-file (C source) -----------------------*/

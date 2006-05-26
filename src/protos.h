@@ -97,8 +97,9 @@ void             rxvt_init_xlocale                __PROTO((rxvt_t *r));
 void             rxvt_init_command                __PROTO((rxvt_t* r, const char* const *argv));
 CARD32           rxvt_get_desktop                 __PROTO((rxvt_t* r));
 void             rxvt_create_show_windows         __PROTO((rxvt_t* r, int argc, const char* const *argv));
-void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, const char TAINTED * title));
 void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page));
+void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
+const char*		 getProfileOption				  __PROTO(( rxvt_t *r, int profile, int resource ));
 int              rxvt_run_command                 __PROTO((rxvt_t* r, int page, const char** argv));
 termenv_t        rxvt_get_termenv                 __PROTO((const char* str));
 char**			 rxvt_string_to_argv    		  __PROTO((const char*, int*));
@@ -412,7 +413,7 @@ long             PngReadFileToPixmap             __PROTO((Display* display, Wind
 
 
 /* Begin prototypes of tabbar.c */
-void             rxvt_append_page               __PROTO((rxvt_t*, const char TAINTED *, const char *));
+void             rxvt_append_page               __PROTO((rxvt_t*, int profile, const char TAINTED *title, const char *command));
 void             rxvt_kill_page                 __PROTO((rxvt_t*, short));
 void             rxvt_remove_page               __PROTO((rxvt_t*, short));
 void             rxvt_activate_page             __PROTO((rxvt_t*, short));

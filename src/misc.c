@@ -79,11 +79,13 @@ rxvt_print_error(const char *fmt,...)
 int
 rxvt_str_match(const char *s1, const char *s2)
 {
-	if( s1 == NULL || s2 == NULL) return 0;
-	else {
+	if( s1 == NULL || s2 == NULL)
+		return 0;
+	else
+	{
 		int             n = STRLEN(s2);
 
-		return ((STRNCMP(s1, s2, n) == 0) ? n : 0);
+		return ( (STRNCMP(s1, s2, n) == 0) ? n : 0 );
 	}
 }
 
@@ -127,7 +129,8 @@ rxvt_str_trim(char *str)
     for (; n > 0 && isspace((int) *r); r--, n--)
 		;
 	/* skip matching leading/trailing quotes */
-    if (*s == '"' && *r == '"' && n > 1) {
+    if( *s == '"' && *r == '"' && n > 1 )
+	{
 		s++;
 		n -= 2;
     }
@@ -168,9 +171,15 @@ rxvt_str_escaped(char *str)
 	/*
 	 * 2006-03-23 gi1242: Disabled, as the user has no 'easy' way to send
 	 * strings beginning with M-x to mrxvt.
+	 *
+	 * 2006-05-24 gi1242: With macros, the user has an 'easy' way to send
+	 * strings to mrxvt. However emacs users should use emacs macros do do such
+	 * things, and not require code bloat in mrxvt for these random features.
+	 * Besides, mrxvt users should use Vim anyway ... :)
 	 */
-#if 0/*{{{*/
-    if (*s == 'M' && s[1] == '-') {
+#if 0
+    if (*s == 'M' && s[1] == '-')
+	{
 		/* Emacs convenience, replace leading `M-..' with `\E..' */
 		*d++ = C0_ESC;
 		s += 2;
@@ -181,13 +190,17 @@ rxvt_str_escaped(char *str)
 				s++)
 				;
     }
-#endif/*}}}*/
-    for (; (ch = *s++);) {
-		if (ch == '\\') {
+#endif
+    for (; (ch = *s++);)
+	{
+		if (ch == '\\')
+		{
 		    ch = *s++;
-		    if (ch >= '0' && ch <= '7') {	/* octal */
+		    if (ch >= '0' && ch <= '7')			/* octal */
+			{
 				num = ch - '0';
-				for (i = 0; i < 2; i++, s++) {
+				for (i = 0; i < 2; i++, s++)
+				{
 				    ch = *s;
 				    if (ch < '0' || ch > '7')
 						break;
@@ -208,7 +221,8 @@ rxvt_str_escaped(char *str)
 			else if (ch == 't')
 				ch = C0_HT;	/* tab */
 		}
-		else if (ch == '^') {
+		else if (ch == '^')
+		{
 		    ch = *s++;
 		    ch = toupper((int) ch);
 		    ch = (ch == '?' ? 127 : (ch - '@'));
@@ -253,9 +267,11 @@ rxvt_splitcommastring(const char *cs)
     ret = rxvt_malloc((n + 1) * sizeof(char *));
     ret[n] = NULL;
 
-    for (l = 0, t = s; l < n; l++) {
-		for ( ; *t && *t != ','; t++) ;
-			p = t - s;
+    for (l = 0, t = s; l < n; l++)
+	{
+		for( ; *t && *t != ','; t++ );
+		p = t - s;
+
 		ret[l] = rxvt_malloc(p + 1);
 		STRNCPY(ret[l], s, p);
 		ret[l][p] = '\0';
@@ -312,12 +328,14 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
     if (!access(name, R_OK))
 		return STRDUP(name);
 
-    if (ext) {
+    if (ext)
+	{
 		STRCAT(name, ext);
 		if (!access(name, R_OK))
 			return STRDUP(name);
     }
-    for (path = pathlist; path != NULL && *path != '\0'; path = p) {
+    for (path = pathlist; path != NULL && *path != '\0'; path = p)
+	{
 		int             n;
 
 		/* colon delimited */
@@ -327,7 +345,8 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
 		n = (p - path);
 		if (*p != '\0') p++;
 
-		if (n > 0 && n <= maxpath) {
+		if (n > 0 && n <= maxpath)
+		{
 			STRNCPY(name, path, n);
 			if (name[n - 1] != '/') name[n++] = '/';
 			name[n] = '\0';
@@ -336,7 +355,8 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
 			if (!access(name, R_OK))
 				return STRDUP(name);
 
-			if (ext) {
+			if (ext)
+			{
 				STRCAT(name, ext);
 				if (!access(name, R_OK))
 					return STRDUP(name);
@@ -356,7 +376,8 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
     if (file == NULL || *file == '\0')
 	return NULL;
 
-	do {
+	do
+	  {
 		char *envpath;
 
 		if ((f = rxvt_File_search_path(path, file, ext))) break;
@@ -377,7 +398,8 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 		 */
 		DBG_MSG( 2, ( stderr, "Searching for %s in ~/.mrxvt\n", file));
 		envpath = getenv("HOME");
-		if( envpath ) {
+		if( envpath )
+		{
 			char *homepath;
 
 			homepath = rxvt_malloc( STRLEN(envpath) + STRLEN(PACKAGE_NAME) + 3);
@@ -395,7 +417,8 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 		DBG_MSG( 2, ( stderr, "Searching for %s in %s\n",
 					file, PKG_CONF_DIR));
 		f = rxvt_File_search_path( PKG_CONF_DIR, file, ext);
-	} while(0);
+	 }
+	while(0);
 
 
 	DBG_MSG( 2, ( stderr, "Got file %s\n", f ? f : "(nil)"));
@@ -424,7 +447,8 @@ rxvt_draw_shadow (Display *Xdisplay, Window win, GC gc, unsigned long topShadow,
     shadow = (w == 0 || h == 0) ? 1 : SHADOW;
     w += x - 1;
     h += y - 1;
-    for (; shadow-- > 0; x++, y++, w--, h--) {
+    for (; shadow-- > 0; x++, y++, w--, h--)
+	{
 		CHOOSE_GC_FG(Xdisplay, gc, topShadow);
 		XDrawLine(Xdisplay, win, gc, x, y, w, y);
 		XDrawLine(Xdisplay, win, gc, x, y, x, h);
@@ -441,44 +465,47 @@ rxvt_draw_shadow (Display *Xdisplay, Window win, GC gc, unsigned long topShadow,
 #ifdef HAVE_MENUBAR
 /* EXTPROTO */
 void
-rxvt_draw_triangle (Display *Xdisplay, Window win, GC gc, unsigned long topShadow, unsigned long botShadow, int x, int y, int w, int type)
+rxvt_draw_triangle( Display *Xdisplay, Window win, GC gc,
+		unsigned long topShadow, unsigned long botShadow,
+		int x, int y, int w, int type)
 {
-    switch (type) {
-    case 'r':			/* right triangle */
-		CHOOSE_GC_FG(Xdisplay, gc, topShadow);
-		XDrawLine(Xdisplay, win, gc, x, y, x, y + w);
-		XDrawLine(Xdisplay, win, gc, x, y, x + w, y + w / 2);
+    switch (type)
+	{
+		case 'r':			/* right triangle */
+			CHOOSE_GC_FG(Xdisplay, gc, topShadow);
+			XDrawLine(Xdisplay, win, gc, x, y, x, y + w);
+			XDrawLine(Xdisplay, win, gc, x, y, x + w, y + w / 2);
 
-		CHOOSE_GC_FG(Xdisplay, gc, botShadow);
-		XDrawLine(Xdisplay, win, gc, x, y + w, x + w, y + w / 2);
-		break;
+			CHOOSE_GC_FG(Xdisplay, gc, botShadow);
+			XDrawLine(Xdisplay, win, gc, x, y + w, x + w, y + w / 2);
+			break;
 
-    case 'l':			/* left triangle */
-		CHOOSE_GC_FG(Xdisplay, gc, botShadow);
-		XDrawLine(Xdisplay, win, gc, x + w, y + w, x + w, y);
-		XDrawLine(Xdisplay, win, gc, x + w, y + w, x, y + w / 2);
+		case 'l':			/* left triangle */
+			CHOOSE_GC_FG(Xdisplay, gc, botShadow);
+			XDrawLine(Xdisplay, win, gc, x + w, y + w, x + w, y);
+			XDrawLine(Xdisplay, win, gc, x + w, y + w, x, y + w / 2);
 
-		CHOOSE_GC_FG(Xdisplay, gc, topShadow);
-		XDrawLine(Xdisplay, win, gc, x, y + w / 2, x + w, y);
-		break;
+			CHOOSE_GC_FG(Xdisplay, gc, topShadow);
+			XDrawLine(Xdisplay, win, gc, x, y + w / 2, x + w, y);
+			break;
 
-    case 'd':			/* down triangle */
-		CHOOSE_GC_FG(Xdisplay, gc, topShadow);
-		XDrawLine(Xdisplay, win, gc, x, y, x + w / 2, y + w);
-		XDrawLine(Xdisplay, win, gc, x, y, x + w, y);
+		case 'd':			/* down triangle */
+			CHOOSE_GC_FG(Xdisplay, gc, topShadow);
+			XDrawLine(Xdisplay, win, gc, x, y, x + w / 2, y + w);
+			XDrawLine(Xdisplay, win, gc, x, y, x + w, y);
 
-		CHOOSE_GC_FG(Xdisplay, gc, botShadow);
-		XDrawLine(Xdisplay, win, gc, x + w, y, x + w / 2, y + w);
-		break;
+			CHOOSE_GC_FG(Xdisplay, gc, botShadow);
+			XDrawLine(Xdisplay, win, gc, x + w, y, x + w / 2, y + w);
+			break;
 
-    case 'u':			/* up triangle */
-		CHOOSE_GC_FG(Xdisplay, gc, botShadow);
-		XDrawLine(Xdisplay, win, gc, x + w, y + w, x + w / 2, y);
-		XDrawLine(Xdisplay, win, gc, x + w, y + w, x, y + w);
+		case 'u':			/* up triangle */
+			CHOOSE_GC_FG(Xdisplay, gc, botShadow);
+			XDrawLine(Xdisplay, win, gc, x + w, y + w, x + w / 2, y);
+			XDrawLine(Xdisplay, win, gc, x + w, y + w, x, y + w);
 
-		CHOOSE_GC_FG(Xdisplay, gc, topShadow);
-		XDrawLine(Xdisplay, win, gc, x, y + w, x + w / 2, y);
-		break;
+			CHOOSE_GC_FG(Xdisplay, gc, topShadow);
+			XDrawLine(Xdisplay, win, gc, x, y + w, x + w / 2, y);
+			break;
     }
 }
 #endif

@@ -5467,8 +5467,8 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * rxvt_menubar_dispatch() violates the constness of the string,
 			 * so DON'T do it here.
 			 *
-			 * 2006-03-13 gi1242: Plus it's a security risk. Only interactive users
-			 * should control menus.
+			 * 2006-03-13 gi1242: Plus it's a security risk. Only interactive
+			 * users should control menus.
 			 */
 			break;
 

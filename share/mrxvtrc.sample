@@ -246,71 +246,71 @@ Mrxvt.protectSecondary:		True
 #
 # ------------------------------- FULL SCREEN -------------------------------- #
 #
-FullScreen.bottomTabbar:		False
+FullScreen.bottomTabbar:	False
 
 # Set a large font ;)
-FullScreen.xftSize:			17
-FullScreen.xftPSize:			12
+FullScreen.xftSize:		17
+FullScreen.xftPSize:		12
 
 # Keep as many tabs as possible on screen
-FullScreen.minVisibleTabs:		15
+FullScreen.minVisibleTabs:	15
 
 # Set the window size increment to 1, so that the X server can resize our window
 # to the screen size without leaving any border.
-FullScreen.smoothResize:		True
+FullScreen.smoothResize:	True
 
 # Request a full screen window from the window manager. Requires a EWMH
 # compatible window manager. This certainly works on OpenBox, Fvwm, KDE, and
 # possibly many others.
-FullScreen.fullscreen:			True
+FullScreen.fullscreen:		True
 
 
 #
 # ------------------------------- KITCHEN SINK ------------------------------- #
 #
 # Number of tabs to launch initially
-KitchenSink.initTermNumber:		3
+KitchenSink.initTermNumber:	3
 
 #
 # Command to execute for each tab.
 #
-# KitchenSink.vt0.command:		/bin/tcsh
-KitchenSink.vt1.command:		mutt
-KitchenSink.vt2.command:		vim
+# KitchenSink.vt0.command:	/bin/tcsh
+KitchenSink.vt1.command:	mutt
+KitchenSink.vt2.command:	vim
 
 #
 # Run the above commands in a shell, so that when it exits the tab will not
 # close.
 #
-KitchenSink.tabShell:			True
+KitchenSink.tabShell:		True
 
 #
 # Only run the above commands on initialization. After that run the shell on
 # each new opened tab.
 #
-KitchenSink.cmdInitTabs:		True
+KitchenSink.cmdInitTabs:	True
 
 
 #
 # Title of the initial tabs launched
 #
-KitchenSink.vt0.tabTitle:		Shell
-KitchenSink.vt1.tabTitle:		email (mutt)
-KitchenSink.vt2.tabTitle:		Vim
+KitchenSink.vt0.tabTitle:	Shell
+KitchenSink.vt1.tabTitle:	email (mutt)
+KitchenSink.vt2.tabTitle:	Vim
 
 #
 # Number of lines to save in the scroll back buffer for each tab
 #
-# KitchenSink.vt0.saveLines:		600
-# KitchenSink.vt1.saveLines:		0
-# KitchenSink.vt2.saveLines:		0
+# KitchenSink.vt0.saveLines:	600
+# KitchenSink.vt1.saveLines:	0
+# KitchenSink.vt2.saveLines:	0
 
 #
 # Pixmap background for each tab.
 #
-# KitchenSink.vt0.Pixmap:		vt0bg.jpg
-# KitchenSink.vt1.Pixmap:		vt1bg.png
-# KitchenSink.vt2.Pixmap:		vt2bg.xpm
+# KitchenSink.vt0.Pixmap:	vt0bg.jpg
+# KitchenSink.vt1.Pixmap:	vt1bg.png
+# KitchenSink.vt2.Pixmap:	vt2bg.xpm
 #
 
 
@@ -337,4 +337,4 @@ Root.macro.Ctrl+Shift+t:	NewTab su
 Root.macro.Ctrl+Shift+n:	NewTab "Shell"
 
 # ---------------------------------------------------------------------------- #
-# vim: set ft=mrxvtrc ts=8:
+# vim: set ft=mrxvtrc ts=8 sts=4:

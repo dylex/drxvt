@@ -164,6 +164,11 @@
  */
 /* #define OFFIX_DND */
 
+/*
+ * Maximum number of profiles.
+ */
+#define MAX_PROFILES	(5)
+
 /*---------------------------------KEYS---------------------------------*/
 
 /*
@@ -324,6 +329,9 @@
 
 /* The extra height (in percent) the active tab should have. */
 #define ATAB_EXTRA_PERCENT (33)
+
+/* Default title of new tabs if unspecified */
+#define DEFAULT_TAB_TITLE	"Terminal"
 
 /*-----------------------------SCROLL BAR-------------------------------*/
 /*

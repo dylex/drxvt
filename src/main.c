@@ -96,6 +96,7 @@ int	 isDoubleWidthFont         (Display *dpy, XftFont *font);
 const char**	cmd_argv;
 /*----------------------------------------------------------------------*/
 
+#if 0
 /* INTPROTO */
 void
 rxvt_free_commands (rxvt_t* r, int command_number)
@@ -149,6 +150,7 @@ rxvt_free_commands (rxvt_t* r, int command_number)
 		}
 	}
 }
+#endif
 
 
 
@@ -213,10 +215,12 @@ rxvt_init(int argc, const char *const *argv)
 		itnum = max (1, itnum);
 		itnum = min (itnum, MAX_PAGES);
 	}
+	/* XXX Mark as obsolete */
 	for (i = 0; i < itnum; i ++)
-		rxvt_append_page (r, NULL, NULL);
+		rxvt_append_page (r, 0, NULL, NULL);
 	rxvt_activate_page (r, 0);
 
+#if 0
 	/*
 	 * If commands are loaded only on init, free command resources now. The
 	 * future commands will only get NULL string as their commands, and will
@@ -225,6 +229,7 @@ rxvt_init(int argc, const char *const *argv)
 	 */
 	if (r->Options2 & Opt2_cmdInitTabs)
 		rxvt_free_commands (r, itnum);
+#endif
 
 	/* Initialize xlocale after VT is created */
 	rxvt_init_xlocale(r);
@@ -2243,7 +2248,7 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
 #endif
 
 	/* handle color aliases */
-	if (isdigit((int) *color))
+	if( isdigit((int) *color) )
 	{
 		i = atoi(color);
 		if (i >= 8 && i <= 15)			/* bright colors */
@@ -2322,21 +2327,20 @@ Done:
 		rxvt_restore_ufbg_color (r);
 
 	/* XXX Need to save the fg / bg colors of each tab here. */
-#if 0 /* Not working */
 	if ( idx == Color_bg )
 	{
-		VTBG( r, page)			= r->PixColors[idx];
-		PVTS( r, page)->p_bg	= &VTBG( r, page);
-
-		VTXFTBG( r, page)		= r->XftColors[idx];
-		PVTS( r, page)->p_xftbg = &VTXFTBG( r, page);
+		PVTS( r, page )->p_bg	= r->PixColors[idx];
+#ifdef XFT_SUPPORT
+		PVTS( r, page )->p_xftbg = r->XftColors[idx];
+#endif
 	}
 	else if ( idx == Color_fg )
 	{
-		PVTS( r, page)->p_fg	= &r->PixColors[idx];
-		PVTS( r, page)->p_xftfg = &r->XftColors[idx];
-	}
+		PVTS( r, page )->p_fg	= r->PixColors[idx];
+#ifdef XFT_SUPPORT
+		PVTS( r, page )->p_xftfg = r->XftColors[idx];
 #endif
+	}
 
 	/* background color has changed */
 	if (
@@ -2530,14 +2534,18 @@ rxvt_parse_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
 
 /* EXTPROTO */
 int
-rxvt_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
+rxvt_alloc_color( rxvt_t* r, XColor *screen_in_out, const char *colour )
 {
 	int				res;
 
-	if ((res = XAllocColor(r->Xdisplay, XCMAP, screen_in_out)))
+	if( (res = XAllocColor(r->Xdisplay, XCMAP, screen_in_out)) )
 		return res;
 
 	/* try again with closest match */
+	/*
+	 * XXX 2006-05-25 gi1242: This is really inefficient. There must be a better
+	 * way!
+	 */
 	if (XDEPTH >= 4 && XDEPTH <= 8)
 	{
 		int				i, numcol;
@@ -2549,7 +2557,7 @@ rxvt_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
 
 		best_diff = 0;
 		numcol = 0x01 << XDEPTH;
-		if ((colors = rxvt_malloc(numcol * sizeof(XColor))))
+		if( (colors = rxvt_malloc(numcol * sizeof(XColor))) )
 		{
 			for (i = 0; i < numcol; i++)
 			colors[i].pixel = i;
@@ -2568,11 +2576,13 @@ rxvt_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
 			}
 			*screen_in_out = colors[best_pixel];
 			free(colors);
+
 			res = XAllocColor(r->Xdisplay, XCMAP, screen_in_out);
 		}
 	}
+
 	if (res == 0)
-		rxvt_print_error("can't allocate colour: %s", colour);
+		rxvt_print_error("can't allocate color: %s", colour);
 
 	return res;
 }

@@ -441,7 +441,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 			else
 # endif	/* BACKGROUND_IMAGE */
 			XSetWindowBackground (r->Xdisplay, PVTS(r, i)->vt,
-				*(PVTS(r, i)->p_bg));
+					PVTS(r, i)->p_bg);
 		}
 
 # ifdef HAVE_SCROLLBARS

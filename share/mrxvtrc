@@ -83,7 +83,10 @@ Mrxvt.macro.Ctrl+Shift+Right:		MoveTab +1
 Mrxvt.macro.Primary+Shift+Left:		GotoTab -1
 Mrxvt.macro.Primary+Shift+Right:	GotoTab +1
 
-Mrxvt.macro.Ctrl+Shift+n:		NewTab
+# We already have a shortcut to open a new tab. Rather make this a shortcut that
+# duplicates the current profile.
+Mrxvt.macro.Ctrl+Shift+n:		NewTab -
+
 #
 # By default we should only have Ctrl+Shift modifier keys defined. Other
 # modifier combinations are sometimes used by the window manager, or
@@ -181,7 +184,7 @@ Mrxvt.macro.Primary+Shift+End:		Scroll +1000000
 Mrxvt.macro.Ctrl+Shift+v:		Paste
 Mrxvt.macro.Shift+Delete:		SetTitle
 
-# External programs. In keeping with the unix "minimalist" philosophy, we don't
+# External programs. In keeping with the Unix "minimalist" philosophy, we don't
 # have shortcuts for the kitchen sink here. Just our own man page.
 #
 # Remember commands start in the current directory of the active tab by
@@ -191,8 +194,21 @@ Mrxvt.macro.Shift+Delete:		SetTitle
 # As of mrxvt-0.5.0, new tabs will be opened in the current directory. So the
 # shortcut for Vim below is extremely useful :).
 
-Mrxvt.macro.Ctrl+Shift+F1:		NewTab "mrxvt man page" man mrxvt
+# Mrxvt.macro.Ctrl+Shift+F1:		NewTab "mrxvt man page" man mrxvt
 # Mrxvt.macro.Ctrl+Shift+F2:		NewTab !vim
 # Mrxvt.macro.Ctrl+Shift+F3:		NewTab !mutt
 
-# vim: set ts=8:
+Mrxvt.macro.Ctrl+Shift+F1:		NewTab -1
+Mrxvt.macro.Ctrl+Shift+F2:		NewTab -2
+Mrxvt.macro.Ctrl+Shift+F3:		NewTab -3
+Mrxvt.macro.Ctrl+Shift+F4:		NewTab -4
+
+
+#
+# Set up profile1 to view mrxvt help.
+#
+Mrxvt.profile1.tabTitle:	man mrxvt (1)
+Mrxvt.profile1.command:		man mrxvt
+Mrxvt.profile1.saveLines:	0
+
+# vim: set ts=8 sts=4:
