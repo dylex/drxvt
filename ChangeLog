@@ -14,6 +14,11 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		5. Adjust several limits, e.g., max border width and min
 		   blink time according to Edgar Toernig's patch.
 		6. Fix rpmbuild (Sourceforge Bug #1482311)
+		7. Fix crash on OpenBSD 3.9 when MULTI_CHAR is enabled -
+		   the variable morecur (defined as char) in screen.c is
+		   treated as unsigned (WtF!).
+		8. Fix compile error on OpenBSD 3.9 when MULTI_CHAR is
+		   enabled (OpenBSD keeps playing game with us!).
 
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for

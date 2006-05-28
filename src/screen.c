@@ -3192,7 +3192,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				showcursor;	/* show the cursor */
 
 
-	char		morecur = 0;/* */
+	signed char	morecur = 0;/* */
 #ifdef TTY_256COLOR
 	RUINT16T	fore, back;	/* desired foreground/background */
 #else
@@ -4226,6 +4226,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #ifdef MULTICHAR_SET
 			if (morecur)
 			{
+				assert (0 == morecur || -1 == morecur || 1 == morecur);
 				srp += morecur;
 				*srp ^= RS_RVid;
 # ifndef NO_CURSORCOLOR
