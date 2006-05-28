@@ -1121,7 +1121,7 @@ rxvt_kill_page (rxvt_t* r, short page)
 /* EXTPROTO */
 void
 rxvt_append_page( rxvt_t* r, int profile,
-		const char TAINTED * title, const char *command )
+		const char TAINTED *title, const char *command )
 {
 	DBG_MSG( 2, ( stderr, "rxvt_append_page( r, %d, %s, %s )\n",
 				profile, title ? title : "(nil)",
@@ -1142,22 +1142,29 @@ rxvt_append_page( rxvt_t* r, int profile,
 		return ;
 	}
 
-	DBG_MSG(1,(stderr,"append_page (%s, %s)\n",
+	DBG_MSG( 1, (stderr,"append_page (%s, %s)\n",
 				title ? title : "NULL",
-				command ? command : "NULL"));
+				command ? command : "NULL") );
 
 	/* indicate that we add a new tab */
 	LTAB(r)++;
+	DBG_MSG( 1, ( stderr, "last page is %d\n", LTAB(r)) );
 
-	rxvt_create_termwin( r, LTAB(r), profile, title == NULL ? command : title );
-	DBG_MSG(1, (stderr, "last page is %d\n", LTAB(r)) );
-
-	/* -e command specified */
-	if( LTAB(r)== 0 && cmd_argv )
+	/*
+	 * Use command specified with -e only if we're opening the first tab, or the
+	 * --cmdAllTabs option is specified, and we're not given a command to
+	 *  execute (e.g. via the NewTab cmd macro).
+	 */
+	if(
+		cmd_argv			/* Argument specified via -e option */
+		&& command == NULL	/* No command specified (e.g. via NewTab macro) */
+		&& (
+			 LTAB(r)== 0							/* First tab */
+			 || (r->Options2 & Opt2_cmdAllTabs)		/* -at option */
+		   )
+	  )
 	{
 		argv = cmd_argv;
-		command = NULL;		/* Reset, so that we don't accidentally run it in
-							   the shell if it begins with "!". */
 	}
 	else
 	{
@@ -1165,7 +1172,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 		if( command == NULL )
 			command = getProfileOption( r, profile, Rs_command );
 
-		if( command != NULL && *command != '!')
+		if( command != NULL && *command != '!' )
 		{
 			/* If "command" starts with '!', we should run it in the shell. */
 			argv = rxvt_string_to_argv( command, &num_cmd_args );
@@ -1173,10 +1180,25 @@ rxvt_append_page( rxvt_t* r, int profile,
 		else
 			argv = NULL;
 	}
-
 	DBG_MSG( 2, ( stderr, "Forking command=%s, argv[0]=%s\n",
 				command ? command : "(nil)",
-				argv && argv[0] ? argv[0] : "(nil)" ) );
+				( argv && argv[0] ) ? argv[0] : "(nil)" ) );
+
+	/*
+	 * Set the tab title.
+	 */
+	if( title == NULL || *title == '\0' )
+	{
+		title = getProfileOption( r, profile, Rs_tabtitle );
+		if( title == NULL || *title == '\0' )
+		{
+			if( command && *command != '\0' )
+				title = command;
+			else if( argv && argv[0] && *argv[0] != '\0' )
+				title = argv[0];
+		}
+	}
+	rxvt_create_termwin( r, LTAB(r), profile, title );
 
 	/*
 	 * Run the child process.

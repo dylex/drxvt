@@ -1745,9 +1745,6 @@ rxvt_init_colors( rxvt_t *r )
 			r->h->rs[vtbg] = ISSET_VTBG( r, 0 ) ?
 					r->h->rs[Rs_background] : def_colorName[ Color_bg ];
 
-		if( (r->Options & Opt_reverseVideo) )
-			SWAP_IT( r->h->rs[vtfg], r->h->rs[vtbg], typeof(r->h->rs[vtfg]) );
-
 		/* foreground color of i terminal */
 		if( rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtfg]) )
 		{
@@ -1813,14 +1810,7 @@ rxvt_init_colors( rxvt_t *r )
 
 		if (!rxvt_parse_alloc_color(r, &xcol, r->h->rs[Rs_color + i]))
 		{
-#ifndef XTERM_REVERSE_VIDEO
-			if (i < 2 && (r->Options & Opt_reverseVideo))
-			{
-				r->h->rs[Rs_color + i] = def_colorName[!i];
-			}
-			else
-#endif
-				r->h->rs[Rs_color + i] = def_colorName[i];
+			r->h->rs[Rs_color + i] = def_colorName[i];
 
 			if (!r->h->rs[Rs_color + i])
 				continue;
@@ -1828,16 +1818,6 @@ rxvt_init_colors( rxvt_t *r )
 			{
 				switch (i)
 				{
-#if 0 /* Get fg / bg from profiles instead */
-
-					case Color_fg:
-					case Color_bg:
-						/* fatal: need bg/fg color */
-						rxvt_print_error("aborting");
-						exit( EXIT_FAILURE );
-						/* NOT REACHED */
-#endif
-
 #ifndef NO_CURSORCOLOR
 					case Color_cursor2:
 						xcol.pixel = r->PixColors[Color_fg];
@@ -1894,11 +1874,11 @@ rxvt_init_colors( rxvt_t *r )
 
 
 	/*
-	** get scrollBar/menuBar shadow colors
-	**
-	** The calculations of topShadow/bottomShadow values are adapted
-	** from the fvwm window manager.
-	**/
+	 * get scrollBar/menuBar shadow colors
+	 *
+	 * The calculations of topShadow/bottomShadow values are adapted from the
+	 * fvwm window manager.
+	 */
 #ifdef KEEP_SCROLLCOLOR
 	if (XDEPTH <= 2)		/* Monochrome */
 	{
@@ -1909,9 +1889,11 @@ rxvt_init_colors( rxvt_t *r )
 	else
 	{
 		XColor			xcol[3];
-		/* xcol[0] == white
+		/*
+		 * xcol[0] == white
 		 * xcol[1] == top shadow
-		 * xcol[2] == bot shadow */
+		 * xcol[2] == bot shadow
+		 */
 
 		xcol[1].pixel = r->PixColors[Color_scroll];
 # ifdef PREFER_24BIT
@@ -2615,13 +2597,12 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 /* EXTPROTO */
 void
 rxvt_create_termwin( rxvt_t *r, int page, int profile,
-		const char TAINTED * title )
+		const char TAINTED *title )
 {
 #ifdef DEBUG_X
 	char			vt_name[32];
 #endif
 	long			vt_emask;
-	const char TAINTED *	t;
 
 
 	assert( page < MAX_PAGES );
@@ -2631,13 +2612,9 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	/*
 	 * Set the tab title
 	 */
-	t = getProfileOption( r, profile, Rs_tabtitle );
-	if( t == NULL || *t == '\0' )
-		t = getProfileOption( r, profile, Rs_command );
-	if( t == NULL || *t == '\0' )
-		t = DEFAULT_TAB_TITLE;
-
-	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP(t, MAX_TAB_TXT);
+	if( title == NULL )
+		title = DEFAULT_TAB_TITLE;
+	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP( title, MAX_TAB_TXT );
 
 #ifdef HAVE_PUTENV
 	/* Set environment variable of tab title */

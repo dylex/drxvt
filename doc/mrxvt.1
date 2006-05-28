@@ -250,11 +250,9 @@ Tabbar background image. Pseudo transparency must be turned off.
 Apply tabbar background image to tabs.
 .Op Cm tabUsePixmap
 .
-.It Fl vt Ns Ar %d Ns Cm .pixmap Ar file Ns Op Ns ; Ns Ar geometry
-background image for
-.Ar %d Ns th terminal. Ar %d
-is an integer that starts from 0, NOT 1! Pseudo-transparency must be turned off.
-.Op Cm vt Ns Ar %d Ns Cm .Pixmap
+.It pixmap Ar file Ns Op Ns ; Ns Ar geometry
+Background image for the terminal window. Pseudo-transparency must be turned off.
+.Op Cm Pixmap
 .
 .El
 .Ed
@@ -325,11 +323,9 @@ does not keep the screen completely up to date while scrolling. This allows
 to run faster when network latencies are very high and is typically useful when running across a very large internet or many gateways.
 .Op Cm scrollWithBuffer
 .
-.It Fl vt Ns Ar %d Ns Cm .sl Ar n
-Number of scrolled lines to save for the
-.Ar %d Ns th tab. Remember Ar %d
-starts from 0 not 1. The maximal number of saved lines is 65535
-.Op Cm vt%d.saveLines
+.It sl Ar n
+Number of lines to save in the scroll back buffer. Max 65535.
+.Op saveLines
 .
 .El
 .Ed
@@ -339,7 +335,7 @@ starts from 0 not 1. The maximal number of saved lines is 65535
 .Bl -tag -width 4n
 .
 .It Fl bg Ar color
-default background color
+Background color
 .Op Cm background
 .
 .It Fl bd Ar color
@@ -374,7 +370,7 @@ is an integer between 0 and 100
 .Op Cm fading
 .
 .It Fl fg Ar color
-Default foreground color.
+Foreground color.
 .Op Cm foreground
 .
 .It Fl itabbg Ar color
@@ -453,18 +449,6 @@ Function applied for text drawing (not implemented yet)
 .It Fl ufbg Ar color
 Default background color when the terminal window looses focus.
 .Op Cm ufBackground
-.
-.It Fl vt Ns Ar %d Ns Cm .bg Ar color
-Background color of
-.Ar %d Ns th tab. Ar %d
-is an integer that starts from 0, NOT 1!
-.Op Cm vt Ns Ar %d Ns Cm .background
-.
-.It Fl vt Ns Ar %d Ns Cm .fg Ar color
-Foreground color of
-.Ar %d Ns th tab. Ar %d
-is an integer that starts from 0, NOT 1!
-.Op Cm vt Ns Ar %d Ns Cm .foreground
 .
 .El
 .Ed
@@ -598,10 +582,13 @@ Automatically hide or show the tab bar depending on the number of tabs. On start
 .BO at
 Run command specified with
 .Fl e
-on all tabs. This overrides the default behavior where the command specified by
+on all tabs (by default the command specified by
 .Fl e
-is only effective for the first tab. It also overrides the behavior of
-.Cm tabShell .
+is only used for the first tab opened). This causes the profile option
+.Cm command
+to be ignored. However a command specified via the
+.Cm NewTab
+macro is honored.
 .Op Cm cmdAllTabs
 .
 .BO bt
@@ -612,9 +599,10 @@ Show tabbar at bottom.
 Specifies the program (and its command line arguments) to be run in the
 .Nm
 window. By default this command is only run initially, and all tabs created after startup will run the default shell (or program supplied by
-.Fl vt Ns Ar %d Ns ). This behaviour can be overridden with the
+.Fl profile Ns Ar %d Ns ). This behaviour can be overridden with the
 .Fl at
 option.
+.Op Cm command
 .
 .BO hb
 Hide buttons in the tabbar.
@@ -636,9 +624,12 @@ Hide tabbar on initialization
 Highlight inactive tabs only when bell sounds. Default is to highlight inactive tabs whenever they produce output.
 .Op Cm highlightTabOnBell
 .
-.BO it
-Run command for each tab only once on initialization, so that later new terminal will run default shell instead of the tab command.
-.Op Cm cmdInitTabs
+.It Fl ip Ar profiles
+.Ar profiles
+is a comma separated list of profiles numbers. On startup
+.Nm
+opens each of these profiles in a tab.
+.Op Cm initProfileList
 .
 .BO ls
 Indicates that the shell that is started in the
@@ -663,6 +654,48 @@ to display tabs, keep at least
 tabs visible.
 .Op Cm minVisibleTabs
 .
+.It Fl profile Ns Ar N Ns Cm . Ns Ar option Ar value
+Set
+.Ar option
+to
+.Ar value
+in profile
+.Ar N .
+When a new tab is created with profile
+.Ar N
+it uses all options that are set for this profile. Currently the only options that can be set per profile are
+.Cm Pixmap , foreground , background , saveLines , command
+and
+.Cm tabTitle .
+Then all the settings from that profile number are used.
+.Pp
+.
+.Ar N
+can be any integer between 0 and the compiled in maximum (default 5). The profile number 0 is special, and contains default settings which are used for all profiles where this option is not set (e.g.
+.Fl profile0.tt Ar mrxvt
+sets the tab title to
+.Ar mrxvt
+for all profiles where the tab title has not been set). In this case the
+.Fl profile0.
+can be omitted entirely (i.e.
+.Fl profile0.tt
+is equivalent to
+.Fl tt ) .
+.Pp
+This option is intended to replace the
+.Fl vt Ns Ar %d Ns Cm .xx
+options from
+.Nm
+version 0.5.0. The old
+.Fl vt Ns Ar %d Ns Cm .xx
+would set options for the
+.Ar %d Ns th
+tab. This causes inconsistent behaviour when the user moves / closes tabs. The behaviour of the
+.Fl profile
+option is to set options for a particular profile, and then these settings can be associated (on demand) to newly created tabs.
+.
+.Op Cm profile Ns Ar N Ns Cm . Ns Ar option
+.
 .BO ps
 Protect tab from being closed if it is using the secondary screen, for example, when the user is running
 .Xr vim 1
@@ -670,10 +703,6 @@ or
 .Xr mutt 1 ,
 this can prevent the terminal from being accidentally closed.
 .Op Cm protectSecondary
-.
-.BO sh
-Run shell in each tab before executing the tab command. Thus if the tab command exits, the tab will not quit.
-.Op Cm tabShell
 .
 .BO sti
 Synchronize icon name with tab title when switch to a new tab or the title of the active tab changes.
@@ -683,29 +712,20 @@ Synchronize icon name with tab title when switch to a new tab or the title of th
 Synchronize terminal title with tab title when switch to a new tab or the title of the active tab changes.
 .Op Cm syncTabTitle
 .
-.It Fl tnum Ar number
-Numbers of terminals at startup
+.It Fl tnum Ar N
+OBSOLETE. Opens
+.Ar N
+tabs on startup. For backward compatibility, the tabs are opened with profile 0, 1, ...
+.Ar N Ns -1 .
 .Op Cm initTermNumber
 .
 .It Fl tt Ar string
-Tab title for all terminals if not set individually.
+Title of the tab
 .Op Cm tabTitle
 .
 .BO vbf
 Show colored text with bold font.
 .Op Cm veryBoldFont
-.
-.It Fl vt Ns Ar %d Ns Cm .e Ar string
-Command to execute for
-.Ar %d Ns th terminal. Ar %d
-is an integer that it starts from 0, NOT 1.
-.Op Cm vt Ns Ar %d Ns Cm .command
-.
-.It Fl vt Ns Ar %d Ns Cm .tt Ar string
-Tab title for
-.Ar %d Ns th terminal. Ar %d
-is an integer that it starts from 0, NOT 1.
-.Op Cm vt Ns Ar %d Ns Cm .tabTitle
 .
 .BO ut
 Utmp inhibit.
@@ -873,7 +893,7 @@ X resource configuration file
 X resource configuration file to save the current configuration
 .Op Cm confFileSave
 .
-.It Fl path : Ar path
+.It Fl path Ar path
 Colon delimited list of directories to search for background images and menu files.
 .Nm
 first searches for the file in the current directory, then in the directories specified by
@@ -1002,6 +1022,8 @@ Color of scrollbar trough (see also
 .
 .El
 .Ed
+.
+.
 .\" CONFIGURATION FILE SYNTAX {{{1
 .Sh CONFIGURATION FILE SYNTAX
 .Bd -filled
@@ -1354,8 +1376,12 @@ to the child process. The string
 .Ar str
 is backslash escaped as above.
 .\" ------------------------------------------------------------
-.It Ic NewTab Oo Ar \*qtitle\*q Oc Op Oo ! Oc Ns Ar command
-Open a new tab. If
+.It Ic NewTab Oo Ar -N Oc Oo Ar \*qtitle\*q Oc Op Oo ! Oc Ns Ar command
+Open a new tab.
+.Ar N
+specifies the profile number. If omitted, profile 0 is used. If only
+.Sq -
+(with no number) is specified, then the profile of the current active tab is used (i.e. this can be used to duplicate the current tab).
 .Ar title
 is specified (needs to be double quoted), use that for the tab title. If
 .Ar command

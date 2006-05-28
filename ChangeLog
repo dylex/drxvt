@@ -37,13 +37,28 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 		7. Also dump initial tab titles when the --cmdInitTabs options are
 		   given (this used to cause incorrect behaviour when the user closes
 		   tab 0, and opens a new tab).
-		8. Fixed bug #1473987.
+		8. Fixed bug #1473987. (Jagged edges of screen fonts)
+		9. Fixed bug #1357219. (Made bg changes via escape sequences sticky)
 
 	* Enhancements:
 		1. Warn if closing mrxvt with multiple tabs (and the tabbar is
 		   hidden).
 		2. Code cleanup (OK. That's not really an enhancement for users)
 		3. Update documentation.
+
+	* New features:
+		1. Changed the behaviour of the --vt%d.xx resources. The settings are
+		   now tied to profile %d (as opposed to the %d'th tab). A new tab
+		   with profile %d can be opened on demand, or on startup.
+		2. Added option --initProfileList to replace -tnum. (Marked -tnum as
+		   obsolete).
+		3. Removed option --cmdInitTabs as it is no longer meaningful with
+		   profiles.
+		4. When the command specified via the --profile%d.command option is
+		   prefixed with an '!', run the shell first and then execute the
+		   command. Removed the --tabShell option (as the prefix with '!' is
+		   more flexible).
+
 
 0.4.2 to 0.5.0
 \-----------------------------------

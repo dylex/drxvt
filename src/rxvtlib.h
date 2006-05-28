@@ -345,7 +345,7 @@ typedef enum {
 #ifdef HAVE_X11_SM_SMLIB_H
 # define Opt2_enableSessionMgt		(1LU<<21)
 #endif
-#define Opt2_tabShell				(1LU<<22)
+// #define Opt2_tabShell				(1LU<<22)
 #define Opt2_linuxHomeEndKey		(1LU<<23)
 #define Opt2_hlTabOnBell			(1LU<<24)
 #define Opt2_smoothResize			(1LU<<25)

@@ -257,17 +257,19 @@ rxvt_splitcommastring(const char *cs)
     const char     *s, *t;
     char          **ret;
 
-    if ((s = cs) == NULL)
-	s = "";
+    if( (s = cs) == NULL )
+		s = "";
 
-    for (n = 1, t = s; *t; t++)
+    for( n=1, t=s; *t; t++)
 		if (*t == ',')
 		    n++;
+
 	assert (n >= 0 && n+1 > 0);	/* possible integer overflow? */
-    ret = rxvt_malloc((n + 1) * sizeof(char *));
+
+    ret = rxvt_malloc( (n + 1) * sizeof(char *) );
     ret[n] = NULL;
 
-    for (l = 0, t = s; l < n; l++)
+    for( l = 0, t = s; l < n; l++ )
 	{
 		for( ; *t && *t != ','; t++ );
 		p = t - s;

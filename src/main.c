@@ -207,17 +207,44 @@ rxvt_init(int argc, const char *const *argv)
 	/*
 	 * Initialize the pages
 	 */
-	if (!r->h->rs[Rs_init_term_num])
-		itnum = 1;
-	else
+	if( r->h->rs[Rs_initProfiles] )
 	{
-		itnum = atoi (r->h->rs[Rs_init_term_num]);
-		itnum = max (1, itnum);
-		itnum = min (itnum, MAX_PAGES);
+		/* Split into a comma separated string */
+		char *s = (char *) r->h->rs[Rs_initProfiles];
+
+		do
+		  {
+			int profile = atoi( s );
+
+			rxvt_append_page( r,
+					( profile < 0 || profile >= MAX_PAGES ? 0 : profile ),
+					NULL, NULL );
+
+			s = STRCHR( s, ',' );
+		  }
+		while( s++ != NULL );
 	}
-	/* XXX Mark as obsolete */
-	for (i = 0; i < itnum; i ++)
-		rxvt_append_page (r, 0, NULL, NULL);
+
+
+	/* Backward compatibility: Open profiles 0 .. n-1 if tnum=n. */
+	else if( r->h->rs[Rs_init_term_num] )
+	{
+		rxvt_print_error( "Option tnum is obsolete."
+				" Use --initProfileList instead" );
+
+		itnum = atoi( r->h->rs[Rs_init_term_num] );
+		itnum = max( 1, itnum );
+		itnum = min( itnum, MAX_PAGES );
+
+		for (i = 0; i < itnum; i ++)
+			rxvt_append_page( r, (i < MAX_PROFILES) ? i : 0 , NULL, NULL );
+	}
+
+	/* Just open the default tab */
+	else
+		rxvt_append_page( r, 0, NULL, NULL );
+
+	/* Activate the tab */
 	rxvt_activate_page (r, 0);
 
 #if 0
@@ -2536,6 +2563,9 @@ rxvt_parse_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
 int
 rxvt_alloc_color( rxvt_t* r, XColor *screen_in_out, const char *colour )
 {
+	return XAllocColor( r->Xdisplay, XCMAP, screen_in_out );
+
+#if 0 /* 2006-05-27 gi1242: Really bad code. */
 	int				res;
 
 	if( (res = XAllocColor(r->Xdisplay, XCMAP, screen_in_out)) )
@@ -2585,6 +2615,7 @@ rxvt_alloc_color( rxvt_t* r, XColor *screen_in_out, const char *colour )
 		rxvt_print_error("can't allocate color: %s", colour);
 
 	return res;
+#endif
 }
 
 

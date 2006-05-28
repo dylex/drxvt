@@ -1165,7 +1165,8 @@ enum {
     Rs_pointerBlank,
     Rs_pointerBlankDelay,
 	Rs_smClientID,
-	Rs_init_term_num,
+	Rs_initProfiles,
+	Rs_init_term_num,		/* OBSOLETE */
 
 	/*
 	 * Options for multiple profiles.
@@ -1189,7 +1190,6 @@ enum {
 	 */
 	Rs_options2,
 	Rs2_protectSecondary,
-	Rs2_tabShell,
 	Rs2_cmdInitTabs,
 	Rs2_cmdAllTabs,
 #ifdef XFT_SUPPORT

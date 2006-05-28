@@ -53,6 +53,7 @@ void  rxvt_get_xdefaults (rxvt_t*, FILE*, const char*);
  *         END   `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
 
+static const char *emptyResource	= "";
 
 static const char *const xnames[3] = {
 	".mrxvtrc",
@@ -108,16 +109,20 @@ static const struct {
 	const char*		desc;		/* description */
 	const char		multiple;	/* multiple values for profiles */
 } optList[] = {
+	/* Options for each profile */
 #ifdef BACKGROUND_IMAGE
-	STRG(Rs_backgroundPixmap, "profile%d.Pixmap", "profile%d.pixmap", "file[;geom]", "background image for a tab", 1),
+	STRG(Rs_backgroundPixmap, "Pixmap", "pixmap", "file[;geom]",
+			"background image for a tab", 1),
 #endif
-	STRG(Rs_tabtitle, "profile%d.tabTitle", "profile%d.tt", "string", "title name for tab", 1),
-	STRG(Rs_saveLines, "profile%d.saveLines", "profile%d.sl", "number", "number of scrolled lines to save for tab", 1),
-	STRG(Rs_command, "profile%d.command", "profile%d.e", "string", "command to execute for a tab", 1),
-	STRG( Rs_foreground, "profile%d.foreground",
-		"profile%d.fg", "color", "foreground color for a tab", 1),
-	STRG( Rs_background, "profile%d.background",
-		"profile%d.bg", "color", "background color for a tab", 1),
+	STRG(Rs_tabtitle, "tabTitle", "tt", "string", "title name for tab", 1),
+	STRG(Rs_saveLines, "saveLines", "sl", "number",
+			"number of scrolled lines to save for tab", 1),
+	STRG(Rs_command, "command", "e", "string",
+			"command to execute for a tab", 1),
+	STRG( Rs_foreground, "foreground", "fg", "color",
+			"foreground color for a tab", 1),
+	STRG( Rs_background, "background", "bg", "color",
+			"background color for a tab", 1),
 
 	STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
 	STRG(Rs_minVisibleTabs, "minVisibleTabs", "mvt", "number", "minimum # of tabs to keep visible (requires xftpfn)", 0),
@@ -421,8 +426,6 @@ static const struct {
 		"size of propotional freetype font", 0),
 #endif
 
-	BOOL(Rs2_tabShell, "tabShell", "sh",
-		Opt2_tabShell, "running shell command for all tabs", 0),
 	BOOL(Rs2_cmdAllTabs, "cmdAllTabs", "at",
 		Opt2_cmdAllTabs, "running -e command for all tabs", 0),
 	BOOL(Rs2_protectSecondary, "protectSecondary", "ps",
@@ -540,8 +543,10 @@ static const struct {
 #endif	/* HAVE_X11_SM_SMLIB_H */
 
 	/* Initial number of terminals */
-	STRG(Rs_init_term_num, "initTermNumber", "tnum", "number",
+	STRG( Rs_init_term_num, "initTermNumber", "tnum", "number",
 		"Initial number of tabs/terminals", 0),
+	STRG( Rs_initProfiles, "initProfileList", "ip", "profile list",
+		"List of profiles to load on startup", 0 ),
 	INFO("e", "command arg ...", "command to execute")
 };
 
@@ -903,15 +908,15 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				 * For backward compatibility, accept vt%d style options.
 				 */
 				offset = rxvt_str_match( opt, "vt" );
-				if( offset )
-					rxvt_print_error( "Obsolete style profile option %s", opt );
-				else
+				if( offset == 0 )
 					offset = rxvt_str_match( opt, "profile" );
 
+				/*
+				 * Copy --profile%d.resource or --vt%d.resource into buflong and
+				 * bufshort.
+				 */
 				if( offset )
 				{
-					char 	*s;
-
 					profileNum = atoi( opt + offset );
 					if( profileNum < 0 || profileNum >= MAX_PROFILES )
 					{
@@ -919,16 +924,12 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 						break;	/* out of range, jump to bad option */
 					}
 
-					s = STRCHR( optList[entry].kw, '.' ) + 1;
-					assert( s != 1 );
-					snprintf( buflong, sizeof(buflong)-1,
-							"%.*s%d.%s", offset, opt, profileNum, s );
+					snprintf( buflong, sizeof(buflong)-1, "%.*s%d.%s",
+							offset, opt, profileNum, optList[entry].kw );
 					buflong[sizeof(buflong)-1] = '\0';
 
-					s = STRCHR( optList[entry].opt, '.' ) + 1;
-					assert( s != 1 );
-					snprintf( bufshort, sizeof(bufshort)-1,
-							"%.*s%d.%s", offset, opt, profileNum, s );
+					snprintf( bufshort, sizeof(bufshort)-1, "%.*s%d.%s",
+							offset, opt, profileNum, optList[entry].opt );
 					bufshort[sizeof(bufshort)-1] = '\0';
 
 					DBG_MSG( 3, ( stderr,
@@ -939,19 +940,10 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				/* If no profile number is specified, use 0 by default */
 				else
 				{
-					/*
-					 * Strip the profile%d from optList, and copy into buflong /
-					 * bufshort.
-					 */
-
-					char *s = STRCHR( optList[entry].kw, '.' );
-					assert(s); /* Should not happen */
-					STRNCPY( buflong, s+1, sizeof(buflong) - 1 );
+					STRNCPY( buflong, optList[entry].kw, sizeof(buflong) - 1 );
 					buflong[ sizeof(buflong)-1 ] = '\0';
 
-					s = STRCHR( optList[entry].opt, '.' );
-					assert(s); /* Should not happen */
-					STRNCPY( bufshort, s+1, sizeof(bufshort) - 1 );
+					STRNCPY( bufshort, optList[entry].opt, sizeof(bufshort)-1 );
 					bufshort[ sizeof(bufshort)-1 ] = '\0';
 
 					profileNum = 0;
@@ -982,9 +974,13 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 
 			/* Check to see if option matches */
-			if ((optList[entry].kw && !STRCMP(opt, buflong)) ||
-				(!longopt && optList[entry].opt &&
-				 !STRCASECMP(opt, bufshort)))
+			if(
+				( optList[entry].kw && !STRCMP(opt, buflong) )
+				|| (
+					 !longopt && optList[entry].opt
+					 && !STRCASECMP(opt, bufshort)
+				   )
+			  )
 				break;
 		} /* for */
 
@@ -995,7 +991,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				flag = (flag == On) ? Off : On;
 
 			/* string value */
-			if (optList_STRLEN(entry))
+			if( optList_STRLEN(entry) )
 			{
 				const char	 *str = argv[++i];
 
@@ -1072,7 +1068,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				else if (!STRCMP(opt, "7") || !STRCMP(opt, "8")
 #ifdef GREEK_SUPPORT
 				   /* obsolete 12 May 1996 (v2.17) */
-				   || !rxvt_str_match(opt, "grk")
+				   || rxvt_str_match(opt, "grk")
 #endif
 				)
 					msg = "obsolete";
@@ -1085,7 +1081,15 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	}
 
 	if (bad_option)
+	{
+		/* Printing the usage is too verbose ... */
+#if 0
 		rxvt_usage(0);
+#endif
+
+		rxvt_print_error( "Use -h, -help or --help to get help" );
+		exit( EXIT_FAILURE );
+	}
 
 	DBG_MSG( 2, (stderr, "rxvt_get_options() done.\n") );
 }
@@ -1163,25 +1167,22 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 					 * For backward compatibility, accept vt%d style options.
 					 */
 					offset = rxvt_str_match( str, "vt" );
-					if( offset )
-						rxvt_print_error( "Obsolete style profile option %s",
-								str );
-					else
+					if( offset == 0 )
 						offset = rxvt_str_match( str, "profile" );
 
+					/*
+					 * Copy profile%d.resource into kw.
+					 */
 					if( offset )
 					{
 						char	buf[256];
-						char	*s;
 
 						profileNum = atoi( str + offset );
 						if (profileNum < 0 || profileNum >= MAX_PROFILES)
 							continue;	/* out of range */
 
-						s = STRCHR( kw, '.' ) + 1;
-						assert( s != 1 );
 						snprintf( buf, sizeof(buf)-1,
-								"%.*s%d.%s", offset, str, profileNum, s );
+								"%.*s%d.%s", offset, str, profileNum, kw );
 						buf[sizeof(buf)-1] = '\0';
 
 						STRNCPY (kw, buf, sizeof(kw)-1);
@@ -1190,16 +1191,18 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 						DBG_MSG( 3, ( stderr, "Matched profile=%d kw=%s\n",
 								profileNum, kw) );
 					}
+
+					/*
+					 * No profile%d specified. Match resource on it's own, and
+					 * use profile 0.
+					 */
 					else
 					{
-						char *s = STRCHR( kw, '.' );
-						assert(s);
-
 						profileNum = 0;
-						STRNCPY( kw, s+1, sizeof(kw) - 1 );
-						kw[ sizeof(kw)-1 ] = '\0';
 
-						DBG_MSG( 3, ( stderr, "Matched default kw=%s\n", kw) );
+						DBG_MSG( 3, ( stderr,
+									"Matched default kw=%s for option %s",
+									kw, str) );
 					}
 				}
 
@@ -1211,13 +1214,13 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 					rxvt_str_trim(str);
 					n = STRLEN(str);
 
-					if (n && !r->h->rs[optList[entry].doff+profileNum])
+					/* Only set the resource if it's not already set */
+					if( !r->h->rs[optList[entry].doff+profileNum] )
 					{
-						/* not already set */
 						int		s;
-						char*	p = STRDUP(str);
 
-						r->h->rs[optList[entry].doff+profileNum] = p;
+						r->h->rs[optList[entry].doff+profileNum] =
+							n ? STRDUP( str ) : emptyResource;
 						if (optList_isBool(entry))
 						{
 							s = STRCASECMP(str, "true") == 0 ||
@@ -1281,8 +1284,6 @@ rxvt_extract_resources (
 			(int) ( 258 - sizeof(XAPPLOADDIRLOCALE) - sizeof(APL_SUBCLASS)),
 			r->h->locale);	/* 258 = 255 + 4 (-.*s) - 1 (/) */
 	}
-
-	{
 #  endif
 # endif
 
@@ -1293,24 +1294,24 @@ rxvt_extract_resources (
 
 	/* open user supplied config file first */
 	if (r->h->rs[Rs_confFile])
-		fd = fopen (r->h->rs[Rs_confFile], "r");
+		fd = fopen( r->h->rs[Rs_confFile], "r" );
 
-	if (NULL == fd && NULL != (home = getenv("HOME")))
+	if( NULL == fd && NULL != ( home = getenv("HOME") ) )
 	{
 		unsigned int	i, len = STRLEN(home) + 2;
 		char*			f = NULL;
 
 		/* possible integer overflow? */
 		assert (len > 0);
-		for (i = 0; i < (sizeof(xnames) / sizeof(xnames[0])); i++)
+		for( i = 0; i < (sizeof(xnames) / sizeof(xnames[0])); i++ )
 		{
 			/* possible integer overflow? */
-			assert (len + STRLEN(xnames[i]) > 0);
-			f = rxvt_realloc(f, (len + STRLEN(xnames[i])) * sizeof(char));
+			assert( len + STRLEN(xnames[i]) > 0 );
+			f = rxvt_realloc( f, ( len + STRLEN(xnames[i]) ) * sizeof(char) );
 
-			sprintf(f, "%s/%s", home, xnames[i]);
+			sprintf( f, "%s/%s", home, xnames[i] );
 
-			if ((fd = fopen(f, "r")) != NULL)
+			if( (fd = fopen(f, "r")) != NULL )
 				break;
 		}
 		free(f);
@@ -1383,10 +1384,21 @@ rxvt_extract_resources (
 		fclose(fd);
 	}
 
-# if defined XAPPLOADDIR
-#  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
+	/*
+	 * Unset resources that point to emptyResource
+	 */
+	{
+		int i;
+
+		for( i=0; i < NUM_RESOURCES; i++)
+		{
+			if( r->h->rs[i] == emptyResource )
+				r->h->rs[i] = NULL;
+		}
 	}
 
+# if defined XAPPLOADDIR
+#  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
 	/* Free the path of the possibly available localized Rxvt file */ 
 	free(localepath);
 #  endif
