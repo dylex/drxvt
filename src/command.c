@@ -2563,7 +2563,7 @@ rxvt_process_buttonpress(rxvt_t* r, int page, XButtonEvent *ev)
 	{
 #ifdef HAVE_MENUBAR
 		/* Popup menu on Control click on terminal window. */
-		if( ev->state & ControlMask && !r->h->ActiveMenu)
+		if( (ev->state & ControlMask) && !r->h->ActiveMenu)
 		{
 			int button;
 
@@ -2590,8 +2590,8 @@ rxvt_process_buttonpress(rxvt_t* r, int page, XButtonEvent *ev)
 
 				r->h->showingMenu |= POPUP_MENU;
 
-				XTranslateCoordinates( r->Xdisplay, ev->window, r->TermWin.parent,
-						ev->x, ev->y, &x, &y, &unused_cr);
+				XTranslateCoordinates( r->Xdisplay, ev->window,
+						r->TermWin.parent, ev->x, ev->y, &x, &y, &unused_cr);
 
 				r->h->ActiveMenu = r->h->popupMenu[button];
 

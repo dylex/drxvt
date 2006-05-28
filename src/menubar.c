@@ -890,16 +890,17 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 	if (parent == NULL)
 	{
 		/* Add menus named PopupButton%d to popupMenu[%d] */
-		if (
-				!STRNCASECMP( "popupbutton", (char *) path, 11)
-				&& path[11] >= '1' && path[11] <= '3'
-				&& !path[12]
-		   )
+		if(
+			!STRNCASECMP( "popupbutton", (char *) path, 11 )
+			&& path[11] >= '1' && path[11] <= '3'
+			&& path[12] == '\0'
+		  )
 		{
 			int i = path[11] - '1';
 
 			/* Free the menu */
-			if( r->h->popupMenu[i] ) rxvt_menu_delete( r, r->h->popupMenu[i]);
+			if( r->h->popupMenu[i] )
+				rxvt_menu_delete( r, r->h->popupMenu[i] );
 
 			r->h->popupMenu[i] = menu;
 		}
@@ -1198,10 +1199,14 @@ rxvt_menu_show(rxvt_t *r)
 	/*
 	 * Popup tablist for menus named tablist, or empty popupbutton menus.
 	 */
-	if( !STRCASECMP( (char*) ActiveMenu->name, "Switch to tab")
-			|| ( !STRNCASECMP( (char*) ActiveMenu->name, "popupbutton", 11)
-				&& !ActiveMenu->head))
-		rxvt_build_tablist( r, ActiveMenu);
+	if(
+		 !STRCASECMP( (char*) ActiveMenu->name, "Switch to tab")
+		 || (
+			  !STRNCASECMP( (char*) ActiveMenu->name, "popupbutton", 11 )
+			  && ActiveMenu->head == NULL
+			)
+	  )
+		rxvt_build_tablist( r, ActiveMenu );
 
 	if (ActiveMenu->parent == NULL)
 	{

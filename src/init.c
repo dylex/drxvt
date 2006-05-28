@@ -3180,6 +3180,20 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	rxvt_menubar_create (r);
 	if (r->Options & Opt_showMenu)
 		rxvt_menubar_show (r);
+
+	/*
+	 * 2006-05-28 gi1242: If popup menu 1 is not defined, set it to an empty
+	 * menu (so that the tab list will be popped up on control clicks and right
+	 * clicks on the tabbar).
+	 */
+	if( r->h->popupMenu[0] == NULL )
+	{
+		DBG_TMSG( 3, ( stderr, "Setting popup menu 1 to a tab list\n" ) );
+		r->h->popupMenu[0] = (menu_t *) rxvt_calloc( 1, sizeof(menu_t) );
+
+		r->h->popupMenu[0]->len		= sizeof( "Switch to tab" );
+		r->h->popupMenu[0]->name	= STRDUP( "Switch to tab" );
+	}
 # endif
 
 	rxvt_tabbar_create (r);
