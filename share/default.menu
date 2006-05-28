@@ -60,7 +60,13 @@
 {Hide all subwindows}					ToggleSubwin -mst
 {Show all subwindows}					ToggleSubwin +mst
 {-}
+./Colors/*
+[read:submenus;background]
+[read:submenus;foreground]
+../
 [read:submenus;transparent]
 [read:submenus;translucent]
 ../
 [done]
+
+# vim: set ts=4 ft=conf nospell:

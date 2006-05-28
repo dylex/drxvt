@@ -1,19 +1,9 @@
 # Sample configuration for mrxvt-0.5.0. To use, copy it to ~/.mrxvtrc.
 #
-# Features:
+# This sets up a pseudo-transparent terminal with black tinted background, Xft
+# font, a transparent Firefox style tab-bar, and a next style scroll bar.
 #
-# This sets up many different profiles for mrxvt. The -name option to mrxvt can
-# be used to load configurations from a different class on startup. When the
-# -name argument is omitted, only options from the class Mrxvt (the default
-# profile below) are loaded. When a -name argument is provided, then options
-# from the default class (Mrxvt) AND from the class provided on the command line
-# are read.
-#
-# The following profiles are defined in this file:
-#
-#   Default:
-#	A pseudo-transparent terminal with black tinted background, Xft font, a
-#	transparent Firefox style tab-bar, and a next style scroll bar.
+# Additionally, using the -name option you can get the following behaviour:
 #
 #   Full screen:
 #   	Start mrxvt with "mrxvt -name FullScreen". Produces a full screen
@@ -37,7 +27,7 @@
 #   	Start mrxvt with "mrxvt -name Root". This produces a green tinted mrxvt
 #   	windows which loads a root shell in the first tab. Ctrl+Shift+t opens a
 #   	new tab as root, and Ctrl+Shift+n opens a new tab as a regular user.
-
+#
 
 
 #
@@ -173,6 +163,7 @@ Mrxvt.cursorColor2:		#000000
 # Setup colors for a black background.
 Mrxvt.background:		#000000
 Mrxvt.foreground:		#9a9a9a
+
 Mrxvt.color0:			#000000
 Mrxvt.color1:			#af0000
 Mrxvt.color2:			#00af00
@@ -237,10 +228,37 @@ Mrxvt.protectSecondary:		True
 # Enable session management
 # Mrxvt.sessionMgt:		true
 
+#
+# --------------------------------- PROFILES --------------------------------- #
+#
+
+# Root console on profile 1. Matrix like green font for root :).
+Mrxvt.profile1.foreground:	#809a70
+Mrxvt.profile1.background:	#002000
+Mrxvt.profile1.command:		su
+Mrxvt.profile1.tabTitle:	su
+# Mrxvt.profile1.Pixmap:	matrix.jpg
+
+# Vim on profile 2. Vim is run in a shell, so after Vim exits, you'll get the
+# shell prompt.
+Mrxvt.profile2.command:		!vim
+# Mrxvt.profile2.Pixmap:	vim.png
+
+# Mutt on profile 3. Kill the scroll back buffer, to save a little memory.
+# Mrxvt.profile3.Pixmap:	email.jpg
+Mrxvt.profile3.saveLines:	0
+Mrxvt.profile3.command:		mutt
+
+# Define macros to open each of the above profiles
+Mrxvt.macro.Ctrl+Shift+F1:	NewTab -1
+Mrxvt.macro.Ctrl+Shift+F2:	NewTab -2
+Mrxvt.macro.Ctrl+Shift+F3:	NewTab -3
+Mrxvt.macro.Ctrl+Shift+F4:	NewTab -4
+
 # ---------------------------------------------------------------------------- #
 
 #
-#				PROFILE SETTINGS
+#				CLASS SETTINGS
 #
 
 #
@@ -269,72 +287,28 @@ FullScreen.fullscreen:		True
 # ------------------------------- KITCHEN SINK ------------------------------- #
 #
 # Number of tabs to launch initially
-KitchenSink.initTermNumber:	3
-
-#
-# Command to execute for each tab.
-#
-# KitchenSink.vt0.command:	/bin/tcsh
-KitchenSink.vt1.command:	mutt
-KitchenSink.vt2.command:	vim
-
-#
-# Run the above commands in a shell, so that when it exits the tab will not
-# close.
-#
-KitchenSink.tabShell:		True
-
-#
-# Only run the above commands on initialization. After that run the shell on
-# each new opened tab.
-#
-KitchenSink.cmdInitTabs:	True
-
-
-#
-# Title of the initial tabs launched
-#
-KitchenSink.vt0.tabTitle:	Shell
-KitchenSink.vt1.tabTitle:	email (mutt)
-KitchenSink.vt2.tabTitle:	Vim
-
-#
-# Number of lines to save in the scroll back buffer for each tab
-#
-# KitchenSink.vt0.saveLines:	600
-# KitchenSink.vt1.saveLines:	0
-# KitchenSink.vt2.saveLines:	0
-
-#
-# Pixmap background for each tab.
-#
-# KitchenSink.vt0.Pixmap:	vt0bg.jpg
-# KitchenSink.vt1.Pixmap:	vt1bg.png
-# KitchenSink.vt2.Pixmap:	vt2bg.xpm
-#
+KitchenSink.initProfileList:	    0,2,3
 
 
 #
 # ------------------------------- FVWM CONSOLE ------------------------------- #
 #
-FvwmConsole.vt0.tabTitle:	FvwmConsole
-FvwmConsole.xftSize:		12
-FvwmConsole.tintColor:		#181830
-FvwmConsole.geometry:		60x15
-FvwmConsole.scrollBar:		False
+FvwmConsole.initProfileList:	    4
+FvwmConsole.profile4.tabTitle:	    FvwmConsole
+FvwmConsole.profile4.background:    #101020
+
+FvwmConsole.xftSize:		    12
+FvwmConsole.tintColor:		    #181830
+FvwmConsole.geometry:		    60x15
+FvwmConsole.scrollBar:		    False
 
 #
 # ------------------------------- ROOT CONSOLE ------------------------------- #
 #
 
-Root.vt0.tabTitle:		su
-Root.vt0.command:		su
-Root.tintColor:			#002000
-Root.itabBackground:		#002000
-
-# Open root console on Ctrl+Shift+t, and shell on Ctrl+Shift+n
-Root.macro.Ctrl+Shift+t:	NewTab su
-Root.macro.Ctrl+Shift+n:	NewTab "Shell"
+Root.initProfileList:		    1
+Root.tintColor:			    #002000
+Root.itabBackground:		    #002000
 
 # ---------------------------------------------------------------------------- #
 # vim: set ft=mrxvtrc ts=8 sts=4:
