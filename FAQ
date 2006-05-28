@@ -2,94 +2,87 @@
 			Frequently Asked Questions (FAQ)
 --------------------------------------------------------------------------
 
-    Q:  I have a question...
-    Q:  What exactly is the name of this project, materm or mrxvt?
-    Q:  Why not use GNU screen? It has provided the multi-screen features!
-    Q:  Why not use gnome-terminal/konsole? They have provided the functionality
-	of mrxvt!
-    Q:  How to build mrxvt, since I cannot find the configure script as usual!?
-    Q:  I just upgraded to the newest version of mrxvt, and feature XXX doesn't
-	work anymore.
-    Q:  When I run mrxvt from command line, it outputs lots of verbose text. How
-	to disable it?
-    Q:  I do not have root privilege on my system. Can I install mrxvt, and what
-	are the restrictions if I install it as normal user?
-    Q:  When I run mrxvt with multiple tabs, why does the output of the `w'
-	command shows many users are using the system?
-    Q:  I dislike the default mrxvt font, so I have installed some new fonts,
-	like the Verdana font. But when I run mrxvt with option `-fn verdana',
-	mrxvt complains that it cannot find the verdana font! What is wrong?
-    Q:  When I want to use Chinese (or Korea/Japanese) encoding and font,
-	executing command `mrxvt -km gb -mfont fontname' is not working! For
-	example, it complains that -km is a bad option.
-    Q:  I have ~/.Xdefaults and ~/.mrxvtrc, which one is the first to be read?
-    Q:  How do I input Chinese (or Korea/Japanese) in mrxvt?
-    Q:  I execute mrxvt with CJK encoding and X11 fonts. But sometimes CJK
-	characters are not display completely, or there are some extra pixels
-	left after the CJK characters.
-    Q:  Does mrxvt support UTF-8 locale/encoding method?
-    Q:  I use UTF-8 as default encoding method, but mrxvt does not support it.
-	So can I start mrxvt with other encoding method, e.g., zh_CN.GB2312
-	without changing the default encoding method?
-    Q:  I run mrxvt with `-o 25' option, but the window is not translucent!
-    Q:  When I run mrxvt in transparent mode or background image mode, can I
-	make the background a little darker?
-    Q:  Why the tinting does not work after I set the tint color in command line
-	or ~/.mrxvtrc?
-    Q:  I am tired with the current tinting color, can I change the color
-	without restart mrxvt?
-    Q:  How to start mrxvt with multiple tabs initially?
-    Q:  How to set the title of each tab when mrxvt starts?
-    Q:  How to let each tab execute different applications when mrxvt starts?
-    Q:  How to change the title of a tab after mrxvt starts?
-    Q:  My Control+Right/Left keys works OK in Konsole and gnome-terminal
-	(Fedora Core 3). They didn't work under mrxvt. When I start vi from
-	mrxvt Home and End keys do not work also. How I can make my keys works
-	as expected in all applications started in mrxvt?
-    Q:  How to change the title of a tab to the current directory automatically?
-    Q:  How to use the Home/End key to move the cursor to the beginning/ end of
-	the current command line? When I press the Home/End key, a ~ character
-	is displayed.
-    Q:  How to dynamically change the title of the mrxvt window so that it is
-	the same as the current active tab when I switch to a new tab?
-    Q:  Why cannot I close a tab? The close button is grey!
-    Q:  Is there any keyboard combination to manipulate the tabs?
-    Q:  Mrxvt default hotkey ctrl+shift+minus conflicts with Emacs. How can I
-	disable this mrxvt default hotkey?
-    Q:  How to enable freetype font, or, say the XFT support?
-    Q:  After I use freetype font, the text rendering speed seems to slow down a
-	lot! How to improve the speed?
-    Q:  After I use freetype font, the line space seems too large. Is there any
-	way to narrow down the line space?
-    Q:  Can I change the color of tab background and text?
-    Q:  I notice that sometimes there is a dash-dot frame around the title of
-	inactive tabs. What has happened? Is it a bug?
-    Q:  I notice that the inactive tab is highlighted by the dash-dot frame, but
-	after I switch to it, I see nothing happened. What is wrong with it?
-    Q:  I like to use command line options to create a new tab in the current
-	mrxvt terminal and execute some commands. For example, if I run command
-	`mrxvt --new-tab -e pine' in a mrxvt terminal, the current terminal will
-	open a new tab and run pine in it. Can you implement it for me?
-    Q:  I like to use context menu when I right click in the terminal window.
-	For example, to copy/paste text. Can you support it?
-    Q:  Will you rewrite mrxvt using C++? The object oriented feature of C++ can
-	make mrxvt much modular.
-    Q:  How do I know which mrxvt version I'm using?
-    Q:  Mouse cut/paste suddenly no longer works.
-    Q:  What's with this bold/blink stuff? I can never get blinking text!
-    Q:  I don't like the screen colors.  How do I change them?
-    Q:  What's with the strange Backspace/Delete key behaviour?
-    Q:  Why doesn't the Backspace key work on my Linux machine?
-    Q:  I don't like the key-bindings.  How do I change them?
-    Q:  I'm using keyboard model XXX that has extra Prior/Next/Insert keys.  How
-	do I make use of them?  For example, the Sun Keyboard type 4 has the
-	following mappings that mrxvt doesn't recognize.
-    Q:  How do I distinguish if I'm running mrxvt or a regular xterm? I need
-	this to decide about setting colors etc.
-    Q:  How do I set the correct, full IP address for the DISPLAY variable?
-    Q:  Where is the CVS repository of mrxvt? I cannot find it on sourceforge!
-    Q:  I find a bug, or I would like to see a new feature in mrxvt, how to
-	report it?
+Q:  I have a question...
+Q:  What exactly is the name of this project, materm or mrxvt?
+Q:  Why not use GNU screen? It has provided the multi-screen features!
+Q:  Why not use gnome-terminal/konsole? They have provided the functionality of
+    mrxvt!
+Q:  How to build mrxvt, since I cannot find the configure script as usual!?
+Q:  I just upgraded to mrxvt-0.5.x, and feature XXX doesn't work anymore.
+Q:  When I run mrxvt from command line, it outputs lots of verbose text. How to
+    disable it?
+Q:  I do not have root privilege on my system. Can I install mrxvt, and what are
+    the restrictions if I install it as normal user?
+Q:  When I run mrxvt with multiple tabs, why does the output of the `w' command
+    shows many users are using the system?
+Q:  I dislike the default mrxvt font, so I have installed some new fonts, like
+    the Verdana font. But when I run mrxvt with option `-fn verdana', mrxvt
+    complains that it cannot find the verdana font! What is wrong?
+Q:  When I want to use Chinese (or Korea/Japanese) encoding and font, executing
+    command `mrxvt -km gb -mfont fontname' is not working! For example, it
+    complains that -km is a bad option.
+Q:  I have ~/.Xdefaults and ~/.mrxvtrc, which one is the first to be read?
+Q:  How do I input Chinese (or Korea/Japanese) in mrxvt?
+Q:  I execute mrxvt with CJK encoding and X11 fonts. But sometimes CJK
+    characters are not display completely, or there are some extra pixels left
+    after the CJK characters.
+Q:  Does mrxvt support UTF-8 locale/encoding method?
+Q:  I use UTF-8 as default encoding method, but mrxvt does not support it. So
+    can I start mrxvt with other encoding method, e.g., zh_CN.GB2312 without
+    changing the default encoding method?
+Q:  I run mrxvt with `-o 25' option, but the window is not translucent!
+Q:  When I run mrxvt in transparent mode or background image mode, can I make
+    the background a little darker?
+Q:  Why the tinting does not work after I set the tint color in command line or
+    ~/.mrxvtrc?
+Q:  I am tired with the current tinting color, can I change the color without
+    restart mrxvt?
+Q:  How to start mrxvt with multiple tabs initially?
+Q:  How do I let each tab execute different applications when mrxvt starts?
+Q:  How to change the title of a tab after mrxvt starts?
+Q:  My Control-Left / Right and Home / End keys do not work properly in some
+    applications.
+Q:  How do I set the tab title to the current command?
+Q:  How to dynamically change the title of the mrxvt window so that it is the
+    same as the current active tab when I switch to a new tab?
+Q:  Why cannot I close a tab? The close button is grey!
+Q:  Is there any keyboard combination to manipulate the tabs?
+Q:  Mrxvt default hotkey ctrl+shift+minus conflicts with Emacs. How can I
+    disable this mrxvt default hotkey?
+Q:  How to enable freetype font, or, say the XFT support?
+Q:  After I use freetype font, the text rendering speed seems to slow down a
+    lot! How to improve the speed?
+Q:  After I use freetype font, the line space seems too large. Is there any way
+    to narrow down the line space?
+Q:  Can I change the color of tab background and text?
+Q:  I notice that sometimes there is a dash-dot frame around the title of
+    inactive tabs. What has happened? Is it a bug?
+Q:  I notice that the inactive tab is highlighted by the dash-dot frame, but
+    after I switch to it, I see nothing happened. What is wrong with it?
+Q:  I like to use command line options to create a new tab in the current mrxvt
+    terminal and execute some commands. For example, if I run command `mrxvt
+    --new-tab -e pine' in a mrxvt terminal, the current terminal will open a new
+    tab and run pine in it. Can you implement it for me?
+Q:  I like to use context menu when I right click in the terminal window. For
+    example, to copy/paste text. Can you support it?
+Q:  Will you rewrite mrxvt using C++? The object oriented feature of C++ can
+    make mrxvt much modular.
+Q:  How do I know which mrxvt version I'm using?
+Q:  Mouse cut/paste suddenly no longer works.
+Q:  What's with this bold/blink stuff? I can never get blinking text!
+Q:  I don't like the screen colors.  How do I change them?
+Q:  What's with the strange Backspace/Delete key behaviour?
+Q:  Why doesn't the Backspace key work on my Linux machine?
+Q:  I don't like the key-bindings.  How do I change them?
+Q:  I'm using keyboard model XXX that has extra Prior/Next/Insert keys.  How do
+    I make use of them?  For example, the Sun Keyboard type 4 has the following
+    mappings that mrxvt doesn't recognize.
+Q:  How do I distinguish if I'm running mrxvt or a regular xterm? I need this to
+    decide about setting colors etc.
+Q:  How do I set the correct, full IP address for the DISPLAY variable?
+Q:  Where is the CVS repository of mrxvt?
+Q:  I find a bug, or I would like to see a new feature in mrxvt, how to report
+    it?
 
 --------------------------------------------------------------------------
 		   Frequently Asked Questions with answers :)
@@ -97,833 +90,801 @@
 
 -----
 
-    Q:  I have a question...
+Q:  I have a question...
 
-    A:  Have you read the README, README.configure, INSTALL, FAQ, TIPS, man
-	page...? Before asking a question, please read through these documents
-	for potential answers.
+A:  Have you read the README, README.configure, INSTALL, FAQ, TIPS, man page...?
+    Before asking a question, please read through these documents for potential
+    answers.
 
-	Here is a good tutorial to ask questions:
+    Here is a good tutorial to ask questions:
 
-	    http://www.catb.org/~esr/faqs/smart-questions.html
+	http://www.catb.org/~esr/faqs/smart-questions.html
 
 -----
 
-    Q:  What exactly is the name of this project, materm or mrxvt?
+Q:  What exactly is the name of this project, materm or mrxvt?
 
-    A:  The current official name of this project is mrxvt (I honestly hope Rui
-	Carmo will not reclaim the ownership of mrxvt because he is the first
-	person who tried to hack a multi-tab rxvt on Cygwin and got this name
-	for his project. Here is the link of his work:
-	http://the.taoofmac.com/space/Projects/mrxvt).
+A:  The current official name of this project is mrxvt (I honestly hope Rui
+    Carmo will not reclaim the ownership of mrxvt because he is the first person
+    who tried to hack a multi-tab rxvt on Cygwin and got this name for his
+    project. Here is the link of his work:
+    http://the.taoofmac.com/space/Projects/mrxvt).
+
+    As stated in README, in the beginning, the project name was materm - derived
+    from the project multi-aterm. And this was the name when I registered the
+    project at sourceforge. Unfortunately it is not easy to rename materm to
+    mrxvt at sourceforge. This is why we keep materm as the name at sourceforge.
+
+-----
+
+Q:  Why not use GNU screen? It has provided the multi-screen features!
+
+A:  Because I do not like GNU screen. ;-)  People have their own flavors. Plus,
+    mrxvt provides some features that GNU screen lacks, e.g., use mouse click to
+    switch from different tabs... :p
+
+-----
+
+Q:  Why not use gnome-terminal/konsole? They have provided the functionality of
+    mrxvt!
+
+A:  Because they are heavy, slow, and depend on too many libraries. For example,
+    gnome-terminal 2.6.1 in the Slackware -current tree depends on
+    58 libraries, konsole of KDE 3.3 in the gentoo depends on 41 libraries,
+    mrxvt with all features only depends on 19 libraries, and this number can be
+    further reduced to 5 (of course you need to strip out some features, like
+    background image ;-))!! Since all I need is a fast and lightweight X
+    terminal emulator supporting multi-tabs, I decide to create mrxvt by myself.
+
+-----
+
+Q:  How to build mrxvt, since I cannot find the configure script as usual!?
+
+A:  Have you read the INSTALL file?
+
+-----
+
+Q:  I just upgraded to mrxvt-0.5.x, and feature XXX doesn't work anymore.
+
+A:  Don't panic! Something is possibly different in the latest release.
+
+    The following are the changes you need to be most wary of when upgrading to
+    mrxvt-4.x to 0.5.x:
+
+	1. Background tinting works differently when compiled with XRender
+	   support (enabled by default in 0.5.0). Now if you want your
+	   background tinted to a specific color, you need to set the tintColor
+	   resource to that color, and NOT the mask (as you had to in 0.4.x).
+	   Specifically, if you want a dark tint, then set tintColor to #000000
+	   (in 0.4.x you would set it to #ffffff).
+
+	   Also keep in mind that very bright colors (e.g. #ffffff) are not very
+	   transparent and not good for tinting.
+
+	2. The default terminal name is now "rxvt" and not "xterm". On systems
+	   with badly configured termcap / terminfo entries for "rxvt", this
+	   will cause NUMEROUS ncurses based programs to behave very badly
+	   (including bash!). If you have any problems, ask your Linux vendor to
+	   fix this! Or wimp out and set the termName resource to "xterm" in
+	   your ~/.mrxvtrc
+
+	3. The old "hotkey" feature has been disabled. The new "macro" feature
+	   in 0.5.0 extends the functionality of the old "hotkey" feature.
+
+	4. The menu syntax for actions from 0.5.x is incompatible with the
+	   syntax from earlier versions. See the man page for details.
+
+	5. The keysym resource is disabled by default (use macros instead).
+
+	6. A few default key-bindings were changed (mainly to adhere to the
+	   convention that terminal programs should use Ctrl-Shift modifiers for
+	   all it's shortcuts, and let the window manager / child process use
+	   other modifier combinations).
+	   
+	   For example the Shift+Left / Shift+Right macros to switch tabs are
+	   enabled ONLY in the primary screen (i.e. they will not work when you
+	   are running Vim). Vim uses Shift+Left/Right to move between words, so
+	   we do not override this behaviour in Vim.
+	   
+	   Read the man page and /etc/mrxvt/mrxvtrc for a complete list and
+	   description of the macros defined in 0.5.x.
+
+	7. A few escape sequences (controlling creation / movement of tabs) have
+	   been disabled for security reasons. The functions can of course be
+	   accessed using keyboard macros or the popup-menus.
+
+	8. Escape sequences generated by function keys / modified cursor keys
+	   have now been changed to produce exactly the same escape sequences as
+	   Xterm does. (If you don't like this, then undefine the macro
+	   XTERM_KEYS in src/feature.h). As a result of this, to get Ctrl+Left /
+	   Right working in your shell, change ~/.inputrc the way you would for
+	   Xterm (not rxvt). This is described later on in this FAQ.
+
+	9. The option --tabShell, --cmdInitTabs have been removed. The options
+	   --initTermNum and --vt%d.xx have been marked as obsolete.
+
+	   Mrxvt-0.5.0 has a new "profile" feature intended to replace the above
+	   options. Here settings are associated to a "profile" instead of a
+	   tab. Tabs can be created on demand with any desired profile. (The
+	   earlier design led to some unresolvable bugs when the user moved
+	   tabs). Migrating to profiles is easy:
+
+	       1. Replace the old vt%d.xx resources with profile%d.xx. remember
+		  that the profile%d resources refer to the PROFILE number, and
+		  not the TAB number.
+
+	       2. To open a new tab with profile number N use the macro "NewTab
+		  -N". E.g.
+
+		    Mrxvt.macro.Ctrl+Shift+F1:  NewTab -1
+		    Mrxvt.macro.Ctrl+Shift+F2:  NewTab -2
+		    Mrxvt.macro.Ctrl+Shift+F3:  NewTab -3
+		    Mrxvt.macro.Ctrl+Shift+F4:  NewTab -4
+
+	       3. Finally replace your initTermNumber option with
+		  initProfileList. The argument to initProfileList is a comma
+		  separated list of profiles you want opened in new tabs on
+		  startup.
+
+    A more complete list of changes is in the ChangeLog, and in the Subversion
+    logs.
+
+-----
+
+Q:  When I run mrxvt from command line, it outputs lots of verbose text. How to
+    disable it?
+
+A:  You probably have configured mrxvt with debug support. You need to
+    reconfigure mrxvt to disable debug support and rebuild it, like the
+    following:
+
+	$ ./configure --enable-whatever-options --disable-debug $ make
+
+-----
+
+Q:  I do not have root privilege on my system. Can I install mrxvt, and what are
+    the restrictions if I install it as normal user?
+
+A:  Surely you can install mrxvt without root privilege. You can configure mrxvt
+    with --prefix=/home/youraccount and install it. Or you can simply copy the
+    mrxvt program to anywhere you wish. Mrxvt only requires setuid root in order
+    to write to utmp/wtmp/lastlog. If you do not have root privilege, you will
+    only lose this feature.
+
+-----
+
+Q:  When I run mrxvt with multiple tabs, why does the output of the `w' command
+    shows many users are using the system?
+
+A:  This is because each mrxvt tab logs itself in an entry of the utmp file. If
+    you do not want this feature, remove the setuid permission from mrxvt binary
+    and do not build mrxvt with utempter support.
+
+-----
+
+Q:  I dislike the default mrxvt font, so I have installed some new fonts, like
+    the Verdana font. But when I run mrxvt with option `-fn verdana', mrxvt
+    complains that it cannot find the verdana font! What is wrong?
+
+A:  There are two types of fonts in X Window System, the ancient X11 bitmap
+    fonts and the new freetype fonts. Mrxvt is capable to use either type of
+    fonts.
     
-	As stated in README, in the beginning, the project name was materm -
-	derived from the project multi-aterm. And this was the name when I
-	registered the project at sourceforge. Unfortunately it is not easy to
-	rename materm to mrxvt at sourceforge. This is why we keep materm as the
-	name at sourceforge.
+    The X11 bitmap fonts have a special format of names. You can execute command
+    `xlsfonts | more' to get a complete list of all X11 bitmap fonts installed
+    in your system, and pick one you like. Or you can execute program `xfontsel'
+    to pick one, which shows you the look of the font nicely. As you can see,
+    the font name is in a special format like the following example. That is why
+    mrxvt complains if you only provide the name of the font:
+
+	-adobe-courier-bold-o-normal--14-140-75-75-m-90-iso8859-1
+
+    The freetype fonts are much simpler to handle. You only need to give the
+    font family name to `-xftfn' option, there is not a magic format like X11
+    font. You can specify other characteristics of the freetype font using other
+    related options.
 
 -----
 
-    Q:  Why not use GNU screen? It has provided the multi-screen features!
+Q:  When I want to use Chinese (or Korea/Japanese) encoding and font, executing
+    command `mrxvt -km gb -mfont fontname' is not working! For example, it
+    complains that -km is a bad option.
 
-    A:  Because I do not like GNU screen. ;-)  People have their own flavors.
-	Plus, mrxvt provides some features that GNU screen lacks, e.g., use
-	mouse click to switch from different tabs... :p
+A:  Most probably, you have not enabled gb/big5/kanji/korea options when you
+    configure the mrxvt. These options are turned off by default. Reconfigure
+    mrxvt to enable these options and rebuild it like the following:
 
------
-
-    Q:  Why not use gnome-terminal/konsole? They have provided the functionality
-	of mrxvt!
-
-    A:  Because they are heavy, slow, and depend on too many libraries. For
-	example, gnome-terminal 2.6.1 in the Slackware -current tree depends on
-	58 libraries, konsole of KDE 3.3 in the gentoo depends on 41 libraries,
-	mrxvt with all features only depends on 19 libraries, and this number
-	can be further reduced to 5 (of course you need to strip out some
-	features, like background image ;-))!! Since all I need is a fast and
-	lightweight X terminal emulator supporting multi-tabs, I decide to
-	create mrxvt by myself.
+	$ ./configure --enable-gb --enable-whatever-other-options
+	$ make
+	$ su
+	$ make install
 
 -----
 
-    Q:  How to build mrxvt, since I cannot find the configure script as usual!?
+Q:  I have ~/.Xdefaults and ~/.mrxvtrc, which one is the first to be read?
 
-    A:  Have you read the INSTALL file?
+A:  ~/.mrxvtrc will be the one to be read, and ~/.Xdefaults is ignored. Mrxvt
+    tries to read three resources files in sequence: ~/.mrxvtrc, ~/.Xdefaults
+    and ~/.Xresources. If either one is successfully opened, the rest are
+    ignored.
+
+    Very soon the ~/.Xdefaults and ~/.Xresources files will not be used by
+    mrxvt, and we recomend you call your config file ~/.mrxvtrc.
 
 -----
 
-    Q:  I just upgraded to the newest version of mrxvt, and feature XXX doesn't
-	work anymore.
+Q:  How do I input Chinese (or Korea/Japanese) in mrxvt?
 
-    A:  Don't panic! Something is possibly different in the latest release.
+A:  First of all, you need to to enable the language options for
+    Chinese/Korea/Japanese as the above question when you configure mrxvt. You
+    also needs to enable the XIM option (--enable-xim).
 
-	The following are the changes you need to be most wary of when upgrading
-	to mrxvt-4.x to 0.5.x:
+    Then make sure you have correctly setup and started the XIM server, like
+    SCIM, Chinput, fcitx, etc. 
 
-	    1. Background tinting works differently when compiled with XRender
-	       support (enabled by default in 0.5.0). Now if you want your
-	       background tinted to a specific color, you need to set the
-	       tintColor resource to that color, and NOT the mask (as you had to
-	       in 0.4.x). Specifically, if you want a dark tint, then set
-	       tintColor to #000000 (in 0.4.x you would set it to #ffffff).
+    Next, set the correct locale for mrxvt. You only need to set the environment
+    variable LC_CTYPE. But after you set it, make sure that the environment
+    variable LC_ALL is not set.
 
-	       Also keep in mind that very bright colors (e.g. #ffffff) are not
-	       very transparent and not good for tinting.
+    Finally, set the correct X resources in ~/.mrxvtrc file as the followling.
+    Remember the value of inputMethod is case sensitive.
 
-	    2. The default terminal name is now "rxvt" and not "xterm". On
-	       systems with badly configured termcap / terminfo entries for
-	       "rxvt", this will cause NUMEROUS ncurses based programs to behave
-	       very badly (including bash!). If you have any problems, ask your
-	       Linux vendor to fix this! Or wimp out and set the termName
-	       resource to "xterm" in your ~/.mrxvtrc
+	mrxvt*multichar_encoding: GB
+	mrxvt*inputMethod:        SCIM
 
-	    3. The old "hotkey" feature has been disabled. The new "macro"
-	       feature in 0.5.0 extends the functionality of the old "hotkey"
-	       feature.
+-----
 
-	    4. The menu syntax for actions from 0.5.x is incompatible with the
-	       syntax from earlier versions. See the man page for details.
+Q:  I execute mrxvt with CJK encoding and X11 fonts. But sometimes CJK
+    characters are not display completely, or there are some extra pixels left
+    after the CJK characters.
 
-	    5. The keysym resource is disabled by default (use macros instead).
+A:  This is a known issue for displaying CJK characters using X11 fonts. Mrxvt
+    requires that the width of each CJK character (mfont) be twice as the width
+    of each english character (font). If this condition is not met, mrxvt may
+    display CJK characters with some problems. For example, if you choose 6x12
+    as the font, and the SimSun font as the mfont, but the width of the SimSun
+    font is 13, you will get in trouble. In particular, let us assume that you
+    want to display a string "XXabc", where "XX" represents a single Chinese
+    character. With SimSun font, the width of "XX" is 13, but mrxvt thinks it is
+    12 (= 2 * 6)!!! Thus, when "abc" is displayed, two pixels of "XX" will be
+    overwritten by "a"! There are two solutions to this issue. One is to
+    carefully choose the font and mfont such that the width of mfont is twice of
+    the font. The other is to use freetype font, where we have a special
+    handling to avoid this problem.
 
-	    6. A few default key-bindings were changed (mainly to adhere to the
-	       convention that terminal programs should use Ctrl-Shift modifiers
-	       for all it's shortcuts, and let the window manager / child
-	       process use other modifier combinations).
+-----
 
-	    7. A few escape sequences (controlling creation / movement of tabs)
-	       have been disabled for security reasons. The functions can of
-	       course be accessed using keyboard macros or the popup-menus.
+Q:  Does mrxvt support UTF-8 locale/encoding method?
 
-	A more complete list of changes is in the ChangeLog.
+A:  Not now. This is a planned work and hopefully will be supported in the next
+    development branch (0.5.x).
+
+-----
+
+Q:  I use UTF-8 as default encoding method, but mrxvt does not support it. So
+    can I start mrxvt with other encoding method, e.g., zh_CN.GB2312 without
+    changing the default encoding method?
+
+A:  No problem! You can start mrxvt like the following if you use bash/ksh/sh:
+
+	LC_CTYPE=zh_CN.GB2312 mrxvt &
+
+    If you use csh, try the following
+
+	env LC_CTYPE=zh_CN.GB2312 mrxvt &
+
+-----
+
+Q:  I run mrxvt with `-o 25' option, but the window is not translucent!
+
+A:  First make sure your X server support translucent, such as Xorg 6.8.1. Next,
+    make sure the translucent extension is enabled in the X server. You can use
+    command `xdpyinfo' to check whether the Composite extension is in the
+    extension list. Then make sure you have run the program `xcompmgr' to enable
+    translucent.
+
+-----
+
+Q:  When I run mrxvt in transparent mode or background image mode, can I make
+    the background a little darker?
+
+A:  Yes, you can. Just tint the background to black using the --shading and
+    --tintColor options:
+
+	Mrxvt.transparent:		True
+	Mrxvt.transparentScrollbar:	True
+	Mrxvt.transparentTabbar:	True
+	Mrxvt.tintColor:		#000000
+	Mrxvt.shading:		85
     
------
-
-    Q:  When I run mrxvt from command line, it outputs lots of verbose text. How
-	to disable it?
-
-    A:  You probably have configured mrxvt with debug support. You need to
-	reconfigure mrxvt to disable debug support and rebuild it, like the
-	following:
-
-	    $ ./configure --enable-whatever-options --disable-debug
-	    $ make
+    You can use Ctrl+Shift+J / K to change the shading amount when mrxvt is
+    running.
 
 -----
 
-    Q:  I do not have root privilege on my system. Can I install mrxvt, and what
-	are the restrictions if I install it as normal user?
+Q:  Why the tinting does not work after I set the tint color in command line or
+    ~/.mrxvtrc?
 
-    A:  Surely you can install mrxvt without root privilege. You can configure
-	mrxvt with --prefix=/home/youraccount and install it. Or you can simply
-	copy the mrxvt program to anywhere you wish. Mrxvt requires setuid root
-	in order to write to utmp/wtmp/lastlog. Since you do not have root
-	privilege, you will lose these logging features.
+A:  First, tinting only works for user supplied background image or transparent
+    background. Secondly, you have to set the shade option as well.
 
 -----
 
-    Q:  When I run mrxvt with multiple tabs, why does the output of the `w'
-	command shows many users are using the system?
+Q:  I am tired with the current tinting color, can I change the color without
+    restart mrxvt?
 
-    A:  This is because each mrxvt tab logs itself in an entry of the utmp file.
-	If you do not want this feature, remove the setuid permission from mrxvt
-	binary and do not build mrxvt with utempter support.
+A:  Yes, you can. Control-RightClick on the terminal window. Select the
+    "Transparency / Tint Background / <favourite color>" menu options.
+    Alternately you can run use an escape sequence as follows:
 
------
+	$ echo "\e]66;red\a"
 
-    Q:  I dislike the default mrxvt font, so I have installed some new fonts,
-	like the Verdana font. But when I run mrxvt with option `-fn verdana',
-	mrxvt complains that it cannot find the verdana font! What is wrong?
-
-    A:  There are two types of fonts in X Window System, the ancient X11 bitmap
-	fonts and the new freetype fonts. Mrxvt is capable to use either type of
-	fonts.
-	
-	The X11 bitmap fonts have a special format of names. You can execute
-	command `xlsfonts | more' to get a complete list of all X11 bitmap fonts
-	installed in your system, and pick one you like. Or you can execute
-	program `xfontsel' to pick one, which shows you the look of the font
-	nicely. As you can see, the font name is in a special format like the
-	following example. That is why mrxvt complains if you only provide the
-	name of the font:
-
-	    -adobe-courier-bold-o-normal--14-140-75-75-m-90-iso8859-1
-
-	The freetype fonts are much simpler to handle. You only need to give the
-	font family name to `-xftfn' option, there is not a magic format like
-	X11 font. You can specify other characteristics of the freetype font
-	using other related options.
+    You can have macros / menu entries to do the same. See also the program
+    settitle.c and mrxvtset.pl supplied with the source, and mrxvt_seq.txt.bz2
+    for a complete list of escape sequences supplied by mrxvt.
 
 -----
 
-    Q:  When I want to use Chinese (or Korea/Japanese) encoding and font,
-	executing command `mrxvt -km gb -mfont fontname' is not working! For
-	example, it complains that -km is a bad option.
+Q:  How to start mrxvt with multiple tabs initially?
 
-    A:  Most probably, you have not enabled gb/big5/kanji/korea options when you
-	configure the mrxvt. These options are turned off by default.
-	Reconfigure mrxvt to enable these options and rebuild it like the
-	following:
+A   You can set the number of tabs you want in ~/.mrxvtrc as the following
+    example:
 
-	    $ ./configure --enable-gb --enable-whatever-other-options
-	    $ make
-	    $ su
-	    $ make install
+	mrxvt.initProfileList:  0,0,0
+
+    Alternatively, you can set it using command line option -ip.
 
 -----
 
-    Q:  I have ~/.Xdefaults and ~/.mrxvtrc, which one is the first to be read?
+Q:  How do I let each tab execute different applications when mrxvt starts?
 
-    A:  ~/.mrxvtrc will be the one to be read, and ~/.Xdefaults is ignored.
-	Mrxvt tries to read three resources files in sequence: ~/.mrxvtrc,
-	~/.Xdefaults and ~/.Xresources. If either one is successfully opened,
-	the rest are ignored.
+A:  You can set command for each tab in ~/.mrxvtrc as the following example:
 
-	Very soon the ~/.Xdefaults and ~/.Xresources files will not be used by
-	mrxvt, and we recomend you call your config file ~/.mrxvtrc.
+	Mrxvt.profile1.background:	#000040
+	Mrxvt.profile1.command:	!mc
+	Mrxvt.profile1.tabTitle:	"Midnight Commander"
 
------
+	Mrxvt.profile2.command: 	telnet www.mitbbs.com
+	Mrxvt.initProfileList:  	0,1,2
 
-    Q:  How do I input Chinese (or Korea/Japanese) in mrxvt?
+    This will open three tabs on startup containing the shell, mc and telnet.
+    See /etc/mrxvt/mrxvtrc.sample for a more complete example.
 
-    A:  First of all, you need to to enable the language options for
-	Chinese/Korea/Japanese as the above question when you configure mrxvt.
-	You also needs to enable the XIM option (--enable-xim).
+    If you only want to change the tab command in other tabs (and not the
+    background / saveLines etc), then you can use the NewTab macro as follows:
 
-	Then make sure you have correctly setup and started the XIM server, like
-	SCIM, Chinput, fcitx, etc. 
-
-	Next, set the correct locale for mrxvt. You only need to set the
-	environment variable LC_CTYPE. But after you set it, make sure that the
-	environment variable LC_ALL is not set.
-
-	Finally, set the correct X resources in ~/.mrxvtrc file as the
-	followling. Remember the value of inputMethod is case sensitive.
-
-	    mrxvt*multichar_encoding: GB
-	    mrxvt*inputMethod:        SCIM
+	Mrxvt.macro.Ctrl+Shift+F1:	NewTab "man mrxvt" man mrxvt
+	Mrxvt.macro.Ctrl+Shift+b:	NewTab bash
+	Mrxvt.macro.Ctrl+Shift+v:	NewTab "Vim" !vim
 
 -----
 
-    Q:  I execute mrxvt with CJK encoding and X11 fonts. But sometimes CJK
-	characters are not display completely, or there are some extra pixels
-	left after the CJK characters.
+Q:  How to change the title of a tab after mrxvt starts?
 
-    A:  This is a known issue for displaying CJK characters using X11 fonts.
-	Mrxvt requires that the width of each CJK character (mfont) be twice as
-	the width of each english character (font). If this condition is not
-	met, mrxvt may display CJK characters with some problems. For example,
-	if you choose 6x12 as the font, and the SimSun font as the mfont, but
-	the width of the SimSun font is 13, you will get in trouble. In
-	particular, let us assume that you want to display a string "XXabc",
-	where "XX" represents a single Chinese character. With SimSun font, the
-	width of "XX" is 13, but mrxvt thinks it is 12 (= 2 * 6)!!! Thus, when
-	"abc" is displayed, two pixels of "XX" will be overwritten by "a"! There
-	are two solutions to this issue. One is to carefully choose the font and
-	mfont such that the width of mfont is twice of the font. The other is to
-	use freetype font, where we have a special handling to avoid this
-	problem.
+A:  You can select some text in the mrxvt terminal and press the hot key
+    combinations: Ctrl+Shift+s, Shift+Delete or middle click with the mouse. The
+    tab title will be changed to the selected text. Currently, the selected text
+    must be in the same mrxvt terminal.
+
+    You can also change the tab title through escape sequence.
+    
+	$ echo -ne "\e]62;New tab title\a"
+
+    Alternately use compile settitle.c, or use the perl script mrxvtset.pl.
+-----
+
+Q:  My Control-Left / Right and Home / End keys do not work properly in some
+    applications.
+
+A:  To get your modified cursor keys working properly in Vim, just upgrade to
+    Vim 7. The new behaviour in mrxvt is designed to work "out of the box" with
+    Vim 7.
+
+    To get your modified cursor keys working in bash / readline based
+    applications put the following in your ~/.inputrc:
+
+	# Cursor movement for mrxvt-0.5.x / xterm
+	"\e[1;5C": forward-word
+	"\e[1;5D": backward-word
+
+	"\e[7~": beginning-of-line
+	"\e[8~": end-of-line
+
+    As of 0.5.0 the escape sequences mrxvt produces for modified cursor keys is
+    the same as those produced by Xterm. If you do not like this behaviour,
+    undefine the XTERM_KEYS macro in src/feature.h.
+
+    Alternately you can use the macro feature of mrxvt to make the cursor keys
+    produce the string that is expected by your application (explained later on
+    in this FAQ)
 
 -----
 
-    Q:  Does mrxvt support UTF-8 locale/encoding method?
-
-    A:  Not now. This is a planned work and hopefully will be supported in the
-	next development branch (0.5.x).
-
------
-
-    Q:  I use UTF-8 as default encoding method, but mrxvt does not support it.
-	So can I start mrxvt with other encoding method, e.g., zh_CN.GB2312
-	without changing the default encoding method?
-
-    A:  No problem! You can start mrxvt like the following if you use
-	bash/ksh/sh:
-
-	    LC_CTYPE=zh_CN.GB2312 mrxvt &
-
-	If you use csh, try the following
-
-	    env LC_CTYPE=zh_CN.GB2312 mrxvt &
-
------
-
-    Q:  I run mrxvt with `-o 25' option, but the window is not translucent!
-
-    A:  First make sure your X server support translucent, such as Xorg 6.8.1.
-	Next, make sure the translucent extension is enabled in the X server.
-	You can use command `xdpyinfo' to check whether the Composite extension
-	is in the extension list. Then make sure you have run the program
-	`xcompmgr' to enable translucent.
-
------
-
-    Q:  When I run mrxvt in transparent mode or background image mode, can I
-	make the background a little darker?
-
-    A:  Yes, you can. This feature is called background fading. You can specify
-	the darker number in the backgroundFade X resource or the -bgfade
-	command line option. Notice that background fading does not work for
-	solid color background. Furthermore, background fading is different from
-	off-focus fading, which fades the background only when mrxvt loses
-	focus.
-
------
-
-    Q:  Why the tinting does not work after I set the tint color in command line
-	or ~/.mrxvtrc?
-
-    A:  First, tinting only works for user supplied background image or
-	transparent background. Secondly, you have to set the shade option as
-	well.
-
------
-
-    Q:  I am tired with the current tinting color, can I change the color
-	without restart mrxvt?
-
-    A:  Yes, you can. Control-RightClick on the terminal window. Select the
-	"Transparency / Tint Background / <favourite color>" menu options.
-	Alternately you can run use an escape sequence as follows:
-
-	    $ echo "\e]66;red\a"
-
-	You can have macros / menu entries to do the same. See also the program
-	settitle.c and mrxvtset.pl supplied with the source.
-
------
-
-    Q:  How to start mrxvt with multiple tabs initially?
-
-    A   You can set the number of tabs you want in ~/.mrxvtrc as the following
-	example:
-
-	mrxvt*initTermNumber:  3
-
-	Alternatively, you can set it using command line option -tnum.
-
------
-
-    Q:  How to set the title of each tab when mrxvt starts?
-
-    A:  You can set title for each tab in ~/.mrxvtrc as the following example:
-
-	    mrxvt*vt0*tabTitle:  term1
-	    mrxvt*vt1*tabTitle:  term2
-	    mrxvt*vt2*tabTitle:  term3
-	    mrxvt*vt3*tabTitle:  term4
-
-	Alternatively, you can set title for each tab using command line
-	options:
-
-	    $ mrxvt -vt0.tt "term1" -vt1.tt "term2" -tnum 2
-
------
-
-    Q:  How to let each tab execute different applications when mrxvt starts?
-
-    A:  You can set command for each tab in ~/.mrxvtrc as the following example:
-
-	    mrxvt*vt0*command:  /bin/bash
-	    mrxvt*vt1*command:  /bin/tcsh
-	    mrxvt*vt2*command:  /bin/bash -c "/usr/bin/mc"
-	    mrxvt*vt3*command:  /usr/bin/telnet www.mitbbs.com
-
-	Alternatively, you can set command for each tab using command line
-	options:
-
-	    $ mrxvt -vt0.e "/bin/bash" -vt1.e '/bin/bash -c "telnet www.mitbbs.com"' -tnum 2
-
-	Notice that by default, -e command will override the first command
-	command. You can change this behavior to let -e command override all tab
-	commands by -at option or cmdAllSession resource.
-
------
-
-    Q:  How to change the title of a tab after mrxvt starts?
-
-    A:  You can select some text in the mrxvt terminal and press the hot key
-	combinations: Ctrl_Shift_s or Shift_Delete. The tab title will be
-	changed to the selected text. Currently, the selected text must be in
-	the same mrxvt terminal.
-
-	You can also change the tab title through escape sequence. Please
-	compile the sample settitle.c in doc/ directory and run it as follows:
-
-	    $ settitle new_tab_title
-
-	The most convenient way to change tab title is to select text in the
-	mrxvt terminal and click the middle button of your mouse on the tab that
-	you want to change the title. If you click on blank area of the tabbar,
-	the title of the active tab will be changed. Of course, this requires
-	middle button support by your X Window System.
-
------
-
-    Q:  My Control+Right/Left keys works OK in Konsole and gnome-terminal
-	(Fedora Core 3). They didn't work under mrxvt. When I start vi from
-	mrxvt Home and End keys do not work also. How I can make my keys works
-	as expected in all applications started in mrxvt?
-
-    A:  Put the following lines into your /etc/inputrc or ~/.inputrc, and try
-	the -lk switch at command line:
-
-	    # for linux console and RH/Debian xterm
-	    "\e[1~": beginning-of-line
-	    "\e[4~": end-of-line
-	    "\e[5~": beginning-of-history
-	    "\e[6~": end-of-history
-
-	    "\e[3~": delete-char
-	    "\e[2~": quoted-insert
-
-	    "\e[5C": forward-word
-	    "\e[5D": backward-word
-	    "\e[1;5C": forward-word
-	    "\e[1;5D": backward-word
-
-	    # for rxvt
-	    "\e[7~": beginning-of-line
-	    "\e[8~": end-of-line
-
-	    "\eOc": forward-word
-	    "\eOd": backward-word
-
-	    # for non RH/Debian xterm, can't hurt for RH/DEbian xterm
-	    "\eOH": beginning-of-line
-	    "\eOF": end-of-line
-
-	    # for freebsd console
-	    "\e[H": beginning-of-line
-	    "\e[F": end-of-line
-	    
-	This question and answer are contributed by Sergey Porfiriev. Many
-	thanks to him!
-
-	Alternately you can use the macro feature of mrxvt to make the cursor
-	keys produce the string that is expected by your application (explained
-	later on in this FAQ)
-
------
-
-    Q:  How to change the title of a tab to the current directory automatically?
-
-    A:  You can achieve it by hack the prompt of your shell. For example, if you
-	use bash, you can set PS1 as this (thanks to Watson@mitbbs.com and
-	Jacques Bouchard AT onera.fr):
-
-	    export PS1="\[\033]61;\w\007\]\u@\h:\w\\$ "
-
-	Notice that `\w' shows the full path of current directory. If you only
-	want the basename of current directory, use `\W' instead.
-
-	For C shell, you can hack `prompt' as this (thanks to Necholas Carrasco
-	for the solution. Sorry folks, there is no fun for this homework any
-	more):
-
-	    set prompt="%{\033]61;%C\007%}$prompt"
-	
-	Alternately (for tcsh), if you want your current command displayed in
-	your tab title, add the following lines to your ~/.tcshrc
-
-	    set backslash_quote
-	    if( $?DISPLAY && $?TERM ) then
-		if( $?MRXVT_TABTITLE ) then
-		    # Set the tab title for mrxvt
-		    alias jobcmd 'echo -n \\\\033]61\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
-		    alias cwdcmd 'echo -n \\\\033]61\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
-		else
-		    # Set the window title for xterm
-		    alias jobcmd 'echo -n \\\\033]0\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
-		    alias cwdcmd 'echo -n \\\\033]0\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
-		endif
+Q:  How do I set the tab title to the current command?
+
+A:  Bash users add the following to your ~/.bashrc:
+
+    # Change the window title of X terminals 
+    if [[ $TERM =~ "xterm|rxvt" ]]; then
+	# set -o functrace
+	if [[ -n $MRXVT_TABTITLE ]]; then
+	    trap 'echo -ne "\e]61;${BASH_COMMAND//\"/} (${PWD/$HOME/~})\a"' DEBUG
+	else
+	    trap 'echo -ne "\e]0;${BASH_COMMAND//\"/} (${PWD/$HOME/~})\a"' DEBUG
+	fi
+    fi
+
+    Alternately (for tcsh), if you want your current command displayed in
+    your tab title, add the following lines to your ~/.tcshrc
+
+	# Change the window title of X terminals 
+	set backslash_quote
+	if( $?DISPLAY && $?TERM ) then
+	    if( $?MRXVT_TABTITLE ) then
+		# Set the tab title for mrxvt
+		alias jobcmd 'echo -n \\\\033]61\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
+		alias cwdcmd 'echo -n \\\\033]61\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
+	    else
+		# Set the window title for xterm
+		alias jobcmd 'echo -n \\\\033]0\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
+		alias cwdcmd 'echo -n \\\\033]0\;\!#:q  \($cwd\) \\\\007 > /dev/stderr'
 	    endif
-	    unset backslash_quote
+	endif
+	unset backslash_quote
 
 -----
 
-    Q:  How to use the Home/End key to move the cursor to the beginning/ end of
-	the current command line? When I press the Home/End key, a ~ character
-	is displayed.
+Q:  How to dynamically change the title of the mrxvt window so that it is the
+    same as the current active tab when I switch to a new tab?
 
-    A:  It depends on your shell setting. If you set the terminal type is set to
-	`xterm' (mrxvt default in 0.4.0), put the following lines in ~/.cshrc
-	(if your shell is tcsh) or ~/.zshrc (if your shell is zsh):
-
-	    bindkey "\e[1~" beginning-of-line
-	    bindkey "\e[4~" end-of-line
-
-	Put the following lines into ~/.inputrc (if your shell is bash):
-
-	    "\e[1~": beginning-of-line
-	    "\e[4~": end-of-line
-
-	If your terminal type is set to `rxvt' (default in 0.5.0), replace `1'
-	with `7', and `4' with `8' in the above lines.
-
-	If the change does not work for you, try the -lk switch when you execute
-	mrxvt. Also you can use the "macro" feature of mrxvt to make the
-	offending keys produce the desired escape sequence.
-
-	Thanks to Jowex at users.sourceforge.net for contributing the
-	answer.
+A:  You can set X resources `syncTabTitle' to true or run mrxvt with -stt
+    option.
 
 -----
 
-    Q:  How to dynamically change the title of the mrxvt window so that it is
-	the same as the current active tab when I switch to a new tab?
+Q:  Why cannot I close a tab? The close button is grey!
 
-    A:  You can set X resources `syncTabTitle' to true or run mrxvt with -stt
-	option.
-
------
-
-    Q:  Why cannot I close a tab? The close button is grey!
-
-    A:  Most probably, you have enabled the protectSecondary resource and you
-	are running an application, like vi and mc that is using the secondary
-	screen in the current tab. Mrxvt considers this tab being protected and
-	disallows you to close it. To close the tab, please exit the application
-	first. To disable this option, you can modify the ~/.mrxvtrc file or run
-	mrxvt with +ps option.
+A:  Most probably, you have enabled the protectSecondary resource and you are
+    running an application, like vi and mc that is using the secondary screen in
+    the current tab. Mrxvt considers this tab being protected and disallows you
+    to close it. To close the tab, please exit the application first. To disable
+    this option, you can modify the ~/.mrxvtrc file or run mrxvt with +ps
+    option.
 
 -----
 
-    Q:  Is there any keyboard combination to manipulate the tabs?
+Q:  Is there any keyboard combination to manipulate the tabs?
 
-    A:  Yes. Please read the man page. Mrxvt currently support the default
-	gnome-terminal and konsole combinations. If you prefer your own
-	combinations, you can define them in the configuration file as well.
-	Please refer to the man page for details.
-
------
-
-    Q:  Mrxvt default hotkey ctrl+shift+minus conflicts with Emacs. How can I
-	disable this mrxvt default hotkey?
-
-    A:  Put the following two lines into your mrxvt configuration file, usually
-	~/.mrxvtrc:
-
-	    Mrxvt.macro.Ctrl+Shift+underscore:	Dummy
-	    Mrxvt.macro.Ctrl+Shift+plus:	Dummy
+A:  Yes. Please read the man page. Mrxvt currently support the default
+    gnome-terminal and konsole combinations. If you prefer your own
+    combinations, you can define them in the configuration file as well. Please
+    refer to the man page for details.
 
 -----
 
-    Q:  How to enable freetype font, or, say the XFT support?
+Q:  Mrxvt default hotkey ctrl+shift+minus conflicts with Emacs. How can I
+    disable this mrxvt default hotkey?
 
-    A:  You can either use the -xft command line option or the `xft' X resource
-	option in the ~/.mrxvtrc file. Check the sample configuration file
-	doc/xdefaults-sample.txt and man page for more details.
+A:  Put the following two lines into your mrxvt configuration file, usually
+    ~/.mrxvtrc:
 
------
-
-    Q:  After I use freetype font, the text rendering speed seems to slow down a
-	lot! How to improve the speed?
-
-    A:  Yes, this is a known problem with XFT support. One way to fix it is to
-	disable antialias (and autohinting or hinting). But it may make the font
-	look ugly. If you do not like it, disable XFT support and use X11 font
-	instead.
+	Mrxvt.macro.Ctrl+Shift+underscore:	Dummy
+	Mrxvt.macro.Ctrl+Shift+plus:	Dummy
 
 -----
 
-    Q:  After I use freetype font, the line space seems too large. Is there any
-	way to narrow down the line space?
+Q:  How to enable freetype font, or, say the XFT support?
 
-    A:  This is probably because you have enabled the multichar support when you
-	configure mrxvt. In this case, mrxvt loads two fonts, one the normal
-	font, and one the multichar font. But due to some problems with XFT
-	library, the font loading function does not follow our instructions to
-	load the two fonts at specified size. Thus, the size of two fonts are
-	often different. To get a better rendering result, mrxvt picks the large
-	size, which is usually the multichar font. But normal text are usually
-	displayed using normal font at a smaller size. So it appears that the
-	line space is too large. To solve this problem, you can specify the
-	multichar font be the same as the normal font since mrxvt 0.3.9, or
-	specify the -xftnfm option to not to load multichar font, or build mrxvt
-	without multichar support.
+A:  You can either use the -xft command line option or the `xft' X resource
+    option in the ~/.mrxvtrc file. Check the sample configuration file
+    doc/xdefaults-sample.txt and man page for more details.
 
 -----
 
-    Q:  Can I change the color of tab background and text?
+Q:  After I use freetype font, the text rendering speed seems to slow down a
+    lot! How to improve the speed?
 
-    A:  Yes you can. You can use command line option to set foreground and
-	background color of active or inactive tabs like this:
-
-	    $ mrxvt -tabfg blue -tabbg grey -itabfg black -itabbg dark
-	    
-	Or you can set them in ~/.mrxvtrc like this:
-
-	    ! text color of active tab
-	    Mrxvt.tabForeground:  blue
-	    ! background color of active tab
-	    Mrxvt.tabBackground:  grey
-	    ! text color of inactive tab
-	    Mrxvt.itabForeground: black
-	    ! background color of inactive tab
-	    Mrxvt.itabBackground: dark
-
-	Or you can use an escape sequence to change it dynamically (see the man
-	page).
+A:  Yes, this is a known problem with XFT support. One way to fix it is to
+    disable antialias (and autohinting or hinting). But it may make the font
+    look ugly. If you do not like it, disable XFT support and use X11 font
+    instead.
 
 -----
 
-    Q:  I notice that sometimes there is a dash-dot frame around the title of
-	inactive tabs. What has happened? Is it a bug?
+Q:  After I use freetype font, the line space seems too large. Is there any way
+    to narrow down the line space?
 
-    A:  This is a new feature introduced from 0.3.9. This indicates that
-	something has happened in the inactive tab, and you probably should
-	check it.
-
-	You can try using the -htb option to ensure that inactive tabs are
-	highlighted only when a bell is sounded by that tab.
-
------
-
-    Q:  I notice that the inactive tab is highlighted by the dash-dot frame, but
-	after I switch to it, I see nothing happened. What is wrong with it?
-
-    A:  This is because you might be running some programs in the inactive tab,
-	like pine. These programs have some features to refresh the screen
-	periodly, though the content of the screen has not changed. Mrxvt
-	detects the refresh and thinks the screen has changed. It is difficult
-	to tell whether the content of the screen is truly changed in this case.
-
-	You can try using the -htb option to ensure that inactive tabs are
-	highlighted only when a bell is sounded by that tab.
+A:  This is probably because you have enabled the multichar support when you
+    configure mrxvt. In this case, mrxvt loads two fonts, one the normal font,
+    and one the multichar font. But due to some problems with XFT library, the
+    font loading function does not follow our instructions to load the two fonts
+    at specified size. Thus, the size of two fonts are often different. To get a
+    better rendering result, mrxvt picks the large size, which is usually the
+    multichar font. But normal text are usually displayed using normal font at a
+    smaller size. So it appears that the line space is too large. To solve this
+    problem, you can specify the multichar font be the same as the normal font
+    since mrxvt 0.3.9, or specify the -xftnfm option to not to load multichar
+    font, or build mrxvt without multichar support.
 
 -----
 
-    Q:  I like to use command line options to create a new tab in the current
-	mrxvt terminal and execute some commands. For example, if I run command
-	`mrxvt --new-tab -e pine' in a mrxvt terminal, the current terminal will
-	open a new tab and run pine in it. Can you implement it for me?
+Q:  Can I change the color of tab background and text?
 
-    A:  Unfortunately, no. This is a dangerous feature that can cause serious
-	security problems. For details about the security problem, consult to
-	the following link:
+A:  Yes you can. You can use command line option to set foreground and
+    background color of active or inactive tabs like this:
 
-	    http://www.digitaldefense.net/labs/papers/Termulation.txt
+	$ mrxvt -tabfg blue -tabbg grey -itabfg black -itabbg dark
+	
+    Or you can set them in ~/.mrxvtrc like this:
 
-	As of mrxvt-0.5.0, you can have macros (or menu items) that open a new
-	tab and execute your favourite program in it (but you have to press a
-	key or select from a menu in your mrxvt window). Multiple window support
-	is planned in the near future, and maybe then something will be done
-	about this issue after multiple window support is implemented.
+	! text color of active tab
+	Mrxvt.tabForeground:  blue
+	! background color of active tab
+	Mrxvt.tabBackground:  grey
+	! text color of inactive tab
+	Mrxvt.itabForeground: black
+	! background color of inactive tab
+	Mrxvt.itabBackground: dark
 
------
-
-    Q:  I like to use context menu when I right click in the terminal window.
-	For example, to copy/paste text. Can you support it?
-
-    A:  YES! As of mrxvt-0.5.0 popup menus are supported. By default control
-	right click on the terminal for a (customizable) menu. Control left
-	click (or right click on the tabbar) for a list of all tabs. You must
-	compile mrxvt with --enable-menubar.
+    Or you can use an escape sequence to change it dynamically (see the man
+    page).
 
 -----
 
-    Q:  Will you rewrite mrxvt using C++? The object oriented feature of C++ can
-	make mrxvt much modular.
+Q:  I notice that sometimes there is a dash-dot frame around the title of
+    inactive tabs. What has happened? Is it a bug?
 
-    A:  No! Because I do not like C++. C does not mean to be less modular or
-	non-object oriented. It depends on how you do it. If you really like a
-	C++ implementation of rxvt, check out the rxvt-unicode project.
+A:  This is a new feature introduced from 0.3.9. This indicates that something
+    has happened in the inactive tab, and you probably should check it.
 
------
-
-    Q:  How do I know which mrxvt version I'm using?
-
-    A:  The version number is displayed with the usage (-h). For rxvt version
-	2.14 and later, the escape sequence `ESC[8n' sets the window title to
-	the version number.
+    You can try using the -htb option to ensure that inactive tabs are
+    highlighted only when a bell is sounded by that tab.
 
 -----
 
-    Q:  Mouse cut/paste suddenly no longer works.
+Q:  I notice that the inactive tab is highlighted by the dash-dot frame, but
+    after I switch to it, I see nothing happened. What is wrong with it?
 
-    A:  Make sure that mouse reporting is actually turned off since killing some
-	editors prematurely may leave the mouse in mouse report mode.  I've
-	heard that tcsh may use mouse reporting unless it otherwise specified.
-	A quick check is to see if cut/paste works when the Alt or Shift keys
-	are depressed. See doc/refer.txt
+A:  This is because you might be running some programs in the inactive tab, like
+    pine. These programs have some features to refresh the screen periodically,
+    though the content of the screen has not changed. Mrxvt detects the refresh
+    and thinks the screen has changed. It is difficult to tell whether the
+    content of the screen is truly changed in this case.
 
------
-
-    Q:  What's with this bold/blink stuff? I can never get blinking text!
-
-    A:  It is not possible, and likely will never be, for mrxvt to have actual
-	blinking text. Instead (if mrxvt was compiled without NO_BOLDCOLOR),
-	bold/blink attributes are used to set high-intensity foreground or
-	background colors ... like what you'd see on a PC video adapter.  There
-	are programs, notably John Davis' SLang-based ones
-	<ftp://space.mit.edu/pub/davis>, that use bold/blink attributes to
-	permit 16 colors.
-
-	    color0-7	are the low-intensity colors.
-	    color8-15	are the corresponding high-intensity colors.
-
-	A side issue of this bold/blink stuff is the question of how the normal
-	default foreground/background colors are to be treated.  If the default
-	foreground/background match one of the low-intensity colors (color0-7),
-	the bold/blink attribute will invoke the appropriate high-intensity
-	color (color8-15).
-
-	In the case that the default foreground doesn't match one of the
-	low-intensity colors, the bold attribute will use an `overstrike' to
-	simulate a bold font. But note this leaves pixel-droppings and so,
-	rather than wasting an inordinate amounts of energy to fix it, its use
-	is simply deprecated.
-
-	In the case that the default background doesn't match one of the
-	low-intensity colors, the blink attribute is simply ignored (rather than
-	representing it as bold as xterm does).
+    You can try using the -htb option to ensure that inactive tabs are
+    highlighted only when a bell is sounded by that tab.
 
 -----
 
-    Q:  I don't like the screen colors.  How do I change them?
+Q:  I like to use command line options to create a new tab in the current mrxvt
+    terminal and execute some commands. For example, if I run command `mrxvt
+    --new-tab -e pine' in a mrxvt terminal, the current terminal will open a new
+    tab and run pine in it. Can you implement it for me?
 
-    A:  You can change the screen colors at run-time using ~/.mrxvtrc resources
-	(or as long-options) ... see the man-page.
+A:  Unfortunately, no. This is a dangerous feature that can cause serious
+    security problems. For details about the security problem, consult to the
+    following link:
 
-	Here are values that are supposed to resemble a VGA screen, including
-	the murky brown that passes for low-intensity yellow:
+	http://www.digitaldefense.net/labs/papers/Termulation.txt
 
-	    Mrxvt.color0:   #000000
-	    Mrxvt.color1:   #A80000
-	    Mrxvt.color2:   #00A800
-	    Mrxvt.color3:   #A8A800
-	    Mrxvt.color4:   #0000A8
-	    Mrxvt.color5:   #A800A8
-	    Mrxvt.color6:   #00A8A8
-	    Mrxvt.color7:   #A8A8A8
-
-	    Mrxvt.color8:   #000054
-	    Mrxvt.color9:   #FF0054
-	    Mrxvt.color10:  #00FF54
-	    Mrxvt.color11:  #FFFF54
-	    Mrxvt.color12:  #0000FF
-	    Mrxvt.color13:  #FF00FF
-	    Mrxvt.color14:  #00FFFF
-	    Mrxvt.color15:  #FFFFFF
+    As of mrxvt-0.5.0, you can have macros (or menu items) that open a new tab
+    and execute your favourite program in it (but you have to press a key or
+    select from a menu in your mrxvt window). Multiple window support is planned
+    in the near future, and maybe then something will be done about this issue
+    after multiple window support is implemented.
 
 -----
 
-    Q:  What's with the strange Backspace/Delete key behaviour?
+Q:  I like to use context menu when I right click in the terminal window. For
+    example, to copy/paste text. Can you support it?
 
-    A:  Assuming that the physical Backspace key corresponds to the BackSpace
-	keysym (not likely for Linux ... see the following question) there are
-	two standard values that can be used for Backspace: ^H and ^?.
+A:  YES! As of mrxvt-0.5.0 popup menus are supported. By default control right
+    click on the terminal for a (customizable) menu. Control left click (or
+    right click on the tabbar) for a list of all tabs. You must compile mrxvt
+    with --enable-menubar.
 
-	Mrxvt tries to inherit the current stty settings and uses the value of
-	`erase' to guess the value for backspace.  If mrxvt wasn't started from
-	a terminal (say, from a menu or by remote shell), then the system value
-	of `erase', which corresponds to CERASE in <termios.h>, will be used
-	(which may not be the same as your stty setting).
+-----
 
-	For starting a new mrxvt:
+Q:  Will you rewrite mrxvt using C++? The object oriented feature of C++ can
+    make mrxvt much modular.
 
-	    use Backspace = ^H
-	    $ stty erase ^H
-	    $ mrxvt
-	    or
-	    $ mrxvt --backspacekey ^H -e bash
+A:  No! Because I do not like C++. C does not mean to be less modular or
+    non-object oriented. It depends on how you do it. If you really like a C++
+    implementation of rxvt, check out the rxvt-unicode project.
 
-	    use Backspace = ^?
-	    $ stty erase ^?
-	    $ mrxvt
-	    $ mrxvt --backspacekey ^? -e bash
+-----
 
-	NB: generate either value with BackSpace and Ctrl/Shift-BackSpace.
-	    Toggle with "ESC[36h" / "ESC[36l" as documented in "doc/refer.txt"
+Q:  How do I know which mrxvt version I'm using?
 
-	For an existing mrxvt:
-	    use Backspace = ^H
+A:  The version number is displayed with the usage (-h). For rxvt version
+    2.14 and later, the escape sequence `ESC[8n' sets the window title to the
+    version number.
+
+-----
+
+Q:  Mouse cut/paste suddenly no longer works.
+
+A:  Make sure that mouse reporting is actually turned off since killing some
+    editors prematurely may leave the mouse in mouse report mode.  I've heard
+    that tcsh may use mouse reporting unless it otherwise specified. A quick
+    check is to see if cut/paste works when the Alt or Shift keys are depressed.
+    See doc/refer.txt
+
+-----
+
+Q:  What's with this bold/blink stuff? I can never get blinking text!
+
+A:  It is not possible, and likely will never be, for mrxvt to have actual
+    blinking text. Instead (if mrxvt was compiled without NO_BOLDCOLOR),
+    bold/blink attributes are used to set high-intensity foreground or
+    background colors ... like what you'd see on a PC video adapter.  There are
+    programs, notably John Davis' SLang-based ones
+    ftp://space.mit.edu/pub/davis, that use bold/blink attributes to permit 16
+    colors.
+
+	color0-7	are the low-intensity colors.
+	color8-15	are the corresponding high-intensity colors.
+
+    A side issue of this bold/blink stuff is the question of how the normal
+    default foreground/background colors are to be treated.  If the default
+    foreground/background match one of the low-intensity colors (color0-7), the
+    bold/blink attribute will invoke the appropriate high-intensity color
+    (color8-15).
+
+    In the case that the default foreground doesn't match one of the
+    low-intensity colors, the bold attribute will use an `overstrike' to
+    simulate a bold font. But note this leaves pixel-droppings and so, rather
+    than wasting an inordinate amounts of energy to fix it, its use is simply
+    deprecated.
+
+    In the case that the default background doesn't match one of the
+    low-intensity colors, the blink attribute is simply ignored (rather than
+    representing it as bold as xterm does).
+
+-----
+
+Q:  I don't like the screen colors.  How do I change them?
+
+A:  You can change the screen colors at run-time using ~/.mrxvtrc resources (or
+    as long-options) ... see the man-page.
+
+    Here are values that are supposed to resemble a VGA screen, including the
+    murky brown that passes for low-intensity yellow:
+
+	Mrxvt.color0:   #000000
+	Mrxvt.color1:   #A80000
+	Mrxvt.color2:   #00A800
+	Mrxvt.color3:   #A8A800
+	Mrxvt.color4:   #0000A8
+	Mrxvt.color5:   #A800A8
+	Mrxvt.color6:   #00A8A8
+	Mrxvt.color7:   #A8A8A8
+
+	Mrxvt.color8:   #000054
+	Mrxvt.color9:   #FF0054
+	Mrxvt.color10:  #00FF54
+	Mrxvt.color11:  #FFFF54
+	Mrxvt.color12:  #0000FF
+	Mrxvt.color13:  #FF00FF
+	Mrxvt.color14:  #00FFFF
+	Mrxvt.color15:  #FFFFFF
+
+-----
+
+Q:  What's with the strange Backspace/Delete key behaviour?
+
+A:  Assuming that the physical Backspace key corresponds to the BackSpace keysym
+    (not likely for Linux ... see the following question) there are two standard
+    values that can be used for Backspace: ^H and ^?.
+
+    Mrxvt tries to inherit the current stty settings and uses the value of
+    `erase' to guess the value for backspace.  If mrxvt wasn't started from a
+    terminal (say, from a menu or by remote shell), then the system value of
+    `erase', which corresponds to CERASE in <termios.h>, will be used (which may
+    not be the same as your stty setting).
+
+    For starting a new mrxvt:
+
+	use Backspace = ^H
+	$ stty erase ^H
+	$ mrxvt
+	or
+	$ mrxvt --backspacekey ^H -e bash
+
+	use Backspace = ^?
+	$ stty erase ^?
+	$ mrxvt
+	$ mrxvt --backspacekey ^? -e bash
+
+    NB: generate either value with BackSpace and Ctrl/Shift-BackSpace. Toggle
+	with "ESC[36h" / "ESC[36l" as documented in "doc/refer.txt"
+
+    For an existing mrxvt:
+	use Backspace = ^H
 	    $ stty erase ^H
 	    $ echo -n "^[[36h"
 
-	    use Backspace = ^?
+	use Backspace = ^?
 	    $ stty erase ^?
 	    $ echo -n "^[[36l"
 
-	This helps satisfy some of the Backspace discrepancies that occur,
-	but if you use Backspace = ^?, make sure that the termcap/terminfo
-	value properly reflects that.
+    This helps satisfy some of the Backspace discrepancies that occur, but if
+    you use Backspace = ^?, make sure that the termcap/terminfo value properly
+    reflects that.
 
-	The Delete key (which one would expect to emit ^?) is a another
-	casualty of the ill-defined Backspace problem.  To avoid confusion
-	between the Backspace and Delete keys, the Delete key has been
-	assigned an escape sequence to match the vt100 for Execute (ESC[3~)
-	and is in the supplied termcap/terminfo.
+    The Delete key (which one would expect to emit ^?) is a another casualty of
+    the ill-defined Backspace problem.  To avoid confusion between the Backspace
+    and Delete keys, the Delete key has been assigned an escape sequence to
+    match the vt100 for Execute (ESC[3~) and is in the supplied
+    termcap/terminfo.
 
-	Some other Backspace problems:
-	    some editors use termcap/terminfo,
-	    some editors (vim I'm told) expect Backspace = ^H,
-	    GNU Emacs (and Emacs-like editors) use ^H for help.
+    Some other Backspace problems:
+	some editors use termcap/terminfo,
+	some editors (vim I'm told) expect Backspace = ^H,
+	GNU Emacs (and Emacs-like editors) use ^H for help.
 
-	Perhaps someday this will all be resolved in a consistent manner ... and
-	maybe xterm will have Home/End values too!
-
------
-
-    Q:  Why doesn't the Backspace key work on my Linux machine?
-
-    A:  The XFree86 server has a notorious problem of mapping the Backspace key
-	as Delete in order to match the Linux console.
-
-	The correct way to fix this:
-
-	0 - Complain to your Linux distributer and the XFree86 team, maybe
-	    they'll fix it.
-
-	1 - Use xmodmap to correct the Backspace mapping
-
-	    ! ~/.Xmodmap
-
-	    ! a correctly-mapped BackSpace
-	    keycode 22 = BackSpace
-
-	    *** Make sure the keycode above matches the physical
-	    Backspace key on your machine!! (use xev) ***
-
-	This will also fix the BackSpace problem with Motif applications, such
-	as ``why doesn't Backspace work for Netscape?''
-
-	Finally, you can also remap the mrxvt key-binding at run-time (next
-	question).
+    Perhaps someday this will all be resolved in a consistent manner ... and
+    maybe xterm will have Home/End values too!
 
 -----
 
-    Q:  I don't like the key-bindings.  How do I change them?
+Q:  Why doesn't the Backspace key work on my Linux machine?
 
-    A:	You can use the "macro" feature of mrxvt (available from version 0.5.0
-	onwards). See the man page for details. For instance, if you want the
-	application keypad keys to work like the regular cursor / home / end
-	keys, then you can use something like:
+A:  The XFree86 server has a notorious problem of mapping the Backspace key as
+    Delete in order to match the Linux console.
 
-	    Mrxvt.macro.KP_Left:	Str \eOD
-	    Mrxvt.macro.KP_Right:	Str \eOC
-	    Mrxvt.macro.KP_Up:		Str \eOA
-	    Mrxvt.macro.KP_Down:	Str \eOB
+    The correct way to fix this:
 
-	    Mrxvt.macro.KP_Prior:	Str \e[5~
-	    Mrxvt.macro.KP_Next:	Str \e[6~
-	    Mrxvt.macro.KP_Home:	Str \e[7~
-	    Mrxvt.macro.KP_End:		Str \e[8~
+    0 - Complain to your Linux distributer and the XFree86 team, maybe they'll
+	fix it.
 
-	    Mrxvt.macro.KP_Insert:	Str \e[2~
-	    Mrxvt.macro.KP_Delete:	Str \e[3~
+    1 - Use xmodmap to correct the Backspace mapping
 
-	You can also use the macro feature to correct the notorious backspace
-	problem, but it is better you fix that by complaining to your Linux
-	vendor :).
+	! ~/.Xmodmap
+
+	! a correctly-mapped BackSpace
+	keycode 22 = BackSpace
+
+	*** Make sure the keycode above matches the physical Backspace key on
+	your machine!! (use xev) ***
+
+    This will also fix the BackSpace problem with Motif applications, such as
+    ``why doesn't Backspace work for Netscape?''
+
+    Finally, you can also remap the mrxvt key-binding at run-time (next
+    question).
 
 -----
 
-    Q:  I'm using keyboard model XXX that has extra Prior/Next/Insert keys.  How
-	do I make use of them?  For example, the Sun Keyboard type 4 has the
-	following mappings that mrxvt doesn't recognize.
+Q:  I don't like the key-bindings.  How do I change them?
+
+A:  You can use the "macro" feature of mrxvt (available from version 0.5.0
+    onwards). See the man page for details. For instance, if you want the
+    application keypad keys to work like the regular cursor / home / end keys,
+    then you can use something like:
+
+	Mrxvt.macro.KP_Left:	Str \eOD
+	Mrxvt.macro.KP_Right:	Str \eOC
+	Mrxvt.macro.KP_Up:	Str \eOA
+	Mrxvt.macro.KP_Down:	Str \eOB
+
+	Mrxvt.macro.KP_Prior:	Str \e[5~
+	Mrxvt.macro.KP_Next:	Str \e[6~
+	Mrxvt.macro.KP_Home:	Str \e[7~
+	Mrxvt.macro.KP_End:	Str \e[8~
+
+	Mrxvt.macro.KP_Insert:	Str \e[2~
+	Mrxvt.macro.KP_Delete:	Str \e[3~
+
+    You can also use the macro feature to correct the notorious backspace
+    problem, but it is better you fix that by complaining to your Linux vendor
+    :).
+
+-----
+
+Q:  I'm using keyboard model XXX that has extra Prior/Next/Insert keys.  How do
+    I make use of them?  For example, the Sun Keyboard type 4 has the following
+    mappings that mrxvt doesn't recognize.
 
 	KP_Insert == Insert
 	F22 == Print
@@ -932,96 +893,100 @@
 	F33 == End
 	F35 == Next
 
-    A:  Rather than have mrxvt try to accomodate all the various possible
-	keyboard mappings, it is better to use `xmodmap' to remap the keys as
-	required for your particular machine.
+A:  Rather than have mrxvt try to accomodate all the various possible keyboard
+    mappings, it is better to use `xmodmap' to remap the keys as required for
+    your particular machine, or the use "macro" feature of mrxvt in your
+    ~/.mrxvtrc.
 
 -----
 
-    Q:  How do I distinguish if I'm running mrxvt or a regular xterm? I need
-	this to decide about setting colors etc.
+Q:  How do I distinguish if I'm running mrxvt or a regular xterm? I need this to
+    decide about setting colors etc.
 
-    A:  mrxvt always exports the variable "COLORTERM", so you can check and see
-	if that is set. It also exports the variable "MRXVT_TABTITLE". Note that
-	several programs, JED, slrn, Midnight Commander automatically check this
-	variable to decide whether or not to use color.
+A:  mrxvt always exports the variable "COLORTERM", so you can check and see if
+    that is set. It also exports the variable "MRXVT_TABTITLE". Note that
+    several programs, JED, slrn, Midnight Commander automatically check this
+    variable to decide whether or not to use color.
 
 -----
 
-    Q:  How do I set the correct, full IP address for the DISPLAY variable?
+Q:  How do I set the correct, full IP address for the DISPLAY variable?
 
-    A:  If you've compiled mrxvt with DISPLAY_IS_IP then it is possible to use
-	the following shell script snippets to correctly set the display.  If
-	your version of mrxvt wasn't also compiled with ESCZ_ANSWER (as assumed
-	in these snippets) then the COLORTERM variable can be used to
-	distinguish mrxvt from a regular xterm.
+A:  If you've compiled mrxvt with DISPLAY_IS_IP then it is possible to use the
+    following shell script snippets to correctly set the display.  If your
+    version of mrxvt wasn't also compiled with ESCZ_ANSWER (as assumed in these
+    snippets) then the COLORTERM variable can be used to distinguish mrxvt from
+    a regular xterm.
 
-	Courtesy of Chuck Blake <cblake@BBN.COM> with the following shell script
-	snippets:
+    Courtesy of Chuck Blake <cblake@BBN.COM> with the following shell script
+    snippets:
 
-	    # Bourne/Korn/POSIX family of shells:
-	    # assume an xterm if we don't know
-	    [ ${TERM:-foo} = foo ] && TERM=xterm
-	    if [ ${TERM:-foo} = xterm ]; then
-		# see if enhanced mrxvt or not
-		stty -icanon -echo min 0 time 15
-		echo -n '^[Z'
-		read term_id
-		stty icanon echo
-		if [ ""${term_id} = '^[[?1;2C' -a ${DISPLAY:-foo} = foo ]; then
-		    # query the mrxvt we are in for the DISPLAY string
-		    echo -n '^[[7n'
-		    # set it in our local shell
-		    read DISPLAY
-		fi
+	# Bourne/Korn/POSIX family of shells:
+	# assume an xterm if we don't know
+	[ ${TERM:-foo} = foo ] && TERM=xterm
+	if [ ${TERM:-foo} = xterm ]; then
+	    # see if enhanced mrxvt or not
+	    stty -icanon -echo min 0 time 15
+	    echo -n '^[Z'
+	    read term_id
+	    stty icanon echo
+	    if [ ""${term_id} = '^[[?1;2C' -a ${DISPLAY:-foo} = foo ]; then
+		# query the mrxvt we are in for the DISPLAY string
+		echo -n '^[[7n'
+		# set it in our local shell
+		read DISPLAY
 	    fi
+	fi
 
-	csh/tcsh family of shells:
+    csh/tcsh family of shells:
 
-	    # if term is unset, we are probably in an xterm
-	    if ( !(${?TERM}) ) then
-		TERM = xterm
+	# if term is unset, we are probably in an xterm
+	if ( !(${?TERM}) ) then
+	    TERM = xterm
+	endif
+	if ( ${TERM} =~ xterm ) then
+	    # see if enhanced mrxvt or not
+	    stty -icanon -echo min 0 time 15  
+	    echo -n '^[Z'
+	    set term_id=$<
+	    stty icanon echo
+	    if ( ""${term_id} == "^[[?1;2C" && ${?DISPLAY} == 0 ) then
+		# query the mrxvt we're in for the DISPLAY string
+		echo -n '^[[7n'
+		# set it in our local shell
+		setenv DISPLAY "$<"
 	    endif
-	    if ( ${TERM} =~ xterm ) then
-		# see if enhanced mrxvt or not
-		stty -icanon -echo min 0 time 15  
-		echo -n '^[Z'
-		set term_id=$<
-		stty icanon echo
-		if ( ""${term_id} == "^[[?1;2C" && ${?DISPLAY} == 0 ) then
-		    # query the mrxvt we're in for the DISPLAY string
-		    echo -n '^[[7n'
-		    # set it in our local shell
-		    setenv DISPLAY "$<"
-		endif
-	    endif
+	endif
 
 -----
 
-    Q:  Where is the CVS repository of mrxvt? I cannot find it on sourceforge!
+Q:  Where is the CVS repository of mrxvt?
 
-    A:  To checkout from CVS use
+A:  From mrxvt-0.5.1, we have abandoned CVS, and now exclusively use Subversion.
+    To check out from the subversion repository use
 
-	    cvs -z9 -d :pserver:anonymous@cvs.sf.net/cvsroot/materm checkout -P mrxvt05b
+	svn checkout https://svn.sourceforge.net/svnroot/materm/mrxvt05b
 
 -----
 
-    Q:  I find a bug, or I would like to see a new feature in mrxvt, how to
-	report it?
+Q:  I find a bug, or I would like to see a new feature in mrxvt, how to report
+    it?
 
-    A:  You can go to http://sourceforge.net/projects/materm and report the bug
-	using tracker system. Alternately, you can email the mrxvt developer
-	mailing list at materm-devel@lists.sourceforge.net. Please use the
-	SourceForge bug tracker system for feature requests, or major bugs.
-	Report minor bugs on the materm-devel mailing list. If in doubt, post to
-	the devel mailing list, and you might be asked to file a feature request
-	/ bug report in addition.
+A:  You can go to http://sourceforge.net/projects/materm and report the bug
+    using tracker system. Alternately, you can email the mrxvt developer mailing
+    list at materm-devel@lists.sourceforge.net. Please use the SourceForge bug
+    tracker system for feature requests, or MAJOR bugs. Report minor bugs on the
+    materm-devel mailing list. If in doubt, post to the devel mailing list, and
+    you might be asked to file a feature request / bug report in addition.
 
-	Please describe the bug as clearly as possible, so that we can replicate
-	it. We can not (and WILL not) fix bugs we can not reproduce! Be sure to
-	test if your bug is still present in the CVS version of mrxvt. If the
-	bug is still present in the CVS version, then please report the system
-	you are running mrxvt on, AND steps to reproduce the bug.
+    Please describe the bug as clearly as possible, so that we can replicate it.
+    We can not (and WILL not) fix bugs we can not reproduce! Be sure to test if
+    your bug is still present in the current version (from Subversion) of mrxvt.
+    If the bug is still present in the subversion repository, then please report
+    the system you are running mrxvt on, AND steps to reproduce the bug.
+
+    Again, we can and will NOT fix bugs we can not reproduce. Tell us how to
+    reproduce the bug, or your report will get (silently) ignored!
 
 --
 
