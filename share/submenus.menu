@@ -108,7 +108,7 @@
 {Cyan}								Esc \e]39;#009a9a\a
 {Grey}								Esc \e]39;#9a9a9a\a
 ../
-[done:background]
+[done:foreground]
 
 # Translucency related options
 [menu:translucent]
