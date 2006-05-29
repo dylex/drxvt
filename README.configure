@@ -141,6 +141,10 @@ script:
 --enable-tinting
      add support for color background tinting of the window.
 
+--enable-xrender
+     add support for tinting background with XRender. It is slower than
+	 default tinting behavior, but looks nicer.
+
 --enable-xft
      add support of freetype font. This option is not completed yet.
 
@@ -154,10 +158,6 @@ script:
 
 --enable-cjk
     add support for the Chinese/Japanese/Korean multichar languages.
-
---enable-thai
-    add support for the Thai language. This option is not completed
-	yet.
 
 --enable-ttygid
     change tty device setting to group "tty" - only use this if
@@ -173,11 +173,6 @@ script:
 
 --enable-resources
     add support to all resources checking.
-
---enable-xgetdefault
-    make resources checking via XGetDefault() instead of our small
-    version which only checks ~/.Xdefaults, or if that doesn't exist
-    then ~/.Xresources.
 
 --enable-swapscreen
     add support for swap screen, which will use more memory but make
