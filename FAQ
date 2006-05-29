@@ -294,7 +294,7 @@ A:  Most probably, you have not enabled gb/big5/kanji/korea options when you
     configure the mrxvt. These options are turned off by default. Reconfigure
     mrxvt to enable these options and rebuild it like the following:
 
-	$ ./configure --enable-gb --enable-whatever-other-options
+	$ ./configure --enable-cjk --enable-whatever-other-options
 	$ make
 	$ su
 	$ make install
