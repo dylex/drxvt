@@ -1402,15 +1402,17 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	 */
 	for( i=0; i < MAX_PROFILES; i++ )
 	{
-		if( rs[ Rs_saveLines+i ] )
+		/* Set saveLines */
+		if( r->h->rs[Rs_saveLines + i] )
 		{
-			int	tmp = atoi( rs[ Rs_saveLines+i ] );
+			int tmp = atoi( r->h->rs[Rs_saveLines + i] );
 
-			r->profile[i].saveLines = (tmp >=0 && tmp <= MAX_SAVELINES) ?
-											tmp : DEFAULT_SAVELINES;
+			r->profile[i].saveLines = ( tmp >= 0 && tmp <= MAX_SAVELINES ) ?
+					tmp : DEFAULT_SAVELINES;
 		}
 		else
-			r->profile[i].saveLines = DEFAULT_SAVELINES;
+			r->profile[i].saveLines = ( i > 0 ) ? r->profile[0].saveLines :
+															DEFAULT_SAVELINES;
 	}
 
 	return cmd_argv;

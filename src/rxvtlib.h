@@ -688,6 +688,17 @@ typedef struct {
 #define MACRO_SHIFT		(1U << 2)
 #define MACRO_PRIMARY	(1U << 3)
 
+/* Number of bits used by modifiers in modFlags */
+#define MACRO_N_MOD_BITS	(4)
+#define MACRO_MODMASK	\
+	( MACRO_CTRL | MACRO_META | MACRO_SHIFT | MACRO_PRIMARY )
+#define MACRO_MAX_CHAINLEN	(0xf)
+
+/* Get / set the macro number from modFlags */
+#define MACRO_GET_NUMBER(x)		\
+	( (x) & ~MACRO_MODMASK ) >> MACRO_N_MOD_BITS
+
+
 /*
  * Action to take when a macro is called / menu item is selected.
  */
@@ -712,9 +723,7 @@ enum {
 	MacroFnToggleSubwin,
 	MacroFnFont,
 	MacroFnToggleVeryBold,
-#ifdef TRANSPARENT
 	MacroFnToggleTransp,
-#endif
 	MacroFnToggleBcst,
 	MacroFnToggleHold,
 	MacroFnSetTitle,
@@ -726,7 +735,9 @@ enum {
 
 typedef struct {
 	KeySym				keysym;
-	unsigned short		BOOLVAR( modFlags, 4);
+	unsigned char		modFlags;		/* First 4 bits are the action order
+										   number. Last four bits are the
+										   modifiers */
 	action_t			action;
 } macros_t;
 

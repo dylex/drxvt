@@ -56,9 +56,7 @@ static const char *const macroNames[] =
 	"ToggleSubwin",			/* Toggle subwindows (scroll / menu / tabbar) */
 	"ResizeFont",			/* Resize terminal font */
 	"ToggleVeryBold",		/* Toggle use of bold font for colored text */
-#ifdef TRANSPARENT
 	"ToggleTransparency",	/* Toggle pseudo transparency */
-#endif
 	"ToggleBroadcast",		/* Toggle broadcasting of input */
 	"ToggleHold",			/* Toggle holding of completed tabs */
 	"SetTitle",				/* Set title of active tab to selection */
@@ -71,8 +69,9 @@ static const char *const macroNames[] =
 /******************************************************************************\
 * 					   BEGIN INTERNAL ROUTINE PROTOTYPES					   *
 \******************************************************************************/
-int		macro_cmp		( const void*, const void*);
-int		rxvt_add_macro	( rxvt_t*, KeySym, int, char*, Bool);
+int				macro_cmp			( const void*, const void*);
+int				rxvt_add_macro		( rxvt_t*, KeySym, unsigned char, char*, Bool, Bool);
+unsigned char	macro_set_number	( unsigned char, unsigned char);
 /******************************************************************************\
 *						END INTERNAL ROUTINE PROTOTYPES						   *
 \******************************************************************************/
@@ -228,6 +227,17 @@ macro_cmp( const void *p1, const void *p2)
 				macro1->keysym - macro2->keysym;
 }
 
+/* {{{1 macro_set_number( flag, num ) */
+/* INTPROTO */
+unsigned char
+macro_set_number( unsigned char flag, unsigned char num )
+{
+	flag &= MACRO_MODMASK;
+	flag |= (num << MACRO_N_MOD_BITS);
+
+	return flag;
+}
+
 /* {{{1 rxvt_parse_macros(str, arg): Parse macro from arguments
  *
  * str and arg can be as follows:
@@ -235,20 +245,24 @@ macro_cmp( const void *p1, const void *p2)
  * 		1. str = keyname,					arg = argument.
  * 		2. str = macro.keyname: argument,	arg = NULL
  *
- * A valid macro is found, it is added to our list (r->macros) of macros.
+ * If a valid macro is found, it is added to our list (r->macros) of macros.
+ * Returns 1 if the macro is added to r->macros, 0 if it is not a macro (i.e.
+ * does not begin with "macro."), and -1 if invalid syntax / error adding / etc.
  */
 /* EXTPROTO */
 #define NEWARGLIM	500	/* `reasonable' size */
 int
 rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 {
-	char	newarg[NEWARGLIM],
-			keyname[ NEWARGLIM],
-			*keyname_nomods;
-	int		modFlags = 0;
-	KeySym	keysym;
+	char			newarg[NEWARGLIM],
+					keyname[ NEWARGLIM],
+					*keyname_nomods;
+	unsigned char	modFlags = 0;
+	KeySym			keysym;
 
-	if (arg == NULL)
+	Bool			addmacro = False;
+
+	if( arg == NULL )
 	{
 		char *keyend;
 		int		n;
@@ -256,35 +270,36 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 		/*
 		 * Need to split str into keyname and argument.
 		 */
-		if ((n = rxvt_str_match(str, "macro.")) == 0)
+		if( (n = rxvt_str_match(str, "macro.")) == 0 )
 			return 0;
 		str += n;		/* skip `macro.' */
 
-		if( (keyend = STRCHR( str, ':' )) == NULL ) return -1;
+		if( (keyend = STRCHR( str, ':' )) == NULL )
+			return -1;
 
-		n = min( keyend - str, NEWARGLIM - 1);
+		n = min( keyend - str, NEWARGLIM - 1 );
 
-		STRNCPY( keyname, str, n);
+		STRNCPY( keyname, str, n );
 		keyname[n] = 0;
 
-		STRNCPY(newarg, keyend + 1, NEWARGLIM - 1);
+		STRNCPY( newarg, keyend + 1, NEWARGLIM - 1 );
 	}
 	else
 	{
 		/*
 		 * Keyname is already in str. Copy arg into newarg.
 		 */
-		STRNCPY( keyname, str, NEWARGLIM - 1);
+		STRNCPY( keyname, str, NEWARGLIM - 1 );
 		keyname[ NEWARGLIM - 1] = '\0';
 
-		STRNCPY( newarg, arg, NEWARGLIM - 1);
+		STRNCPY( newarg, arg, NEWARGLIM - 1 );
 	}
 
 	/* Null terminate and strip leading / trailing spaces */
 	newarg[NEWARGLIM - 1] = '\0';
-	rxvt_str_trim( newarg);
+	rxvt_str_trim( newarg );
 
-	DBG_MSG( 1, ( stderr, "Got macro '%s' -- '%s'\n", keyname, newarg));
+	DBG_MSG( 1, ( stderr, "Got macro '%s' -- '%s'\n", keyname, newarg ) );
 
 	/*
 	 * Breakup keyname into a keysym and modifier flags.
@@ -304,14 +319,19 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 
 		/*
 		 * keyname is now a null terminated string containing only the
-		 * modifiers, and keyname_nomods is a null terminated string containing
-		 * only the key name.
+		 * modifiers, and keyname_nomods is a null terminated string
+		 * containing only the key name.
 		 */
-		if( STRCASESTR( keyname, "ctrl" ) ) modFlags |= MACRO_CTRL;
+		if( STRCASESTR( keyname, "ctrl" ) )
+			modFlags |= MACRO_CTRL;
 		if( STRCASESTR( keyname, "meta" ) || STRCASESTR( keyname, "alt"))
-				modFlags |= MACRO_META;
-		if( STRCASESTR( keyname, "shift") ) modFlags |= MACRO_SHIFT;
-		if( STRCASESTR( keyname, "primary"))modFlags |= MACRO_PRIMARY;
+			modFlags |= MACRO_META;
+		if( STRCASESTR( keyname, "shift") )
+			modFlags |= MACRO_SHIFT;
+		if( STRCASESTR( keyname, "primary"))
+			modFlags |= MACRO_PRIMARY;
+		if( STRCASESTR( keyname, "add" ) )
+			addmacro = True;
 	}
 
 	/*
@@ -327,50 +347,75 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 		return -1;
 	}
 
-	return rxvt_add_macro( r, keysym, modFlags, newarg, noReplace) ? 1 : -1;
+	return rxvt_add_macro( r, keysym, modFlags, newarg, addmacro, noReplace)
+				? 1 : -1;
 }
 
 /* {{{1 rxvt_add_macro( keysym, modFlags, astring, noreplace)
  *
  * Add a macro to our list of macros (r->macros) if astring describes a valid
- * macro.
+ * macro. If keysym == None, then add the macro to the previous one.
  *
  * If noReplace is true, don't replace existing macros. Required when reading
  * the system config file so that we don't replace existing user macros.
  */
 /* INTPROTO */
 int
-rxvt_add_macro( rxvt_t *r, KeySym keysym, int modFlags, char *astring,
-		Bool noReplace)
+rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
+		Bool addmacro, Bool noReplace)
 {
+	DBG_MSG( 2, ( stderr, "rxvt_add_macro(%08lx, %2hhx, %s)\n",
+				keysym, modFlags, astring));
+
 	const unsigned nmacros_increment = 64;	/* # extra macros to alloc space for
 											   when we need to enlarge our list
 											   of macros. A large number here is
 											   not wasteful as we clean it up
 											   after initialization */
-	unsigned short	i;
+	unsigned short	i,
+					replaceIndex = r->nmacros,
+					dummyIndex = r->nmacros;
+
+	unsigned char	macroNum = 0;
 	action_t		action;
 
-	assert( astring ); /* Don't pass NULL pointers */
-
-	DBG_MSG( 3, ( stderr, "Adding macro (%lx, %d, %s)\n",
-				keysym, modFlags, astring));
 	/*
 	 * Check to see if macro already exists.
 	 */
 	for( i=0; i < r->nmacros; i++ )
 	{
 		if(
-				r->macros[i].keysym == keysym
-				&& (r->macros[i].modFlags & ~MACRO_PRIMARY)
-						== (modFlags & ~MACRO_PRIMARY)
+			r->macros[i].keysym == keysym
+			&& (r->macros[i].modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
+					== (modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
 		  )
 		{
+			if( addmacro )
+			{
+				/*
+				 * Find the last macro in the macro chain (the macro with the
+				 * largest number).
+				 */
+				unsigned char num;
+
+				num		 = MACRO_GET_NUMBER( r->macros[i].modFlags );
+				if( num > macroNum )
+					macroNum = num;
+
+				if( macroNum == MACRO_MAX_CHAINLEN )
+				{
+					rxvt_print_error( "Macro chain too long" );
+					return 0;
+				}
+
+				replaceIndex = i;
+			}
+
 			/*
-			 * Macro for key already exists. If noReplace is set, don't touch
-			 * this macro.
+			 * Macro for key already exists. If noReplace is set, don't
+			 * touch this macro.
 			 */
-			if( noReplace )
+			else if( noReplace )
 				return 1; /* Claim to have succeded so that caller will not
 							 complain about "Failing to add a ... macro". */
 			
@@ -380,78 +425,68 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, int modFlags, char *astring,
 			 * the system /etc/mrxvt/mrxvtrc file. "Dummy" macros will be
 			 * deleted after init.
 			 */
-#if 0 /* {{{ */
-			/*
-			 * Now this macro needs to be replaced. If astring is "Dummy" or
-			 * null, delete it.
-			 */
-			if( *astring == '\0' || !STRCMP( astring, "Dummy") ) {
-				/*
-				 * Delete the current macro.
-				 */
-				unsigned short j;
-
-				DBG_MSG( 2, ( stderr, "Removing macro %hu of %hu. "
-							"Type %s, len %hu, args '%s'.\n",
-							i, r->maxMacros,
-							macroNames[ r->macros[i].action.type ],
-							r->macros[i].action.len,
-							(r->macros[i].action.type == MacroFnStr ||
-									r->macros[i].action.type == MacroFnEsc) ?
-								"(escaped string)" :
-								((r->macros[i].action.str == NULL) ?
-									"(nil)" : r->macros[i].action.str)));
-
-				/* Free memory taken up by the macro action string */
-				free( r->macros[i].action.str );
-
-				/* Move subsequent macro entries up one */
-				for( j=i; j < r->nmacros; j++ )
-					r->macros[j] = r->macros[j+1];
-
-				/*
-				 * If our list of macros is much smaller than the allocated
-				 * space, then shrink the allocated space.
-				 */
-				if( --r->nmacros < r->maxMacros - 8 ) {
-					r->maxMacros -= nmacros_increment;
-					if( r->maxMacros > 0 ) {
-						r->macros = (macros_t *) rxvt_realloc( r->macros,
-										r->maxMacros * sizeof( macros_t ) );
-					}
-					else {
-						free( r->macros );
-						r->macros = NULL;
-					}
+			else
+			{
+				if( replaceIndex < r->nmacros )
+				{
+					/*
+					 * replaceIndex points to a macro with keysym == the keysym
+					 * of the macro to be added. Set keysym to 0 so that it will
+					 * be cleaned up by rxvt_cleanup_macros().
+					 */
+					r->macros[replaceIndex].keysym = 0;
 				}
-				return 1; /* Success */
+				replaceIndex = i;
 			}
-#endif /* }}} */
-			/* 
-			 * Break out of the loop so that this macro will get replaced from
-			 * the list.
-			 */
-			break;
 		}
+
+		else if( r->macros[i].keysym == 0 )
+			/*
+			 * Macros with keysym 0 are dummies, and can be safely replaced.
+			 */
+			dummyIndex = i;
 	} /* for */
 
-	action.str = NULL;	/* Make sure rxvt_set_action won't free non-existent
-						   memory */
-	if( !rxvt_set_action( &action, astring) )
-		/* Failed setting action (probabaly unrecognized action type) */
-		return 0; /* Failure */
+	if( addmacro )
+	{
+		if( replaceIndex == r->nmacros )
+		{
+			rxvt_print_error( "No previous macro to add to (key %s%s%s%s)",
+					(modFlags & MACRO_CTRL) ? "Ctrl+" : "",
+					(modFlags & MACRO_META) ? "Meta+" : "",
+					(modFlags & MACRO_SHIFT) ? "Shift+" : "",
+					XKeysymToString( keysym ) );
+			return 0;	/* Failure */
+		}
+
+		modFlags = macro_set_number( modFlags, macroNum+1 );
+
+		/* Don't replace this macro. */
+		replaceIndex = dummyIndex;
+	}
+
+	else
+	{
+		modFlags = macro_set_number( modFlags, 0 );
+
+		/* Set replaceIndex to the index of a macro we can replace */
+		if( dummyIndex < replaceIndex )
+			replaceIndex = dummyIndex;
+	}
+
+
 
 	/*
 	 * Add action to the list of macros (making it bigger if necessary).
 	 */
-	if( i == r->nmacros )
+	if( replaceIndex == r->nmacros )
 	{
 		if( r->nmacros == r->maxMacros )
 		{
 			/* Get space for more macros*/
 			r->maxMacros += nmacros_increment;
 			r->macros = (macros_t *) rxvt_realloc( r->macros,
-							r->maxMacros * sizeof(macros_t));
+										r->maxMacros * sizeof(macros_t));
 		}
 
 		r->nmacros++;
@@ -459,19 +494,30 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, int modFlags, char *astring,
 	else
 	{
 		/* Macro action string needs to be freed (as it will be replaced) */
-		free( r->macros[i].action.str );
+		free( r->macros[replaceIndex].action.str );
 	}
+
+
+	/*
+	 * Set the action string. This malloc's memory so any returns after this
+	 * should either save action in to a global variable, or free it.
+	 */
+	assert( astring );
+	action.str = NULL;	/* Make sure rxvt_set_action won't free non-existent
+						   memory */
+	if( !rxvt_set_action( &action, astring) )
+		return 0; /* Failure: Probably unrecognized action type */
 
 	/*
 	 * Save macro values in our global macro list.
 	 */
-	r->macros[i].keysym		= keysym;
-	r->macros[i].modFlags	= modFlags;
-	r->macros[i].action		= action;
+	r->macros[replaceIndex].keysym		= keysym;
+	r->macros[replaceIndex].modFlags	= modFlags;
+	r->macros[replaceIndex].action		= action;
 
 	DBG_MSG( 2, ( stderr, "Added macro %hu of %hu. "
 					"Type %s, len %hu, args '%s'.\n",
-				i, r->maxMacros,
+				replaceIndex, r->maxMacros,
 				macroNames[ action.type ], action.len,
 				(action.type == MacroFnStr || action.type == MacroFnEsc) ?
 					"(escaped string)" :
@@ -494,7 +540,10 @@ rxvt_cleanup_macros( rxvt_t *r )
 
 	for( i = 0; i < r->nmacros; i++)
 	{
-		if( r->macros[i].action.type == MacroFnDummy )
+		if(
+			 r->macros[i].action.type == MacroFnDummy
+			 || r->macros[i].keysym == None
+		  )
 		{
 			/*
 			 * Dummy macro needs to be deleted. Make sure this macro comes first
@@ -540,9 +589,9 @@ rxvt_cleanup_macros( rxvt_t *r )
 	for( i=0; i < r->nmacros; i++)
 	{
 		DBG_TMSG( 3, ( stderr,
-					"%2d. Keysym %lx, Modifiers %hd, Type %hu, Action len %hu\n",
-					i, r->macros[i].keysym, r->macros[i].modFlags,
-					r->macros[i].action.type, r->macros[i].action.len));
+				"%2d. Key 0x%08lx, Mods 0x%02hhx, Type %2hu, Action: %s\n",
+				i, r->macros[i].keysym, r->macros[i].modFlags,
+				r->macros[i].action.type, r->macros[i].action.str ) );
 	}
 #endif	/* }}} */
 }
@@ -603,8 +652,9 @@ rxvt_set_action		(action_t *action, char *astring)
 
 	/* All macros exept MacroFnStr and MacroFnEsc have null terminated string */
 	if( type != MacroFnStr && type != MacroFnEsc && len > 0 && astring[len-1] )
-		astring[ len++ ] = 0;	/* Since astring was null terminated, astring[len]
-								   is certainly part of the memory in astring. */
+		astring[ len++ ] = 0;	/* Since astring was null terminated,
+								   astring[len] is certainly part of the memory
+								   in astring. */
 
 	action->len		= len;
 
@@ -639,6 +689,7 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 								   key that's pressed. */
 				*macro;			/* Macro we find in our saved list corresponding
 								   to the current key press */
+	int			status;
 
 	/* Copy the modifier mask and keysym into ck */
 	ck.modFlags = 0;
@@ -653,30 +704,41 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 	macro = bsearch( &ck, r->macros, r->nmacros, sizeof( macros_t ),
 				macro_cmp);
 	if (
-			/*
-			 * No macro found.
-			 */
-			macro == NULL
-			|| (
-				/*
-				 * Primary only macro in secondary screen.
-				 */
-				(macro->modFlags & MACRO_PRIMARY)
-				&& AVTS(r)->current_screen != PRIMARY
-			   )
-			|| (
-				/*
-				 * When macros are disabled, only the toggle macros macro should
-				 * work.
-				 */
-				( r->Options2 & Opt2_disableMacros )
-				&& macro->action.type != MacroFnToggleMacros
-			   )
+	     /*
+	      * No macro found.
+	      */
+	     macro == NULL
+	     || (
+	     	  /*
+	     	   * Primary only macro in secondary screen.
+	     	   */
+	     	  (macro->modFlags & MACRO_PRIMARY)
+	     	  && AVTS(r)->current_screen != PRIMARY
+	        )
+	     || (
+	     	  /*
+	     	   * When macros are disabled, only the toggle macros macro should
+	     	   * work.
+	     	   */
+	     	  ( r->Options2 & Opt2_disableMacros )
+	     	  && macro->action.type != MacroFnToggleMacros
+	        )
 	   )
 		return 0;	/* No macro processed */
 
-	DBG_MSG( 3, ( stderr, "Processing macro %p\n", macro));
-	return rxvt_dispatch_action( r, &(macro->action), (XEvent *) ev);
+	do
+	  {
+		DBG_MSG( 3, ( stderr, "Processing macro #%d mods %02hhx\n",
+					macro - r->macros, macro->modFlags ) );
+		status = rxvt_dispatch_action( r, &(macro->action), (XEvent*) ev );
+	  }
+	while(
+		   status == 1
+		   && (macro - r->macros) < r->nmacros
+		   && MACRO_GET_NUMBER( (++macro)->modFlags ) 
+		 );
+
+	return status;
 }
 
 /* {{{1 rxvt_dispatch_action( action, ev)
@@ -843,7 +905,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		case MacroFnScroll:
-			/* Scroll by an ammount specified in action->str */
+			/* Scroll by an amount specified in action->str */
 			if( action->len > 1 )
 			{
 				int				amount		= abs( atoi( (char*) action->str ));
@@ -897,11 +959,11 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			rxvt_toggle_verybold(r);
 			break;
 
-#ifdef TRANSPARENT
 		case MacroFnToggleTransp:
+#ifdef TRANSPARENT
 			rxvt_toggle_transparency(r);
-			break;
 #endif
+			break;
 
 		case MacroFnToggleBcst:
 			r->Options2 ^= Opt2_broadcast;
@@ -972,4 +1034,5 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 }
 /* }}} */
 
+/* vim: set fdm=marker: */
 /*----------------------- end-of-file (C source) -----------------------*/
