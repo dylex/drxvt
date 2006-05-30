@@ -150,11 +150,11 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 		char			restart_style = SmRestartIfRunning;
 		struct passwd*	pw = NULL;
 		int				n = 0, i;
-		char			tnum[32];
-		char			desktop[32];
-		char			geometry[128];
+		char			initprof[(32+1) * MAX_PAGES];
+		char			desktop[32 + 1];
+		char			geometry[(32+1)*4];
 		int				x, y;
-		char			posx[32], posy[32];
+		char			posx[32+1], posy[32+1];
 
 
 		vals.program->value  = (r->global_argv)[0];
@@ -172,9 +172,18 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 		vals.priority->value  = &priority;
 		vals.priority->length = 1;
 
-		sprintf (tnum, "%d", LTAB(r)+1); /* start from 0! */
+		/* generate init profile list */
+		sprintf (initprof, "%d", PVTS(r, 0)->profileNum);
+		for (i = 1; i <= LTAB(r); i ++)	{
+			char	tmpbuf[sizeof (long int) + 1];
+			sprintf (tmpbuf, ",%d", PVTS(r, i)->profileNum);
+			STRCAT (initprof, tmpbuf);
+		}
+		/* generate desktop number */
 		sprintf (desktop, "%d", (int) rxvt_get_desktop (r));
+		/* generate window geometry */
 		sprintf (geometry, "%dx%d", r->TermWin.ncol, r->TermWin.nrow);
+		/* generate window position */
 		fetch_window_position (r, &x, &y);
 		sprintf (posx, (x >= 0) ? "+%d":"%d", x);
 		sprintf (posy, (y >= 0) ? "+%d":"%d", y);
@@ -182,8 +191,8 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 		STRCAT (geometry, posy);
 
 		vals.restart[n++].value = (r->global_argv)[0];
-		vals.restart[n++].value = "-tnum";
-		vals.restart[n++].value = tnum;
+		vals.restart[n++].value = "-ip";
+		vals.restart[n++].value = initprof;
 		vals.restart[n++].value = "-desktop";
 		vals.restart[n++].value = desktop;
 		vals.restart[n++].value = "-geometry";
