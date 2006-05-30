@@ -691,6 +691,9 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 								   to the current key press */
 	int			status;
 
+	if( r->nmacros == 0 )
+		return 0;	/* No macro processed */
+
 	/* Copy the modifier mask and keysym into ck */
 	ck.modFlags = 0;
 	if (ev->state & ShiftMask)				ck.modFlags |= MACRO_SHIFT;
