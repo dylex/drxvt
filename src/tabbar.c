@@ -79,7 +79,8 @@
  */
 /* space between top window border and tab top */
 #define TAB_TOPOFF		((int) 0)
-/* Extra height of the active tab */
+/* Extra height of the active tab. Usually one pixel is adequate */
+/* #define ATAB_EXTRA		((int) 1) */
 #define ATAB_EXTRA		((int) (ATAB_EXTRA_PERCENT * r->TermWin.FHEIGHT / 100))
 /* space between top window border and tab bottom */
 #define TAB_BOTOFF		((int) (r->TermWin.FHEIGHT + 2*TXT_MARGIN) + ATAB_EXTRA)
@@ -1206,6 +1207,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	 * 2006-02-17 gi1242: Bug -- If the child produces some output and exits
 	 * quickly, then some of that output is sometimes lost.
 	 */
+#ifdef OS_LINUX
 	if( ATAB(r) != LTAB(r) )
 	{
 		/*
@@ -1213,8 +1215,8 @@ rxvt_append_page( rxvt_t* r, int profile,
 		 * current tab.
 		 */
 		char *cwd = getcwd( NULL, PATH_MAX ),
-			 proc_cwd[32],
-			 atab_pwd[PATH_MAX];
+			proc_cwd[32],
+			atab_pwd[PATH_MAX];
 		int len;
 
 		sprintf( proc_cwd, "/proc/%d/cwd", AVTS(r)->cmd_pid );
@@ -1250,7 +1252,10 @@ rxvt_append_page( rxvt_t* r, int profile,
 		free( cwd );
 	}
 	else
+#endif /* OS_LINUX */
+	{
 		LVTS(r)->cmd_fd = rxvt_run_command (r, LTAB(r), (const char**) argv);
+	}
 
 	/*
 	 * In case we allocated memory for argv using rxvt_string_to_argv (because a
