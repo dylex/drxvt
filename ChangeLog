@@ -19,6 +19,7 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   treated as unsigned (WtF!).
 		8. Fix compile error on OpenBSD 3.9 when MULTI_CHAR is
 		   enabled (OpenBSD keeps playing game with us!).
+		9. Saving session behavior now conforms to profile support.
 
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
