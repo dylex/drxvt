@@ -1833,8 +1833,8 @@ rxvt_change_font_xft (rxvt_t* r, const char* fontname)
 #if 0
 	DBG_MSG(1, (stderr, "Destroy %p, (xftpattern %p, xftmpattern %p)\n",
 				xp, r->TermWin.xftpattern, r->TermWin.xftmpattern));
-	// FcPatternPrint (xp);
-	// FcPatternPrint (r->TermWin.xftpattern);
+	/* FcPatternPrint (xp);
+	FcPatternPrint (r->TermWin.xftpattern); */
 	XftPatternDestroy (xp);
 # ifdef MULTICHAR_SET
 	if (xp != mxp)

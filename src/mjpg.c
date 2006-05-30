@@ -125,7 +125,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
 	}
     vwidth = *w;
     vheight = *h;
-//    long bpp = jinf.data_precision;
+/*    long bpp = jinf.data_precision; */
     components = jinf.output_components;
 	/* possible integer overflow */
 	assert ((int) components > 0);
@@ -133,7 +133,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
 	assert ((int) rwidth > 0);
 	assert (components * rheight * rwidth * sizeof (JSAMPLE) > 0);
     buf = (unsigned char*)rxvt_malloc(components * rheight * rwidth*sizeof(JSAMPLE));
-//printf("jpg::readjpg w,h=%d,%d  c=%d\n",width,height,components);
+/*printf("jpg::readjpg w,h=%d,%d  c=%d\n",width,height,components); */
 
 
     for(i=0; i< rheight; i++){
@@ -162,7 +162,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
         free(buf);
                  return -1;
     }
-    //
+
     if ((win_attr.depth == 24) || (win_attr.depth == 16)) {
       unsigned int n;
       if (win_attr.depth == 24) {
@@ -386,7 +386,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
         }
       }
     }else if (image->bits_per_pixel == 8){
-//printf("components=%d\n",components);
+	/* printf("components=%d\n",components); */
       XColor col[5*5*5];
       Colormap cm = DefaultColormap(display,DefaultScreen(display));
       long k;

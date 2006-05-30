@@ -80,8 +80,8 @@
 /* space between top window border and tab top */
 #define TAB_TOPOFF		((int) 0)
 /* Extra height of the active tab. Usually one pixel is adequate */
-/* #define ATAB_EXTRA		((int) 1) */
-#define ATAB_EXTRA		((int) (ATAB_EXTRA_PERCENT * r->TermWin.FHEIGHT / 100))
+#define ATAB_EXTRA		((int) 1)
+/* #define ATAB_EXTRA		((int) (ATAB_EXTRA_PERCENT * r->TermWin.FHEIGHT / 100)) */
 /* space between top window border and tab bottom */
 #define TAB_BOTOFF		((int) (r->TermWin.FHEIGHT + 2*TXT_MARGIN) + ATAB_EXTRA)
 
@@ -563,7 +563,7 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 					x, y, buf, len, multichar, tnum == ATAB(r));
 
 			/* adjust start position */
-			// x += Width2Pixel(len);
+			/* x += Width2Pixel(len); */
 			/*
 #ifdef XFT_SUPPORT
 			if ((r->Options & Opt_xft) && r->tabBar.xftwin)

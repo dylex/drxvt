@@ -3527,11 +3527,11 @@ Bool getWMStruts( Display *dpy, Window w,
 				== None) continue;
 
 		if( XGetWindowProperty( dpy, w, atom,
-				0,		// offset
-				4,		// length
-				False,	// Delete?
-				XA_CARDINAL,	// Type
-				&type, &format, &nitems, &bytes_after, // return values
+				0,		/* offset */
+				4,		/* length */
+				False,	/* Delete? */
+				XA_CARDINAL,	/* Type */
+				&type, &format, &nitems, &bytes_after, /* return values */
 				(unsigned char **) &struts) != Success )
 			continue;
 

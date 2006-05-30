@@ -954,7 +954,7 @@ rxvt_drawbox_menubar(rxvt_t *r, int x, int len, int state)
 
 	DBG_MSG( 2, (stderr, "rxvt_drawbox_menubar()\n"));
 
-	// XXXMENU
+	/* XXXMENU */
 	len += HSPACE_PIXEL + SHADOW;
 
 	if (x >= TWIN_WIDTH(r))
@@ -2139,8 +2139,8 @@ rxvt_menubar_draw_labels( rxvt_t *r)
 		rxvt_print_menu_descendants(menu);
 # endif
 
-		// if (x >= r->TermWin.ncol)
-		// 	len = (r->TermWin.ncol - (menu->x + HSPACE));
+		/* if (x >= r->TermWin.ncol)
+		 	len = (r->TermWin.ncol - (menu->x + HSPACE)); */
 
 		/* 2006-01-29 gi1242: Boxes in the menubar are ugly */
 #if 0

@@ -225,7 +225,7 @@ fprintf(stderr,"png read error: out of memory..\n");
         fclose(ifile);
                  return -1;
     }
-    //
+
     if ((win_attr.depth == 24) || (win_attr.depth == 16)) {
       unsigned int n;
       if (win_attr.depth == 24) {
@@ -455,7 +455,7 @@ fprintf(stderr,"png read error: out of memory..\n");
         }
       }
     }else if (image->bits_per_pixel == 8){
-//printf("components=%d\n",components);
+	/* printf("components=%d\n",components); */
       XColor col[5*5*5];
       Colormap cm = DefaultColormap(display,DefaultScreen(display));
       long k;

@@ -702,17 +702,17 @@ rxvt_scr_release(rxvt_t* r, int page)
 
 	for (i = 0; i < r->TermWin.nrow; i++)
 	{
-		// if (PVTS(r, page)->drawn_text[i])
+		/* if (PVTS(r, page)->drawn_text[i]) */
 			free(PVTS(r, page)->drawn_text[i]);
 		PVTS(r, page)->drawn_text[i] = NULL;
-		// if (PVTS(r, page)->drawn_rend[i])
+		/* if (PVTS(r, page)->drawn_rend[i]) */
 			free(PVTS(r, page)->drawn_rend[i]);
 		PVTS(r, page)->drawn_rend[i] = NULL;
 #if NSCREENS
-		// if (PVTS(r, page)->swap.text[i])
+		/* if (PVTS(r, page)->swap.text[i]) */
 			free(PVTS(r, page)->swap.text[i]);
 		PVTS(r, page)->swap.text[i] = NULL;
-		// if (PVTS(r, page)->swap.rend[i]))
+		/* if (PVTS(r, page)->swap.rend[i])) */
 			free(PVTS(r, page)->swap.rend[i]);
 		PVTS(r, page)->swap.rend[i] = NULL;
 #endif
@@ -3849,7 +3849,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						if ( (stp[col] != dtp[col]) || (srp[col] != drp[col]) )
 						{
 							/* This position needed to be refreshed anyway */
-							// if (must_clear && (i++ > (len / 2))) break;
+							/* if (must_clear && (i++ > (len / 2))) break; */
 
 							dtp[col] = stp[col];
 							drp[col] = srp[col];
