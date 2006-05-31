@@ -53,10 +53,12 @@ typedef unsigned long	u_intp_t;
 #  error No 8 byte integer type available
 # endif
 #else
-/* If we have <inttypes.h>, use *intptr_t instead of *INT32T. This
-** eliminates some problems on 64-bit systems. Reported by David
-** Mosberger (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=312710).
-** Patch is applied after slight modification. :-) */
+/*
+ * If we have <inttypes.h>, use *intptr_t instead of *INT32T. This eliminates
+ * some problems on 64-bit systems. Reported by David Mosberger
+ * (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=312710). Patch is applied
+ * after slight modification. :-)
+ */
 # ifdef HAVE_INTTYPES_H
 typedef intptr_t		intp_t;
 typedef uintptr_t		u_intp_t;
@@ -318,7 +320,7 @@ typedef enum {
 
 /* rxvt_vars.Options2 */
 #define Opt2_protectSecondary		(1LU<<0)
-// #define Opt2_cmdInitTabs			(1LU<<1)
+/* #define Opt2_cmdInitTabs			(1LU<<1) OBSOLETE */
 #define Opt2_cmdAllTabs   			(1LU<<2)
 #ifdef XFT_SUPPORT
 # ifdef MULTICHAR_SET
