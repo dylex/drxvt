@@ -79,11 +79,13 @@
  */
 /* space between top window border and tab top */
 #define TAB_TOPOFF		((int) 0)
-/* Extra height of the active tab. Usually one pixel is adequate */
-#define ATAB_EXTRA		((int) 1)
-/* #define ATAB_EXTRA		((int) (ATAB_EXTRA_PERCENT * r->TermWin.FHEIGHT / 100)) */
+/* Extra height of the active tab. */
+#define ATAB_EXTRA		((int) (ATAB_EXTRA_PERCENT * r->TermWin.FHEIGHT / 100))
 /* space between top window border and tab bottom */
 #define TAB_BOTOFF		((int) (r->TermWin.FHEIGHT + 2*TXT_MARGIN) + ATAB_EXTRA)
+
+/* Radius of tab corners */
+#define TAB_RADIUS		(TAB_RADIUS_PERCENT * TXT_XOFF / 100 )
 
 
 /* X offset of text in tab */
@@ -709,24 +711,24 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				/* Top tabbar line & left of active tab */
 				SET_POINT( points[0], 0, TAB_TOPOFF);
 				SET_POINT( points[1], x, TAB_TOPOFF);
-				SET_POINT( points[2], x, TAB_BOTOFF - TXT_XOFF);
+				SET_POINT( points[2], x, TAB_BOTOFF - TAB_RADIUS);
 
 				/* Arc coordinates for rounded tab tops :) */
-				SET_ARC( arcs[0], x, TAB_BOTOFF - 2*TXT_XOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 180*64, 90*64);
+				SET_ARC( arcs[0], x, TAB_BOTOFF - 2*TAB_RADIUS,
+						2*TAB_RADIUS, 2*TAB_RADIUS, 180*64, 90*64);
 				SET_ARC( arcs[1],
-						x + AVTS(r)->tab_width - 2*TXT_XOFF,
-						TAB_BOTOFF - 2*TXT_XOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 270*64, 90*64);
+						x + AVTS(r)->tab_width - 2*TAB_RADIUS,
+						TAB_BOTOFF - 2*TAB_RADIUS,
+						2*TAB_RADIUS, 2*TAB_RADIUS, 270*64, 90*64);
 
 				/* Coordinates for horizontal line below tab. */
-				SET_POINT( points[3], x + TXT_XOFF, TAB_BOTOFF);
+				SET_POINT( points[3], x + TAB_RADIUS, TAB_BOTOFF);
 				SET_POINT( points[4],
-						x + AVTS(r)->tab_width - TXT_XOFF, TAB_BOTOFF);
+						x + AVTS(r)->tab_width - TAB_RADIUS, TAB_BOTOFF);
 
 				/* Right line of tab and top of tabbar. */
 				SET_POINT( points[5],
-						x + AVTS(r)->tab_width, TAB_BOTOFF - TXT_XOFF);
+						x + AVTS(r)->tab_width, TAB_BOTOFF - TAB_RADIUS);
 				SET_POINT( points[6], x + AVTS(r)->tab_width, TAB_TOPOFF);
 				SET_POINT( points[7], TWIN_WIDTH(r), TAB_TOPOFF);
 			}
@@ -739,25 +741,26 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				 */
 				SET_POINT( points[0], 0, TAB_BOTOFF);
 				SET_POINT( points[1], x, TAB_BOTOFF);
-				SET_POINT( points[2], x, TAB_TOPOFF + TXT_XOFF);
+				SET_POINT( points[2], x, TAB_TOPOFF + TAB_RADIUS);
 
 				/* Arc coordinates for rounded tab tops :) */
 				SET_ARC( arcs[0], x, TAB_TOPOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 180*64, -90*64);
+						2*TAB_RADIUS, 2*TAB_RADIUS, 180*64, -90*64);
 				SET_ARC( arcs[1],
-						x + AVTS(r)->tab_width - 2*TXT_XOFF, TAB_TOPOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 90*64, -90*64);
+						x + AVTS(r)->tab_width - 2*TAB_RADIUS, TAB_TOPOFF,
+						2*TAB_RADIUS, 2*TAB_RADIUS, 90*64, -90*64);
 
 				/* Coordinates for horizontal line above tab. */
-				SET_POINT( points[3], x + TXT_XOFF, TAB_TOPOFF);
+				SET_POINT( points[3], x + TAB_RADIUS, TAB_TOPOFF);
 				SET_POINT( points[4],
-						x + AVTS(r)->tab_width - TXT_XOFF, TAB_TOPOFF);
+						x + AVTS(r)->tab_width - TAB_RADIUS, TAB_TOPOFF);
 
 				/*
 				 * Coordinates for vertical line on the right of the active tab, and
 				 * bottom line of tab bar after active tab.
 				 */
-				SET_POINT( points[5], x + AVTS(r)->tab_width, TAB_TOPOFF + TXT_XOFF);
+				SET_POINT( points[5], x + AVTS(r)->tab_width,
+						TAB_TOPOFF + TAB_RADIUS);
 				SET_POINT( points[6], x + AVTS(r)->tab_width, TAB_BOTOFF);
 				SET_POINT( points[7], TWIN_WIDTH(r), TAB_BOTOFF);
 			}
@@ -841,27 +844,27 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
 						x, TAB_TOPOFF + 1, /* Dont' interupt tabbar line */
-						x, TAB_BOTOFF - TXT_XOFF - ATAB_EXTRA);
+						x, TAB_BOTOFF - TAB_RADIUS - ATAB_EXTRA);
 
 				/* Draw rounded tab bottoms :). */
-				SET_ARC( arcs[0], x, TAB_BOTOFF - ATAB_EXTRA - 2*TXT_XOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 180*64, 90*64);
+				SET_ARC( arcs[0], x, TAB_BOTOFF - ATAB_EXTRA - 2*TAB_RADIUS,
+						2*TAB_RADIUS, 2*TAB_RADIUS, 180*64, 90*64);
 				SET_ARC( arcs[1],
-						x + PVTS(r, page)->tab_width - 2*TXT_XOFF,
-						TAB_BOTOFF - ATAB_EXTRA - 2*TXT_XOFF,
-						2*TXT_XOFF, 2*TXT_XOFF, 270*64, 90*64);
+						x + PVTS(r, page)->tab_width - 2*TAB_RADIUS,
+						TAB_BOTOFF - ATAB_EXTRA - 2*TAB_RADIUS,
+						2*TAB_RADIUS, 2*TAB_RADIUS, 270*64, 90*64);
 				XDrawArcs( r->Xdisplay, r->tabBar.win, r->tabBar.gc, arcs, 2);
 
 				/* Horizontal line below tab. */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
-						x + TXT_XOFF, TAB_BOTOFF - ATAB_EXTRA,
-						x + PVTS(r, page)->tab_width - TXT_XOFF,
+						x + TAB_RADIUS, TAB_BOTOFF - ATAB_EXTRA,
+						x + PVTS(r, page)->tab_width - TAB_RADIUS,
 						TAB_BOTOFF - ATAB_EXTRA);
 
 				/* Right vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
 						x + PVTS(r, page)->tab_width,
-						TAB_BOTOFF - TXT_XOFF - ATAB_EXTRA,
+						TAB_BOTOFF - TAB_RADIUS - ATAB_EXTRA,
 						x + PVTS(r, page)->tab_width, TAB_TOPOFF + 1);
 			}
 
@@ -869,27 +872,28 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			{
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
-						x, TAB_BOTOFF-1, x, TAB_TOPOFF + TXT_XOFF + ATAB_EXTRA);
+						x, TAB_BOTOFF-1, x,
+						TAB_TOPOFF + TAB_RADIUS + ATAB_EXTRA);
 
 				/* Draw rounded tab tops :). */
 				SET_ARC( arcs[0], x, TAB_TOPOFF + ATAB_EXTRA,
-						2*TXT_XOFF, 2*TXT_XOFF, 180*64, -90*64);
+						2*TAB_RADIUS, 2*TAB_RADIUS, 180*64, -90*64);
 				SET_ARC( arcs[1],
-						x + PVTS(r, page)->tab_width - 2*TXT_XOFF,
+						x + PVTS(r, page)->tab_width - 2*TAB_RADIUS,
 						TAB_TOPOFF + ATAB_EXTRA,
-						2*TXT_XOFF, 2*TXT_XOFF, 90*64, -90*64);
+						2*TAB_RADIUS, 2*TAB_RADIUS, 90*64, -90*64);
 				XDrawArcs( r->Xdisplay, r->tabBar.win, r->tabBar.gc, arcs, 2);
 
 				/* Horizontal line above tab. */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
-						x + TXT_XOFF, TAB_TOPOFF + ATAB_EXTRA,
-						x + PVTS(r, page)->tab_width - TXT_XOFF,
+						x + TAB_RADIUS, TAB_TOPOFF + ATAB_EXTRA,
+						x + PVTS(r, page)->tab_width - TAB_RADIUS,
 						TAB_TOPOFF + ATAB_EXTRA);
 
 				/* Right vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
 						x + PVTS(r, page)->tab_width,
-						TAB_TOPOFF + TXT_XOFF + ATAB_EXTRA,
+						TAB_TOPOFF + TAB_RADIUS + ATAB_EXTRA,
 						x + PVTS(r, page)->tab_width, TAB_BOTOFF-1);
 			}
 
@@ -2150,6 +2154,10 @@ rxvt_tabbar_create (rxvt_t* r)
 		assert (None != img[i]);
 #endif
 	}
+
+	DBG_MSG( 3, ( stderr,
+				"TXT_XOFF=%d, TXT_YOFF=%d, ATAB_EXTRA=%d, TAB_RADIUS=%d\n",
+				TXT_XOFF, TXT_YOFF, ATAB_EXTRA, TAB_RADIUS) );
 }
 
 

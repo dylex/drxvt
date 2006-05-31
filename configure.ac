@@ -755,6 +755,22 @@ AC_ARG_WITH(
 )
 AC_DEFINE_UNQUOTED(MAX_PAGES, $max_term_option, [the max number of vt that can be open])
 
+AC_ARG_WITH(
+	atab-extra,
+	AC_HELP_STRING( [--with-atab-extra=%], [The extra height (as a % of the font height) active tabs should have] ),
+	[atab_extra_option=$withval],
+	[atab_extra_option=20]
+)
+AC_DEFINE_UNQUOTED( ATAB_EXTRA_PERCENT, $atab_extra_option, [The extra height (as a % of the font height) active tabs should have])
+
+AC_ARG_WITH(
+	tab-radius,
+	AC_HELP_STRING( [--with-tab-radius=%], [The radius (as a % of the font X offset) of tab corners]),
+	[tab_radius_option=$withval],
+	[tab_radius_option=100],
+)
+AC_DEFINE_UNQUOTED( TAB_RADIUS_PERCENT, $tab_radius_option, [The radius (as a % of the font X offset) of tab corners])
+
 
 withval=""
 AC_ARG_WITH(
@@ -1501,6 +1517,8 @@ echo
 echo "Options:"
 echo "Terminal name               : $term_name_option"
 echo "Maximal tabs                : $max_term_option"
+echo "Extra height% of active tab : $atab_extra_option"
+echo "Radius% of tab corners      : $tab_radius_option"
 if test "x$support_linespace" = "xyes"; then
     echo "Line space                  : $line_space_option"
 fi
