@@ -1063,13 +1063,13 @@ AC_CHECK_HEADERS( \
     assert.h \
     fcntl.h \
     iconv.h \
-	inttypes.h \
+    inttypes.h \
     lastlog.h \
-	limits.h \
+    limits.h \
     locale.h \
     langinfo.h \
     netinet/in.h \
-	pty.h \
+    pty.h \
     sgtty.h \
     stdarg.h \
     stdlib.h \
@@ -1090,7 +1090,7 @@ AC_CHECK_HEADERS( \
     unistd.h \
     utmp.h \
     utmpx.h \
-	wchar.h \
+    wchar.h \
 )
 
 if test "x$support_sessionmgr" = "xyes"; then
@@ -1329,7 +1329,7 @@ AC_CHECK_FUNCS(
     setsid \
     setutent \
     socket \
-	strcasestr \
+    strcasestr \
     strchr \
     strdup \
     strndup \

@@ -123,6 +123,8 @@ static const struct {
 			"foreground color for a tab", 1),
 	STRG( Rs_background, "background", "bg", "color",
 			"background color for a tab", 1),
+	STRG( Rs_cwd, "workingDirectory", "wd", "dir",
+			"Working directory to open new tabs in", 1 ),
 
 	STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
 	STRG(Rs_minVisibleTabs, "minVisibleTabs", "mvt", "number", "minimum # of tabs to keep visible (requires xftpfn)", 0),

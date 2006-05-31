@@ -1211,29 +1211,46 @@ rxvt_append_page( rxvt_t* r, int profile,
 	 * 2006-02-17 gi1242: Bug -- If the child produces some output and exits
 	 * quickly, then some of that output is sometimes lost.
 	 */
-#ifdef OS_LINUX
-	if( ATAB(r) != LTAB(r) )
+	if( getProfileOption( r, profile, Rs_cwd ) != NULL )
 	{
-		/*
-		 * Attempt to spawn child process in the working directory of the
-		 * current tab.
-		 */
-		char *cwd = getcwd( NULL, PATH_MAX ),
-			proc_cwd[32],
-			atab_pwd[PATH_MAX];
-		int len;
+		const char	*cwdOption	= getProfileOption( r, profile, Rs_cwd );
+		char		*cwd		= getcwd( NULL, PATH_MAX ),
+					*child_cwd[PATH_MAX];
+		int			len = 0;
 
-		sprintf( proc_cwd, "/proc/%d/cwd", AVTS(r)->cmd_pid );
-		if( (len = readlink( proc_cwd, atab_pwd, PATH_MAX-1) ) > 0 )
-			/* readlink does not null terminate */
-			atab_pwd[len] = 0;
+		if( !STRCMP( cwdOption, "." ) )
+		{
+#if 1 /* defined(OS_LINUX) */
+			if( ATAB(r) != LTAB(r) )
+			{
+				/*
+				 * Copy working directory of the current tab into child_cwd.
+				 */
+				char	proc_cwd[32];			/* 16 is enough */
 
-		if(	len > 0 && atab_pwd[0] == '/'	/* valid cwd for atab */
-			&& chdir( atab_pwd ) == 0)		/* Sucess changing to atab cwd */
+				sprintf( proc_cwd, "/proc/%d/cwd", AVTS(r)->cmd_pid );
+				if( (len = readlink( proc_cwd, child_cwd, PATH_MAX-1) ) > 0 )
+					/* readlink does not null terminate */
+					child_cwd[len] = 0;
+			}
+#endif /* defined( OS_LINUX ) */
+		}
+		
+		else
+		{
+			/* XXX Maybe better to use wordexp here */
+			len  = STRLEN( cwdOption );
+
+			MIN_IT( len, PATH_MAX - 1 );
+			STRNCPY( child_cwd, cwdOption, len );
+			child_cwd[len] = 0;
+		}
+
+		if( len > 0 && chdir( child_cwd ) )
 		{
 			/* Now in working directory of ATAB */
 			DBG_MSG( 2, ( stderr, "Running child in directory: %s\n",
-						atab_pwd));
+						child_cwd ));
 
 			/* Run command in this new directory. */
 			LVTS(r)->cmd_fd =
@@ -1242,6 +1259,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 			/* Restore old working directory. */
 			chdir( cwd );
 		}
+
 		else
 		{
 			/* Exec command in original directory. */
@@ -1256,10 +1274,8 @@ rxvt_append_page( rxvt_t* r, int profile,
 		free( cwd );
 	}
 	else
-#endif /* OS_LINUX */
-	{
 		LVTS(r)->cmd_fd = rxvt_run_command (r, LTAB(r), (const char**) argv);
-	}
+
 
 	/*
 	 * In case we allocated memory for argv using rxvt_string_to_argv (because a

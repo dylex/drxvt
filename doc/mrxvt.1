@@ -682,9 +682,9 @@ in profile
 When a new tab is created with profile
 .Ar N
 it uses all options that are set for this profile. Currently the only options that can be set per profile are
-.Cm Pixmap , foreground , background , saveLines , command
+.Cm Pixmap , background , command , foreground , saveLines , tabTitle 
 and
-.Cm tabTitle .
+.Cm workingDirectory .
 Then all the settings from that profile number are used.
 .Pp
 .
@@ -741,13 +741,19 @@ tabs on startup. For backward compatibility, the tabs are opened with profile 0,
 Title of the tab
 .Op Cm tabTitle
 .
+.BO ut
+Utmp inhibit.
+.Op Cm utmpInhibit
+.
 .BO vbf
 Show colored text with bold font.
 .Op Cm veryBoldFont
 .
-.BO ut
-Utmp inhibit.
-.Op Cm utmpInhibit
+.It Fl wd
+Working directory of the child process. If non-empty, then the child process is started in this directory. If set to
+.Sq \&.
+then the child process is run in the working directory of the current tab if possible. On Linux, this is the default. (NOTE: It is not always possible to find the working directory of the current tab. This works fine on Linux, but causes problems on other systems [e.g. OpenBSD], which is why it is only enabled by default on Linux).
+.Op Cm workingDirectory
 .
 .El
 .Ed

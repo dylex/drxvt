@@ -1415,6 +1415,11 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 															DEFAULT_SAVELINES;
 	}
 
+#ifdef OS_LINUX
+	if( !r->h->rs[Rs_cwd] )
+		r->h->rs[Rs_cwd] = ".";
+#endif
+
 	return cmd_argv;
 }
 

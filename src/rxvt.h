@@ -1181,6 +1181,7 @@ enum {
 
 	Rs_foreground,		_Rs_foreground = Rs_foreground + MAX_PROFILES - 1,
 	Rs_background,		_Rs_background = Rs_background + MAX_PROFILES - 1,
+	Rs_cwd,				_Rs_cwd = Rs_cwd + MAX_PROFILES - 1,
 
 	/*
 	 * Secondary boolean options (stored in r->Options2).
