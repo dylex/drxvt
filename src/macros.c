@@ -995,32 +995,58 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		case MacroFnPrintScreen:
-			/* If arguments are given, print the whole scroll back */
-			rxvt_scr_printscreen (r, ATAB(r), action->str != NULL);
+		{
+			/*
+			 * If first argument is "-scrollback", then dump the whole
+			 * scroll back buffer. The argument if any is the command to use for
+			 * the printer pipe.
+			 */
+
+			char	*s			= action->str;
+			int		pretty		= 0,
+					scrollback	= 0;
+
+			if( *s && *s == '-' )
+			{
+				while( *(++s) && !isspace( *s ) )
+				{
+					if( *s == 's' )
+						scrollback = 1;
+					else if( *s == 'p' )
+						pretty = 1;
+				}
+
+				while( isspace(*s) ) s++;
+			}
+
+			rxvt_scr_printscreen( r, ATAB(r), scrollback, pretty,
+					*s ? s : NULL );
+
 			break;
+		}
 
 		case MacroFnSaveConfig:
+		{
+			char	cfile[PATH_MAX] = "";
+
+			if( action->str != NULL )
+				STRNCPY( cfile, action->str, PATH_MAX-1 );
+			else if( r->h->rs[Rs_confFileSave] != NULL )
+				STRNCPY( cfile, r->h->rs[Rs_confFileSave], PATH_MAX-1 );
+			else
 			{
-				char	cfile[PATH_MAX] = "";
+				char*	home = getenv ("HOME");
 
-				if( action->str != NULL )
-					STRNCPY (cfile, action->str, PATH_MAX-1);
-				else if( r->h->rs[Rs_confFileSave] != NULL )
-					STRNCPY (cfile, r->h->rs[Rs_confFileSave], PATH_MAX-1);
-				else
-				{
-					char*	home = getenv ("HOME");
+				if (NULL == home) return -1; /* Failure */
 
-					if (NULL == home) return -1; /* Failure */
-
-					snprintf (cfile, PATH_MAX-1, "%s/%s", home,
-							".mrxvtrc.save");
-				}
-				cfile[PATH_MAX-1] = (char) 0;	/* Null terminate */
-
-				return rxvt_save_options (r, cfile) ? 1 : -1;
-				/* Not reached */
+				snprintf (cfile, PATH_MAX-1, "%s/%s", home,
+						".mrxvtrc.save");
 			}
+			cfile[PATH_MAX-1] = (char) 0;	/* Null terminate */
+
+			return rxvt_save_options (r, cfile) ? 1 : -1;
+			/* Not reached */
+		}
 
 		case MacroFnToggleMacros:
 			r->Options2 ^= Opt2_disableMacros;

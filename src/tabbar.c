@@ -2293,7 +2293,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 
 	switch (item)
 	{
-		case Xterm_tabfg:
+		case MRxvt_tabfg:
 			if (r->h->rs[Rs_tabfg] &&
 				!STRCASECMP(str, r->h->rs[Rs_tabfg]))
 				break;	/* no color change */
@@ -2312,7 +2312,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 			}
 			break;
 
-		case Xterm_tabbg:
+		case MRxvt_tabbg:
 			if (r->h->rs[Rs_tabbg] &&
 				!STRCASECMP(str, r->h->rs[Rs_tabbg]))
 				break;	/* no color change */
@@ -2328,7 +2328,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 			}
 			break;
 
-		case Xterm_itabfg:
+		case MRxvt_itabfg:
 			if (r->h->rs[Rs_itabfg] &&
 				!STRCASECMP(str, r->h->rs[Rs_itabfg]))
 				break;	/* no color change */
@@ -2347,7 +2347,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 			}
 			break;
 
-		case Xterm_itabbg:
+		case MRxvt_itabbg:
 			if (r->h->rs[Rs_itabbg] && !STRCASECMP(str, r->h->rs[Rs_itabbg]))
 				break;
 
@@ -2368,7 +2368,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 
 	if (changed)
 	{
-		if (Xterm_itabbg == item)
+		if (MRxvt_itabbg == item)
 		{
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
 			if (

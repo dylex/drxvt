@@ -249,11 +249,26 @@ Mrxvt.profile2.command:		!vim
 Mrxvt.profile3.saveLines:	0
 Mrxvt.profile3.command:		mutt
 
-# Define macros to open each of the above profiles
+#
+# ---------------------------- KEYBOARD SHORTCUTS ---------------------------- #
+#
+
+# Open profiles 1 -- 4 on Ctrl+Shift+F1 -- F4.
 Mrxvt.macro.Ctrl+Shift+F1:	NewTab -1
 Mrxvt.macro.Ctrl+Shift+F2:	NewTab -2
 Mrxvt.macro.Ctrl+Shift+F3:	NewTab -3
 Mrxvt.macro.Ctrl+Shift+F4:	NewTab -4
+
+#
+# Save the scroll back buffer to a file, and open it (in less / vim) in a new
+# tab. Useful for searching, or cut/paste from the scroll back buffer.
+#
+Mrxvt.macro.Primary+Ctrl+Shift+question: PrintScreen -ps perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
+Mrxvt.macro.Primary+Add+Ctrl+Shift+question: NewTab "(Search)" /bin/sh -c "less -ifLR +G /tmp/scrollback; rm /tmp/scrollback"
+
+Mrxvt.macro.Primary+Ctrl+slash: PrintScreen -s perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
+Mrxvt.macro.Primary+Add+Ctrl+slash: NewTab "(Search)" /bin/sh -c 'view +"syn off|set nospell notitle |normal G" /tmp/scrollback; rm /tmp/scrollback'
+
 
 # ---------------------------------------------------------------------------- #
 

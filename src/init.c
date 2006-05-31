@@ -2473,13 +2473,6 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	PVTS(r, page)->termenv = rxvt_get_termenv (
 		r->h->rs[Rs_term_name] ? r->h->rs[Rs_term_name] : TERMENV);
 
-#if 0
-	/* get command argv from resources */
-	PVTS(r, page)->command_argv = rxvt_string_to_argv (
-				(char*) r->h->rs[Rs_command+i],
-				&(PVTS(r, page)->command_argc));
-#endif
-
 	/* Initialize PrivateModes and SavedModes */
 	PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
 		PrivMode_Default;
@@ -2546,21 +2539,8 @@ void
 rxvt_destroy_termwin( rxvt_t *r, int page )
 {
 	assert (page < MAX_PAGES);
-
-#if 0
-	/* free command argv */
-	if (PVTS(r, page)->command_argv && PVTS(r, page)->command_argc)
-	{
-		register int	i;
-		for (i = 0; i < PVTS(r, page)->command_argc; i ++)
-			free (PVTS(r, page)->command_argv[i]);
-		free (PVTS(r, page)->command_argv);
-		PVTS(r, page)->command_argv = NULL;
-		PVTS(r, page)->command_argc = 0;
-	}
-#endif
-
 	assert (PVTS(r, page)->tab_title);
+
 	free (PVTS(r, page)->tab_title);
 	PVTS(r, page)->tab_title = NULL;
 
@@ -3190,7 +3170,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 */
 	if( r->h->popupMenu[0] == NULL )
 	{
-		DBG_TMSG( 3, ( stderr, "Setting popup menu 1 to a tab list\n" ) );
+		DBG_MSG( 3, ( stderr, "Setting popup menu 1 to a tab list\n" ) );
 		r->h->popupMenu[0] = (menu_t *) rxvt_calloc( 1, sizeof(menu_t) );
 
 		r->h->popupMenu[0]->len		= sizeof( "Switch to tab" );

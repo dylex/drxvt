@@ -318,7 +318,7 @@ typedef enum {
 
 /* rxvt_vars.Options2 */
 #define Opt2_protectSecondary		(1LU<<0)
-#define Opt2_cmdInitTabs			(1LU<<1)
+// #define Opt2_cmdInitTabs			(1LU<<1)
 #define Opt2_cmdAllTabs   			(1LU<<2)
 #ifdef XFT_SUPPORT
 # ifdef MULTICHAR_SET

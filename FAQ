@@ -80,6 +80,7 @@ Q:  I'm using keyboard model XXX that has extra Prior/Next/Insert keys.  How do
 Q:  How do I distinguish if I'm running mrxvt or a regular xterm? I need this to
     decide about setting colors etc.
 Q:  How do I set the correct, full IP address for the DISPLAY variable?
+Q:  Can I search the scroll back buffer?
 Q:  Where is the CVS repository of mrxvt?
 Q:  I find a bug, or I would like to see a new feature in mrxvt, how to report
     it?
@@ -957,6 +958,37 @@ A:  If you've compiled mrxvt with DISPLAY_IS_IP then it is possible to use the
 		setenv DISPLAY "$<"
 	    endif
 	endif
+
+-----
+
+Q:  Can I search the scroll back buffer?
+
+A:  Yes! (Well sort of). The following two macros (bound to Ctrl+Shift+? and
+    Ctrl+/ respectively) will save your scroll back buffer to a file and open it
+    in less and vim respectively. When opened in less, you can see the same
+    colors as you do on your screen. When opened in Vim, you can edit / cut &
+    paste, but can't see the same colors [unless you write your own syntax file,
+    and use the "conceal" patch by Vince Negri].
+
+	Mrxvt.macro.Primary+Ctrl+Shift+question: PrintScreen -ps perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
+	Mrxvt.macro.Primary+Add+Ctrl+Shift+question: NewTab "(Search)" /bin/sh -c "less -ifLR +G /tmp/scrollback; rm /tmp/scrollback"
+
+	Mrxvt.macro.Primary+Ctrl+slash: PrintScreen -s perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
+	Mrxvt.macro.Primary+Add+Ctrl+slash: NewTab "(Search)" /bin/sh -c 'view +"syn off|set nospell notitle |normal G" /tmp/scrollback; rm /tmp/scrollback'
+
+    NOTE: If you use Vim-6.4, you probably want to remove the "nospell" Vim
+    option. Opening in Vim is especially useful if Vim is compiled with X
+    support. In this case, Vim will synchronize your visual selection to the X
+    clipboard buffer, and you can paste it into other tabs using Ctrl+Shift+v.
+    
+    The perl command just strips the trailing new lines from your buffer. If you
+    want them, replace it with "cat". Remember that once you view the scroll
+    back buffer in less / vim, new output in the original tab will not be
+    visible in less / vim. Also the scroll back buffer is in the file
+    /tmp/scrollback. If you are working on some highly secret government
+    project, and don't want any one else to be able to see your scroll back
+    buffer, umask it correctly, or replace /tmp/scrollback to some private
+    location in your home directory.
 
 -----
 

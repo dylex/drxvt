@@ -4265,12 +4265,15 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 #ifdef PRINTPIPE
 /* EXTPROTO */
 FILE*
-rxvt_popen_printer(rxvt_t *r)
+rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 {
-	FILE		   *stream = popen(r->h->rs[Rs_print_pipe], "w");
+	assert( pipeName || r->h->rs[Rs_print_pipe] );
+
+	FILE		   *stream = popen( pipeName ?: r->h->rs[Rs_print_pipe], "w" );
 
 	if (stream == NULL)
-		rxvt_print_error("can't open printer pipe");
+		rxvt_print_error("Can't open printer pipe %s",
+				r->h->rs[Rs_print_pipe] ?: pipeName );
 
 	return stream;
 }
@@ -4297,7 +4300,7 @@ rxvt_pclose_printer(FILE *stream)
  */
 /* INTPROTO */
 void
-rxvt_process_print_pipe(rxvt_t* r, int page)
+rxvt_process_print_pipe( rxvt_t* r, int page )
 {
 	int			readpage = page;
 	int			done;
@@ -4307,7 +4310,7 @@ rxvt_process_print_pipe(rxvt_t* r, int page)
 #endif	/* DEBUG */
 
 
-	if ((fd = rxvt_popen_printer(r)) == NULL)
+	if( ( fd = rxvt_popen_printer( r, NULL ) ) == NULL )
 		return;
 
 	/*
@@ -4832,10 +4835,10 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 			switch (arg[0])
 			{
 				case 0:			/* initiate transfer to primary aux device */
-					rxvt_scr_printscreen(r, page, 0);
+					rxvt_scr_printscreen( r, page, 0, 0, NULL );
 					break;
 				case 5:			/* start relay to primary aux device */
-					rxvt_process_print_pipe(r, page);
+					rxvt_process_print_pipe( r, page );
 					break;
 			}
 			break;
@@ -5411,23 +5414,39 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 	assert(str != NULL);
 	switch (op)
 	{
-		case XTerm_name:
+		case XTerm_title:	/* Set tab / term title */
+		case XTerm_name:	/* also set icon title */
+#ifdef SET_TAB_TITLE_ON_XTERM_SEQUENCE
+			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
+#ifndef SET_TAB_TITLE_NOT_WIN_TITLE
+			/*
+			 * Set both the tab title and win title. However if -stt is used,
+			 * then the window title will already be set by
+			 * rxvt_tabbar_set_title(), so we only have to set it here if +stt.
+			 */
+			if( !(r->Options2 & Opt2_syncTabTitle ) )
+				rxvt_set_term_title(r, (const unsigned char*) str);
+#endif
+#else
 			rxvt_set_term_title(r, (const unsigned char*) str);
-			/* FALLTHROUGH */
+#endif
+			if( op == XTerm_title )
+				break;	/* Don't set the icon name */
+			/* else FALL THROUGH */
+
 		case XTerm_iconName:
 			rxvt_set_icon_name(r, (const unsigned char*) str);
+			/*
+			 * 2006-05-30 gi1242: -sti means sync the icon name to the tab
+			 * title, and NOT the other way around.
+			 */
+#if 0
 			if (r->Options2 & Opt2_syncTabIcon)
 				rxvt_tabbar_set_title (r, ATAB(r),
 						(const unsigned char TAINTED*) str);
-			break;
-		case XTerm_title:
-#ifndef SET_TAB_TITLE_NOT_WIN_TITLE
-			rxvt_set_term_title(r, (const unsigned char*) str);
-#endif
-#ifdef SET_TAB_TITLE_ON_XTERM_SEQUENCE
-			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
 #endif
 			break;
+
 		case XTerm_Color:
 			for (buf = (char *)str; buf && *buf;)
 			{
@@ -5522,16 +5541,25 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			break;
 #endif
 
-		/*
-		 * Mrxvt extension to set tab title and terminal title
-		 * Example: echo "\e]61;newtitle\a"
-		 */
-		case Xterm_tabterm:
+		case MRxvt_tabterm:		/* Set window and tab title */
+			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
+			if( r->Options2 & Opt2_syncTabTitle )
+				/*
+				 * Window title will automatically be synced, so setting it
+				 * again is wasteful.
+				 */
+				break;
+			/* else FALL THROUGH */
+
+		case MRxvt_term:		/* Set window title */
 			rxvt_set_term_title(r, (const unsigned char*) str);
-			/* FALLTHROUGH */
-		case Xterm_tab:
+			break;
+
+
+		case MRxvt_tab:
 			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
 			break;
+
 
 		/*
 		 * 2006-02-20 gi1242: These escape sequences are disabled for a possible
@@ -5552,7 +5580,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 		 * below AND port it to use the macro feature from 0.5.0 upward.
 		 */
 #if 0 /* {{{ DISABLED FOR SECURITY REASONS */
-		case Xterm_hide:
+		case MRxvt_hide:
 #ifdef HAVE_SCROLLBARS
 			if ('s' == *str || 'S' == *str) 		/* show/hide scrollbar */
 			{
@@ -5572,38 +5600,38 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			}
 			break;
 
-		case Xterm_tabbtn:
+		case MRxvt_tabbtn:
 			rxvt_hotkey_hide_button (r, 0);
 			break;
 
-		case Xterm_saveconfig:
+		case MRxvt_saveconfig:
 			rxvt_hotkey_save_config (r, 0);
 			break;
 
-		case Xterm_newtab:
+		case MRxvt_newtab:
 			rxvt_append_page (r, str, NULL);
 			break;
-		case Xterm_prevtab:
+		case MRxvt_prevtab:
 			if (0 != page)
 				rxvt_activate_page (r, page-1);
 			else if (0 != LTAB(r))
 				rxvt_activate_page (r, LTAB(r));
 			break;
-		case Xterm_nexttab:
+		case MRxvt_nexttab:
 			if (page != LTAB(r))
 				rxvt_activate_page (r, page+1);
 			else if (0 != LTAB(r))
 				rxvt_activate_page (r, 0);
 			break;
 
-		case Xterm_moveleft:
+		case MRxvt_moveleft:
 			rxvt_tabbar_move_tab (r, 0);
 			break;
-		case Xterm_moveright:
+		case MRxvt_moveright:
 			rxvt_tabbar_move_tab (r, 1);
 			break;
 
-		case Xterm_closewin:
+		case MRxvt_closewin:
 			if( *str )
 			{
 				int tabno = atoi(str) - 1;
@@ -5624,7 +5652,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			rxvt_hotkey_close_window (r, NULL);
 			break;
 
-		case Xterm_switchtab:
+		case MRxvt_switchtab:
 			{
 				int tabno = atoi(str) - 1;
 				if( tabno == -1)
@@ -5642,13 +5670,13 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 		 * have it using macros / menus.
 		 */
 #if 0 /* {{{ DISABLED because macros are more useful */
-		case Xterm_verybold:
+		case MRxvt_verybold:
 			/* rxvt_hotkey_verybold (r, 0); */
 			rxvt_toggle_verybold(r);
 			break;
 
 #ifdef TRANSPARENT
-		case Xterm_trans:
+		case MRxvt_trans:
 			rxvt_toggle_transparency (r);
 			break;
 #endif	/* TRANSPARENT */
@@ -5656,13 +5684,13 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 #endif /* }}} */
 
 #ifdef MULTICHAR_SET
-		case Xterm_encode:
+		case MRxvt_encode:
 			/* We only change encoding method, but not font ;-) */
 			rxvt_set_multichar_encoding (r, str);	
 			break;
 #endif	/* MULTICHAR_SET */
 
-		case Xterm_opacity:
+		case MRxvt_opacity:
 			if (None != r->h->xa[XA_NET_WM_WINDOW_OPACITY])
 			{
 				int		oldopacity = r->TermWin.opacity;
@@ -5704,23 +5732,23 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			}
 			break;
 
-		case Xterm_tabfg:
-		case Xterm_tabbg:
-		case Xterm_itabfg:
-		case Xterm_itabbg:
+		case MRxvt_tabfg:
+		case MRxvt_tabbg:
+		case MRxvt_itabfg:
+		case MRxvt_itabbg:
 			rxvt_tabbar_change_color (r, op, str);
 			break;
 
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
 # ifdef TINTING_SUPPORT
-		case Xterm_tint:
+		case MRxvt_tint:
 			if (ISSET_PIXCOLOR (r->h, Color_tint) &&
 				r->h->rs[Rs_shade])
 				rxvt_set_window_color(r, page, Color_tint, str);
 			break;
 
-		case Xterm_bgfade:	/* Make bgfade behave like shade */
-		case Xterm_shade:
+		case MRxvt_bgfade:	/* Make bgfade behave like shade */
+		case MRxvt_shade:
 			if (!ISSET_PIXCOLOR (r->h, Color_tint) ||
 				!r->h->rs[Rs_shade])
 				break;
@@ -5750,7 +5778,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 # endif	/* TINTING_SUPPORT */
 #endif	/* TRANSPARENT || BACKGROUND_IMAGE */
 
-		case Xterm_termenv:
+		case MRxvt_termenv:
 			PVTS(r, page)->termenv = rxvt_get_termenv ((const char*) str);
 			break;
 

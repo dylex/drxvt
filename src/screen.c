@@ -2374,17 +2374,59 @@ rxvt_scr_bell(rxvt_t *r, int page)
 }
 
 /* ------------------------------------------------------------------------- */
-/* ARGSUSED */
+
+#ifdef PRINTPIPE
+/*
+ * Generate escape sequences (not including the "\e[0") to reproduce screen
+ * rendition attributes for the foreground / background color. If "fg" is true,
+ * then sequences for the foreground color are generated, otherwise sequences
+ * for setting the background color are generated.
+ *
+ * Returns a pointer to the character after the escape sequence written. If no
+ * further attributes are to be added, strip the trailing ";".
+ */
+/* INTPROTO */
+char *
+escSetColor( char *s, int color, int fg)
+{
+	if( color >= minCOLOR && color < minCOLOR + 8 )
+		s += sprintf( s, "%c%d;", fg ? '3' : '4', color - minCOLOR );
+#ifndef NO_BRIGHTCOLOR
+	else if( color >= minBrightCOLOR && color <= maxBrightCOLOR )
+		s += sprintf( s, "%s%d;", fg ? "9" : "10", color - minBrightCOLOR );
+#endif
+#ifdef TTY_256COLOR
+	else if( color >= min256COLOR && color <= max256COLOR )
+		s += sprintf( s, "%c8;5;%d;", fg ? '3' : '4',
+								color - min256COLOR + 16 );
+#endif
+	else
+		assert(0);
+
+	return s;
+}
+#endif
+
+/*
+ * Print the screen into the printer pipe. If fullhist != 0, then the entire
+ * scroll back buffer is also dumped.
+ */
 /* EXTPROTO */
 void
-rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist)
+rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
+		const char *pipeName )
 {
+	DBG_MSG( 1, ( stderr, "rxvt_scr_printscreen( r, %d, %d, %d, %s )\n",
+				page, fullhist, pretty, pipeName ) );
+
 #ifdef PRINTPIPE
-	int			i, r1, nrows, row_offset;
-	text_t*		t;
+	int			row, col, nrows, row_offset;
+	text_t		*txt;
+	rend_t		*rnd;
+
 	FILE*		fd;
 
-	if ( (fd = rxvt_popen_printer(r)) == NULL )
+	if ( ( fd = rxvt_popen_printer( r, pipeName ) ) == NULL )
 		return;
 
 	nrows		= r->TermWin.nrow;
@@ -2397,18 +2439,82 @@ rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist)
 		row_offset -= PVTS(r, page)->nscrolled;
 	}
 
-	for (r1 = 0; r1 < nrows && !ferror( fd ); r1++)
+	for( row=0; row < nrows && !ferror( fd ); row++ )
 	{
-		t = PSCR(r, page).text[r1 + row_offset];
+		int lineEnd;
+
+		txt = PSCR( r, page ).text[ row + row_offset ];
+		rnd = PSCR( r, page ).rend[ row + row_offset ];
 
 		/* Trim trailing spaces */
-		for (i = r->TermWin.ncol - 1; i >= 0; i--)
+		for(
+			 lineEnd = r->TermWin.ncol - 1;
+			 lineEnd >= 0 && isspace( txt[lineEnd] );
+			 lineEnd--
+		   )
+		;
+
+		if( pretty )
 		{
-			if ( !isspace(t[i]) )
-				break;
+			/* Print colors as escape sequences */
+
+			for( col=0; col <= lineEnd; )
+			{
+				char	escsq[32];	/* Buffer to hold the escape sequence. 29
+									   bytes are enough. */
+				char	*s, *t;
+				int		start = col;
+				int		color;
+
+				rend_t	rend = rnd[start];
+
+				/* Get longest string with constant rendition attrs */
+
+				do
+				  {
+					col++;
+				  }
+				while( col <= lineEnd && rnd[col] == rend );
+
+
+				t = s = escsq + sprintf( escsq, "\e[" );
+
+				if( rend & RS_Bold )		s += sprintf( s, "1;" );
+				if( rend & RS_Uline )		s += sprintf( s, "4;" );
+				if( rend & RS_Blink )		s += sprintf( s, "5;" );
+				if( rend & RS_RVid )		s += sprintf( s, "7;" );
+
+				color = GET_BASEFG( rend );
+				if( color != Color_fg )
+					s = escSetColor( s, color, 1 );
+
+				color = GET_BASEBG( rend );
+				if( color != Color_bg )
+					s = escSetColor( s, color, 0 );
+
+				if( s != t )
+				{
+					/*
+					 * Some esc seq has been set. Null terminate and Replace
+					 * trailing ';' with 'm'
+					 */
+					*(s--)	= '\0';
+					*s		= 'm';
+
+					fprintf( fd, "%s%.*s\e[0m", escsq, col-start, txt+start );
+				}
+
+				else
+					fprintf( fd, "%.*s", col - start, txt + start );
+
+			}
+			fputc( '\n', fd );
 		}
 
-		fprintf( fd, "%.*s\n", (i + 1), t );
+		else
+			/* Vanilla text */
+			fprintf( fd, "%.*s\n", (lineEnd + 1), txt );
+
 	}
 
 	rxvt_pclose_printer(fd);

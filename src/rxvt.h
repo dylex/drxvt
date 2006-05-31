@@ -888,31 +888,32 @@ enum {
  * mrxvt extensions of XTerm OSCs: ESC ] Ps;Pt (ST|BEL)
  * Example: echo "\e]61;newtitle\a"
  */
-#define Xterm_tab			(61) /* change tab title */
-#define Xterm_tabterm		(62) /* change tab and terminal title */
-/* #define Xterm_newtab		(63)*/ /* DISABLED create a new tab with title */
-/* #define Xterm_prevtab	(64)*/ /* DISABLED switch to previous tab */
-/* #define Xterm_nexttab	(65)*/ /* DISABLED switch to next tab */
-#define Xterm_tint			(66) /* change tinting color */
-#define Xterm_shade			(67) /* change shade level */
-#define Xterm_encode		(68) /* change encoding */
-/* #define Xterm_hide		(69)*/ /* DISABLED hide/show tabbar */
-#define Xterm_opacity		(70) /* set opacity level */
-/* #define Xterm_tabbtn		(71)*/ /* DISABLED hide/show tabbar buttons */
-#define Xterm_tabfg			(72) /* change active tab fg */
-#define Xterm_tabbg			(73) /* change tabbar/active tab bg */
-#define Xterm_itabfg		(74) /* change inactive tab fg */
-#define Xterm_itabbg		(75) /* change inactive tab bg */
-/* #define Xterm_trans		(76)*/ /* DISABLED toggle transparency */
-/* #define Xterm_moveleft	(77)*/ /* DISABLED move active tab to left */
-/* #define Xterm_moveright	(78)*/ /* DISABLED move active tab to right */
-/* #define Xterm_verybold	(79)*/ /* DISABLED toggle bold font for color text */
-/* #define Xterm_hotkeys	(80)*/ /* DISABLED toggle hotkeys */
-/* #define Xterm_saveconfig	(81)*/ /* DISABLED save configuration */
-#define Xterm_bgfade		(82) /* set bgfade degree (Obsolete) */
-#define Xterm_termenv		(83) /* set TERMENV type */
-/* #define Xterm_closewin	(84)*/ /* DISABLED Close all tabs and exit */
-/* #define Xterm_switchtab	(85)*/ /* DISABLED Switch to tab N */
+#define MRxvt_term			(60) /* Change window title */
+#define MRxvt_tab			(61) /* change tab title */
+#define MRxvt_tabterm		(62) /* change tab and terminal title */
+// #define MRxvt_newtab		(63) /* DISABLED create a new tab with title */
+// #define MRxvt_prevtab	(64) /* DISABLED switch to previous tab */
+// #define MRxvt_nexttab	(65) /* DISABLED switch to next tab */
+#define MRxvt_tint			(66) /* change tinting color */
+#define MRxvt_shade			(67) /* change shade level */
+#define MRxvt_encode		(68) /* change encoding */
+// #define MRxvt_hide		(69) /* DISABLED hide/show tabbar */
+#define MRxvt_opacity		(70) /* set opacity level */
+// #define MRxvt_tabbtn		(71) /* DISABLED hide/show tabbar buttons */
+#define MRxvt_tabfg			(72) /* change active tab fg */
+#define MRxvt_tabbg			(73) /* change tabbar/active tab bg */
+#define MRxvt_itabfg		(74) /* change inactive tab fg */
+#define MRxvt_itabbg		(75) /* change inactive tab bg */
+// #define MRxvt_trans		(76) /* DISABLED toggle transparency */
+// #define MRxvt_moveleft	(77) /* DISABLED move active tab to left */
+// #define MRxvt_moveright	(78) /* DISABLED move active tab to right */
+// #define MRxvt_verybold	(79) /* DISABLED toggle bold font for color text */
+// #define MRxvt_hotkeys	(80) /* DISABLED toggle hotkeys */
+// #define MRxvt_saveconfig	(81) /* DISABLED save configuration */
+#define MRxvt_bgfade		(82) /* set bgfade degree (Obsolete) */
+#define MRxvt_termenv		(83) /* set TERMENV type */
+// #define MRxvt_closewin	(84) /* DISABLED Close all tabs and exit */
+// #define MRxvt_switchtab	(85) /* DISABLED Switch to tab N */
 
 
 

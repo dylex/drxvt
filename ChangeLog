@@ -45,6 +45,12 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 		   tab 0, and opens a new tab).
 		8. Fixed bug #1473987. (Jagged edges of screen fonts)
 		9. Fixed bug #1357219. (Made bg changes via escape sequences sticky)
+	   10. Saved configuration file is now profile compliant.
+	   11. Setting the tab title via \e]0 behaves like \e]2 (i.e. honors the
+		   macros SET_TAB_TITLE_ON_XTERM_SEQUENCE & SET_TAB_TITLE_NOT_WIN_TITLE
+		   defined in feature.h). Previously only \e]2 would honor these
+		   macros. To only set the window title, the new escape sequence \e]60
+		   has been added.
 
 	* Enhancements:
 		1. Warn if closing mrxvt with multiple tabs (and the tabbar is
@@ -66,6 +72,10 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 		   more flexible).
 		5. Macros can now be chained (i.e. you can execute upto 16 actions in
 		   sequence with any macro).
+		6. Made the print screen macro take a command argument. You can use
+		   this to define a macro to open the scroll back buffer in less (for
+		   instance) in a new tab, and search regexp's to your heart's content
+		   :).
 
 
 0.4.2 to 0.5.0
@@ -2839,3 +2849,5 @@ from 1.4 to 1.45
 	1.	Fixed scrolling error when switching to larger fonts
 	2.	Fixed utmp-entry removal for SYSV type systems.
 	3.	Icorportated patches for FreeBSD and svr4
+
+# vim: set ts=4 :

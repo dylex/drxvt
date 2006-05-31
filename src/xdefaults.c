@@ -781,12 +781,23 @@ rxvt_usage(int type)
 }
 
 
+/* INTPROTO */
+int
+num_tabs( int len )
+{
+	return (len >=0 && len < 40) ? (40 - (len - (len%8)) ) / 8 : 0;
+}
+
 /* EXTPROTO */
 int
 rxvt_save_options (rxvt_t* r, const char* filename)
 {
-	int		i;
-	FILE*	pf = fopen (filename, "w");
+	int			i;
+	FILE*		pf = fopen (filename, "w");
+
+	const char	*name = r->h->rs[Rs_name] ?: APL_NAME;
+
+	char		*tabs="\t\t\t\t\t";
 
 	if (NULL == pf)
 		return 0;
@@ -798,19 +809,17 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 		if (-1 == optList[i].doff)
 			continue;
 
-		/* TODO PROFILES */
-		if (
-				optList[i].multiple
-				&& rxvt_str_match( optList[i].kw, "vt%d." )
-		   )
+		if( optList[i].multiple)
 		{
 			register int	j;
 
-			for (j = 0; j < MAX_PAGES; j ++)
+			for (j = 0; j < MAX_PROFILES; j ++)
 			{
 				if (r->h->rs[optList[i].doff + j])
-					fprintf (pf, "%s*vt%d*%s:\t\t\t%s\n", APL_NAME,
-						j, optList[i].kw + STRLEN("vt%d."),
+					fprintf( pf, "%s.profile%d.%s:%.*s%s\n", name,
+						j, optList[i].kw,
+						num_tabs( STRLEN(name) + sizeof(".profile") + 2
+									+ STRLEN( optList[i].kw ) ), tabs,
 						r->h->rs[optList[i].doff +j]);
 			}
 		}
@@ -825,15 +834,21 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 				bval = (r->Options2 & optList[i].flag) ? 1 : 0;
 			if (optList_isReverse(i))
 				bval = !bval;
-			fprintf (pf, "%s*%s:\t\t\t%s\n", APL_NAME,
-				optList[i].kw, OnOff[bval]);
+			fprintf( pf, "%s.%s:%.*s%s\n", name,
+				optList[i].kw,
+				num_tabs( STRLEN(name) + 1 + STRLEN(optList[i].kw) + 1 ), tabs,
+				OnOff[bval] );
 		}
 		else if (r->h->rs[optList[i].doff])
 		{
-			fprintf (pf, "%s*%s:\t\t\t%s\n", APL_NAME,
-				optList[i].kw, r->h->rs[optList[i].doff]);
+			fprintf( pf, "%s.%s:%.*s%s\n", name,
+				optList[i].kw,
+				num_tabs( STRLEN(name) + 1 + STRLEN(optList[i].kw) + 1 ), tabs,
+				r->h->rs[optList[i].doff] );
 		}
 	}
+
+	fputs( "\n\n# vim: set ft=mrxvtrc :\n", pf );
 
 	fclose (pf);
 	return 1;

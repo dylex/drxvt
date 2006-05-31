@@ -1535,8 +1535,14 @@ Toggle holding of exited tabs.
 Set title of active tab to selection. (The selection must be owned by
 .Nm )
 .\" ------------------------------------------------------------
-.It Ic PrintScreen Op Ar scrollback
-Dump screen to printer. If a non-empty argument is given, then print the entire scroll back buffer too.
+.It Ic PrintScreen Oo Fl ps Oc Op Ar command
+Dump screen to printer. If the
+.Fl p
+option is specified, then the output is pretty printed (i.e. escape sequences are used to get the same color in the output as on your screen). If the
+.Fl s
+option is specified, then the entire scroll back is printed (instead of just the current screen). Finally, if command is specified it is used as the printer pipe (if not the value of
+.Ic printPipe
+or the compiled in default is used).
 .\" ------------------------------------------------------------
 .It Ic SaveConfig Op Ar filename
 Save config to file. If no filename is specified, save to

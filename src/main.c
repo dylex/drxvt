@@ -96,64 +96,6 @@ int	 isDoubleWidthFont         (Display *dpy, XftFont *font);
 const char**	cmd_argv;
 /*----------------------------------------------------------------------*/
 
-#if 0
-/* INTPROTO */
-void
-rxvt_free_commands (rxvt_t* r, int command_number)
-{
-	register int	i;
-
-	/* reset all tab commands to NULL */
-	for (i = 0; i < MAX_PAGES; i ++)
-	{
-		/*
-		 * rs[ANYTHING] is static string, shouldn't use free to release. So we
-		 * simply reset them to NULL.
-		 */
-		r->h->rs[Rs_command+i]		= NULL;
-
-		/*
-		 * 2006-04-28 gi1242: Also free all options set for multiple tabs. This
-		 * is mainly to solve the following problem. If user specifies resources
-		 * for tabs 0,1,2 and then closes tab 1. When he opens a new tab, it
-		 * will be created with the resources of tab 2 (so he's going to have
-		 * a "duplicate" tab).
-		 *
-		 * However if he's specified cmdInitTabs, then dump all this info, and
-		 * create a new tab using the default resources.
-		 */
-		r->h->rs[Rs_tabtitle + i]	= NULL;
-		r->h->rs[Rs_saveLines + i]	= NULL;
-
-		/* Clear background and foreground colors */
-		r->h->rs[Rs_color + TOTAL_COLORS + i]				= NULL;
-		r->h->rs[Rs_color + TOTAL_COLORS + MAX_PAGES + i]	= NULL;
-
-#ifdef BACKGROUND_IMAGE
-		/* Free background pixmaps */
-		r->h->rs[Rs_backgroundPixmap + i] = NULL;
-#endif
-	}
-
-	/* free all command argv */
-	for (i = 0; i < command_number; i ++)
-	{
-		if (PVTS(r, i)->command_argv && PVTS(r, i)->command_argc)
-		{
-			register int	j;
-
-	        for (j = 0; j < PVTS(r, i)->command_argc; j ++)
-	            free (PVTS(r, i)->command_argv[j]);
-	        free (PVTS(r, i)->command_argv);
-	        PVTS(r, i)->command_argv = NULL;
-	        PVTS(r, i)->command_argc = 0;
-		}
-	}
-}
-#endif
-
-
-
 /* rxvt_init() */
 /* LIBPROTO */
 rxvt_t			*
@@ -247,17 +189,6 @@ rxvt_init(int argc, const char *const *argv)
 	/* Activate the tab */
 	rxvt_activate_page (r, 0);
 
-#if 0
-	/*
-	 * If commands are loaded only on init, free command resources now. The
-	 * future commands will only get NULL string as their commands, and will
-	 * fall back to default shell. This simplify the logic to choose commands
-	 * for a new terminal.
-	 */
-	if (r->Options2 & Opt2_cmdInitTabs)
-		rxvt_free_commands (r, itnum);
-#endif
-
 	/* Initialize xlocale after VT is created */
 	rxvt_init_xlocale(r);
 
@@ -312,7 +243,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
 	while ( (pid = waitpid(-1, NULL, WNOHANG)) == -1 && errno == EINTR );
 #endif
 
-	pid = waitpid( -1, NULL, WNOHANG);
+	pid = waitpid( -1, NULL, WNOHANG );
 
 	if (pid > 0)
 	{
@@ -375,48 +306,48 @@ rxvt_Exit_signal(int sig)
 	rxvt_t*			r;
 
 	DBG_MSG( 1, ( stderr, "Received signal %d\n", (int) sig));
-	signal(sig, SIG_DFL);
+	signal( sig, SIG_DFL );
 
 	r = rxvt_get_r();
 
 #ifdef UTMP_SUPPORT
 	for (i = 0; i <= LTAB(r); i ++)
 	{
-		rxvt_privileges (RESTORE);
-		rxvt_cleanutent (r, i);
-		rxvt_privileges (IGNORE);
+		rxvt_privileges( RESTORE );
+		rxvt_cleanutent( r, i );
+		rxvt_privileges( IGNORE );
 	}
 #endif
 
 	/* resend signal to default handler */
 	/* kill (getpid (), sig); */
-	rxvt_clean_exit (r);
+	rxvt_clean_exit( r );
 }
 
 
 /* INTPROTO */
 void
-rxvt_free_hidden (rxvt_t* r)
+rxvt_free_hidden( rxvt_t* r )
 {
 #ifdef DEBUG
 	if (None != r->h->bar_pointer)
 	{
-		XFreeCursor (r->Xdisplay, r->h->bar_pointer);
+		XFreeCursor( r->Xdisplay, r->h->bar_pointer );
 		r->h->bar_pointer = None;
 	}
 # ifdef POINTER_BLANK
-	if (None != r->h->blank_pointer)
+	if( None != r->h->blank_pointer )
 	{
-		XFreeCursor (r->Xdisplay, r->h->blank_pointer);
+		XFreeCursor( r->Xdisplay, r->h->blank_pointer );
 		r->h->blank_pointer = None;
 	}
 # endif
 #endif	/* DEBUG */
 
 #ifdef USE_XIM
-	if (r->h->Input_Context)   
+	if( r->h->Input_Context )   
 	{
-		XDestroyIC (r->h->Input_Context);
+		XDestroyIC( r->h->Input_Context );
 		r->h->Input_Context = NULL; 
 	}
 #endif
@@ -2419,22 +2350,6 @@ Done:
 # endif	/* TINTING_SUPPORT */
 #endif	/* TRANSPARENT || BACKGROUND_IMAGE */
 
-	/* the only reasonable way to enforce a clean update */
-#if 0
-	for (i = 0; i <= LTAB(r); i ++)
-		rxvt_scr_poweron(r, i);
-#endif
-
-	/*
-	 * Poweron is not a good idea since other terminal may be using secondary
-	 * screen, like vim. We should just refresh the screen. And we only need to
-	 * refresh the current screen. When we switch to other terminals, their
-	 * screen will be automatically updated.
-	 */
-#if 0
-	rxvt_scr_clear (r, ATAB(r) );
-	rxvt_scr_touch (r, ATAB(r), True);
-#endif
 	/*
 	 *  Just clear the window and generate expose events. The screen refresh
 	 *  will get put on our queue of X events :)
