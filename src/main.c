@@ -2106,6 +2106,7 @@ void
 rxvt_set_utf8_property (rxvt_t* r, Atom prop, Window win, const char* str)
 {
 #ifdef HAVE_WCHAR_H
+# if !defined (OS_FREEBSD) || _FreeBSD_version >= 500000
 	wchar_t*	ws = rxvt_mbstowcs (str);
 	char*		s = rxvt_wcstoutf8 (ws);
 
@@ -2115,6 +2116,7 @@ rxvt_set_utf8_property (rxvt_t* r, Atom prop, Window win, const char* str)
 
 	free (s);
 	free (ws);
+# endif /* !defined (OS_FREEBSD) ||... */
 #endif	/* HAVE_WCHAR_H */
 }
 #endif	/* X_HAVE_UTF8_STRING */

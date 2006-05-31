@@ -41,6 +41,7 @@
 
 
 #ifdef HAVE_WCHAR_H
+# if !defined (OS_FREEBSD) || _FreeBSD_version >= 500000
 /* EXTPROTO */
 char*
 rxvt_wcstombs (const wchar_t* str, int len)
@@ -191,6 +192,7 @@ rxvt_utf8towcs (const char* str)
 
 	return r;
 }
+# endif /* !defined (OS_FREEBSD) ||... */
 #endif	/* HAVE_WCHAR_H */
 
 
