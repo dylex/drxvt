@@ -92,13 +92,7 @@
 #endif
 
 #ifdef HAVE_WCHAR_H
-/*
- * The following is ugly hack for OpenBSD 3.8 (and perhaps earlier versions).
- * There should be a better way... If you get compile error for mbstate_t on
- * OpenBSD 3.8 (and earlier versions), uncomment the following code.
- */
-/*
-# ifdef OS_OPENBSD
+# if defined(OS_OPENBSD) && (OS_OPENBSD_REL < 39)
 typedef unsigned int    _our_wint_t;
 typedef struct {
 	int __count;
@@ -107,8 +101,7 @@ typedef struct {
 		char		__wchb[4]
 	} __value;
 } mbstate_t;
-# endif
-*/
+# endif /* defined(OS_OPENBSD) &&... */
 # include <wchar.h>
 #endif
 

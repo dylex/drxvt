@@ -90,6 +90,10 @@ case "$host" in
     AC_DEFINE(OS_OPENBSD, [], [set OS to openbsd])
     local_os_type="openbsd"
 
+	dnl get openbsd release number, remove `.' from release number
+	OBSD_REL=`/usr/bin/uname -r | sed 's/\.//g'`
+	AC_DEFINE_UNQUOTED(OS_OPENBSD_REL, ${OBSD_REL}, [set openbsd release number])
+
     dnl our hack for openbsd system
     CFLAGS="$CFLAGS -I/usr/local/include"
     LIBS="$LIBS -L/usr/local/lib"
