@@ -237,6 +237,10 @@ Mrxvt.profile1.foreground:	#809a70
 Mrxvt.profile1.background:	#002000
 Mrxvt.profile1.command:		su
 Mrxvt.profile1.tabTitle:	su
+
+# Better to start root consoles in root's home directory (and not the current
+# directory).
+Mrxvt.profile1.workingDirectory:/root
 # Mrxvt.profile1.Pixmap:	matrix.jpg
 
 # Vim on profile 2. Vim is run in a shell, so after Vim exits, you'll get the
@@ -248,6 +252,7 @@ Mrxvt.profile2.command:		!vim
 # Mrxvt.profile3.Pixmap:	email.jpg
 Mrxvt.profile3.saveLines:	0
 Mrxvt.profile3.command:		mutt
+Mrxvt.profile3.workingDirectory:
 
 #
 # ---------------------------- KEYBOARD SHORTCUTS ---------------------------- #

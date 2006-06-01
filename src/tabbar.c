@@ -1161,16 +1161,15 @@ rxvt_append_page( rxvt_t* r, int profile,
 	 *  execute (e.g. via the NewTab cmd macro).
 	 */
 	if(
-		cmd_argv			/* Argument specified via -e option */
-		&& command == NULL	/* No command specified (e.g. via NewTab macro) */
-		&& (
-			 LTAB(r)== 0							/* First tab */
-			 || (r->Options2 & Opt2_cmdAllTabs)		/* -at option */
-		   )
+		 cmd_argv			/* Argument specified via -e option */
+		 && command == NULL	/* No command specified (e.g. via NewTab macro) */
+		 && (
+			   LTAB(r)== 0							/* First tab */
+			   || (r->Options2 & Opt2_cmdAllTabs)	/* -at option */
+		    )
 	  )
-	{
 		argv = cmd_argv;
-	}
+
 	else
 	{
 		/* load tab command if necessary*/
@@ -1220,7 +1219,6 @@ rxvt_append_page( rxvt_t* r, int profile,
 
 		if( !STRCMP( cwdOption, "." ) )
 		{
-#if 1 /* defined(OS_LINUX) */
 			if( ATAB(r) != LTAB(r) )
 			{
 				/*
@@ -1233,12 +1231,11 @@ rxvt_append_page( rxvt_t* r, int profile,
 					/* readlink does not null terminate */
 					child_cwd[len] = 0;
 			}
-#endif /* defined( OS_LINUX ) */
 		}
 		
 		else
 		{
-			/* XXX Maybe better to use wordexp here */
+			/* XXX Maybe better to use wordexp and expand ~ & $HOME here */
 			len  = STRLEN( cwdOption );
 
 			MIN_IT( len, PATH_MAX - 1 );
@@ -1354,11 +1351,11 @@ rxvt_append_page( rxvt_t* r, int profile,
 	/*
 	 * Auto show tabbar if we have exactly two tabs.
 	 */
-	if (
-			!r->tabBar.state && LTAB(r) == 1
-			&& (r->Options2 & Opt2_autohideTabbar)
-			&& rxvt_tabbar_show( r )
-	   )
+	if(
+		 !r->tabBar.state && LTAB(r) == 1
+		 && (r->Options2 & Opt2_autohideTabbar)
+		 && rxvt_tabbar_show( r )
+	  )
 		rxvt_resize_on_subwin( r, SHOW_TABBAR);
 
 	/* synchronize terminal title with tab title */
