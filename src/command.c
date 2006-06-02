@@ -916,8 +916,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		******************************************************
 		** Begin of part that is used when XIM is disabled
 		*/
-		len = XLookupString(ev, (char *)kbuf, KBUFSZ, &keysym,
-			&r->h->compose);
+		len = XLookupString(ev, (char *)kbuf, KBUFSZ, &keysym, NULL);
 		/*
 		** map unmapped Latin[2-4]/Katakana/Arabic/Cyrillic/Greek
 		** entries -> Latin1. good for installations with correct

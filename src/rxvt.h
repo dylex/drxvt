@@ -1592,7 +1592,6 @@ struct rxvt_hidden {
     int				event_type;
 #endif
     struct mouse_event	MEvent;
-    XComposeStatus	compose;
     row_col_t		oldcursor;
 #ifdef MULTICHAR_SET
     signed int		oldcursormulti;

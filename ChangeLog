@@ -21,6 +21,9 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   enabled (OpenBSD keeps playing game with us!).
 		9. Saving session behavior now conforms to profile support.
 		10. Apply patches from FreeBSD ports.
+		11. Fix crash on Solaris when calling XLookupString. Xlib
+		   manual states that a portable program should pass NULL
+		   to the last (compose) parameter.
 
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for

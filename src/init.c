@@ -748,7 +748,6 @@ rxvt_init_vars(rxvt_t *r)
 # endif
 	/* h->v_bufstr = NULL; */
 	h->buffer = NULL;
-	h->compose.compose_ptr = NULL;
 #ifdef TRANSPARENT
 	h->am_pixmap_trans = 0;
 	h->am_transparent  = 0;
