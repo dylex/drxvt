@@ -1644,8 +1644,8 @@ struct rxvt_hidden {
 	/*
     unsigned char*	cmdbuf_ptr, *cmdbuf_endp;
     unsigned char	cmdbuf_base[BUFSIZ];
-	*/
     unsigned char	kbuf[KBUFSZ];
+	*/
 
 #ifdef TRANSPARENT
 	Pixmap		rootPixmap;	/* Pixmap ID of the root pixmap */
