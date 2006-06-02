@@ -1403,16 +1403,25 @@ rxvt_extract_resources (
 
 	/*
 	 * Unset resources that point to emptyResource
+	 *
+	 * 2006-06-02 gi1242: On second thought, let's leave them pointing to
+	 * emptyResource. That way we will be able to tell which resources have been
+	 * cleared by the user, and which were never set in the first place.
 	 */
+#if 0
 	{
 		int i;
 
 		for( i=0; i < NUM_RESOURCES; i++)
 		{
 			if( r->h->rs[i] == emptyResource )
+			{
+				DBG_TMSG( 3, ( stderr, "Setting resource #%d to NULL\n", i ) );
 				r->h->rs[i] = NULL;
+			}
 		}
 	}
+#endif
 
 # if defined XAPPLOADDIR
 #  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)

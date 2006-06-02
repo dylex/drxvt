@@ -991,14 +991,16 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	/*
 	 * Look for -exec option.  Find => split and make cmd_argv[] of command args
 	 */
-	for (r_argc = 0; r_argc < argc; r_argc++)
-	if (!STRCMP(argv[r_argc], "-e") || !STRCMP(argv[r_argc], "-exec"))
-		break;
-	r_argv = (const char **)rxvt_malloc(sizeof(char*) * (r_argc + 1));
+	for( r_argc = 0; r_argc < argc; r_argc++ )
+		if( !STRCMP(argv[r_argc], "-e") || !STRCMP(argv[r_argc], "-exec") )
+			break;
 
-	for (i = 0; i < r_argc; i++)
-	r_argv[i] = (const char *)argv[i];
+	r_argv = (const char**) rxvt_malloc( sizeof(char*) * (r_argc + 1) );
+
+	for( i = 0; i < r_argc; i++ )
+		r_argv[i] = (const char*) argv[i];
 	r_argv[i] = NULL;
+
 	if (r_argc == argc)
 		cmd_argv = NULL;
 	else
@@ -1015,19 +1017,19 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	for (i = 0; i < NUM_RESOURCES;)
 		rs[i++] = NULL;
 
-	rs[Rs_name] = rxvt_r_basename(argv[0]);
+	rs[Rs_name] = rxvt_r_basename( argv[0] );
 
 	/*
 	 * Open display, get options/resources and create the window
 	 */
-	if ((rs[Rs_display_name] = getenv("DISPLAY")) == NULL)
+	if( ( rs[Rs_display_name] = getenv("DISPLAY") ) == NULL)
 		rs[Rs_display_name] = ":0";
 
-	rxvt_get_options(r, r_argc, r_argv);
-	free(r_argv); /* XXX memory leak? */
+	rxvt_get_options( r, r_argc, r_argv );
+	free( r_argv ); /* XXX memory leak? */
 
 #ifdef LOCAL_X_IS_UNIX
-	if (rs[Rs_display_name][0] == ':')
+	if( rs[Rs_display_name][0] == ':' )
 	{
 		int		l = 5 + STRLEN(rs[Rs_display_name]);
 		if (l <= 0 || l > 1024) /* possible integer overflow */
@@ -1042,56 +1044,53 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	}
 #endif
 
-	if (r->Xdisplay == NULL)
+	if( r->Xdisplay == NULL )
 	{
-		DBG_MSG(1, ( stderr, "Open X display %s\n",
+		DBG_MSG( 1, ( stderr, "Open X display %s\n",
 					rs[Rs_display_name] ? rs[Rs_display_name] : "nil"));
-		r->Xdisplay = XOpenDisplay(rs[Rs_display_name]);
-		if (NULL == r->Xdisplay)
+		r->Xdisplay = XOpenDisplay( rs[Rs_display_name] );
+		if( NULL == r->Xdisplay )
 		{
-			rxvt_print_error("can't open display %s", rs[Rs_display_name]);
-			exit(EXIT_FAILURE);
+			rxvt_print_error( "can't open display %s", rs[Rs_display_name] );
+			exit( EXIT_FAILURE );
 		}
 	}
 
 
 #ifdef DEBUG_X
-	XSynchronize(r->Xdisplay, True);
-	XSetErrorHandler((XErrorHandler) abort);
+	XSynchronize( r->Xdisplay, True );
+	XSetErrorHandler( (XErrorHandler) abort );
 	/* XSetErrorHandler((XErrorHandler) rxvt_xerror_handler); */
 #else
-	XSetErrorHandler((XErrorHandler) rxvt_xerror_handler);
+	XSetErrorHandler( (XErrorHandler) rxvt_xerror_handler );
 #endif
 
 	/* Initialize all atoms after establishing connection to X */
 	for (i = 0; i < NUM_XA; i++)
-	{
-		r->h->xa[i] = XInternAtom(r->Xdisplay, xa_names[i], False);
-	}
+		r->h->xa[i] = XInternAtom( r->Xdisplay, xa_names[i], False );
 
-
-	rxvt_extract_resources(r, r->Xdisplay, rs[Rs_name]);
+	rxvt_extract_resources( r, r->Xdisplay, rs[Rs_name] );
 
 	/*
-	** set any defaults not already set
-	*/
-	if (cmd_argv && cmd_argv[0])
+	 * set any defaults not already set
+	 */
+	if( cmd_argv && cmd_argv[0] )
 	{
-		if (!rs[Rs_title])
-			rs[Rs_title] = rxvt_r_basename(cmd_argv[0]);
-		if (!rs[Rs_iconName])
+		if( !rs[Rs_title] )
+			rs[Rs_title] = rxvt_r_basename( cmd_argv[0] );
+		if( !rs[Rs_iconName] )
 			rs[Rs_iconName] = rs[Rs_title];
 	}
 	else
 	{
-		if (!rs[Rs_title])
+		if( !rs[Rs_title] )
 			rs[Rs_title] = rs[Rs_name];
-		if (!rs[Rs_iconName])
+		if( !rs[Rs_iconName] )
 			rs[Rs_iconName] = rs[Rs_name];
 	}
 
 
-	if (rs[Rs_maxTabWidth])	
+	if( rs[Rs_maxTabWidth] )
 	{
 		register int	tmp = atoi( rs[ Rs_maxTabWidth]);
 		r->TermWin.maxTabWidth = ( tmp >=1 && tmp <= MAX_DISPLAY_TAB_TXT ) ?
@@ -1108,7 +1107,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #endif
 			DEFAULT_DISPLAY_TAB_TXT;
 
-	if (rs[Rs_minVisibleTabs])
+	if( rs[Rs_minVisibleTabs] )
 	{
 		register int	n = atoi( rs[Rs_minVisibleTabs] );
 		r->TermWin.minVisibleTabs = (n >= 2 && n <= MAX_PAGES) ?
@@ -1119,14 +1118,14 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #ifndef NO_FRILLS
 	if (rs[Rs_int_bwidth])
 	{
-		register int	tmp = atoi (rs[Rs_int_bwidth]);
-		r->TermWin.int_bwidth = (tmp >= 0 && tmp <= MAX_INTERNALBORDERWIDTH) ?
+		register int	tmp = atoi( rs[Rs_int_bwidth] );
+		r->TermWin.int_bwidth =( tmp >= 0 && tmp <= MAX_INTERNALBORDERWIDTH ) ?
 										tmp : DEFAULT_INTERNALBORDERWIDTH;
 	}
 
 	if (rs[Rs_ext_bwidth])
 	{
-		register int	tmp = atoi (rs[Rs_ext_bwidth]);
+		register int	tmp = atoi( rs[Rs_ext_bwidth] );
 		r->TermWin.ext_bwidth = (tmp >= 0 && tmp <= MAX_EXTERNALBORDERWIDTH) ?
 										tmp : DEFAULT_EXTERNALBORDERWIDTH;
 	}
@@ -1135,7 +1134,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #ifndef NO_LINESPACE
 	if (rs[Rs_lineSpace])
 	{
-		register int	tmp = atoi (rs[Rs_lineSpace]);
+		register int	tmp = atoi( rs[Rs_lineSpace] );
 		r->TermWin.lineSpace = (tmp >= 0 && tmp <= MAX_LINESPACE) ?
 										tmp : DEFAULT_LINESPACE;
 	}
@@ -1144,7 +1143,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #ifdef POINTER_BLANK
 	if (rs[Rs_pointerBlankDelay])
 	{
-		register int	tmp = atoi (rs[Rs_pointerBlankDelay]);
+		register int	tmp = atoi( rs[Rs_pointerBlankDelay] );
 		r->h->pointerBlankDelay = (tmp >= 0 && tmp <= MAX_BLANKDELAY) ?
 										tmp : DEFAULT_BLANKDELAY;
 	}
@@ -1153,7 +1152,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	/* Handle opacity of translucent window */
 	if (rs[Rs_opacity])	
 	{
-		register int	tmp = atoi (rs[Rs_opacity]);
+		register int	tmp = atoi( rs[Rs_opacity] );
 		r->TermWin.opacity = (tmp >= 0 && tmp <= 100) ? 100 - tmp : 0;
 
 #ifdef TRANSPARENT
@@ -1177,7 +1176,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	if (rs[Rs_shade])
 	{
 		register int	shade;
-		shade = atoi (rs[Rs_shade]);
+		shade = atoi( rs[Rs_shade] );
 		if (shade < 0 || shade > 100)
 			shade = 100;
 		r->TermWin.shade = 100 - shade;
@@ -1208,7 +1207,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #ifdef CURSOR_BLINK
 	if (rs[Rs_cursorBlinkInterval])
 	{
-		register long	tmp = (long) atoi (rs[Rs_cursorBlinkInterval]);
+		register long	tmp = atol( rs[Rs_cursorBlinkInterval] );
 		r->h->blinkInterval = (tmp >= MIN_BLINK_TIME && tmp <= MAX_BLINK_TIME) ? tmp : DEFAULT_BLINK_TIME;
 	}
 	/* convert msec to usec */
@@ -1223,18 +1222,19 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 		rs[Rs_cutchars] = CUTCHARS;
 
 #ifdef ACS_ASCII
-	if (!rs[Rs_acs_chars])
+	if( !rs[Rs_acs_chars] )
 		rs[Rs_acs_chars] = ACS_CHARS;
-	if ((i = STRLEN(rs[Rs_acs_chars])) < 0x20)
+	if( (i = STRLEN(rs[Rs_acs_chars])) < 0x20 )
 	{
-		val = rxvt_realloc((void *)rs[Rs_acs_chars], 0x20);
-		for (; i < 0x20; )
-			val[i] = ' ';
+		val = rxvt_realloc( (void*) rs[Rs_acs_chars], 0x20 );
+		for( ; i < 0x20; )
+			val[i++] = ' ';
 		rs[Rs_acs_chars] = val;
 	}
 #endif
+
 #ifndef NO_BACKSPACE_KEY
-	if (!rs[Rs_backspace_key])
+	if( !rs[Rs_backspace_key] )
 # ifdef DEFAULT_BACKSPACE
 		r->h->key_backspace = DEFAULT_BACKSPACE;
 # else
@@ -1243,13 +1243,13 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	else
 	{
 		char*	val = STRDUP(rs[Rs_backspace_key]);
-		rxvt_str_trim(val);
-		rxvt_str_escaped(val);
+		rxvt_str_trim( val );
+		rxvt_str_escaped( val );
 		r->h->key_backspace = val;
 	}
 #endif
 #ifndef NO_DELETE_KEY
-	if (!rs[Rs_delete_key])
+	if( !rs[Rs_delete_key] )
 # ifdef DEFAULT_DELETE
 		r->h->key_delete = DEFAULT_DELETE;
 # else
@@ -1257,35 +1257,35 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 # endif
 	else
 	{
-		char* val = STRDUP(rs[Rs_delete_key]);
-		rxvt_str_trim(val);
-		rxvt_str_escaped(val);
+		char *val = STRDUP( rs[Rs_delete_key] );
+		rxvt_str_trim( val );
+		rxvt_str_escaped( val );
 		r->h->key_delete = val;
 	}
 #endif
-	if (rs[Rs_answerbackstring])
+	if( rs[Rs_answerbackstring] )
 	{
-		rxvt_str_trim((char *)rs[Rs_answerbackstring]);
-		rxvt_str_escaped((char *)rs[Rs_answerbackstring]);
+		rxvt_str_trim( (char*) rs[Rs_answerbackstring] );
+		rxvt_str_escaped( (char*) rs[Rs_answerbackstring] );
 	}
 
-	if (rs[Rs_selectstyle])
+	if( rs[Rs_selectstyle] )
 	{
-		if (STRNCASECMP(rs[Rs_selectstyle], "oldword", 7) == 0)
+		if( STRNCASECMP( rs[Rs_selectstyle], "oldword", 7 ) == 0 )
 			r->selection_style = OLD_WORD_SELECT;
 #ifndef NO_OLD_SELECTION
-		else if (STRNCASECMP(rs[Rs_selectstyle], "old", 3) == 0)
+		else if( STRNCASECMP( rs[Rs_selectstyle], "old", 3 ) == 0 )
 			r->selection_style = OLD_SELECT;
 #endif
 	}
 
 
 	/* Set default X11 fonts */
-	rxvt_set_default_font_x11 (r);
+	rxvt_set_default_font_x11( r );
 #ifdef XFT_SUPPORT
-	if (rs[Rs_xftsz])
+	if( rs[Rs_xftsz] )
 	{
-		int		sz = atoi (rs[Rs_xftsz]);
+		int		sz = atoi( rs[Rs_xftsz] );
 		r->TermWin.xftsize = (sz >= MIN_XFT_FONT_SIZE) ? sz : MIN_XFT_FONT_SIZE;
 	}
 	else /* default xft font size */

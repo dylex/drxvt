@@ -1213,11 +1213,9 @@ rxvt_append_page( rxvt_t* r, int profile,
 	if( getProfileOption( r, profile, Rs_cwd ) != NULL )
 	{
 		const char	*cwdOption	= getProfileOption( r, profile, Rs_cwd );
-		char		*cwd		= getcwd( NULL, PATH_MAX );
-		/* initialize child_cwd to "." by default */
-		char		child_cwd[PATH_MAX] = ".";
+		char		*cwd		= getcwd( NULL, PATH_MAX ),
+					child_cwd[PATH_MAX];
 		int			len = 0;
-
 
 		if( !STRCMP( cwdOption, "." ) )
 		{
@@ -1233,13 +1231,6 @@ rxvt_append_page( rxvt_t* r, int profile,
 					/* readlink does not null terminate */
 					child_cwd[len] = 0;
 			}
-			/*
-			else {
-				This is the first tab (ATAB==LTAB==0), and child_cwd
-				is initialized as "." by default. so no worry here.
-				In addition, len==0 doubles the guard of our logic.
-			}
-			*/
 		}
 		
 		else
@@ -1252,7 +1243,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 			child_cwd[len] = 0;
 		}
 
-		if( len > 0 && chdir( child_cwd ) )
+		if( len > 0 && chdir( child_cwd ) == 0 )
 		{
 			/* Now in working directory of ATAB */
 			DBG_MSG( 2, ( stderr, "Running child in directory: %s\n",
