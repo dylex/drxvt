@@ -868,6 +868,12 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 #ifdef USE_XIM
 	int				valid_keysym = 0;
 #endif	/* USE_XIM */
+    /*
+    ** kbuf should be static in order to avoid performance penalty
+    ** on allocation in the stack. And we only define it inside this
+    ** function to avoid potential abuse of this buffer at somewhere
+    ** else.
+    */
 	static unsigned char kbuf[KBUFSZ];	/* was r->h->kbuf */
 
 
