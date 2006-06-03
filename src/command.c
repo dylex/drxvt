@@ -868,7 +868,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 #ifdef USE_XIM
 	int				valid_keysym = 0;
 #endif	/* USE_XIM */
-	unsigned char*	kbuf = r->h->kbuf;
+	static unsigned char kbuf[KBUFSZ];	/* was r->h->kbuf */
 
 
 	DBG_MSG(2, (stderr, "KeyPress event\n"));
