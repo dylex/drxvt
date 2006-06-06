@@ -84,6 +84,7 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 		   compile time options.
 		8. Added a --workingDirectory (profile) option to set the working
 		   directory of new tabs. Set to "." to use the cwd of the active tab.
+		9. Added a ToggleFullscreen macro. (Use with --smoothResize enabled).
 
 
 0.4.2 to 0.5.0
