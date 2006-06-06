@@ -1008,7 +1008,7 @@ enum {
     Rs_geometry,
     Rs_reverseVideo,
     Rs_color,
-    _Rs_color = Rs_color + TOTAL_COLORS + 2 * MAX_PAGES - 1,
+    _Rs_color = Rs_color + TOTAL_COLORS, /*+ 2 * MAX_PAGES - 1,*/
     Rs_font,
     _Rs_font = Rs_font + MAX_NFONTS - 1,
 #ifdef MULTICHAR_SET

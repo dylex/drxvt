@@ -804,15 +804,13 @@ typedef struct rxvt_vars {
 
 	Colormap        Xcmap;
 #ifdef OFF_FOCUS_FADING
-	/* TOTAL_COLORS + 2 * MAX_PAGES */
-	unsigned long*	PixColorsUnfocus;
+	unsigned long	*PixColorsUnfocus;		/* Array of size TOTAL_COLORS */
 	/* PixColorsUnfocus and PixColor has been switched */
 	char			color_switched;
 #endif
 	/* Bg and UfBg has been switched */
 	char			ufbg_switched;
-	/* TOTAL_COLORS + 2 * MAX_PAGES */
-	unsigned long*	PixColors;
+	unsigned long	*PixColors;				/* Array of size TOTAL_COLORS */
 #ifdef XFT_SUPPORT
     XftColor*		XftColors;	/* number of colors + 2 * NPAGES */
 #endif

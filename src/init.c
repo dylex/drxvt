@@ -669,14 +669,14 @@ rxvt_init_vars(rxvt_t *r)
 	}
 
 	r->PixColors = (unsigned long*) rxvt_malloc(
-		sizeof(unsigned long) * (TOTAL_COLORS + 2 * MAX_PAGES));
+		sizeof(unsigned long) * (TOTAL_COLORS));
 #ifdef OFF_FOCUS_FADING
 	r->PixColorsUnfocus = (unsigned long*) rxvt_malloc(
-		sizeof(unsigned long) * (TOTAL_COLORS + 2 * MAX_PAGES));
+		sizeof(unsigned long) * (TOTAL_COLORS));
 #endif
 #ifdef XFT_SUPPORT
 	r->XftColors = (XftColor*) rxvt_malloc (
-		sizeof (XftColor) * (TOTAL_COLORS + 2 * MAX_PAGES));
+		sizeof (XftColor) * (TOTAL_COLORS));
 #endif
 	if(
 		 NULL == r->h || NULL == r->PixColors
