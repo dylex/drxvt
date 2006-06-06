@@ -36,8 +36,9 @@
 {Toggle Tabbar}{Ctrl-Shift-i}		ToggleSubwin t
 {Toggle Scrollbar}{Ctrl-Shift-d}	ToggleSubwin s
 {-}
+{Toggle Fullscreen}					ToggleFullscreen
 {Toggle Macros}						ToggleMacros
-
+{-}
 [read:submenus;tabsmenu]
 [read:submenus;transparent]
 
