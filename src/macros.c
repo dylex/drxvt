@@ -59,6 +59,7 @@ static const char *const macroNames[] =
 	"ToggleTransparency",	/* Toggle pseudo transparency */
 	"ToggleBroadcast",		/* Toggle broadcasting of input */
 	"ToggleHold",			/* Toggle holding of completed tabs */
+	"ToggleFullscreen",		/* Toggle full screen mode */
 	"SetTitle",				/* Set title of active tab to selection */
 	"PrintScreen",			/* Dump screen to file / printer */
 	"SaveConfig",			/* Save config to file */
@@ -983,6 +984,14 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			}
 			else
 				r->Options2 |= Opt2_holdExit;
+			break;
+
+		case MacroFnToggleFullscren:
+			ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
+				XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
+				_NET_WM_STATE_TOGGLE,
+				XInternAtom( r->Xdisplay, "_NET_WM_STATE_FULLSCREEN", True),
+				0, 0, 0 );
 			break;
 
 		case MacroFnSetTitle:

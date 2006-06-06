@@ -100,6 +100,7 @@ void             rxvt_create_show_windows         __PROTO((rxvt_t* r, int argc, 
 void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page));
 void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
 const char*		 getProfileOption				  __PROTO(( rxvt_t *r, int profile, int resource ));
+Status			 ewmh_message					  __PROTO(( Display *, Window, Window, Atom, long, long, long, long, long));
 int              rxvt_run_command                 __PROTO((rxvt_t* r, int page, const char** argv));
 termenv_t        rxvt_get_termenv                 __PROTO((const char* str));
 char**			 rxvt_string_to_argv    		  __PROTO((const char*, int*));

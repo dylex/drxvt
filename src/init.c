@@ -2701,6 +2701,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
  *
  * The string returned is one of r->h->rs[], so should not be freed.
  */
+/* EXTPROTO */
 const char *
 getProfileOption( rxvt_t *r, int profile, int resource )
 {
@@ -2746,14 +2747,10 @@ rxvt_set_borderless( rxvt_t *r )
 			32, PropModeReplace, (unsigned char*) &hints, 1);
 }
 
-
-#define _NET_WM_STATE_REMOVE	0
-#define _NET_WM_STATE_ADD		1
-#define _NET_WM_STATE_TOGGLE	2
-
 /*
  * Send a message to an EWMH compatible window manager.
  */
+/* EXTPROTO */
 Status
 ewmh_message( Display *dpy, Window root_win, Window client_win,
 		Atom msgAtom, long d0, long d1, long d2, long d3, long d4)
@@ -3204,8 +3201,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 			_NET_WM_STATE_ADD,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE_FULLSCREEN", True),
-			XInternAtom( r->Xdisplay, "_NET_WM_STATE_MAXIMIZED_VERT", True),
-			0, 0);
+			0, 0, 0);
 }
 
 /*----------------------------------------------------------------------*/

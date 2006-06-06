@@ -728,6 +728,7 @@ enum {
 	MacroFnToggleTransp,
 	MacroFnToggleBcst,
 	MacroFnToggleHold,
+	MacroFnToggleFullscren,
 	MacroFnSetTitle,
 	MacroFnPrintScreen,
 	MacroFnSaveConfig,
