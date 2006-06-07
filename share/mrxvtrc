@@ -166,9 +166,9 @@ Mrxvt.macro.Ctrl+Shift+i:		ToggleSubwin t
 Mrxvt.macro.Ctrl+Shift+s:		ToggleSubwin s
 Mrxvt.macro.Ctrl+Shift+a:		ToggleSubwin b
 
-# Toggle very bold font.
-Mrxvt.macro.Ctrl+Shift+f:		ToggleVeryBold
-Mrxvt.macro.Ctrl+Shift+b:		ToggleBroadcast
+Mrxvt.macro.Ctrl+Shift+b:		ToggleVeryBold
+# Mrxvt.macro.Ctrl+Shift+d:		ToggleBroadcast
+Mrxvt.macro.Ctrl+Shift+f:	    	ToggleFullscreen
 Mrxvt.macro.Ctrl+Shift+e:		ToggleHold
 Mrxvt.macro.Ctrl+Shift+x:		SaveConfig
 

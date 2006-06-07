@@ -56,6 +56,12 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 		   macros. To only set the window title, the new escape sequence \e]60
 		   has been added.
 
+	* Code cleanup:
+		1. Made coding & comment style similar to that of Vim (works well with
+		   Vim7's syntax folding).
+		2. Removed --confFileSave option. It's no longer needed as the
+		   SaveConfig macro accepts an argument.
+
 	* Enhancements:
 		1. Warn if closing mrxvt with multiple tabs (and the tabbar is
 		   hidden).

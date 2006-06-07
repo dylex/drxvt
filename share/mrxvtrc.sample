@@ -222,9 +222,6 @@ Mrxvt.protectSecondary:		True
 # Run as a login shell.
 # Mrxvt.loginShell:		True
 
-# Where the SaveConfig menu item / macro saves your config file.
-# Mrxvt.confFileSave:		~/.mrxvtrc.save
-
 # Enable session management
 # Mrxvt.sessionMgt:		true
 

@@ -8,6 +8,8 @@ Q:  Why not use GNU screen? It has provided the multi-screen features!
 Q:  Why not use gnome-terminal/konsole? They have provided the functionality of
     mrxvt!
 Q:  How to build mrxvt, since I cannot find the configure script as usual!?
+Q:  Shift+Left/Right do not always work. Ctrl+Shift+6 does not do anything.
+    Some other keyboard shortcut do not work either.
 Q:  I just upgraded to mrxvt-0.5.x, and feature XXX doesn't work anymore.
 Q:  When I run mrxvt from command line, it outputs lots of verbose text. How to
     disable it?
@@ -144,6 +146,36 @@ Q:  How to build mrxvt, since I cannot find the configure script as usual!?
 A:  Have you read the INSTALL file?
 
 -----
+
+Q:  Shift+Left/Right do not always work. Ctrl+Shift+6 does not do anything.
+    Some other keyboard shortcut do not work either.
+
+A:  Do not report these issues as bugs. They most certainly are NOT. As of
+    mrxvt-0.5.0, a lot have changed, this includes a few default keyboard
+    shortcut sequences.
+
+    Shift+Left/Right by default is only bound when you are in the primary
+    screen. This is because good editors (i.e. Vim) use this keyboard
+    combination to move between words. This of course can be changed by adding
+    the following lines to your ~/.mrxvtrc
+
+	Mrxvt.macro.Shift+Left:		GotoTab -1
+	Mrxvt.macro.Shift+Right:	GotoTab +1
+
+    but we recommend you use Ctrl+PgUP/PgDn or Ctrl+Shift+h/l to switch tabs
+    instead.
+
+    About Ctrl+Shift+6: Vim uses this sequence to switch to the "alternate"
+    file. However when you press it in mrxvt, it seems to do nothing. This is
+    because pressing Ctrl+Shift+6 by default moves the current tab to position
+    6.
+
+    Most terminal applications we know of so far can NOT tell the difference
+    between Ctrl+Shift+number and Ctrl+number. Thus pressing Ctrl+6 in Vim will
+    switch to the alternate buffer, so mrxvt can safely swallow the Ctrl+Shift+6
+    keystroke.
+
+----
 
 Q:  I just upgraded to mrxvt-0.5.x, and feature XXX doesn't work anymore.
 
