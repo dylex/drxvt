@@ -1040,8 +1040,6 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 			if( action->str != NULL )
 				STRNCPY( cfile, action->str, PATH_MAX-1 );
-			else if( r->h->rs[Rs_confFileSave] != NULL )
-				STRNCPY( cfile, r->h->rs[Rs_confFileSave], PATH_MAX-1 );
 			else
 			{
 				char*	home = getenv ("HOME");

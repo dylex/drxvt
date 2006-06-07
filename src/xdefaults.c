@@ -234,8 +234,6 @@ static const struct {
 		"utmp inhibit - do not log to utmp", 0),
 	STRG(Rs_confFile, NULL, "cf", "file",
 		"X resource configuration file instead of ~/.mrxvtrc", 0),
-	STRG(Rs_confFileSave, "confFileSave", "cfs", "file",
-		"X resource configuration file to save the configuration", 0),
 
 #ifndef NO_BELL
 	BOOL(Rs_visualBell, "visualBell", "vb",

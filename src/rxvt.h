@@ -1157,7 +1157,6 @@ enum {
 #endif
     Rs_modifier,
 	Rs_confFile,
-	Rs_confFileSave,
     Rs_answerbackstring,
     Rs_tripleclickwords,
     Rs_cursorBlink,
