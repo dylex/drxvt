@@ -24,6 +24,10 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		11. Fix crash on Solaris when calling XLookupString. Xlib
 		   manual states that a portable program should pass NULL
 		   to the last (compose) parameter.
+		12. Add mrxvt 0.4.x compatible keyboard combinations to 
+		   mrxvtrc. They are disabled by default though. Thanks to
+		   Mihail Zenkov for the report and Dimitri AT sun.com for
+		   the solution.
 
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
