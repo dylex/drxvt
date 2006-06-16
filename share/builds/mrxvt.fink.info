@@ -1,0 +1,17 @@
+Package: mrxvt
+Version: 0.5.0
+Revision: 1
+Depends: x11
+Maintainer: Jeremy Anthony <stinkyj@gmail.com>
+HomePage: http://materm.sourceforge.net/
+License: GPL
+Description: Fast and lightweight tabbed X11 terminal
+Source: mirror:sourceforge:materm/%n-%v.tar.gz
+Source-MD5: ee0e6f5d7afaddfd399ae174f6adfcef
+ConfigureParams: --enable-everything --disable-debug --mandir=%p/share/man
+CompileScript: ./configure %c ; make
+InstallScript: make install DESTDIR=%d
+DescDetail: <<
+Mrxvt (previously named materm) is a lightweight and powerful
+multi-tabbed X terminal emulator based on the popular rxvt and aterm.
+<<
