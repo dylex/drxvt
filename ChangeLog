@@ -32,6 +32,8 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	* Enhancements:
 		1. Enable multiple bold fonts. Thanks to Edgar Toernig for
 		   the patch.
+		2. Add Fink package build. Thanks to Jeremy Anthony for the
+		   submission.
 
 Gautam Iyer <gi1242@users.sourceforge.net>
 	* Bug Fixes:
