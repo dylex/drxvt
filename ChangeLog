@@ -3,6 +3,8 @@
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	* Bug Fixes:
 		1. Fix mrxvtset.pl as pointed by Avi Yagodnick.
+		2. Fix mouse button 4/5 behavior. Make it the same as firefox
+		   as pointed out by Yoshihiko Kashio.
 
 	* Enhancements:
 		1. Add --with-max-profiles to configure script as suggested
