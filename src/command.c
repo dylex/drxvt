@@ -5614,7 +5614,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			break;
 
 		case MRxvt_newtab:
-			rxvt_append_page (r, str, NULL);
+			rxvt_append_page (r, 0, str, NULL);
 			break;
 		case MRxvt_prevtab:
 			if (0 != page)
