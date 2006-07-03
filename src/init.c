@@ -1326,7 +1326,6 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	{
 		if (!rs[Rs_color + Color_fg])
 			rs[Rs_color + Color_fg] = def_colorName[Color_bg];
-
 		if (!rs[Rs_color + Color_bg])
 			rs[Rs_color + Color_bg] = def_colorName[Color_fg];
 
@@ -1358,12 +1357,22 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	/* this is how we implement reverseVideo */
 	if (r->Options & Opt_reverseVideo)
 	{
+		if (!rs[Rs_color + Color_fg])
+			rs[Rs_color + Color_fg] = def_colorName[Color_fg];
+		if (!rs[Rs_color + Color_bg])
+			rs[Rs_color + Color_bg] = def_colorName[Color_bg];
+
 		SWAP_IT(rs[Rs_color + Color_fg], rs[Rs_color + Color_bg], const char *);
 
 		for (i = 0; i < MAX_PROFILES; i++)
 		{
 			int		vtfg = Rs_foreground + i;
 			int		vtbg = Rs_background + i;
+			if (!rs[vtfg])
+				rs[vtfg] = def_colorName[Color_fg];
+			if (!rs[vtbg])
+				rs[vtbg] = def_colorName[Color_bg];
+
 			SWAP_IT(rs[vtfg], rs[vtbg], const char*);
 		}
 	}
