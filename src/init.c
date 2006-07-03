@@ -2705,7 +2705,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 const char *
 getProfileOption( rxvt_t *r, int profile, int resource )
 {
-	assert( profile >= 0 || profile <= MAX_PROFILES );
+	assert( profile >= 0 || profile < MAX_PROFILES );
 
 	/*
 	 * Profile 0 is default, so if the profile option is unset, fall back to
