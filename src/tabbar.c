@@ -1645,7 +1645,8 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	but = -1;
 	DBG_MSG( 2, ( stderr, "click in (%d,%d)\n", x, y));
 
-	/* Button4 and Button5 of wheel mouse activate the left/right tab */
+	/* Button4/Button5 of wheel mouse activate the left/right tab as
+	   Mozilla firefox */
 	switch ( ev->button )
 	{
 #ifdef HAVE_MENUBAR
@@ -1671,18 +1672,18 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 			}
 			break;
 #endif
-		case Button4: /* scroll-up -> activate right tab */
-			if( ATAB(r) != LTAB(r) )
-				rxvt_activate_page( r, ATAB(r) + 1 );
-			else if( 0 != LTAB(r) )
-				rxvt_activate_page( r, 0 );
-			return;
-
-		case Button5: /* scroll-down -> activate left tab */
+		case Button4: /* activate left tab */
 			if (0 != ATAB(r))
 				rxvt_activate_page (r, ATAB(r)-1);
 			else if (0 != LTAB(r))
 				rxvt_activate_page (r, LTAB(r));
+			return;
+
+		case Button5: /* activate right tab */
+			if( ATAB(r) != LTAB(r) )
+				rxvt_activate_page( r, ATAB(r) + 1 );
+			else if( 0 != LTAB(r) )
+				rxvt_activate_page( r, 0 );
 			return;
 
 		default:
