@@ -24,8 +24,8 @@ dnl#
 dnl 2006-02-20 gi1242: If the version contains a letter, then it sometimes
 dnl produces spurious results when programs use an escape sequence to query the
 dnl terminal version.
-AC_INIT(mrxvt, 0.5.1, [jimmyzhou@users.sourceforge.net])
-AM_INIT_AUTOMAKE(mrxvt, 0.5.1)
+AC_INIT(mrxvt, 0.5.2, [jimmyzhou@users.sourceforge.net])
+AM_INIT_AUTOMAKE(mrxvt, 0.5.2)
 
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR([src/main.c])
@@ -745,6 +745,15 @@ AC_ARG_WITH(
     [save_lines_option=100]
 )
 AC_DEFINE_UNQUOTED(SAVELINES, $save_lines_option, [the lines to save in scroll])
+
+
+AC_ARG_WITH(
+    max-profiles,
+    AC_HELP_STRING([--with-max-profiles=NUM],[set the max number of terminal [[5]]]),
+    [max_prof_option=$withval],
+    [max_prof_option=5]
+)
+AC_DEFINE_UNQUOTED(MAX_PROFILES, $max_prof_option, [the max number of profiles])
 
 
 AC_ARG_WITH(
@@ -1516,6 +1525,7 @@ echo "Old selection               : $support_old_selection"
 echo
 echo "Options:"
 echo "Terminal name               : $term_name_option"
+echo "Maximal profiles            : $max_prof_option"
 echo "Maximal tabs                : $max_term_option"
 echo "Extra height% of active tab : $atab_extra_option"
 echo "Radius% of tab corners      : $tab_radius_option"

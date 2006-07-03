@@ -1,3 +1,14 @@
+0.5.1 to 0.5.2
+\-----------------------------------
+Jimmy Zhou <jimmyzhou@users.sourceforge.net>
+	* Bug Fixes:
+		1. Fix mrxvtset.pl as pointed by Avi Yagodnick.
+
+	* Enhancements:
+		1. Add --with-max-profiles to configure script as suggested
+		   by Avi Yagodnick.
+
+
 0.5.0 to 0.5.1
 \-----------------------------------
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>

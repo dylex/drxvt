@@ -164,11 +164,6 @@
  */
 /* #define OFFIX_DND */
 
-/*
- * Maximum number of profiles.
- */
-#define MAX_PROFILES	(5)
-
 /*---------------------------------KEYS---------------------------------*/
 
 /*
