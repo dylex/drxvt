@@ -80,7 +80,7 @@ my %opcode = (
     fg     => 39,       # Xterm_restoreFG: change default fg color
     bg     => 49,       # Xterm_restoreBG: change default bg color
     ##  XTerm_dumpscreen	(55) /* dump scrollback and all screen */
-    tabtitle => 61,     # Xterm_tab: change tab title
+    tabtitle => 60,     # Xterm_tab: change tab title
     ##  Xterm_tabterm		(62) /* change tab and terminal title */
     newtab => 63,       # create a new tab with title
     ##  Xterm_prevtab		(64) /* switch to previous tab */
