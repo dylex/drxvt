@@ -7,6 +7,8 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   as pointed out by Yoshihiko Kashio.
 		3. Fix reverse video when foreground/background colors are not
 		   defined. Thanks to Yoshihiko Kashio.
+		4. Disable slave macros in the macro chains if the first (master)
+		   macro is defined as dummy.
 
 	* Enhancements:
 		1. Add --with-max-profiles to configure script as suggested

@@ -5,6 +5,7 @@
  * All portions of code are copyright by their respective author/s.
  *
  *	Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
+ *	Copyright (c) 2006        Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -368,90 +369,25 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	DBG_MSG( 2, ( stderr, "rxvt_add_macro(%08lx, %2hhx, %s)\n",
 				keysym, modFlags, astring));
 
-	const unsigned nmacros_increment = 64;	/* # extra macros to alloc space for
-											   when we need to enlarge our list
-											   of macros. A large number here is
-											   not wasteful as we clean it up
-											   after initialization */
-	unsigned short	i,
-					replaceIndex = r->nmacros,
-					dummyIndex = r->nmacros;
-
-	unsigned char	macroNum = 0;
+	unsigned short	idx;
 	action_t		action;
 
 	/*
 	 * Check to see if macro already exists.
 	 */
-	for( i=0; i < r->nmacros; i++ )
+	for( idx = 0; idx < r->nmacros; idx ++ )
 	{
-		if(
-			r->macros[i].keysym == keysym
-			&& (r->macros[i].modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
+		if( (r->macros[idx].keysym == keysym) &&
+			(r->macros[idx].modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
 					== (modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
 		  )
-		{
-			if( addmacro )
-			{
-				/*
-				 * Find the last macro in the macro chain (the macro with the
-				 * largest number).
-				 */
-				unsigned char num;
-
-				num		 = MACRO_GET_NUMBER( r->macros[i].modFlags );
-				if( num > macroNum )
-					macroNum = num;
-
-				if( macroNum == MACRO_MAX_CHAINLEN )
-				{
-					rxvt_print_error( "Macro chain too long" );
-					return 0;
-				}
-
-				replaceIndex = i;
-			}
-
-			/*
-			 * Macro for key already exists. If noReplace is set, don't
-			 * touch this macro.
-			 */
-			else if( noReplace )
-				return 1; /* Claim to have succeded so that caller will not
-							 complain about "Failing to add a ... macro". */
-			
-			/*
-			 * 2006-03-06 gi1242: Don't delete "Dummy" macros here. If we do
-			 * that then the user will have no way to delete macros defined in
-			 * the system /etc/mrxvt/mrxvtrc file. "Dummy" macros will be
-			 * deleted after init.
-			 */
-			else
-			{
-				if( replaceIndex < r->nmacros )
-				{
-					/*
-					 * replaceIndex points to a macro with keysym == the keysym
-					 * of the macro to be added. Set keysym to 0 so that it will
-					 * be cleaned up by rxvt_cleanup_macros().
-					 */
-					r->macros[replaceIndex].keysym = 0;
-				}
-				replaceIndex = i;
-			}
-		}
-
-		else if( r->macros[i].keysym == 0 )
-			/*
-			 * Macros with keysym 0 are dummies, and can be safely replaced.
-			 */
-			dummyIndex = i;
+			break;
 	} /* for */
 
-	if( addmacro )
-	{
-		if( replaceIndex == r->nmacros )
-		{
+
+	if (idx == r->nmacros)	{
+		/* The macro to add does not exists */
+		if( addmacro )	{
 			rxvt_print_error( "No previous macro to add to (key %s%s%s%s)",
 					(modFlags & MACRO_CTRL) ? "Ctrl+" : "",
 					(modFlags & MACRO_META) ? "Meta+" : "",
@@ -459,43 +395,128 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 					XKeysymToString( keysym ) );
 			return 0;	/* Failure */
 		}
+		/* all error situations have been returned above */
 
-		modFlags = macro_set_number( modFlags, macroNum+1 );
-
-		/* Don't replace this macro. */
-		replaceIndex = dummyIndex;
-	}
-
-	else
-	{
 		modFlags = macro_set_number( modFlags, 0 );
+		/* now we can fall through */
+	}
+	else	{
+		/* Find the macro to replace or chain */
+		if (addmacro)	{
+			/* Find the first macro to chain */
+			unsigned char	num;
+			unsigned int	i;
 
-		/* Set replaceIndex to the index of a macro we can replace */
-		if( dummyIndex < replaceIndex )
-			replaceIndex = dummyIndex;
+			/* If the first macro is dummy, we ignore the new macro */
+			if ( MacroFnDummy == r->macros[idx].action.type ) {
+				rxvt_print_error( "First macro in this chain is dummy" );
+				return 0;
+			}
+
+
+			/*
+			 * Find the last macro in the macro chain (the macro with the
+			 * largest number).
+			 */
+			num	= 0;
+			/* should be zero here, hum? */
+			assert (0 == MACRO_GET_NUMBER(r->macros[idx].modFlags));
+
+			for (i = idx + 1; i < r->nmacros; i ++)
+			{
+				if( (r->macros[i].keysym == keysym) &&
+					(r->macros[i].modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
+						== (modFlags & MACRO_MODMASK & ~MACRO_PRIMARY) &&
+					(MACRO_GET_NUMBER(r->macros[i].modFlags) > num)
+				  )
+					num = MACRO_GET_NUMBER( r->macros[i].modFlags );
+			}
+
+			if( MACRO_MAX_CHAINLEN == num )
+			{
+				rxvt_print_error( "Macro chain too long" );
+				return 0;
+			}
+
+			modFlags= macro_set_number( modFlags, (num + 1));
+			/* now we can fall through */
+		}
+		else	{
+			/* Find the macro to replace */
+			if (noReplace)	{
+				/* Claim to have succeded so that caller will not
+				 * complain about "Failing to add a ... macro".
+				 */
+				return 1;
+			}
+
+			/* this is the first entry, so its number must be zero */
+			assert (0 == MACRO_GET_NUMBER (r->macros[idx].modFlags));
+			modFlags = macro_set_number( modFlags, 0);
+
+			assert( astring );
+			action.str = NULL;	/* Make sure rxvt_set_action won't free
+								non-existent memory */
+			if( !rxvt_set_action( &action, astring) )
+				return 0; /* Failure: Probably unrecognized action type */
+			/* free strings of old action */
+			assert (r->macros[idx].action.str);
+			free (r->macros[idx].action.str);
+
+
+			/* If the new macro is dummy, and there are chained macros,
+			 * all chained macros will be set to dummy. So if a user can
+			 * NOT reenable this macro and reuse the old chained macros.
+			 * He must redefine the chained macros.
+			 */
+			if (MacroFnDummy == action.type)	{
+				unsigned int i;
+
+				for (i = idx + 1; i < r->nmacros; i ++)
+				{
+					if( (r->macros[i].keysym == keysym) &&
+						(r->macros[i].modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
+						== (modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
+						)	{
+						r->macros[i].action.type = MacroFnDummy;
+						/* not necessary, just in case */
+						r->macros[i].keysym = None;
+					}
+				}
+			}
+
+			r->macros[idx].modFlags = modFlags;
+			r->macros[idx].action = action;
+
+			return 1;
+		}
 	}
 
 
-
-	/*
-	 * Add action to the list of macros (making it bigger if necessary).
-	 */
-	if( replaceIndex == r->nmacros )
+	/* Allocation memory if out of macro entries */
+	if( r->nmacros == r->maxMacros )
 	{
-		if( r->nmacros == r->maxMacros )
-		{
-			/* Get space for more macros*/
-			r->maxMacros += nmacros_increment;
-			r->macros = (macros_t *) rxvt_realloc( r->macros,
-										r->maxMacros * sizeof(macros_t));
+		/* # extra macros to alloc space for when we need to enlarge our
+		 * list of macros. A large number here is not wasteful as we
+		 * clean it up after initialization
+		 */
+		const unsigned int	nmacros_increment = 64;
+		macros_t*			newmacros;
+		unsigned int		newmax = nmacros_increment + r->maxMacros;
+
+		/* Get space for more macros*/
+		if (NULL == r->macros)
+			newmacros = (macros_t *) rxvt_malloc(newmax * sizeof(macros_t));
+		else
+			newmacros = (macros_t *) rxvt_realloc( r->macros,
+						newmax * sizeof(macros_t));
+		if (NULL == newmacros)	{
+			rxvt_print_error( "Out of memory, cannot add macros" );
+			return 0;
 		}
 
-		r->nmacros++;
-	}
-	else
-	{
-		/* Macro action string needs to be freed (as it will be replaced) */
-		free( r->macros[replaceIndex].action.str );
+		r->macros = newmacros;
+		r->maxMacros = newmax;
 	}
 
 
@@ -504,28 +525,32 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	 * should either save action in to a global variable, or free it.
 	 */
 	assert( astring );
-	action.str = NULL;	/* Make sure rxvt_set_action won't free non-existent
-						   memory */
+	action.str = NULL;	/* Make sure rxvt_set_action won't free
+							non-existent memory */
 	if( !rxvt_set_action( &action, astring) )
 		return 0; /* Failure: Probably unrecognized action type */
 
-	/*
-	 * Save macro values in our global macro list.
-	 */
-	r->macros[replaceIndex].keysym		= keysym;
-	r->macros[replaceIndex].modFlags	= modFlags;
-	r->macros[replaceIndex].action		= action;
+
+	/* Save macro values in our global macro list. */
+	r->macros[r->nmacros].keysym	= keysym;
+	r->macros[r->nmacros].modFlags	= modFlags;
+	r->macros[r->nmacros].action	= action;
 
 	DBG_MSG( 2, ( stderr, "Added macro %hu of %hu. "
 					"Type %s, len %hu, args '%s'.\n",
-				replaceIndex, r->maxMacros,
-				macroNames[ action.type ], action.len,
-				(action.type == MacroFnStr || action.type == MacroFnEsc) ?
+					r->nmacros, r->maxMacros,
+					macroNames[ action.type ], action.len,
+					(action.type == MacroFnStr || action.type == MacroFnEsc) ?
 					"(escaped string)" :
 					((action.str == NULL) ? "(nil)" : (char*) action.str)));
 
+
+	/* now increase the number of macros */
+	r->nmacros++;
+
 	return 1;	/* Success */
 }
+
 
 /* {{{1 rxvt_cleanup_macros()
  *
@@ -535,53 +560,45 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 void
 rxvt_cleanup_macros( rxvt_t *r )
 {
-	unsigned i, nDummyMacros = 0;
+	unsigned i, notdummy = 0;
 
-	if( r->nmacros == 0 ) return; /* Nothing to be done */
+	if( 0 == r->nmacros )
+		return; /* Nothing to be done */
 
 	for( i = 0; i < r->nmacros; i++)
 	{
-		if(
-			 r->macros[i].action.type == MacroFnDummy
-			 || r->macros[i].keysym == None
-		  )
+		/* We keep two indexes, i and notdummy. Index i just iterates all
+		 * macros. Index notdummy records the number of not-dummy macros
+		 * we have seen so far. If we meet a dummy macro, just skip it 
+		 * and increase index i. If we meet a not-dummy macro, we move it
+		 * ahead to r->macros[notdummy] and increase notdummy by 1. This
+		 * avoids the memmove in the original implementation.
+		 */
+		if ((MacroFnDummy != r->macros[i].action.type ) &&
+			(None != r->macros[i].keysym) )
 		{
-			/*
-			 * Dummy macro needs to be deleted. Make sure this macro comes first
-			 * in the macro list.
-			 *
-			 * 2006-03-06 gi1242: Would be more efficient if we made sure that
-			 * this macro was last in the list, however that would involve
-			 * knowing what the max keysym value is. Could be different on
-			 * different architectures.
-			 */
-			r->macros[i].keysym		= 0;
-			r->macros[i].modFlags	= 0;
-
-			free( r->macros[i].action.str );
-			r->macros[i].action.str	= NULL; /* Probably unnecessary */
-
-			nDummyMacros++;
+			if ( i != notdummy )	{
+				free( r->macros[i].action.str );
+				r->macros[notdummy] = r->macros[i];
+			}
+			notdummy ++;
 		}
 	} /* for */
+
 
 	/*
 	 * The macro list now needs to be sorted on keysym. When we look for macros,
 	 * we assume the macro list is sorted, so we can use a binary search to
 	 * lookup macros quickly.
 	 */
-	qsort( r->macros, r->nmacros, sizeof( macros_t ), macro_cmp);
-
-	/* Remove dummy macros from our list */
-	MEMMOVE( r->macros, r->macros + nDummyMacros,
-			(r->nmacros - nDummyMacros) * sizeof( macros_t ) );
-	r->nmacros -= nDummyMacros;
+	qsort( r->macros, notdummy, sizeof( macros_t ), macro_cmp);
 
 	/* Shrink our macros list */
-	if( r->nmacros < r->maxMacros )
+	if( notdummy < r->maxMacros )
 	{
-		r->macros = rxvt_realloc( r->macros, r->nmacros * sizeof( macros_t ));
-		r->maxMacros = r->nmacros;
+		r->macros = rxvt_realloc( r->macros, notdummy * sizeof(macros_t));
+		assert (NULL != r->macros);
+		r->maxMacros = r->nmacros = notdummy;
 	}
 
 	DBG_MSG( 3, ( stderr, "Read %d macros. (Have space for %d macros)\n",
