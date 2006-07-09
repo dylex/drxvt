@@ -444,6 +444,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 		else	{
 			/* Find the macro to replace */
 			if (noReplace)	{
+				DBG_MSG( 1, ( stderr, "    macro is ignored\n"));
 				/* Claim to have succeded so that caller will not
 				 * complain about "Failing to add a ... macro".
 				 */
@@ -459,9 +460,8 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 								non-existent memory */
 			if( !rxvt_set_action( &action, astring) )
 				return 0; /* Failure: Probably unrecognized action type */
-			/* free strings of old action */
-			assert (r->macros[idx].action.str);
-			free (r->macros[idx].action.str);
+			if (r->macros[idx].action.str)
+				free (r->macros[idx].action.str);
 
 
 			/* If the new macro is dummy, and there are chained macros,
@@ -509,8 +509,10 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 			newmacros = (macros_t *) rxvt_malloc(newmax * sizeof(macros_t));
 		else
 			newmacros = (macros_t *) rxvt_realloc( r->macros,
-						newmax * sizeof(macros_t));
+							newmax * sizeof(macros_t));
+
 		if (NULL == newmacros)	{
+			/* non-fatal error here, though not good either */
 			rxvt_print_error( "Out of memory, cannot add macros" );
 			return 0;
 		}
@@ -578,10 +580,13 @@ rxvt_cleanup_macros( rxvt_t *r )
 			(None != r->macros[i].keysym) )
 		{
 			if ( i != notdummy )	{
-				free( r->macros[i].action.str );
 				r->macros[notdummy] = r->macros[i];
 			}
 			notdummy ++;
+		}
+		else	{
+			if (NULL != r->macros[i].action.str)
+				free( r->macros[i].action.str );
 		}
 	} /* for */
 
@@ -669,25 +674,40 @@ rxvt_set_action		(action_t *action, char *astring)
 	len	= rxvt_str_escaped( astring );
 
 	/* All macros exept MacroFnStr and MacroFnEsc have null terminated string */
-	if( type != MacroFnStr && type != MacroFnEsc && len > 0 && astring[len-1] )
+	if( type != MacroFnStr && type != MacroFnEsc &&
+		len > 0 && astring[len-1] )
 		astring[ len++ ] = 0;	/* Since astring was null terminated,
-								   astring[len] is certainly part of the memory
-								   in astring. */
+								   astring[len] is certainly part of
+								   the memory in astring. */
 
-	action->len		= len;
 
 	/* Set action->str. If any data is previously there, realloc it. */
 	if( len > 0 )
 	{
-		action->str = (unsigned char *) rxvt_realloc( action->str,
+		unsigned char*	str;
+
+		if (NULL == action->str)
+			str = (unsigned char*) rxvt_malloc (len * sizeof(unsigned char));
+		else
+			str = (unsigned char*) rxvt_realloc(action->str,
 												len * sizeof(unsigned char));
+		if (NULL == str)	{
+			/* non-fatal error here, though not good either */
+			rxvt_print_error ("Unable to allocate memory");
+			return False;
+		}
+
+		action->str = str;
+		action->len	= len;
 		MEMCPY( action->str, astring, len);
 	}
 	else
 	{
 		free( action->str );
 		action->str = NULL;
+		action->len	= 0;
 	}
+
 	return True;
 }
 
@@ -888,7 +908,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 					/* Wrap around */
 					tabno = tabno % (LTAB(r) + 1);
-					if( tabno < 0 ) tabno += LTAB(r) + 1;
+					if( tabno < 0 )
+						tabno += (LTAB(r) + 1);
 				}
 				else if( tabno == 0 )
 				{
