@@ -754,6 +754,9 @@ typedef struct _profile_t
 #ifdef XFT_SUPPORT
 	XftColor			xftfg, xftbg;
 #endif
+#ifdef OFF_FOCUS_FADING
+	unsigned long		fg_fade, bg_fade;
+#endif
 
 	int					saveLines;
 
@@ -880,12 +883,21 @@ typedef enum {
 	((R)->profile[(P)].fg)
 #define VTBG(R, P)		\
 	((R)->profile[(P)].bg)
+
 #ifdef XFT_SUPPORT
 # define VTXFTFG(R, P)		\
 	((R)->profile[(P)].xftfg)
 # define VTXFTBG(R, P)		\
 	((R)->profile[(P)].xftbg)
 #endif	/* XFT_SUPPORT */
+
+#ifdef OFF_FOCUS_FADING
+#define VTFG_FADE(R, P)		\
+	((R)->profile[(P)].fg_fade)
+#define VTBG_FADE(R, P)		\
+	((R)->profile[(P)].bg_fade)
+#endif /* OFF_FOCUS_FADING */
+
 #define ISSET_VTFG(R, P)	\
 	(NULL != ((R)->h->rs[Rs_foreground + (P)] ) )
 #define ISSET_VTBG(R, P)	\

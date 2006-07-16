@@ -1726,13 +1726,16 @@ rxvt_switch_pix_color (rxvt_t* r)
 	if (r->h->rs[Rs_fade] && !r->color_switched)
 	{
 		DBG_MSG(2, (stderr, "switch back to unfocus color\n"));
+		/* set correct fading color of the current profile */
+		r->PixColorsUnfocus[Color_fg] = VTFG_FADE(r, ATAB(r));
+		r->PixColorsUnfocus[Color_bg] = VTBG_FADE(r, ATAB(r));
 		SWAP_IT (r->PixColors, r->PixColorsUnfocus, unsigned long*);
 		r->color_switched = 1;
 		return (1);	/* switched */
 	}
 	return (0);	/* no change */
 }
-#endif
+#endif	/* OFF_FOCUS_FADING */
 
 
 /*
@@ -1767,6 +1770,9 @@ rxvt_init_colors( rxvt_t *r )
 #ifdef XFT_SUPPORT
 			rxvt_alloc_xft_color (r, VTFG(r, i), &(VTXFTFG(r, i)));
 #endif
+#ifdef OFF_FOCUS_FADING
+			VTFG_FADE(r, i) = rxvt_fade_color (r, VTFG(r, i));
+#endif
 		}
 		else
 		{
@@ -1781,6 +1787,9 @@ rxvt_init_colors( rxvt_t *r )
 #ifdef XFT_SUPPORT
 			VTXFTFG( r, i ) = VTXFTFG( r, 0 );
 #endif
+#ifdef OFF_FOCUS_FADING
+			VTFG_FADE(r, i) = rxvt_fade_color (r, VTFG(r, 0));
+#endif
 		}
 
 		/* background color of i terminal */
@@ -1789,6 +1798,9 @@ rxvt_init_colors( rxvt_t *r )
 			VTBG(r, i) = xcol.pixel;
 #ifdef XFT_SUPPORT
 			rxvt_alloc_xft_color( r, VTBG(r, i), &(VTXFTBG(r, i)) );
+#endif
+#ifdef OFF_FOCUS_FADING
+			VTBG_FADE(r, i) = rxvt_fade_color (r, VTBG(r, i));
 #endif
 		}
 		else
@@ -1804,6 +1816,9 @@ rxvt_init_colors( rxvt_t *r )
 #ifdef XFT_SUPPORT
 			VTXFTBG( r, i ) = VTXFTBG( r, 0 );
 #endif
+#ifdef OFF_FOCUS_FADING
+			VTBG_FADE(r, i) = rxvt_fade_color (r, VTBG(r, 0));
+#endif
 		}
 	}
 
@@ -1813,6 +1828,10 @@ rxvt_init_colors( rxvt_t *r )
 #ifdef XFT_SUPPORT
 	r->XftColors[ Color_fg ] = VTXFTFG( r, 0 );
 	r->XftColors[ Color_bg ] = VTXFTBG( r, 0 );
+#endif
+#ifdef OFF_FOCUS_FADING
+	r->PixColorsUnfocus[Color_fg] = rxvt_fade_color (r, r->PixColors[Color_fg]);
+	r->PixColorsUnfocus[Color_bg] = rxvt_fade_color (r, r->PixColors[Color_bg]);
 #endif
 
 
