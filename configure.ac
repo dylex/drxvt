@@ -978,12 +978,13 @@ if test "x$support_xft" = "xyes"; then
     OLD_CFLAGS="$CFLAGS"
     OLD_LDFLAGS="$LDFLAGS"
 
-    dnl Get new variables
-    LIBS="$LIBS `xft-config --libs`"
-    CFLAGS="$CFLAGS `xft-config --cflags`"
-    LDFLAGS="$LDFLAGS `xft-config --libs`"
-    dnl If xft-config is not found, try pkg-config instead
-    if test "$LIBS" = "$OLD_LIBS"; then
+    dnl Get new variables.
+    if which xft-config >/dev/null 2>&1; then
+	LIBS="$LIBS `xft-config --libs`"
+	CFLAGS="$CFLAGS `xft-config --cflags`"
+	LDFLAGS="$LDFLAGS `xft-config --libs`"
+    else
+	dnl If xft-config is not found, try pkg-config instead
         LIBS="$LIBS `pkg-config --libs xft`"
         CFLAGS="$CFLAGS `pkg-config --cflags xft`"
         LDFLAGS="$LDFLAGS `pkg-config --libs xft`"
