@@ -16,6 +16,7 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		   macro is defined as dummy.
 		5. Fix off-focus fading. Thanks to Ken Zalewski for the report.
 		6. Add macros to check and set options.
+		7. Add macros to check and unset X resources.
 
 	* Enhancements:
 		1. Add --with-max-profiles to configure script as suggested

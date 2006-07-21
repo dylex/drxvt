@@ -291,7 +291,7 @@ rxvt_tabbar_set_visible_tabs (rxvt_t* r, Bool refresh)
 				LVTAB(r) = FVTAB(r) + numVisible - 1;
 		}
 
-		if( refresh && r->tabBar.win != None)
+		if( refresh && IS_WIN(r->tabBar.win))
 		{
 			/* Clear out the parts of the tabbar that have changed. Expose
 			 * events will be sent to the tabbar. */
@@ -327,7 +327,7 @@ rxvt_tabbar_set_visible_tabs (rxvt_t* r, Bool refresh)
 
 			FVTAB(r) = find_left_tab (r, FVTAB(r), size);
 		}
-		if( refresh && r->tabBar.win != None)
+		if( refresh && IS_WIN(r->tabBar.win))
 			XClearArea( r->Xdisplay, r->tabBar.win, 0, 0, TAB_SPACE, 0, True);
 	}
 }
@@ -480,7 +480,9 @@ static void
 draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 		Region region)
 {
-	Region		clipRegion = None;
+	Region		clipRegion;
+
+	UNSET_REGION(clipRegion);
 	char		str[MAX_DISPLAY_TAB_TXT + 1];
 
 #ifdef MULTICHAR_SET
@@ -515,7 +517,7 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 			clipRegion = XCreateRegion();
 			XUnionRectWithRegion( &rect, clipRegion, clipRegion);
 
-			if( region != None )
+			if (IS_REGION(region))
 				XIntersectRegion( clipRegion, region, clipRegion);
 
 			XftDrawSetClip( r->tabBar.xftwin, clipRegion);
@@ -609,11 +611,11 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 	/*
 	 * Restore clipping of the xftdrawable / gc.
 	 */
-	if( clipRegion != None )
+	if (IS_REGION(clipRegion))
 	{
 		XDestroyRegion( clipRegion);
 
-		if( region == None )
+		if (NOT_REGION(region))
 			XSetClipMask( r->Xdisplay, r->tabBar.gc, None);
 		else
 			XSetRegion( r->Xdisplay, r->tabBar.gc, region);
@@ -671,7 +673,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 {
 	int		page, x;
 
-	if (LTAB(r) < 0 || r->tabBar.win == None || !r->tabBar.state)
+	if (LTAB(r) < 0 || NOT_WIN(r->tabBar.win) || !r->tabBar.state)
 		/*
 		 * Nothing to do here :)
 		 */
@@ -687,7 +689,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 	assert( ATAB(r)  <= LVTAB(r) );
 
 
-	if( region != None )
+	if (IS_REGION(region))
 		XSetRegion( r->Xdisplay, r->tabBar.gc, region);
 
 	for( page=FVTAB(r), x=TAB_BORDER; page <= LVTAB(r); page++)
@@ -914,7 +916,8 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 		x += TAB_WIDTH(page);
 	}
 
-	if( region != None) XSetClipMask( r->Xdisplay, r->tabBar.gc, None);
+	if (IS_REGION(region))
+		XSetClipMask( r->Xdisplay, r->tabBar.gc, None);
 }
 
 
@@ -946,7 +949,7 @@ rxvt_tabbar_highlight_tab (rxvt_t* r, short page, Bool force)
 	/* set highlight flag */
 	PVTS(r, page)->highlight = 1;
 
-	if (LTAB(r) < 0 || r->tabBar.win == None || !r->tabBar.state)
+	if (LTAB(r) < 0 || NOT_WIN(r->tabBar.win) || !r->tabBar.state)
 		return ;
 
 	/* do not highlight invisible/active tab */
@@ -995,7 +998,7 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 
 	if (LTAB(r) < 0)
 		return;
-	if (None == r->tabBar.win)
+	if (NOT_WIN(r->tabBar.win))
 		return;
 	if (!r->tabBar.state)
 		return;
@@ -1038,7 +1041,7 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 				break;
 		}
 #endif
-		if (None != img[NB_XPM-i])
+		if (IS_PIXMAP(img[NB_XPM-i]))
 		{
 			XCopyArea  (r->Xdisplay, img[NB_XPM-i], r->tabBar.win,
 				r->tabBar.gc, 0, 0,
@@ -1100,7 +1103,7 @@ init_tabbar (rxvt_t* r)
 		assert (NULL != r->TermWin.xftfont);
 	else
 #endif
-	assert (None != r->TermWin.font);
+	assert (NULL != r->TermWin.font);
 	assert (r->TermWin.FHEIGHT > 0);
 
 	/* resource string are static, needn't to free */
@@ -1554,7 +1557,7 @@ rxvt_activate_page (rxvt_t* r, short index)
 {
 	/* shortcut */
 	if (/* !r->tabBar.state ||
-		None == r->tabBar.win || */
+		NOT_WIN(r->tabBar.win) || */
 		index == ATAB(r))
 		return;
 
@@ -1826,7 +1829,7 @@ rxvt_tabbar_button_release( rxvt_t *r, XButtonEvent *ev)
 int
 rxvt_tabbar_visible (rxvt_t* r)
 {
-	return (None != r->tabBar.win && r->tabBar.state);
+	return (IS_WIN(r->tabBar.win) && r->tabBar.state);
 }
 
 
@@ -1837,7 +1840,9 @@ rxvt_tabbar_visible (rxvt_t* r)
 void
 rxvt_tabbar_expose (rxvt_t* r, XEvent *ev)
 {
-	Region region = None;
+	Region region;
+	
+	UNSET_REGION(region);
 
 	if( ev && ev->type == Expose)
 	{
@@ -1864,7 +1869,8 @@ rxvt_tabbar_expose (rxvt_t* r, XEvent *ev)
 	/* draw the buttons */
 	rxvt_tabbar_draw_buttons (r);
 
-	if( region != None) XDestroyRegion( region );
+	if (IS_REGION(region))
+		XDestroyRegion( region );
 }
 
 
@@ -1877,7 +1883,7 @@ rxvt_tabbar_hide (rxvt_t* r)
 {
 	int		changed = 0;
 
-	assert (None != r->tabBar.win);
+	assert (IS_WIN(r->tabBar.win));
 	changed = r->tabBar.state;
 	XUnmapWindow  (r->Xdisplay, r->tabBar.win);
 	r->tabBar.state = 0;
@@ -1895,7 +1901,7 @@ rxvt_tabbar_show (rxvt_t* r)
 {
 	int		changed = 0;
 
-	assert (None != r->tabBar.win);
+	assert (IS_WIN(r->tabBar.win));
 	changed = !r->tabBar.state;
 	XMapWindow  (r->Xdisplay, r->tabBar.win);
 	r->tabBar.state = 1;
@@ -2039,7 +2045,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	r->tabBar.win = XCreateSimpleWindow( r->Xdisplay, r->TermWin.parent,
 						sx, sy, TWIN_WIDTH(r), rxvt_tabbar_rheight( r ),
 						0, r->tabBar.ifg, r->tabBar.ibg );
-	assert( None != r->tabBar.win );
+	assert(IS_WIN(r->tabBar.win));
 
 #ifdef XFT_SUPPORT
 	if (ISSET_OPTION(r, Opt_xft))
@@ -2072,7 +2078,7 @@ rxvt_tabbar_create (rxvt_t* r)
 		Pixmap	pmap;
 
 		pmap = rxvt_load_pixmap (r, r->h->rs[Rs_tabbarPixmap], &w, &h);
-		if( pmap != None)
+		if (IS_PIXMAP(pmap))
 		{
 			XSetWindowBackgroundPixmap (r->Xdisplay, r->tabBar.win, pmap);
 			XFreePixmap( r->Xdisplay, pmap);
@@ -2121,7 +2127,7 @@ rxvt_tabbar_create (rxvt_t* r)
 
 	r->tabBar.gc = XCreateGC (r->Xdisplay, r->tabBar.win,
 		gcmask, &gcvalue);
-	assert (None != r->tabBar.gc);
+	assert (IS_GC(r->tabBar.gc));
 
 
 	XDefineCursor (r->Xdisplay, r->tabBar.win, r->h->bar_pointer);
@@ -2156,15 +2162,15 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef HAVE_LIBXPM
 		XpmCreatePixmapFromData (r->Xdisplay, r->tabBar.win,
 			xpm_name[i], &img_e[i], &img_emask[i], &xpm_attr);
-		assert (None != img_e[i]);
+		assert (IS_PIXMAP(img_e[i]));
 		XpmCreatePixmapFromData (r->Xdisplay, r->tabBar.win,
 			xpm_d_name[i], &img_d[i], &img_dmask[i], &xpm_attr);
-		assert (None != img_d[i]);
+		assert (IS_PIXMAP(img_d[i]));
 #else
 		img[i] = XCreatePixmapFromBitmapData (r->Xdisplay,
 			r->tabBar.win, xpm_name[i], BTN_WIDTH, BTN_HEIGHT,
 			r->tabBar.fg, r->tabBar.bg, XDEPTH);
-		assert (None != img[i]);
+		assert (IS_PIXMAP(img[i]));
 #endif
 	}
 
@@ -2184,7 +2190,7 @@ rxvt_tabbar_clean_exit (rxvt_t* r)
 	register int	i;
 
 
-	r->tabBar.win = None;	/* destroyed by XDestroySubwindows */
+	UNSET_WIN(r->tabBar.win);	/* destroyed by XDestroySubwindows */
 
 	/* free resource strings */
 	if (r->tabBar.rsfg)
@@ -2196,40 +2202,40 @@ rxvt_tabbar_clean_exit (rxvt_t* r)
 	if (r->tabBar.rsibg)
 		free ((void*) r->h->rs[Rs_itabbg]);
 
-	if (None != r->tabBar.gc)
+	if (IS_GC(r->tabBar.gc))
 	{
 		XFreeGC (r->Xdisplay, r->tabBar.gc);
-		r->tabBar.gc = None;
+		UNSET_GC(r->tabBar.gc);
 	}
 
 	for (i = 0; i < NB_XPM; i ++)
 	{
 #ifdef HAVE_LIBXPM
-		if (None != img_e[i])
+		if (IS_PIXMAP(img_e[i]))
 		{
 			XFreePixmap (r->Xdisplay, img_e[i]);
-			img_e[i] = None;
+			UNSET_PIXMAP(img_e[i]);
 		}
-		if (None != img_emask[i])
+		if (IS_PIXMAP(img_emask[i]))
 		{
 			XFreePixmap (r->Xdisplay, img_emask[i]);
-			img_emask[i] = None;
+			UNSET_PIXMAP(img_emask[i]);
 		}
-		if (None != img_d[i])
+		if (IS_PIXMAP(img_d[i]))
 		{
 			XFreePixmap (r->Xdisplay, img_d[i]);
-			img_d[i] = None;
+			UNSET_PIXMAP(img_d[i]);
 		}
-		if (None != img_dmask[i])
+		if (IS_PIXMAP(img_dmask[i]))
 		{
 			XFreePixmap (r->Xdisplay, img_dmask[i]);
-			img_dmask[i] = None;
+			UNSET_PIXMAP(img_dmask[i]);
 		}
 #else
-		if (None != img[i])
+		if (IS_PIXMAP(img[i]))
 			XFreePixmap (r->Xdisplay, img[i]);
 #endif
-		img[i] = None;
+		UNSET_PIXMAP(img[i]);
 	}	/* for */
 }
 
@@ -2238,7 +2244,7 @@ rxvt_tabbar_clean_exit (rxvt_t* r)
 unsigned short
 rxvt_tabbar_height (rxvt_t* r)
 {
-	if (None == r->tabBar.win || !r->tabBar.state)
+	if (NOT_WIN(r->tabBar.win) || !r->tabBar.state)
 		return 0;
 	return (rxvt_tabbar_rheight(r));
 }

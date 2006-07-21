@@ -176,12 +176,11 @@ rxvt_resize_pixmap(rxvt_t *r, int page)
 	unsigned int	width = VT_WIDTH(r);
 	unsigned int	height = VT_HEIGHT(r);
 
-	if (PVTS(r, page)->pixmap != None)
+	if (IS_PIXMAP(PVTS(r, page)->pixmap))
 		XFreePixmap(r->Xdisplay, PVTS(r, page)->pixmap);
 
-	if (PVTS(r, page)->bg.pixmap == None) {
+	if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap)) {
 		/* So be it: I'm not using pixmaps */
-		PVTS(r, page)->bg.pixmap = None;
 # ifdef TRANSPARENT
 		if ( !r->h->am_transparent && !r->h->am_pixmap_trans )
 # endif
@@ -193,8 +192,7 @@ rxvt_resize_pixmap(rxvt_t *r, int page)
 	gcvalue.foreground = r->PixColors[Color_bg];
 	gc = XCreateGC(r->Xdisplay, PVTS(r, page)->vt, GCForeground, &gcvalue);
 
-	if ((None != gc) &&
-		(None != PVTS(r, page)->bg.pixmap)) {
+	if (IS_GC(gc) && IS_PIXMAP(PVTS(r, page)->bg.pixmap)) {
 		/* we have a specified pixmap */
 		unsigned int	w = PVTS(r, page)->bg.w;
 		unsigned int	h = PVTS(r, page)->bg.h;
@@ -372,11 +370,11 @@ rxvt_load_bg_pixmap(rxvt_t *r, int page, const char *file)
 	assert(file != NULL);
 
 	pixmap = rxvt_load_pixmap (r, file, &w, &h);
-	if (PVTS(r, page)->bg.pixmap != None)
+	if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
 		XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
 	PVTS(r, page)->bg.pixmap = pixmap;
 
-	if (None == pixmap)	{
+	if (NOT_PIXMAP(pixmap))	{
 		XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt, r->PixColors[Color_bg]);
 		return None;
 	}
@@ -404,8 +402,9 @@ rxvt_load_pixmap(rxvt_t *r, const char *file, long* pwidth, long* pheight)
 	long			w = 0, h = 0;
 #endif
 	XpmAttributes	xpm_attr;
-	Pixmap			pixmap = None;
+	Pixmap			pixmap;
 
+	UNSET_PIXMAP(pixmap);
 
 	assert(file != NULL);
 	if ((char) 0 == *file) { /* No file to load */
@@ -474,7 +473,7 @@ rxvt_load_pixmap(rxvt_t *r, const char *file, long* pwidth, long* pheight)
 	}
 
 	free(f);
-	if (None == pixmap)	{
+	if (NOT_PIXMAP(pixmap))	{
 		char		   *p;
 		/* semi-colon delimited */
 		if ((p = STRCHR(file, ';')) == NULL)

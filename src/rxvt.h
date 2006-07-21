@@ -247,6 +247,81 @@ typedef struct {
 # endif
 #endif
 
+/* Macros to check X Window IDs. Notice that we can use only one macro
+** to check all different type of IDs such as Window and Pixmap. But it
+** lose the point that we can possibly check the type of those IDs.
+*/
+#undef IS_WIN
+#undef NOT_WIN
+#undef UNSET_WIN
+#define IS_WIN(WINDOW_ID)	\
+	(None != (WINDOW_ID))
+#define NOT_WIN(WINDOW_ID)	\
+	(None == (WINDOW_ID))
+#define UNSET_WIN(WINDOW_ID)	\
+	((WINDOW_ID) = None)
+
+#undef IS_PIXMAP
+#undef NOT_PIXMAP
+#undef UNSET_PIXMAP
+#define IS_PIXMAP(PIXMAP_ID)	\
+	(None != (PIXMAP_ID))
+#define NOT_PIXMAP(PIXMAP_ID)	\
+	(None == (PIXMAP_ID))
+#define UNSET_PIXMAP(PIXMAP_ID)	\
+	((PIXMAP_ID) = None)
+
+#undef IS_ATOM
+#undef NOT_ATOM
+#undef UNSET_ATOM
+#define IS_ATOM(ATOM_ID)	\
+	(None != (ATOM_ID))
+#define NOT_ATOM(ATOM_ID)	\
+	(None == (ATOM_ID))
+#define UNSET_ATOM(ATOM_ID)	\
+	((ATOM_ID) = None)
+
+#undef IS_GC
+#undef NOT_GC
+#undef UNSET_GC
+#define IS_GC(GC_ID)	\
+	(None != (GC_ID))
+#define NOT_GC(GC_ID)	\
+	(None == (GC_ID))
+#define UNSET_GC(GC_ID)	\
+	((GC_ID) = None)
+
+#undef IS_CURSOR
+#undef NOT_CURSOR
+#undef UNSET_CURSOR
+#define IS_CURSOR(CURSOR_ID)	\
+	(None != (CURSOR_ID))
+#define NOT_CURSOR(CURSOR_ID)	\
+	(None == (CURSOR_ID))
+#define UNSET_CURSOR(CURSOR_ID)	\
+	((CURSOR_ID) = None)
+
+#undef IS_REGION
+#undef NOT_REGION
+#undef UNSET_REGION
+#define IS_REGION(REGION_ID)	\
+	(None != (REGION_ID))
+#define NOT_REGION(REGION_ID)	\
+	(None == (REGION_ID))
+#define UNSET_REGION(REGION_ID)	\
+	((REGION_ID) = None)
+
+#undef IS_KEYSYM
+#undef NOT_KEYSYM
+#undef UNSET_KEYSYM
+#define IS_KEYSYM(KEYSYM_ID)	\
+	(None != (KEYSYM_ID))
+#define NOT_KEYSYM(KEYSYM_ID)	\
+	(None == (KEYSYM_ID))
+#define UNSET_KEYSYM(KEYSYM_ID)	\
+	((KEYSYM_ID) = None)
+
+
 #ifndef HAVE_XPOINTER
 typedef char*		XPointer;
 #endif
@@ -459,6 +534,17 @@ typedef char*		XPointer;
 #if defined(OS_CYGWIN) || defined(PTYS_ARE_OPENPTY)
 # define NO_SETOWNER_TTYDEV
 #endif
+
+
+/* Macros to check NULL pointers. This is solely to make the code more
+** readable/pretty
+*/
+#define IS_NULL(PTR)	\
+	(NULL == (PTR))
+#define NOT_NULL(PTR)	\
+	(NULL != (PTR))
+#define SET_NULL(PTR)	\
+	((PTR) = NULL)
 
 /*
  *****************************************************************************

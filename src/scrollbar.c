@@ -189,7 +189,7 @@ rxvt_scrollbar_init(rxvt_t* r)
 # endif
 
 
-	r->scrollBar.win = None;
+	UNSET_WIN(r->scrollBar.win);
 	r->scrollBar.state = 0;
 }
 
@@ -202,7 +202,7 @@ int
 rxvt_scrollbar_hide (rxvt_t* r)
 {
 	int		changed = 0;
-	assert (None != r->scrollBar.win);
+	assert (IS_WIN(r->scrollBar.win));
 	changed = r->scrollBar.state;
 	XUnmapWindow(r->Xdisplay, r->scrollBar.win);
 	r->scrollBar.state = 0;
@@ -220,7 +220,7 @@ int
 rxvt_scrollbar_show (rxvt_t* r)
 {
 	int		changed = 0;
-	assert (None != r->scrollBar.win);
+	assert (IS_WIN(r->scrollBar.win));
 	changed = !r->scrollBar.state;
 	XMapWindow(r->Xdisplay, r->scrollBar.win);
 	r->scrollBar.state = 1;
@@ -237,7 +237,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 
 
 	DBG_MSG(1,(stderr,"Create scrollbar\n"));
-	assert (None != r->TermWin.parent);
+	assert (IS_WIN(r->TermWin.parent));
 
 	sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
 	sb_y = r->h->window_vt_y;
@@ -283,7 +283,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 						0,
 						r->PixColors[Color_fg],
 						r->PixColors[Color_bg]);
-	assert (None != r->scrollBar.win);
+	assert (IS_WIN(r->scrollBar.win));
 
 # ifdef DEBUG_X
 	rxvt_set_win_title (r, r->scrollBar.win, "scrollbar");
@@ -296,7 +296,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 				| Button3MotionMask));
 
 # ifdef BACKGROUND_IMAGE
-	r->scrollBar.pixmap = None;	/* initialize it to None */
+	UNSET_PIXMAP(r->scrollBar.pixmap);	/* initialize it to None */
 #  ifdef TRANSPARENT
 	if (!(ISSET_OPTION(r, Opt_transparent) &&
 		  ISSET_OPTION(r, Opt_transparent_scrollbar)
@@ -306,7 +306,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 		long	w = 0, h = 0;
 		r->scrollBar.pixmap = rxvt_load_pixmap (r,
 								r->h->rs[Rs_scrollbarPixmap], &w, &h);
-		if (None != r->scrollBar.pixmap)
+		if (IS_PIXMAP(r->scrollBar.pixmap))
 			XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
 				r->scrollBar.pixmap);
 	}
@@ -350,17 +350,17 @@ rxvt_scrollbar_create (rxvt_t* r)
 void
 rxvt_scrollbar_clean_exit (rxvt_t* r)
 {
-	r->scrollBar.win = None;	/* Destroyed by XDestroySubwindows */
+	UNSET_WIN(r->scrollBar.win);	/* Destroyed by XDestroySubwindows */
 
-	if (None != r->scrollBar.gc)	{
+	if (IS_GC(r->scrollBar.gc))	{
 		XFreeGC (r->Xdisplay, r->scrollBar.gc);
-		r->scrollBar.gc = None;
+		UNSET_GC(r->scrollBar.gc);
 	}
 
 #ifdef BACKGROUND_IMAGE
-	if (None != r->scrollBar.pixmap)	{
+	if (IS_PIXMAP(r->scrollBar.pixmap))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.pixmap);
-		r->scrollBar.pixmap = None;
+		UNSET_PIXMAP(r->scrollBar.pixmap);
 	}
 #endif
 
@@ -442,7 +442,7 @@ rxvt_scrollbar_resize(rxvt_t *r)
 int
 rxvt_scrollbar_visible(rxvt_t *r)
 {
-	return (None != r->scrollBar.win && r->scrollBar.state);
+	return (IS_WIN(r->scrollBar.win) && r->scrollBar.state);
 }
 
 
@@ -505,7 +505,7 @@ rxvt_scrollbar_update (rxvt_t* r, int update)
 unsigned short
 rxvt_scrollbar_width(rxvt_t *r)
 {
-	if (None == r->scrollBar.win || !r->scrollBar.state)
+	if (NOT_WIN(r->scrollBar.win) || !r->scrollBar.state)
 		return 0;
 	return (r->scrollBar.width + r->sb_shadow * 2);
 }

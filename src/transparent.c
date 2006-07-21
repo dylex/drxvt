@@ -79,8 +79,8 @@ rxvt_set_opacity (rxvt_t* r)
 
 
 	/* do not set opacity */
-	if (NULL == r->h->rs[Rs_opacity] ||
-		None == r->h->xa[XA_NET_WM_WINDOW_OPACITY])
+	if (IS_NULL(r->h->rs[Rs_opacity]) ||
+		NOT_ATOM(r->h->xa[XA_NET_WM_WINDOW_OPACITY]))
 		return 0;
 
 #ifdef TRANSPARENT
@@ -273,7 +273,8 @@ resetParentPixmap( rxvt_t *r,
 
 	pmap = XCreatePixmap( r->Xdisplay, r->TermWin.parent,
 						r->szHint.width, r->szHint.height, rootd);
-	if ( pmap == None ) return 0;
+	if (NOT_PIXMAP(pmap))
+		return 0;
 
 	gc = XCreateGC( r->Xdisplay, r->TermWin.parent, 0, NULL);
 
@@ -435,7 +436,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 		for (i = 0; i <= LTAB(r); i ++)
 		{
 # ifdef BACKGROUND_IMAGE
-			if (None != PVTS(r, i)->pixmap)
+			if (IS_PIXMAP(PVTS(r, i)->pixmap))
 				XSetWindowBackgroundPixmap (r->Xdisplay,
 					PVTS(r, i)->vt, PVTS(r, i)->pixmap);
 			else
@@ -445,11 +446,11 @@ rxvt_toggle_transparency (rxvt_t* r)
 		}
 
 # ifdef HAVE_SCROLLBARS
-		if (None != r->scrollBar.win &&
+		if (IS_WIN(r->scrollBar.win) &&
 			ISSET_OPTION(r, Opt_transparent_scrollbar))
 		{
 #  ifdef BACKGROUND_IMAGE
-			if (None != r->scrollBar.pixmap)
+			if (IS_PIXMAP(r->scrollBar.pixmap))
 				XSetWindowBackgroundPixmap (r->Xdisplay,
 					r->scrollBar.win, r->scrollBar.pixmap);
 			else
@@ -464,11 +465,11 @@ rxvt_toggle_transparency (rxvt_t* r)
 # endif	/* HAVE_SCROLLBARS */
 
 # ifdef HAVE_MENUBAR
-		if (None != r->menuBar.win &&
+		if (IS_WIN(r->menuBar.win) &&
 			ISSET_OPTION(r, Opt_transparent_menubar))
 		{
 #  ifdef BACKGROUND_IMAGE
-			if (None != r->menuBar.pixmap)
+			if (IS_PIXMAP(r->menuBar.pixmap))
 				XSetWindowBackgroundPixmap (r->Xdisplay,
 					r->menuBar.win, r->menuBar.pixmap);
 			else
@@ -486,7 +487,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 				Pixmap pmap;
 
 				pmap = rxvt_load_pixmap (r, r->h->rs[Rs_tabbarPixmap], &w, &h);
-				if (pmap != None)
+				if (IS_PIXMAP(pmap))
 				{
 					XSetWindowBackgroundPixmap (r->Xdisplay, r->tabBar.win,
 							pmap);
@@ -511,13 +512,13 @@ rxvt_toggle_transparency (rxvt_t* r)
 				PVTS(r, i)->vt, ParentRelative);
 		}
 # ifdef HAVE_SCROLLBARS
-		if (None != r->scrollBar.win &&
+		if (IS_WIN(r->scrollBar.win) &&
 			ISSET_OPTION(r, Opt_transparent_scrollbar))
 			XSetWindowBackgroundPixmap (r->Xdisplay,
 				r->scrollBar.win, ParentRelative);
 # endif
 # ifdef HAVE_MENUBAR
-		if (None != r->menuBar.win &&
+		if (IS_WIN(r->menuBar.win) &&
 			ISSET_OPTION(r, Opt_transparent_menubar))
 			XSetWindowBackgroundPixmap (r->Xdisplay,
 				r->menuBar.win, ParentRelative);
@@ -564,8 +565,8 @@ refreshRootBGVars(rxvt_t *r )
 
 	/* Get new root pixmap ID in h->rootPixmap*/
 	if (
-			r->h->xa[XA_XROOTPMAPID] != None
-			&& XGetWindowProperty( r->Xdisplay, XROOT,
+			IS_ATOM(r->h->xa[XA_XROOTPMAPID]) &&
+			XGetWindowProperty( r->Xdisplay, XROOT,
 					r->h->xa[XA_XROOTPMAPID], 0L, 1L, False, XA_PIXMAP,
 					&atype, &aformat, &nitems, &bytes_after, &prop) == Success
 			&& prop != NULL
@@ -587,14 +588,14 @@ refreshRootBGVars(rxvt_t *r )
 	}
 	else
 		/* Failed. */
-		r->h->rootPixmap = None;
+		UNSET_PIXMAP(r->h->rootPixmap);
 
 	r->h->allowedxerror = 0;
 	if( r->h->xerror_return != Success ) /* Set by xerror handler */
-		r->h->rootPixmap = None;
+		UNSET_PIXMAP(r->h->rootPixmap);
 
 	DBG_MSG( 1, (stderr, "Got %snull root pixmap %lx\n",
-			r->h->rootPixmap == None ? "" : "non-",
+			NOT_PIXMAP(r->h->rootPixmap) ? "" : "non-",
 			r->h->rootPixmap));
 }
 
@@ -679,7 +680,7 @@ rxvt_check_our_parents(rxvt_t *r)
 		 */
 		int			retvt = 0;
 
-		if( r->h->rootPixmap == None )
+		if (NOT_PIXMAP(r->h->rootPixmap))
 		{
 			have_changed = tempDisableTransparent( r);
 			break;
@@ -752,7 +753,7 @@ rxvt_check_our_parents(rxvt_t *r)
 
 			if (r->TermWin.parenttree[i] == XROOT)
 			{
-				if (oldp != None)
+				if (IS_WIN(oldp))
 					have_changed = 1;
 				break;
 			}
@@ -836,7 +837,7 @@ rxvt_check_our_parents(rxvt_t *r)
 		 * Set the tail portion of our tree to None for future calls
 		 */
 		for (; i < PARENT_NUMBER; i++)
-			r->TermWin.parenttree[i] = None;
+			UNSET_WIN(r->TermWin.parenttree[i]);
 	}
 
 	DBG_MSG( 1, (stderr, "am_transparent: %hhu am_pixmap_trans: %hhu have_changed %d\n",
@@ -956,12 +957,12 @@ reset_parent_pixmap (rxvt_t* r, XImage* image, int nx, int ny)
 				r->szHint.width, r->szHint.height,
 				(unsigned int) image->depth);
 
-	if (None == pixmap)
+	if (IS_PIXMAP(pixmap))
 		return 0;
 
 	/* XXX: Unnecessary XCreateGC */
 	gc = XCreateGC (r->Xdisplay, r->TermWin.parent, 0UL, 0);
-	if (None != gc)
+	if (IS_GC(gc))
 	{
 		XPutImage(r->Xdisplay, pixmap, gc, image,
 			0, 0,		/* src x and y */

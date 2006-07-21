@@ -2201,7 +2201,8 @@ void
 rxvt_pointer_blank(rxvt_t* r, int page)
 {
 	DBG_MSG(1, ( stderr, "Blanking pointer\n"));
-	if (ISSET_OPTION(r, Opt_pointerBlank) && (None != r->h->blank_pointer))
+	if (ISSET_OPTION(r, Opt_pointerBlank) &&
+		IS_CURSOR(r->h->blank_pointer))
 	{
 		XDefineCursor(r->Xdisplay, PVTS(r, page)->vt,
 			r->h->blank_pointer);
@@ -2308,7 +2309,7 @@ rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
 	if (ISNOT_OPTION(r, Opt_transparent))
 # endif	/* TRANSPARENT */
 #ifdef BACKGROUND_IMAGE
-	if (None == PVTS(r, page)->pixmap)
+	if (NOT_PIXMAP(PVTS(r, page)->pixmap))
 #endif	/* BACKGROUND_IMAGE */
 	{
 		XSetBackground(r->Xdisplay, r->TermWin.gc,
@@ -2323,7 +2324,7 @@ rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
 	else
 #endif	/* TRANSPARENT */
 #ifdef BACKGROUND_IMAGE
-	if (None != PVTS(r, page)->pixmap)
+	if (IS_PIXMAP(PVTS(r, page)->pixmap))
 	{
 		DBG_MSG (1, (stderr, "reset pixmap bg of vt %d\n", page));
 		XSetWindowBackgroundPixmap(r->Xdisplay, PVTS(r, page)->vt,
@@ -2808,7 +2809,7 @@ rxvt_process_buttonrelease(rxvt_t* r, int page, XButtonEvent *ev)
 
 	if (ev->window == PVTS(r, page)->vt)
 	{
-		if (ev->subwindow == None)
+		if (NOT_WIN(ev->subwindow))
 		{
 			if (reportmode)
 			{
@@ -3528,8 +3529,9 @@ Bool getWMStruts( Display *dpy, Window w,
 	/* Now try and read the property */
 	for( i=0; i < natoms; i++)
 	{
-		if( (atom = XInternAtom( dpy, atomName[i], False))
-				== None) continue;
+		atom = XInternAtom( dpy, atomName[i], False);
+		if (NOT_ATOM(atom))
+			continue;
 
 		if( XGetWindowProperty( dpy, w, atom,
 				0,		/* offset */
@@ -3717,13 +3719,11 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
 		}
 
 #ifdef TRANSPARENT
-		else if (
-					r->h->xa[XA_XROOTPMAPID] != None
-					&& r->h->xa[XA_XSETROOTID] != None
-					&& (
-						ev->xproperty.atom == r->h->xa[XA_XROOTPMAPID]
-						|| ev->xproperty.atom == r->h->xa[XA_XSETROOTID]
-					   )
+		else if (IS_ATOM(r->h->xa[XA_XROOTPMAPID]) &&
+				 IS_ATOM(r->h->xa[XA_XSETROOTID]) &&
+				 (ev->xproperty.atom == r->h->xa[XA_XROOTPMAPID] ||
+				  ev->xproperty.atom == r->h->xa[XA_XSETROOTID]
+				 )
 				)
 		{
 			/*
@@ -3807,7 +3807,7 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 		 * We group exposes, and clip to the appropriate locations.
 		 */
 
-		if( r->h->refreshRegion == None )
+		if (NOT_REGION(r->h->refreshRegion))
 		{
 			r->h->refreshRegion = XCreateRegion();
 			DBG_MSG( 3, ( stderr, "Created clip region %p\n",
@@ -5696,7 +5696,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 #endif	/* MULTICHAR_SET */
 
 		case MRxvt_opacity:
-			if (None != r->h->xa[XA_NET_WM_WINDOW_OPACITY])
+			if (IS_ATOM(r->h->xa[XA_NET_WM_WINDOW_OPACITY]))
 			{
 				int		oldopacity = r->TermWin.opacity;
 				int		tmp;

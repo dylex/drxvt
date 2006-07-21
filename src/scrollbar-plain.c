@@ -57,7 +57,7 @@ rxvt_scrollbar_init_plain (rxvt_t* r)
 	unsigned long	gcmask;
 
 
-	r->scrollBar.gc = None;
+	UNSET_GC(r->scrollBar.gc);
 
 	/* Initialize the colors */
 #ifdef KEEP_SCROLLCOLOR
@@ -86,7 +86,7 @@ rxvt_scrollbar_init_plain (rxvt_t* r)
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
-	if (None == r->scrollBar.pixmap)
+	if (NOT_PIXMAP(r->scrollBar.pixmap))
 #endif
 	{
 		gcmask  |= GCBackground;
@@ -97,7 +97,7 @@ rxvt_scrollbar_init_plain (rxvt_t* r)
 
 	r->scrollBar.gc = XCreateGC (r->Xdisplay, r->scrollBar.win,
 			gcmask, &gcvalue);
-	assert (None != r->scrollBar.gc);
+	assert (IS_GC(r->scrollBar.gc));
 }
 
 
@@ -125,7 +125,7 @@ rxvt_scrollbar_show_plain(rxvt_t *r, int update __attribute__((unused)), int las
 	else
 #endif
 #ifdef BACKGROUND_IMAGE
-	if (None != r->scrollBar.pixmap)
+	if (IS_PIXMAP(r->scrollBar.pixmap))
 		clear = 1;
 	else
 #endif

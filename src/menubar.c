@@ -882,7 +882,7 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 	menu->head = menu->tail = NULL;
 	menu->prev = menu->next = NULL;
 
-	menu->win = None;
+	UNSET_WIN(menu->win);
 	menu->x = menu->y = menu->height = 0;
 	menu->item = NULL;
 
@@ -1261,7 +1261,7 @@ rxvt_menu_show(rxvt_t *r)
 	/*
 	 * Create the menu window.
 	 */
-	if (ActiveMenu->win == None)
+	if (NOT_WIN(ActiveMenu->win))
 	{
 #if 0
 		ActiveMenu->win = XCreateSimpleWindow(r->Xdisplay,
@@ -1502,10 +1502,10 @@ rxvt_menu_display(rxvt_t *r, void (*update)(rxvt_t *))
 	DBG_MSG( 2, (stderr, "rxvt_menu_display()\n"));
 
 	if (ActiveMenu == NULL) return;
-	if (ActiveMenu->win != None)
+	if (IS_WIN(ActiveMenu->win))
 	{
 		XDestroyWindow(r->Xdisplay, ActiveMenu->win);
-		ActiveMenu->win = None;
+		UNSET_WIN(ActiveMenu->win);
 	}
 	ActiveMenu->item = NULL;
 
@@ -1906,7 +1906,7 @@ rxvt_menubar_create (rxvt_t* r)
 					TWIN_WIDTH(r), rxvt_menubar_rheight (r),
 					0, r->PixColors[Color_fg],
 					r->PixColors[Color_scroll]);
-	assert (None != r->menuBar.win);
+	assert (IS_WIN(r->menuBar.win));
 
 #  ifdef DEBUG_X
 	rxvt_set_win_title (r, r->menuBar.win, "menubar");
@@ -1918,7 +1918,7 @@ rxvt_menubar_create (rxvt_t* r)
 			  | Button1MotionMask));
 
 #  ifdef BACKGROUND_IMAGE
-	r->menuBar.pixmap = None;	/* Initialize it to None */
+	UNSET_PIXMAP(r->menuBar.pixmap);	/* Initialize it to None */
 #   ifdef TRANSPARENT
 	if (!(ISSET_OPTION(r, Opt_transparent) &&
 		  ISSET_OPTION(r, Opt_transparent_menubar)
@@ -1929,7 +1929,7 @@ rxvt_menubar_create (rxvt_t* r)
 		long	w = 0, h = 0;
 		r->menuBar.pixmap = rxvt_load_pixmap (r,
 								r->h->rs[Rs_menubarPixmap], &w, &h);
-		if (None != r->menuBar.pixmap)
+		if (IS_PIXMAP(r->menuBar.pixmap))
 			XSetWindowBackgroundPixmap (r->Xdisplay, r->menuBar.win,
 				r->menuBar.pixmap);
 	}
@@ -1978,7 +1978,7 @@ rxvt_menubar_create (rxvt_t* r)
 		))
 #  endif
 #  ifdef BACKGROUND_IMAGE
-	if (None == r->menuBar.pixmap)
+	if (NOT_PIXMAP(r->menuBar.pixmap))
 #  endif
 	gcvalue.background = r->menuBar.bg;
 	gcmask = GCForeground;
@@ -1989,13 +1989,12 @@ rxvt_menubar_create (rxvt_t* r)
 		))
 #  endif
 #  ifdef BACKGROUND_IMAGE
-	if (None == r->menuBar.pixmap)
+	if (NOT_PIXMAP(r->menuBar.pixmap))
 #  endif
 	gcmask |= GCBackground;
 	r->menuBar.gc = XCreateGC (r->Xdisplay, r->menuBar.win,
 						gcmask, &gcvalue);
-
-	assert (None != r->menuBar.gc);
+	assert (IS_GC(r->menuBar.gc));
 
 #  ifdef XFT_SUPPORT
 	if (ISSET_OPTION(r, Opt_xft))
@@ -2034,18 +2033,18 @@ rxvt_menubar_clean_exit (rxvt_t* r)
 #	endif
 #  endif
 
-	r->menuBar.win = None;	/* Destroyed by XDestroySubwindows */
+	UNSET_WIN(r->menuBar.win);	/* Destroyed by XDestroySubwindows */
 
-	if (None != r->menuBar.gc)
+	if (IS_GC(r->menuBar.gc))
 	{
 		XFreeGC (r->Xdisplay, r->menuBar.gc);
-		r->menuBar.gc = None;
+		UNSET_GC(r->menuBar.gc);
 	}
 #  ifdef BACKGROUND_IMAGE
-	if (None != r->menuBar.pixmap)
+	if (IS_PIXMAP(r->menuBar.pixmap))
 	{
 		XFreePixmap (r->Xdisplay, r->menuBar.pixmap);
-		r->menuBar.pixmap = None;
+		UNSET_PIXMAP(r->menuBar.pixmap);
 	}
 #  endif
 }
@@ -2060,7 +2059,7 @@ rxvt_menubar_visible (rxvt_t* r)
 {
 	DBG_MSG( 3, (stderr, "rxvt_menubar_visible()\n"));
 
-	return (None != r->menuBar.win && r->menuBar.state);
+	return (IS_WIN(r->menuBar.win) && r->menuBar.state);
 }
 
 
@@ -2075,7 +2074,7 @@ rxvt_menubar_hide (rxvt_t* r)
 
 	DBG_MSG( 2, (stderr, "rxvt_menubar_hide()\n"));
 
-	assert (None != r->menuBar.win);
+	assert (IS_WIN(r->menuBar.win));
 	changed = r->menuBar.state;
 	XUnmapWindow(r->Xdisplay, r->menuBar.win);
 	r->menuBar.state = 0;
@@ -2094,7 +2093,7 @@ rxvt_menubar_show (rxvt_t* r)
 	int		changed = 0;
 
 	DBG_MSG( 2, (stderr, "rxvt_menubar_show()\n"));
-	assert (None != r->menuBar.win);
+	assert (IS_WIN(r->menuBar.win));
 
 	changed = !r->menuBar.state;
 	XMapWindow(r->Xdisplay, r->menuBar.win);
@@ -2113,7 +2112,7 @@ rxvt_menubar_expose(rxvt_t *r)
 {
 	DBG_MSG( 2, (stderr, "rxvt_menubar_expose()\n"));
 
-	if (!r->menuBar.state || None == r->menuBar.win)
+	if (!r->menuBar.state || NOT_WIN(r->menuBar.win))
 		return;
 
 	rxvt_menu_hide_all(r);
@@ -2799,7 +2798,7 @@ rxvt_menubar_height(rxvt_t *r)
 	DBG_MSG( 3, (stderr, "rxvt_menubar_height()\n"));
 
 	/* If menubar is not created or not mapped, return 0 */
-	return  (None == r->menuBar.win || !r->menuBar.state) ?
+	return  (NOT_WIN(r->menuBar.win) || !r->menuBar.state) ?
 			0 : rxvt_menubar_rheight(r);
 }
 
@@ -2837,7 +2836,7 @@ rxvt_menubar_resize(rxvt_t *r)
 
 	DBG_MSG( 2, (stderr, "rxvt_menubar_resize()\n"));
 
-	if (None != r->menuBar.win && r->menuBar.state)
+	if (IS_WIN(r->menuBar.win) && r->menuBar.state)
 		XMoveResizeWindow(r->Xdisplay, r->menuBar.win,
 			0, 0, TWIN_WIDTH(r), rxvt_menubar_rheight(r));
 

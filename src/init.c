@@ -724,13 +724,13 @@ rxvt_init_vars(rxvt_t *r)
 #ifdef OFF_FOCUS_FADING
 	r->color_switched = 0;	/* color is not switched */
 #endif
-	h->xa[XA_COMPOUND_TEXT] =
-	h->xa[XA_MULTIPLE] =
-	h->xa[XA_TARGETS] =
-	h->xa[XA_TEXT] =
-	h->xa[XA_TIMESTAMP] =
-	h->xa[XA_VT_SELECTION] =
-	h->xa[XA_INCR] = None;
+	UNSET_ATOM(h->xa[XA_COMPOUND_TEXT]);
+	UNSET_ATOM(h->xa[XA_MULTIPLE]);
+	UNSET_ATOM(h->xa[XA_TARGETS]);
+	UNSET_ATOM(h->xa[XA_TEXT]);
+	UNSET_ATOM(h->xa[XA_TIMESTAMP]);
+	UNSET_ATOM(h->xa[XA_VT_SELECTION]);
+	UNSET_ATOM(h->xa[XA_INCR]);
 	h->locale = NULL;
 
 # ifdef HAVE_MENUBAR
@@ -751,7 +751,7 @@ rxvt_init_vars(rxvt_t *r)
 #ifdef TRANSPARENT
 	h->am_pixmap_trans = 0;
 	h->am_transparent  = 0;
-	h->rootPixmap	   = None;
+	UNSET_PIXMAP(h->rootPixmap);
 	h->bgRefreshInterval = DEFAULT_BG_REFRESH_INTERVAL;
 	h->lastCNotify.tv_sec = 0;		/* No BG update pending */
 #endif
@@ -824,7 +824,7 @@ rxvt_init_vars(rxvt_t *r)
 #endif
 	h->refresh_limit = 1;
 	h->refresh_type = SLOW_REFRESH;
-	h->refreshRegion = None;			/* Will be created when needed */
+	UNSET_REGION(h->refreshRegion);			/* Will be created when needed */
 	h->prev_nrow = h->prev_ncol = 0;
 
 	r->encoding_method = ENC_NOENC;
@@ -1157,8 +1157,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 #ifdef TRANSPARENT
 		if (
-			  None != r->h->xa[XA_NET_WM_WINDOW_OPACITY]
-			  && ISSET_OPTION(r, Opt_transparent)
+			  IS_ATOM(r->h->xa[XA_NET_WM_WINDOW_OPACITY]) &&
+			  ISSET_OPTION(r, Opt_transparent)
 		   )
 		{
 			/* Override pseudo-transparent */
@@ -2476,15 +2476,15 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	PVTS( r, page )->saveLines = r->profile[profile].saveLines;
 
 	/* will be set in rxvt_create_termwin */
-	PVTS(r, page)->vt = None;
+	UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef XFT_SUPPORT
 	PVTS(r, page)->xftvt = NULL;
 #endif
 	PVTS(r, page)->tab_title = NULL;
 #ifdef BACKGROUND_IMAGE
-	PVTS(r, page)->pixmap = None;
-	PVTS(r, page)->bg.pixmap = None;
+	UNSET_PIXMAP(PVTS(r, page)->pixmap);
+	UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
 	PVTS(r, page)->bg.x = PVTS(r, page)->bg.y = 50;
 #endif
 	PVTS(r, page)->cmd_pid = -1;
@@ -2583,20 +2583,20 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 		PVTS(r, page)->xftvt = NULL;
 	}
 #endif
-	assert (None != PVTS(r, page)->vt);
+	assert (IS_WIN(PVTS(r, page)->vt));
 	XDestroyWindow (r->Xdisplay, PVTS(r, page)->vt);
-	PVTS(r, page)->vt = None;
+	UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef BACKGROUND_IMAGE
-	if (None != PVTS(r, page)->pixmap)
+	if (IS_PIXMAP(PVTS(r, page)->pixmap))
 	{
 		XFreePixmap (r->Xdisplay, PVTS(r, page)->pixmap);
-		PVTS(r, page)->pixmap = None;
+		UNSET_PIXMAP(PVTS(r, page)->pixmap);
 	}
-	if (None != PVTS(r, page)->bg.pixmap)
+	if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
 	{
 		XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
-		PVTS(r, page)->bg.pixmap = None;
+		UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
 	}
 #endif
 
@@ -2654,7 +2654,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 								0,
 								r->PixColors[Color_fg],
 								r->PixColors[Color_bg]);
-	assert (None != PVTS(r, page)->vt);
+	assert (IS_WIN(PVTS(r, page)->vt));
 #ifdef XFT_SUPPORT
 	if (ISSET_OPTION(r, Opt_xft))
 	{
@@ -2756,20 +2756,20 @@ rxvt_set_borderless( rxvt_t *r )
 
 	/* Motif compatible WM */
 	prop = XInternAtom (r->Xdisplay, "_MOTIF_WM_HINTS", True);
-	if (None != prop)
+	if (IS_ATOM(prop))
 		XChangeProperty (r->Xdisplay, r->TermWin.parent, prop, prop,
 			32, PropModeReplace, (unsigned char*) &mwmhints,
 			PROP_MWM_HINTS_ELEMENTS);
 
 	/* GNOME compatible WM */
 	prop = XInternAtom (r->Xdisplay, "_WIN_HINTS", True);
-	if (None != prop)
+	if (IS_ATOM(prop))
 		XChangeProperty (r->Xdisplay, r->TermWin.parent, prop, prop,
 			32, PropModeReplace, (unsigned char*) &hints, 1);
 
 	/* KDE compatible WM */
 	prop = XInternAtom (r->Xdisplay, "KWM_WIN_DECORATION", True);
-	if (None != prop)
+	if (IS_ATOM(prop))
 		XChangeProperty (r->Xdisplay, r->TermWin.parent, prop, prop,
 			32, PropModeReplace, (unsigned char*) &hints, 1);
 }
@@ -2785,7 +2785,8 @@ ewmh_message( Display *dpy, Window root_win, Window client_win,
 
 	XEvent event;
 
-	if( msgAtom  == None ) return 1;
+	if (NOT_ATOM(msgAtom))
+		return 1;
 
     event.xclient.type = ClientMessage;
     event.xclient.serial = 0;
@@ -2812,14 +2813,14 @@ rxvt_set_desktop( rxvt_t* r, CARD32 desktop )
 {
 	/* GNOME compatible WM */
 	if (desktop >= 0 && desktop <= 64 &&
-		None != r->h->xa[XA_WIN_WORKSPACE])
+		IS_ATOM(r->h->xa[XA_WIN_WORKSPACE]))
 		XChangeProperty(r->Xdisplay, r->TermWin.parent,
 			r->h->xa[XA_WIN_WORKSPACE], XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char*) &desktop, 1L);
 
 	/* WindowMaker/FreeDesktop.org compatible WM */
 	if (desktop >= 0 && desktop <= 64 &&
-		None != r->h->xa[XA_NET_WM_DESKTOP])
+		IS_ATOM(r->h->xa[XA_NET_WM_DESKTOP]))
 		XChangeProperty(r->Xdisplay, r->TermWin.parent, 
 			r->h->xa[XA_NET_WM_DESKTOP], XA_CARDINAL, 32,
 			PropModeReplace, (unsigned char*) &desktop, 1L);
@@ -2838,7 +2839,7 @@ rxvt_get_desktop( rxvt_t* r )
 	long*	cardinals;
 	CARD32	desktop;
 
-	if (None == r->h->xa[XA_NET_WM_DESKTOP])
+	if (NOT_ATOM(r->h->xa[XA_NET_WM_DESKTOP]))
 		return 0;
 
 	result = XGetWindowProperty (r->Xdisplay, r->TermWin.parent,
@@ -2986,7 +2987,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 						r->PixColors[Color_border],
 						r->PixColors[Color_bg]);
 #endif
-	assert (None != r->TermWin.parent);
+	assert (IS_WIN(r->TermWin.parent));
 
 
 #ifdef XFT_SUPPORT
@@ -3082,7 +3083,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	** set WM_CLIENT_LEADER property so that session management proxy
 	** can handle us even session management is not enabled.
 	*/
-	if (None != r->h->xa[XA_WM_CLIENT_LEADER])
+	if (IS_ATOM(r->h->xa[XA_WM_CLIENT_LEADER]))
 		XChangeProperty(r->Xdisplay, r->TermWin.parent,
 			r->h->xa[XA_WM_CLIENT_LEADER], XA_WINDOW, 32,
 			PropModeReplace, (unsigned char*) &(r->TermWin.parent), 1L);
@@ -3093,7 +3094,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 		  && STRCMP (r->TermWin.sm_client_id, "")
 	   )
 	{
-		if (None != r->h->xa[XA_SM_CLIENT_ID])
+		if (IS_ATOM(r->h->xa[XA_SM_CLIENT_ID]))
 			XChangeProperty(r->Xdisplay, r->TermWin.parent,
 				r->h->xa[XA_SM_CLIENT_ID], XA_STRING, 8,
 				PropModeReplace,
@@ -3106,7 +3107,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 #ifdef TRANSPARENT
 	r->TermWin.parenttree[0] = r->TermWin.parent;
 	for (i = 1; i < PARENT_NUMBER; i ++)
-		r->TermWin.parenttree[i] = None;
+		UNSET_WIN(r->TermWin.parenttree[i]);
 
 	/*
 	 * XXX 2006-01-02 gi1242: This is inefficient. If window is pseudo
@@ -3146,7 +3147,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 #ifdef POINTER_BLANK
 	if (ISNOT_OPTION(r, Opt_pointerBlank))
-		r->h->blank_pointer = None;
+		UNSET_CURSOR(r->h->blank_pointer);
 	else
 		r->h->blank_pointer = XCreateGlyphCursor(r->Xdisplay,
 			r->TermWin.font->fid, r->TermWin.font->fid, ' ', ' ',

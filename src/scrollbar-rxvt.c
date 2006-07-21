@@ -165,7 +165,7 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
-	if (None == r->scrollBar.pixmap)
+	if (NOT_PIXMAP(r->scrollBar.pixmap))
 # endif
 	gcvalue.background = r->scrollBar.rxvt_bg;
 	gcmask = GCForeground;
@@ -177,12 +177,12 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
-	if (None == r->scrollBar.pixmap)
+	if (NOT_PIXMAP(r->scrollBar.pixmap))
 # endif
 	gcmask |= GCBackground;
 	r->scrollBar.gc = XCreateGC (r->Xdisplay, r->scrollBar.win,
 						gcmask, &gcvalue);
-	assert (None != r->scrollBar.gc);
+	assert (IS_GC(r->scrollBar.gc));
 
 # ifdef TRANSPARENT
 	/* set background color when there's no transparent */
@@ -192,7 +192,7 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
-	if (None == r->scrollBar.pixmap)
+	if (NOT_PIXMAP(r->scrollBar.pixmap))
 # endif
 		XSetWindowBackground (r->Xdisplay, r->scrollBar.win,
 			r->scrollBar.rxvt_bg);
@@ -242,7 +242,7 @@ rxvt_scrollbar_show_rxvt(rxvt_t *r, int update __attribute__((unused)), int last
 #endif
 # ifdef BACKGROUND_IMAGE
 	/* clear background when there's bg image */
-	if (None != r->scrollBar.pixmap)
+	if (IS_PIXMAP(r->scrollBar.pixmap))
 	{
 		XClearArea (r->Xdisplay, r->scrollBar.win,
 				sbshadow, r->scrollBar.top, sbwidth, scroller_len,

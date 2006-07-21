@@ -199,7 +199,7 @@ create_icon (rxvt_t* r, char **data, int sx, int sy, unsigned int width, unsigne
     
 	pixmap = XCreatePixmap (r->Xdisplay, r->scrollBar.win,
 				width, height, XDEPTH);
-	if (None == pixmap)
+	if (NOT_PIXMAP(pixmap))
 		return None;
 
     y = sy;
@@ -381,7 +381,7 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
 
     stipple = XCreateBitmapFromData(r->Xdisplay, r->scrollBar.win,
 				    (const char*) stp_bits, stp_width, stp_height);
-	assert (None != stipple);
+	assert (IS_PIXMAP(stipple));
     gcvalue.foreground = r->scrollBar.sgi_dark;
     gcvalue.background = r->scrollBar.sgi_bg;
     gcvalue.fill_style = FillStippled;
@@ -389,13 +389,13 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
 	gcmask = GCForeground | GCBackground | GCStipple | GCFillStyle;
     r->scrollBar.sgi_stippleGC = XCreateGC(r->Xdisplay,
 					r->scrollBar.win, gcmask, &gcvalue);
-	assert (None != r->scrollBar.sgi_stippleGC);
+	assert (IS_GC(r->scrollBar.sgi_stippleGC));
 
 	/* Create icons */
 	r->scrollBar.sgi_dimple = create_icon (r, SCROLLER_DIMPLE,
 		0, 0,
 		SCROLLER_DIMPLE_WIDTH, SCROLLER_DIMPLE_HEIGHT);
-	assert (None != r->scrollBar.sgi_dimple);
+	assert (IS_PIXMAP(r->scrollBar.sgi_dimple));
 
     x_offset = y_offset = (ARROW_SOURCE_WIDTH-SGI_ARROW_WIDTH)>>1;
 	r->scrollBar.sgi_upArrow = create_icon (r, SCROLLER_ARROW_UP,
@@ -428,7 +428,7 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
-	if (None == r->scrollBar.pixmap)
+	if (NOT_PIXMAP(r->scrollBar.pixmap))
 #endif
 		XSetWindowBackground (r->Xdisplay, r->scrollBar.win,
 			r->scrollBar.sgi_bg);
@@ -439,37 +439,37 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
 void 
 rxvt_scrollbar_exit_sgi (rxvt_t* r)
 {
-	if (None != r->scrollBar.sgi_stippleGC)	{
+	if (IS_GC(r->scrollBar.sgi_stippleGC))	{
 		XFreeGC (r->Xdisplay, r->scrollBar.sgi_stippleGC);
-		r->scrollBar.sgi_stippleGC = None;
+		UNSET_GC(r->scrollBar.sgi_stippleGC);
 	}
-	if (None != r->scrollBar.sgi_dimple)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_dimple))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_dimple);
-		r->scrollBar.sgi_dimple = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_dimple);
 	}
-	if (None != r->scrollBar.sgi_upArrow)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_upArrow))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_upArrow);
-		r->scrollBar.sgi_upArrow = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_upArrow);
 	}
-	if (None != r->scrollBar.sgi_upArrowHi)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_upArrowHi))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_upArrowHi);
-		r->scrollBar.sgi_upArrowHi = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_upArrowHi);
 	}
-	if (None != r->scrollBar.sgi_upArrowLow)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_upArrowLow))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_upArrowLow);
-		r->scrollBar.sgi_upArrowLow = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_upArrowLow);
 	}
-	if (None != r->scrollBar.sgi_downArrow)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_downArrow))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_downArrow);
-		r->scrollBar.sgi_downArrow = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_downArrow);
 	}
-	if (None != r->scrollBar.sgi_downArrowHi)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_downArrowHi))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_downArrowHi);
-		r->scrollBar.sgi_downArrowHi = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_downArrowHi);
 	}
-	if (None != r->scrollBar.sgi_downArrowLow)	{
+	if (IS_PIXMAP(r->scrollBar.sgi_downArrowLow))	{
 		XFreePixmap (r->Xdisplay, r->scrollBar.sgi_downArrowLow);
-		r->scrollBar.sgi_downArrowLow = None;
+		UNSET_PIXMAP(r->scrollBar.sgi_downArrowLow);
 	}
 }
 

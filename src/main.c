@@ -330,16 +330,16 @@ void
 rxvt_free_hidden( rxvt_t* r )
 {
 #ifdef DEBUG
-	if (None != r->h->bar_pointer)
+	if (IS_CURSOR(r->h->bar_pointer))
 	{
 		XFreeCursor( r->Xdisplay, r->h->bar_pointer );
-		r->h->bar_pointer = None;
+		UNSET_CURSOR(r->h->bar_pointer);
 	}
 # ifdef POINTER_BLANK
-	if( None != r->h->blank_pointer )
+	if (IS_CURSOR(r->h->blank_pointer))
 	{
 		XFreeCursor( r->Xdisplay, r->h->blank_pointer );
-		r->h->blank_pointer = None;
+		UNSET_CURSOR(r->h->blank_pointer);
 	}
 # endif
 #endif	/* DEBUG */
@@ -423,11 +423,11 @@ rxvt_clean_exit (rxvt_t* r)
 	 */
 /* #ifdef DEBUG	*/
 	/* Destroy windows before other X resources */
-	if (None != r->TermWin.parent)
+	if (IS_WIN(r->TermWin.parent))
 	{
 		XDestroySubwindows (r->Xdisplay, r->TermWin.parent);
 		XDestroyWindow (r->Xdisplay, r->TermWin.parent);
-		r->TermWin.parent = None;
+		UNSET_WIN(r->TermWin.parent);
 	}
 
 # ifdef HAVE_SCROLLBARS
@@ -511,15 +511,15 @@ rxvt_clean_exit (rxvt_t* r)
 #  endif
 # endif
 
-	if (None != r->term_pointer)
+	if (IS_CURSOR(r->term_pointer))
 	{
 		XFreeCursor (r->Xdisplay, r->term_pointer);
-		r->term_pointer = None;
+		UNSET_CURSOR(r->term_pointer);
 	}
-	if (None != r->TermWin.gc)
+	if (IS_GC(r->TermWin.gc))
 	{
 		XFreeGC (r->Xdisplay, r->TermWin.gc);
-		r->TermWin.gc = None;
+		UNSET_GC(r->TermWin.gc);
 	}
 	XCloseDisplay (r->Xdisplay);
 	r->Xdisplay = NULL;
@@ -2001,7 +2001,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 #ifdef XFT_SUPPORT
 		ISNOT_OPTION(r, Opt_xft) &&
 #endif
-		r->menuBar.win != None)
+		IS_WIN(r->menuBar.win))
 	{
 		DBG_MSG( 3, ( stderr, "Resized menubar font\n"));
 		XSetFont( r->Xdisplay, r->menuBar.gc, r->TermWin.font->fid);
@@ -2313,7 +2313,7 @@ Done:
 #endif
 		{
 #ifdef BACKGROUND_IMAGE
-			if (None == PVTS(r, page)->pixmap)
+			if (NOT_PIXMAP(PVTS(r, page)->pixmap))
 #endif
 			{
 				DBG_MSG( 3, ( stderr, "Changing background of page %d\n",
@@ -2594,7 +2594,7 @@ rxvt_IM_is_running(rxvt_t *r)
 
 		atom = XInternAtom(r->Xdisplay, server, False);
 		win = XGetSelectionOwner (r->Xdisplay, atom);
-		if (win != None)
+		if (IS_WIN(win))
 			return True;
 	}
 	return False;

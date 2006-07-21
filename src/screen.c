@@ -2015,7 +2015,7 @@ rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 		SWAP_IT(r->PixColors[Color_fg], r->PixColors[Color_bg],
 			unsigned long);
 #if defined(BACKGROUND_IMAGE)
-		if (PVTS(r, page)->bg.pixmap == None)
+		if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
 #endif
 #if defined(TRANSPARENT)
 			if ( ISNOT_OPTION(r, Opt_transparent) ||
@@ -2325,7 +2325,7 @@ rxvt_scr_bell(rxvt_t *r, int page)
 #  endif
 # endif
 # ifdef BACKGROUND_IMAGE
-			  None != PVTS(r, page)->pixmap
+			  IS_PIXMAP(PVTS(r, page)->pixmap)
 # endif
 		   )
 		{
@@ -2619,7 +2619,7 @@ rxvt_set_clipping (rxvt_t* r, __attribute__((unused)) void *xftdraw,
 
 	region = XCreateRegion();
 	XUnionRectWithRegion( &rect, region, region);
-	if( refreshRegion != None )
+	if (IS_REGION(refreshRegion))
 		XIntersectRegion( region, refreshRegion, region);
 
 	XSetRegion( r->Xdisplay, gc, region);
@@ -2647,8 +2647,10 @@ rxvt_free_clipping (rxvt_t* r, void* xftdraw, GC gc, Region refreshRegion)
 	if (SHADOW_NONE == r->TermWin.shadow_mode)
 		return;	/* shortcut */
 
-	if( refreshRegion != None ) XSetRegion( r->Xdisplay, gc, refreshRegion );
-	else XSetClipMask( r->Xdisplay, gc, None);
+	if (IS_REGION(refreshRegion))
+		XSetRegion( r->Xdisplay, gc, refreshRegion );
+	else
+		XSetClipMask( r->Xdisplay, gc, None);
 
 # ifdef XFT_SUPPORT
 	if( ISSET_OPTION(r, Opt_xft) && xftdraw)
@@ -3385,7 +3387,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		h->refresh_type &= ~REFRESH_BOUNDS;
 	}
 #ifdef BACKGROUND_IMAGE
-	must_clear |= (PVTS(r, page)->bg.pixmap != None);
+	must_clear |= IS_PIXMAP(PVTS(r, page)->bg.pixmap);
 #endif
 #ifdef TRANSPARENT
 	must_clear |= ( h->am_transparent || h->am_pixmap_trans );
@@ -3404,7 +3406,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	 * time drawing pixels outside this clipping. (This probably happened
 	 * because of an expose event).
 	 */
-	if( (refresh_type & CLIPPED_REFRESH) && h->refreshRegion != None )
+	if( (refresh_type & CLIPPED_REFRESH) && IS_REGION(h->refreshRegion))
 	{
 		DBG_MSG( 3, ( stderr, "Doing clipped refresh (Region %p)\n",
 					h->refreshRegion));
@@ -4400,7 +4402,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	if (refresh_type & SMOOTH_REFRESH)
 		XSync(r->Xdisplay, False);
 
-	if( (refresh_type & CLIPPED_REFRESH) && h->refreshRegion != None)
+	if( (refresh_type & CLIPPED_REFRESH) && IS_REGION(h->refreshRegion))
 	{
 		/*
 		 * A clipped refresh is complete. Don't restrict future refreshes.
@@ -4426,10 +4428,10 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 								 performed a clipped refresh or not. */
 
 	/* Clipping regions will now carry stale information. */
-	if( h->refreshRegion != None )
+	if (IS_REGION(h->refreshRegion))
 	{
 		XDestroyRegion( h->refreshRegion );
-		h->refreshRegion = None;
+		UNSET_REGION(h->refreshRegion);
 	}
 
 	PVTS(r, page)->num_scr = 0;
@@ -4463,7 +4465,7 @@ rxvt_scr_clear(rxvt_t* r, int page)
 #ifdef TRANSPARENT
 	if ISSET_OPTION(r, Opt_transparent)
 	{
-		if (r->TermWin.parent != None)
+		if (IS_WIN(r->TermWin.parent))
 			XClearWindow(r->Xdisplay, r->TermWin.parent);
 	}
 #endif
@@ -4641,7 +4643,7 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 
 	DBG_MSG(2,(stderr, "rxvt_selection_paste (%08lx, %lu, %d), wait=%2x\n", win, (unsigned long)prop, (int)delete_prop, r->h->selection_wait));
 
-	if (prop == None)		/* check for failed XConvertSelection */
+	if (NOT_ATOM(prop))		/* check for failed XConvertSelection */
 	{
 #ifdef MULTICHAR_SET
 		if ((r->h->selection_type & Sel_CompoundText))
@@ -4733,7 +4735,7 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
 {
 	int			 reget_time = 0;
 
-	if (prop == None)
+	if (NOT_ATOM(prop))
 		return;
 
 	DBG_MSG(2,(stderr, "rxvt_selection_property(%08lx, %lu)\n", win, (unsigned long)prop));

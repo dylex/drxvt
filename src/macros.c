@@ -165,7 +165,7 @@ rxvt_toggle_subwin( rxvt_t *r, const unsigned char *str)
 
 		/* Refresh tabbar */
 		rxvt_tabbar_set_visible_tabs (r, False);
-		if( r->tabBar.win != None)
+		if (IS_WIN(r->tabBar.win))
 			XClearArea( r->Xdisplay, r->tabBar.win, 0, 0, 0, 0, True);
 
 		return;
@@ -343,7 +343,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 	 */
 	keysym = tolower( XStringToKeysym( keyname_nomods ) );
 
-	if( keysym == None )
+	if (NOT_KEYSYM(keysym))
 	{
 		rxvt_print_error( "Invalid keysym %s. Skipping macro.",
 				keyname_nomods);
@@ -563,8 +563,8 @@ rxvt_cleanup_macros( rxvt_t *r )
 	for( i = 0; i < r->nmacros; i++)
 	{
 		if(
-			 r->macros[i].action.type == MacroFnDummy
-			 || r->macros[i].keysym == None
+			 r->macros[i].action.type == MacroFnDummy ||
+			 NOT_KEYSYM(r->macros[i].keysym)
 		  )
 		{
 			/*
