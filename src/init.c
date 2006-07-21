@@ -1103,7 +1103,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 		 */
 		r->TermWin.maxTabWidth =
 #ifdef XFT_SUPPORT
-			(r->Options & Opt_xft) ? MAX_DISPLAY_TAB_TXT :
+			ISSET_OPTION(r, Opt_xft) ? MAX_DISPLAY_TAB_TXT :
 #endif
 			DEFAULT_DISPLAY_TAB_TXT;
 
@@ -1158,11 +1158,11 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 #ifdef TRANSPARENT
 		if (
 			  None != r->h->xa[XA_NET_WM_WINDOW_OPACITY]
-			  && r->Options & Opt_transparent
+			  && ISSET_OPTION(r, Opt_transparent)
 		   )
 		{
 			/* Override pseudo-transparent */
-			r->Options &= ~Opt_transparent;
+			UNSET_OPTION(r, Opt_transparent);
 		}
 #endif
 	}
@@ -1322,7 +1322,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 #ifdef XTERM_REVERSE_VIDEO
 	/* this is how xterm implements reverseVideo */
-	if (r->Options & Opt_reverseVideo)
+	if (ISSET_OPTION(r, Opt_reverseVideo))
 	{
 		if (!rs[Rs_color + Color_fg])
 			rs[Rs_color + Color_fg] = def_colorName[Color_bg];
@@ -1355,7 +1355,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 #ifndef XTERM_REVERSE_VIDEO
 	/* this is how we implement reverseVideo */
-	if (r->Options & Opt_reverseVideo)
+	if (ISSET_OPTION(r, Opt_reverseVideo))
 	{
 		if (!rs[Rs_color + Color_fg])
 			rs[Rs_color + Color_fg] = def_colorName[Color_fg];
@@ -1398,8 +1398,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	 * using autohideTabbar will only display the tabbar if there are multiple
 	 * tabs. The user can hide / show the tabbar using a macro at will.
 	 */
-	if( r->Options2 & Opt2_autohideTabbar )
-		r->Options2 |= Opt2_hideTabbar;
+	if(ISSET_OPTION2(r, Opt2_autohideTabbar))
+		SET_OPTION2(r, Opt2_hideTabbar);
 
 	/* Cleanup the macro list */
 	rxvt_cleanup_macros( r );
@@ -1587,7 +1587,7 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
 			&(r->h->xa[XA_WMDELETEWINDOW]), 1);
 
 #ifdef META8_OPTION
-	r->h->meta_char = (r->Options & Opt_meta8 ? 0x80 : C0_ESC);
+	r->h->meta_char = (ISSET_OPTION(r, Opt_meta8) ? 0x80 : C0_ESC);
 #endif
 	rxvt_get_ourmods(r);
 
@@ -1598,7 +1598,7 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
 	r->Xfd = XConnectionNumber(r->Xdisplay);
 
 #ifdef CURSOR_BLINK
-	if (r->Options & Opt_cursorBlink)
+	if (ISSET_OPTION(r, Opt_cursorBlink))
 		(void)gettimeofday(&r->h->lastcursorchange, NULL);
 #endif
 
@@ -2033,7 +2033,7 @@ rxvt_init_win_size( rxvt_t *r )
 
 	/* Calculate the terminal increment width and height */
 #ifndef NO_FRILLS
-	if( r->Options2 & Opt2_smoothResize )
+	if( ISSET_OPTION2(r, Opt2_smoothResize))
 	{
 		r->szHint.width_inc = 1;
 		r->szHint.height_inc = 1;
@@ -2049,14 +2049,14 @@ rxvt_init_win_size( rxvt_t *r )
 	r->szHint.base_width = 2 * r->TermWin.int_bwidth;
 	r->szHint.base_height = 2 * r->TermWin.int_bwidth;
 #ifdef HAVE_SCROLLBARS
-	if (r->Options & Opt_scrollBar)
+	if (ISSET_OPTION(r, Opt_scrollBar))
 		r->szHint.base_width += rxvt_scrollbar_rwidth (r);
 #endif
 #ifdef HAVE_MENUBAR
-	if (r->Options & Opt_showMenu)
+	if (ISSET_OPTION(r, Opt_showMenu))
 		r->szHint.base_height += rxvt_menubar_rheight (r);
 #endif
-	if (!(r->Options2 & Opt2_hideTabbar))
+	if (ISNOT_OPTION2(r, Opt2_hideTabbar))
 		r->szHint.base_height += rxvt_tabbar_rheight (r);
 
 	/* Set the terminal minimal width and height */
@@ -2068,7 +2068,7 @@ rxvt_init_win_size( rxvt_t *r )
 	{
 		r->TermWin.ncol = BOUND_POSITIVE_INT16(w);
 #ifndef NO_FRILLS
-		if( (r->Options2 & Opt2_smoothResize) )
+		if( ISSET_OPTION2(r, Opt2_smoothResize) )
 		{
 			/* For smoothResize, w as a pixel width (if large enough) */
 			if(r->TermWin.ncol > r->szHint.base_width + r->TermWin.fwidth)
@@ -2087,7 +2087,7 @@ rxvt_init_win_size( rxvt_t *r )
 	{
 		r->TermWin.nrow = BOUND_POSITIVE_INT16(h);
 #ifndef NO_FRILLS
-		if( r->Options2 & Opt2_smoothResize )
+		if(ISSET_OPTION2(r, Opt2_smoothResize))
 		{
 			/* For smoothResize, w as a pixel height (if large enough) */
 			if(r->TermWin.nrow > r->szHint.base_height + r->TermWin.fheight)
@@ -2141,11 +2141,10 @@ rxvt_init_win_size( rxvt_t *r )
 			- r->szHint.height - 2 * r->TermWin.ext_bwidth);
 
 	/* Set the terminal window starting position */
-	r->h->window_vt_x = (r->Options & Opt_scrollBar_right) ? 
+	r->h->window_vt_x = (ISSET_OPTION(r, Opt_scrollBar_right)) ? 
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 	r->h->window_vt_y = r->szHint.base_height - 2*r->TermWin.int_bwidth;
-	if ((r->Options2 & Opt2_bottomTabbar) &&
-		!(r->Options2 & Opt2_hideTabbar))
+	if (ISSET_OPTION2(r, Opt2_bottomTabbar) && ISNOT_OPTION2(r, Opt2_hideTabbar))
 		r->h->window_vt_y -= rxvt_tabbar_rheight (r);
 }
 
@@ -2508,11 +2507,11 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	/* Initialize PrivateModes and SavedModes */
 	PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
 		PrivMode_Default;
-	if (r->Options & Opt_scrollTtyOutputInhibit)
+	if (ISSET_OPTION(r, Opt_scrollTtyOutputInhibit))
 		PVTS(r, page)->PrivateModes |= PrivMode_TtyOutputInh;
-	if (r->Options & Opt_scrollTtyKeypress)
+	if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
 		PVTS(r, page)->PrivateModes |= PrivMode_Keypress;
-	if (!(r->Options & Opt_jumpScroll))
+	if (ISNOT_OPTION(r, Opt_jumpScroll))
 		PVTS(r, page)->PrivateModes |= PrivMode_smoothScroll;
 #ifndef NO_BACKSPACE_KEY
 	if (STRCMP(r->h->key_backspace, "DEC") == 0)
@@ -2577,7 +2576,7 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 	PVTS(r, page)->tab_title = NULL;
 
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		if (PVTS(r, page)->xftvt)
 			XftDrawDestroy (PVTS(r, page)->xftvt);
@@ -2657,7 +2656,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 								r->PixColors[Color_bg]);
 	assert (None != PVTS(r, page)->vt);
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		PVTS(r, page)->xftvt = XftDrawCreate (r->Xdisplay,
 			PVTS(r, page)->vt, XVISUAL, XCMAP);
@@ -2678,7 +2677,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	vt_emask = (ExposureMask | ButtonPressMask | ButtonReleaseMask
 		| PropertyChangeMask);
 #ifdef POINTER_BLANK
-	if ((r->Options & Opt_pointerBlank))
+	if (ISSET_OPTION(r, Opt_pointerBlank))
 		vt_emask |= PointerMotionMask;
 	else
 #endif
@@ -2687,7 +2686,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 
 #ifdef TRANSPARENT
 	/* Set transparent background */
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		XSetWindowBackgroundPixmap (r->Xdisplay, PVTS(r, page)->vt,
 			ParentRelative);
@@ -2699,7 +2698,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	 */
 #ifdef BACKGROUND_IMAGE
 # ifdef TRANSPARENT
-	if( !(r->Options & Opt_transparent) )
+	if( ISNOT_OPTION(r,  Opt_transparent) )
 # endif
 	{
 		const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
@@ -2716,7 +2715,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 			rxvt_load_bg_pixmap(r, page, pf);
 			/* rxvt_scr_touch(r, page, True); */
 		}
-	} /* if( !(r->Options & Opt_transparent) ) */
+	} /* if( ISNOT_OPTION(r,  Opt_transparent) ) */
 #endif
 
 	XMapWindow (r->Xdisplay, PVTS(r, page)->vt);
@@ -2890,7 +2889,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	XCMAP = DefaultColormap(r->Xdisplay, XSCREEN);
 	XVISUAL = DefaultVisual(r->Xdisplay, XSCREEN);
 
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		XGetWindowAttributes(r->Xdisplay,
 			RootWindow(r->Xdisplay, XSCREEN), &gattr);
@@ -2933,14 +2932,14 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 * usage (minimaly).
 	 */
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		if (!rxvt_init_font_xft (r))
 		{
 			DBG_MSG (1, (stderr,
 					"Failed to load FreeType font, fallback to X11 font\n"));
 			/* disable xft */
-			r->Options &= ~Opt_xft;
+			UNSET_OPTION(r, Opt_xft);
 		}
 		else
 		{
@@ -2991,7 +2990,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		/* create XFT draw, test only */
 		XftDraw*		xftdraw = XftDrawCreate (r->Xdisplay,
@@ -3007,7 +3006,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			 */
 #  if 0
 			/* disable pointer blank */
-			r->Options &= ~Opt_pointerBlank;
+			UNSET_OPTION(r, Opt_pointerBlank);
 #  endif
 # endif
 		}
@@ -3016,7 +3015,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 
 # ifdef HAVE_X11_SM_SMLIB_H
-	if (r->Options2 & Opt2_enableSessionMgt)
+	if (ISSET_OPTION2(r, Opt2_enableSessionMgt))
 		rxvt_session_init (r);
 # endif
 
@@ -3037,8 +3036,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	/* window manager hints */
 	wm_hint.flags = (InputHint | StateHint | WindowGroupHint);
 	wm_hint.input = True;
-	wm_hint.initial_state = (r->Options & Opt_iconic ? IconicState
-							: NormalState);
+	wm_hint.initial_state = ISSET_OPTION(r, Opt_iconic) ? IconicState
+							: NormalState;
 	wm_hint.window_group = r->TermWin.parent;
 	/* class hints */
 	class_hint.res_name = (char*) r->h->rs[Rs_name];
@@ -3055,7 +3054,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	XSetCommand (r->Xdisplay, r->TermWin.parent, (char**) argv, argc);
 
 	/* override redirect */
-	if (r->Options2 & Opt2_overrideRedirect)
+	if (ISSET_OPTION2(r, Opt2_overrideRedirect))
 	{
 		XSetWindowAttributes	attrib;
 		attrib.override_redirect = True;
@@ -3069,7 +3068,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 		PropModeReplace, (unsigned char*) &pid, 1);
 #endif
 
-	if (r->Options2 & Opt2_borderLess)
+	if (ISSET_OPTION2(r, Opt2_borderLess))
 	{
 		rxvt_set_borderless (r);
 	}
@@ -3115,7 +3114,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 * else.
 	 */
 #if 0
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		XSetWindowBackgroundPixmap (r->Xdisplay, r->TermWin.parent,
 			ParentRelative);
@@ -3146,7 +3145,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	r->h->bar_pointer = XCreateFontCursor(r->Xdisplay, XC_left_ptr);
 
 #ifdef POINTER_BLANK
-	if (!(r->Options & Opt_pointerBlank))
+	if (ISNOT_OPTION(r, Opt_pointerBlank))
 		r->h->blank_pointer = None;
 	else
 		r->h->blank_pointer = XCreateGlyphCursor(r->Xdisplay,
@@ -3157,7 +3156,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 	/* graphics context for the vt window */
 #ifdef XFT_SUPPORT
-	if (!(r->Options & Opt_xft))
+	if (ISNOT_OPTION(r, Opt_xft))
 #endif
 	gcvalue.font = r->TermWin.font->fid;
 	gcvalue.foreground = r->PixColors[Color_fg];
@@ -3165,7 +3164,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	gcvalue.graphics_exposures = 1;
 	gcmask = GCForeground | GCBackground | GCGraphicsExposures;
 #ifdef XFT_SUPPORT
-	if (!(r->Options & Opt_xft))
+	if (ISNOT_OPTION(r, Opt_xft))
 #endif
 	gcmask |= GCFont;
 	r->TermWin.gc = XCreateGC(r->Xdisplay, r->TermWin.parent,
@@ -3173,7 +3172,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 #ifdef HAVE_SCROLLBARS
 	rxvt_scrollbar_create (r);
-	if (r->Options & Opt_scrollBar)
+	if (ISSET_OPTION(r, Opt_scrollBar))
 	{
 		rxvt_scrollbar_show (r);
 	}
@@ -3189,7 +3188,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	else rxvt_menubar_load_file( r, (unsigned char*) "default.menu");
 
 	rxvt_menubar_create (r);
-	if (r->Options & Opt_showMenu)
+	if (ISSET_OPTION(r, Opt_showMenu))
 		rxvt_menubar_show (r);
 
 	/*
@@ -3208,7 +3207,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 # endif
 
 	rxvt_tabbar_create (r);
-	if (!(r->Options2 & Opt2_hideTabbar))
+	if (ISNOT_OPTION2(r, Opt2_hideTabbar))
 		rxvt_tabbar_show (r);
 
 	XMapWindow (r->Xdisplay, r->TermWin.parent);
@@ -3217,14 +3216,14 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 * We have to wait till our window is mapped before we can set the maximized
 	 * or fullscreen options.
 	 */
-	if( r->Options2 & Opt2_maximized)
+	if( ISSET_OPTION2(r, Opt2_maximized))
 		ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 			_NET_WM_STATE_ADD,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", True),
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE_MAXIMIZED_VERT", True),
 			0, 0);
-	else if ( r->Options2 & Opt2_fullscreen )
+	else if (ISSET_OPTION2 (r, Opt2_fullscreen))
 		ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 			_NET_WM_STATE_ADD,
@@ -3417,7 +3416,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	/* init terminal attributes */
 	SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
 
-	if( r->Options & Opt_console )		/* be virtual console, fail silently */
+	if (ISSET_OPTION(r, Opt_console))		/* be virtual console, fail silently */
 	{
 #ifdef TIOCCONS
 		unsigned int	on = 1;
@@ -3498,7 +3497,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 		}
 
 		argv0 = (const char *) rxvt_r_basename( shell);
-		if (r->Options & Opt_loginShell)
+		if (ISSET_OPTION(r, Opt_loginShell))
 		{
 			int		l = STRLEN(argv0) + 2;
 			if (l <= 0 || l > 4096)	/* possible integer overflow */
@@ -3542,7 +3541,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 				command = "/bin/sh";
 
 			arg_a[0] = my_basename(command);
-			if (r->Options & Opt_loginShell)
+			if (ISSET_OPTION(r, Opt_loginShell))
 			{
 				int		l = STRLEN(arg_a[0]) + 2;
 				if (l <= 0 || l > 4096)	/* possible integer overflow */

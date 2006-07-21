@@ -6,9 +6,9 @@
  * Copyright (c) 2002        Alexis <materm@tuxfamily.org>
  * Copyright (c) 2004        Terry Griffin <griffint@pobox.com>
  * Copyright (c) 2004        Sergey Popov <p_sergey@jungo.com>
- * Copyright (c) 2004-2005   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+ * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005        Mark Olesen <Mark.Olesen@gmx.net>
- * Copyright (c) 2005		 Gautam Iyer <gi1242@users.sourceforge.net>
+ * Copyright (c) 2005-2006	 Gautam Iyer <gi1242@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,7 +106,7 @@
 
 /* width of tabbar that can be used to draw tabs */
 #define TAB_SPACE		(TWIN_WIDTH(r)- \
-	((r->Options2 & Opt2_hideButtons) ? 0 : 1) * \
+	(ISSET_OPTION2(r, Opt2_hideButtons) ? 0 : 1) * \
 	(4 * (BTN_WIDTH+BTN_SPACE) + TAB_BORDER))
 
 
@@ -246,7 +246,7 @@ rxvt_tabbar_set_visible_tabs (rxvt_t* r, Bool refresh)
 	 * For Firefox style tabs, we should recompute all tabwidths.
 	 */
 #ifdef XFT_SUPPORT
-	if( (r->Options & Opt_xft) && r->TermWin.xftpfont )
+	if( ISSET_OPTION(r, Opt_xft) && r->TermWin.xftpfont )
 	{
 		int		i;
 		short	tabWidth = rxvt_tab_width( r, NULL);	/* Firefox style tabs
@@ -360,7 +360,7 @@ draw_string (rxvt_t* r, Region clipRegion,
 		 */
 # ifdef XFT_SUPPORT
 
-		if ((r->Options & Opt_xft) && (NULL != r->tabBar.xftwin))
+		if (ISSET_OPTION(r, Opt_xft) && (NULL != r->tabBar.xftwin))
 		{
 #  ifdef HAVE_ICONV_H
 			if (
@@ -440,7 +440,7 @@ draw_string (rxvt_t* r, Region clipRegion,
 		 * Draw the non-multichar string
 		 */
 # ifdef XFT_SUPPORT
-		if ((r->Options & Opt_xft) && (NULL != r->tabBar.xftwin))
+		if (ISSET_OPTION(r, Opt_xft) && (NULL != r->tabBar.xftwin))
 		{
 			rxvt_draw_string_xft (r, r->tabBar.win, r->tabBar.gc,
 					clipRegion, RS_None,
@@ -496,7 +496,7 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 	 * title.
 	 */
 # ifdef XFT_SUPPORT
-	if ((r->Options & Opt_xft) && (NULL != r->tabBar.xftwin))
+	if (ISSET_OPTION(r, Opt_xft) && (NULL != r->tabBar.xftwin))
 	{
 		if( r->TermWin.xftpfont )
 		{
@@ -568,7 +568,7 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 			/* x += Width2Pixel(len); */
 			/*
 #ifdef XFT_SUPPORT
-			if ((r->Options & Opt_xft) && r->tabBar.xftwin)
+			if (ISSET_OPTION(r, Opt_xft) && r->tabBar.xftwin)
 			{
 				x += Width2Pixel(len);
 			}
@@ -706,7 +706,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 			int				clear = 0;	/* use ClearArea or FillRectangle */
 
-			if( r->Options2 & Opt2_bottomTabbar )
+			if (ISSET_OPTION2(r, Opt2_bottomTabbar))
 			{
 				/* Top tabbar line & left of active tab */
 				SET_POINT( points[0], 0, TAB_TOPOFF);
@@ -733,7 +733,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				SET_POINT( points[7], TWIN_WIDTH(r), TAB_TOPOFF);
 			}
 
-			else	/* if ( r->Options2 & Opt2_bottomTabbar ) */
+			else	/* if (ISSET_OPTION2(r, Opt2_bottomTabbar)) */
 			{
 				/*
 				 * Coordinates for the draw bottom line to the left of active
@@ -766,12 +766,12 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			}
 
 #ifdef BACKGROUND_IMAGE
-			if( r->tabBar.hasPixmap  && (r->Options & Opt_tabPixmap))
+			if( r->tabBar.hasPixmap  && ISSET_OPTION(r, Opt_tabPixmap))
 				clear = 1;	/* use background image */
 #endif
 #ifdef TRANSPARENT
 			if ( ( r->h->am_transparent || r->h->am_pixmap_trans ) &&
-				(r->Options & Opt_transparent_tabbar))
+				ISSET_OPTION(r, Opt_transparent_tabbar))
 				clear = 1;	/* transparent override background image */
 #endif
 
@@ -839,7 +839,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			 */
 			CHOOSE_GC_FG( r, r->tabBar.delimit);
 
-			if( r->Options2 & Opt2_bottomTabbar )
+			if (ISSET_OPTION2(r, Opt2_bottomTabbar))
 			{
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
@@ -868,7 +868,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 						x + PVTS(r, page)->tab_width, TAB_TOPOFF + 1);
 			}
 
-			else /* if( r->Options2 & Opt2_bottomTabbar ) */
+			else /* if (ISSET_OPTION2(r, Opt2_bottomTabbar)) */
 			{
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
@@ -901,8 +901,8 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			CHOOSE_GC_FG( r, r->tabBar.ifg);
 			draw_title (r, PVTS(r, page)->tab_title,
 					x + TXT_XOFF,
-					(r->Options2 & Opt2_bottomTabbar ?
-					 		TXT_YOFF : ATAB_EXTRA + TXT_YOFF),
+					ISSET_OPTION2(r, Opt2_bottomTabbar) ?
+					 		TXT_YOFF : ATAB_EXTRA + TXT_YOFF,
 					page, region);
 
 			/* Highlight the tab if necessary */
@@ -966,7 +966,7 @@ rxvt_tabbar_highlight_tab (rxvt_t* r, short page, Bool force)
 
 	/* Set dimensions of the highlighted tab rectangle */
 	sx = x + ( TXT_XOFF / 2 );
-	sy = (r->Options2 & Opt2_bottomTabbar)		?
+	sy = ISSET_OPTION2(r, Opt2_bottomTabbar)	?
 				TAB_TOPOFF + 1					:
 				TAB_TOPOFF + ATAB_EXTRA + 1;
 	rw = PVTS(r, page)->tab_width - TXT_XOFF;
@@ -1001,12 +1001,12 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 		return;
 
 	/* whether the buttons are hidden */
-	if (r->Options2 & Opt2_hideButtons)
+	if (ISSET_OPTION2(r, Opt2_hideButtons))
 		return;
 
 	topoff = BTN_TOPOFF;
 #if 0
-	frame = !(r->Options2 & Opt2_bottomTabbar) ?
+	frame = ISNOT_OPTION2(r, Opt2_bottomTabbar) ?
 				r->tabBar.frame : r->tabBar.delimit;
 #endif
 	frame = r->tabBar.frame;
@@ -1024,7 +1024,7 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 					img_d[XPM_TERM] : img_e[XPM_TERM];
 				break;
 			case XPM_CLOSE:
-				img[XPM_CLOSE] = ((r->Options2 & Opt2_protectSecondary) &&
+				img[XPM_CLOSE] = (ISSET_OPTION2(r, Opt2_protectSecondary) &&
 								PRIMARY != AVTS(r)->current_screen) ?
 						img_d[XPM_CLOSE] : img_e[XPM_CLOSE];
 				break;
@@ -1096,7 +1096,7 @@ init_tabbar (rxvt_t* r)
 
 	/* Make sure that font has been initialized */
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION (r, Opt_xft))
 		assert (NULL != r->TermWin.xftfont);
 	else
 #endif
@@ -1165,7 +1165,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 		 && command == NULL	/* No command specified (e.g. via NewTab macro) */
 		 && (
 			   LTAB(r)== 0							/* First tab */
-			   || (r->Options2 & Opt2_cmdAllTabs)	/* -at option */
+			   || ISSET_OPTION2(r, Opt2_cmdAllTabs)	/* -at option */
 		    )
 	  )
 		argv = cmd_argv;
@@ -1353,18 +1353,18 @@ rxvt_append_page( rxvt_t* r, int profile,
 	 */
 	if(
 		 !r->tabBar.state && LTAB(r) == 1
-		 && (r->Options2 & Opt2_autohideTabbar)
+		 && ISSET_OPTION2(r, Opt2_autohideTabbar)
 		 && rxvt_tabbar_show( r )
 	  )
 		rxvt_resize_on_subwin( r, SHOW_TABBAR);
 
 	/* synchronize terminal title with tab title */
-	if (r->Options2 & Opt2_syncTabTitle)
+	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r,
 				(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (r->Options2 & Opt2_syncTabIcon)
+	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name (r,
 				(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
@@ -1468,7 +1468,7 @@ rxvt_remove_page (rxvt_t* r, short page)
 	/* redraw the tabs and buttons */
 	if (r->tabBar.state)
 	{
-		if( LTAB(r) == 0 && (r->Options2 & Opt2_autohideTabbar) 
+		if( LTAB(r) == 0 && ISSET_OPTION2(r, Opt2_autohideTabbar) 
 				&& rxvt_tabbar_hide( r ))
 			/*
 			 * Only one tab left. Auto hide tabbar.
@@ -1488,11 +1488,11 @@ rxvt_remove_page (rxvt_t* r, short page)
 	/* rxvt_scr_touch (r, ATAB(r), True); */
 
 	/* synchronize terminal title with tab title */
-	if (r->Options2 & Opt2_syncTabTitle)
+	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (r->Options2 & Opt2_syncTabIcon)
+	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
@@ -1534,12 +1534,12 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
 	}
 
 	/* synchronize terminal title with active tab title */
-	if ((r->Options2 & Opt2_syncTabTitle) &&
+	if (ISSET_OPTION2(r, Opt2_syncTabTitle) &&
 		(page == ATAB(r)))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if ((r->Options2 & Opt2_syncTabIcon) &&
+	if (ISSET_OPTION2(r, Opt2_syncTabIcon) &&
 		(page == ATAB(r)))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
@@ -1589,11 +1589,11 @@ rxvt_activate_page (rxvt_t* r, short index)
 	DBG_MSG(1,(stderr,"active page is %d\n",ATAB(r)));
 
 	/* synchronize terminal title with tab title */
-	if (r->Options2 & Opt2_syncTabTitle)
+	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (r->Options2 & Opt2_syncTabIcon)
+	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
@@ -1614,7 +1614,7 @@ rxvt_tabbar_resize (rxvt_t* r)
 #ifdef HAVE_MENUBAR
 	sy += rxvt_menubar_height (r);
 #endif
-	if (r->Options2 & Opt2_bottomTabbar)
+	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
 		sy += VT_HEIGHT(r);
 	XMoveResizeWindow  (r->Xdisplay, r->tabBar.win,
 		sx, sy, TWIN_WIDTH(r), rxvt_tabbar_rheight (r));
@@ -1694,7 +1694,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	/* let's decode where the user click */
 	z = TWIN_WIDTH(r) - x;
 	if (
-			!(r->Options2 & Opt2_hideButtons)
+			ISNOT_OPTION2(r, Opt2_hideButtons)
 			&& z < 4*(BTN_WIDTH+BTN_SPACE)
 			&& (z%(BTN_WIDTH+BTN_SPACE)) > BTN_SPACE
 	   )
@@ -1722,11 +1722,10 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 				break;
 
 			case 2 : /* delete the active vt if it's in primary screen */
-				if(
-						!(r->Options2 & Opt2_protectSecondary)
-						|| ( (r->Options2 & Opt2_protectSecondary)
-								&& (PRIMARY == AVTS(r)->current_screen) )
-				  )
+				if (ISNOT_OPTION2(r, Opt2_protectSecondary) ||
+					( ISSET_OPTION2(r, Opt2_protectSecondary) &&
+					  PRIMARY == AVTS(r)->current_screen
+					))
 					rxvt_kill_page (r, ATAB(r));
 				break;
 
@@ -2018,7 +2017,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	}
 
 #ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION (r, Opt_xft))
 	{
 		rxvt_alloc_xft_color (r, r->tabBar.fg, &(r->tabBar.xftfg));
 		rxvt_alloc_xft_color (r, r->tabBar.ifg, &(r->tabBar.xftifg));
@@ -2031,7 +2030,7 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef HAVE_MENUBAR
 	sy += rxvt_menubar_height (r);
 #endif
-	if (r->Options2 & Opt2_bottomTabbar)
+	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
 		sy += VT_HEIGHT(r);
 	/*
 	 * create the window of the tabbar. Use ifg and ibg for the background of
@@ -2043,7 +2042,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	assert( None != r->tabBar.win );
 
 #ifdef XFT_SUPPORT
-	if( r->Options & Opt_xft )
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		r->tabBar.xftwin = XftDrawCreate (r->Xdisplay, r->tabBar.win,
 								XVISUAL, XCMAP);
@@ -2061,8 +2060,8 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef TRANSPARENT
 			/* Transparency overrides background */
 			!(
-				(r->Options & Opt_transparent)
-				&& (r->Options & Opt_transparent_tabbar)
+				ISSET_OPTION(r, Opt_transparent)
+				&& ISSET_OPTION(r, Opt_transparent_tabbar)
 			 )
 			&&
 #endif
@@ -2086,8 +2085,8 @@ rxvt_tabbar_create (rxvt_t* r)
 
 #ifdef TRANSPARENT
 	if (
-			(r->Options & Opt_transparent)
-			&& (r->Options & Opt_transparent_tabbar)
+			ISSET_OPTION(r, Opt_transparent)
+			&& ISSET_OPTION(r, Opt_transparent_tabbar)
 	   )
 		XSetWindowBackgroundPixmap( r->Xdisplay, r->tabBar.win, ParentRelative);
 #endif
@@ -2109,7 +2108,7 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
 	if (!(( r->h->am_transparent || r->h->am_pixmap_trans) &&
-		(r->Options & Opt_transparent_tabbar)))
+		ISSET_OPTION(r, Opt_transparent_tabbar)))
 #endif
 #ifdef BACKGROUND_IMAGE
 		/* set background color when there's no bg image */
@@ -2134,7 +2133,7 @@ rxvt_tabbar_create (rxvt_t* r)
 		);
 
 #ifdef XFT_SUPPORT
-	if (!(r->Options & Opt_xft))
+	if (ISNOT_OPTION(r, Opt_xft))
 #endif
 	XSetFont (r->Xdisplay, r->tabBar.gc, r->TermWin.font->fid);
 
@@ -2258,7 +2257,7 @@ unsigned int
 rxvt_tab_width (rxvt_t *r, const char *str)
 {
 #ifdef XFT_SUPPORT
-	if ( (r->Options & Opt_xft) && r->TermWin.xftpfont)
+	if ( ISSET_OPTION (r, Opt_xft) && r->TermWin.xftpfont)
 	{
 		/*
 		 * With a proportionally spaced font defined, let's try and make the
@@ -2286,7 +2285,7 @@ rxvt_tab_width (rxvt_t *r, const char *str)
 		if (len > maxw)
 			len = maxw;
 #ifdef XFT_SUPPORT
-		if ((r->Options & Opt_xft) && (NULL != r->tabBar.xftwin))
+		if (ISSET_OPTION (r, Opt_xft) && (NULL != r->tabBar.xftwin))
 		{
 			return (2 * TXT_XOFF + Width2Pixel(len));
 		}
@@ -2397,7 +2396,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 # ifdef TRANSPARENT
 					(
 					 (r->h->am_transparent || r->h->am_pixmap_trans)
-					 && (r->Options & Opt_transparent_tabbar)
+					 && ISSET_OPTION (r, Opt_transparent_tabbar)
 					)
 # endif
 # if defined(TRANSPARENT) && defined(BACKGROUND_IMAGE)

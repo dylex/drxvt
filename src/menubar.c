@@ -95,9 +95,9 @@ static const struct {
 };
 
 #ifdef XFT_SUPPORT
-#define PTEXTWIDTH( r, s, len)								\
-	(( ((r)->Options & Opt_xft) && r->TermWin.xftpfont ) ?	\
-		( xftPfontTextWidth( (r), (s), (len)) )	:			\
+#define PTEXTWIDTH( R, s, len)								\
+	( (ISSET_OPTION(R, Opt_xft) && r->TermWin.xftpfont ) ?	\
+		( xftPfontTextWidth( (R), (s), (len)) )	:			\
 		Width2Pixel(len))
 
 int
@@ -494,8 +494,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 			continue;
 
 		/* possible integer overflow? */
-		assert (parse[i].len >= 0 && xtra_len >= 0);
-		assert (parse[i].len + xtra_len + 1 > 0);
+		assert (parse[i].len <= 0xffff - xtra_len - 1);
 		/* str = rxvt_malloc(parse[i].len + xtra_len + 1); */
 
 		len = 0;
@@ -1297,7 +1296,7 @@ rxvt_menu_show(rxvt_t *r)
 		XMapWindow(r->Xdisplay, ActiveMenu->win);
 	}
 #ifdef XFT_SUPPORT
-	else if( r->Options & Opt_xft )
+	else if (ISSET_OPTION(r, Opt_xft))
 		XClearWindow( r->Xdisplay, ActiveMenu->win );
 #endif
 
@@ -1405,7 +1404,7 @@ rxvt_menu_show(rxvt_t *r)
 				/*
 				 * TODO: Add multichar support.
 				 */
-				if( r->Options & Opt_xft )
+				if (ISSET_OPTION(r, Opt_xft))
 				{
 					XftFont *font = r->TermWin.xftpfont ?
 						r->TermWin.xftpfont : r->TermWin.xftfont;
@@ -1442,7 +1441,7 @@ rxvt_menu_show(rxvt_t *r)
 				/*
 				 * XXX Add multichar support.
 				 */
-				if( r->Options & Opt_xft )
+				if (ISSET_OPTION(r, Opt_xft))
 				{
 					XftFont *font = r->TermWin.xftpfont ?
 						r->TermWin.xftpfont : r->TermWin.xftfont;
@@ -1477,7 +1476,7 @@ rxvt_menu_show(rxvt_t *r)
 		y += h;
 	}
 #ifdef XFT_SUPPORT
-	if( r->Options & Opt_xft )
+	if (ISSET_OPTION(r, Opt_xft))
 		/*
 		 * 2006-01-29 gi1242: For some reason if we leave xftDraw
 		 * with drawable ActiveMenu->win, we get a RenderBadPicture
@@ -1921,8 +1920,9 @@ rxvt_menubar_create (rxvt_t* r)
 #  ifdef BACKGROUND_IMAGE
 	r->menuBar.pixmap = None;	/* Initialize it to None */
 #   ifdef TRANSPARENT
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_menubar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_menubar)
+		))
 #   endif
 	if (r->h->rs[Rs_menubarPixmap])
 	{
@@ -1936,8 +1936,8 @@ rxvt_menubar_create (rxvt_t* r)
 #  endif
 
 #  ifdef TRANSPARENT
-	if ((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_menubar))
+	if (ISSET_OPTION(r, Opt_transparent) &&
+		ISSET_OPTION(r, Opt_transparent_menubar))
 	{
 		XSetWindowBackgroundPixmap (r->Xdisplay, r->menuBar.win,
 			ParentRelative);
@@ -1973,8 +1973,9 @@ rxvt_menubar_create (rxvt_t* r)
 
 	gcvalue.foreground = r->menuBar.fg;
 #  ifdef TRANSPARENT
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_menubar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_menubar)
+		))
 #  endif
 #  ifdef BACKGROUND_IMAGE
 	if (None == r->menuBar.pixmap)
@@ -1983,8 +1984,9 @@ rxvt_menubar_create (rxvt_t* r)
 	gcmask = GCForeground;
 
 #  ifdef TRANSPARENT
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_menubar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_menubar)
+		))
 #  endif
 #  ifdef BACKGROUND_IMAGE
 	if (None == r->menuBar.pixmap)
@@ -1996,7 +1998,7 @@ rxvt_menubar_create (rxvt_t* r)
 	assert (None != r->menuBar.gc);
 
 #  ifdef XFT_SUPPORT
-	if (r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		/*
 		 * Set up Xft stuff here.
@@ -2025,7 +2027,7 @@ rxvt_menubar_clean_exit (rxvt_t* r)
 	 * Sometimes gives a RenderBadPicture error, so don't destroy it.
 	 */
 #	if 0
-	if( r->Options & Opt_xft)
+	if (ISSET_OPTION(r, Opt_xft))
 	{
 		XftDrawDestroy( r->menuBar.xftDraw);
 	}
@@ -2152,7 +2154,7 @@ rxvt_menubar_draw_labels( rxvt_t *r)
 		/*
 		 * XXX Add multichar support.
 		 */
-		if( r->Options & Opt_xft )
+		if (ISSET_OPTION(r, Opt_xft))
 		{
 			XftFont *font = r->TermWin.xftpfont ?
 				r->TermWin.xftpfont : r->TermWin.xftfont;
@@ -2251,7 +2253,7 @@ rxvt_menubar_draw_labels( rxvt_t *r)
 			/*
 			 * XXX Add multichar support.
 			 */
-			if( r->Options & Opt_xft )
+			if (ISSET_OPTION(r, Opt_xft))
 			{
 				XftFont *font = r->TermWin.xftpfont ?
 					r->TermWin.xftpfont : r->TermWin.xftfont;
@@ -2809,7 +2811,7 @@ rxvt_menubar_rheight(rxvt_t *r)
 	DBG_MSG( 3, (stderr, "rxvt_menubar_rheight()\n"));
 
 # ifdef XFT_SUPPORT
-	if( r->Options & Opt_xft )
+	if (ISSET_OPTION(r, Opt_xft))
 		return (r->TermWin.pheight + 2*SHADOW + 2*MENUBAR_MARGIN);
 	else
 # endif

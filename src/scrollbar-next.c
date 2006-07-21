@@ -210,8 +210,9 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 	gcvalue.foreground = r->scrollBar.next_fg;
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -221,8 +222,9 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 	gcmask = GCForeground;
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -241,8 +243,9 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 		gcvalue.foreground = r->scrollBar.next_dark;
 #ifdef TRANSPARENT
 		/* set background color when there's no transparent */
-		if (!((r->Options & Opt_transparent) &&
-			(r->Options & Opt_transparent_scrollbar)))
+		if (!(ISSET_OPTION(r, Opt_transparent) &&
+			  ISSET_OPTION(r, Opt_transparent_scrollbar)
+			))
 #endif
 #ifdef BACKGROUND_IMAGE
 		/* set background color when there's no bg image */
@@ -254,8 +257,9 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 		gcmask = GCForeground | GCStipple | GCFillStyle;
 #ifdef TRANSPARENT
 		/* set background color when there's no transparent */
-		if (!((r->Options & Opt_transparent) &&
-			(r->Options & Opt_transparent_scrollbar)))
+		if (!(ISSET_OPTION(r, Opt_transparent) &&
+			  ISSET_OPTION(r, Opt_transparent_scrollbar)
+			))
 #endif
 #ifdef BACKGROUND_IMAGE
 		/* set background color when there's no bg image */
@@ -288,8 +292,9 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -381,8 +386,9 @@ rxvt_scrollbar_show_next(rxvt_t *r, int update, int last_top, int last_bot, int 
 
 # ifdef TRANSPARENT
 		/* set background color when there's no transparent */
-		if (!((r->Options & Opt_transparent) &&
-			(r->Options & Opt_transparent_scrollbar)))
+		if (!(ISSET_OPTION(r, Opt_transparent) &&
+			  ISSET_OPTION(r, Opt_transparent_scrollbar)
+			))
 # endif
 #ifdef BACKGROUND_IMAGE
 		/* set background color when there's no bg image */
@@ -399,8 +405,8 @@ rxvt_scrollbar_show_next(rxvt_t *r, int update, int last_top, int last_bot, int 
 			*/
 # ifdef TRANSPARENT
 			/* clear background when there's transparent */
-			if ((r->Options & Opt_transparent) &&
-				(r->Options & Opt_transparent_scrollbar))
+			if (ISSET_OPTION(r, Opt_transparent) &&
+				ISSET_OPTION(r, Opt_transparent_scrollbar))
 				XClearArea (r->Xdisplay, r->scrollBar.win,
 					NEXT_SB_LPAD, NEXT_SB_PAD + last_top,
 					NEXT_SB_BTN_WIDTH, r->scrollBar.top - last_top,
@@ -427,8 +433,8 @@ rxvt_scrollbar_show_next(rxvt_t *r, int update, int last_top, int last_bot, int 
 			*/
 # ifdef TRANSPARENT
 			/* clear background when there's transparent */
-			if ((r->Options & Opt_transparent) &&
-				(r->Options & Opt_transparent_scrollbar))
+			if (ISSET_OPTION(r, Opt_transparent) &&
+				ISSET_OPTION(r, Opt_transparent_scrollbar))
 				XClearArea(r->Xdisplay, r->scrollBar.win,
 					NEXT_SB_LPAD, r->scrollBar.bot + NEXT_SB_PAD,
 					NEXT_SB_BTN_WIDTH, (last_bot - r->scrollBar.bot),
@@ -455,8 +461,8 @@ rxvt_scrollbar_show_next(rxvt_t *r, int update, int last_top, int last_bot, int 
 		*/
 # ifdef TRANSPARENT
 		/* clear background when there's transparent */
-		if ((r->Options & Opt_transparent) &&
-			(r->Options & Opt_transparent_scrollbar))
+		if (ISSET_OPTION(r, Opt_transparent) &&
+			ISSET_OPTION(r, Opt_transparent_scrollbar))
 			XClearArea (r->Xdisplay, r->scrollBar.win,
 				NEXT_SB_LPAD, r->scrollBar.top + NEXT_SB_PAD,
 				NEXT_SB_BTN_WIDTH, scroller_len/*-NEXT_SB_BTN_HEIGHT*/,

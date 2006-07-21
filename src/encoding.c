@@ -400,7 +400,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
 	** iconv. Otherwise, xfticonv is -1
 	*/
 	if (ENC_NOENC != r->encoding_method &&
-		!(r->Options2 & Opt2_xftNomFont))
+		ISNOT_OPTION2(r, Opt2_xftNomFont))
 		r->TermWin.xfticonv = iconv_open ("UTF-8",
 								rxvt_encoding_name(r));
 # endif
@@ -473,11 +473,11 @@ rxvt_fallback_mfont_xft (rxvt_t* r)
 void
 rxvt_set_default_font_xft (rxvt_t* r)
 {
-	if ((r->Options & Opt_xft) && (NULL == r->h->rs[Rs_xftfont]))
+	if (ISSET_OPTION(r, Opt_xft) && (NULL == r->h->rs[Rs_xftfont]))
 		r->h->rs[Rs_xftfont] = DEFAULT_XFT_FONT_NAME;
 
 # ifdef MULTICHAR_SET
-	if ((r->Options & Opt_xft) && (NULL == r->h->rs[Rs_xftmfont]))
+	if (ISSET_OPTION(r, Opt_xft) && (NULL == r->h->rs[Rs_xftmfont]))
 		r->h->rs[Rs_xftmfont] = rxvt_fallback_mfont_xft (r);
 # endif
 }

@@ -85,8 +85,8 @@ rxvt_set_opacity (rxvt_t* r)
 
 #ifdef TRANSPARENT
 	/* Override pseudo-transparent in case */
-	if (r->Options & Opt_transparent)
-		r->Options &= ~Opt_transparent;
+	if (ISSET_OPTION(r, Opt_transparent))
+		UNSET_OPTION(r, Opt_transparent);
 	XSetWindowBackground(r->Xdisplay, r->TermWin.parent,
 		r->h->global_bg);
 #endif
@@ -131,7 +131,7 @@ rxvt_process_reparentnotify (rxvt_t* r, XEvent* ev)
 	rxvt_set_opacity (r);
 
 #ifdef TRANSPARENT
-	if( r->Options & Opt_transparent )
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 #if 0
 		XEvent ev;
@@ -191,7 +191,7 @@ tempDisableTransparent( rxvt_t *r)
 		r->h->am_transparent = 0;
 		r->h->want_full_refresh = 1;
 
-		if( !(r->Options & Opt_forceTransparent) )
+		if( ISNOT_OPTION(r, Opt_forceTransparent) )
 		{
 			XSetWindowBackground( r->Xdisplay, r->TermWin.parent,
 					r->h->global_bg );
@@ -216,7 +216,7 @@ expose_transparent_subwin( rxvt_t *r)
 	if (-1 == LTAB(r)) return;
 
 # ifdef HAVE_SCROLLBARS
-	if (r->Options & Opt_transparent_scrollbar)
+	if (ISSET_OPTION(r, Opt_transparent_scrollbar))
 	{
 		DBG_MSG(2, (stderr, "reset background image for scrollbar\n"));
 		XClearWindow (r->Xdisplay, r->scrollBar.win);
@@ -225,13 +225,13 @@ expose_transparent_subwin( rxvt_t *r)
 	}
 # endif
 # ifdef HAVE_MENUBAR
-	if (r->Options & Opt_transparent_menubar)
+	if (ISSET_OPTION(r, Opt_transparent_menubar))
 	{
 		DBG_MSG(2, (stderr, "reset background image for menubar\n"));
 		rxvt_menubar_expose (r);
 	}
 # endif
-	if (r->Options & Opt_transparent_tabbar)
+	if (ISSET_OPTION(r, Opt_transparent_tabbar))
 	{
 		DBG_MSG(2, (stderr, "reset background image for tabbar\n"));
 		rxvt_tabbar_expose (r, NULL);
@@ -421,10 +421,10 @@ rxvt_toggle_transparency (rxvt_t* r)
 	register int	i;
 
 
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		DBG_MSG(1, (stderr, "unset background transparency\n"));
-		r->Options &= ~Opt_transparent;
+		UNSET_OPTION(r, Opt_transparent);
 		r->h->am_transparent = 0;
 		r->h->am_pixmap_trans = 0;
 		r->h->bgGrabbed = False;
@@ -445,7 +445,8 @@ rxvt_toggle_transparency (rxvt_t* r)
 		}
 
 # ifdef HAVE_SCROLLBARS
-		if (None != r->scrollBar.win && r->Options & Opt_transparent_scrollbar)
+		if (None != r->scrollBar.win &&
+			ISSET_OPTION(r, Opt_transparent_scrollbar))
 		{
 #  ifdef BACKGROUND_IMAGE
 			if (None != r->scrollBar.pixmap)
@@ -463,7 +464,8 @@ rxvt_toggle_transparency (rxvt_t* r)
 # endif	/* HAVE_SCROLLBARS */
 
 # ifdef HAVE_MENUBAR
-		if (None != r->menuBar.win && r->Options & Opt_transparent_menubar)
+		if (None != r->menuBar.win &&
+			ISSET_OPTION(r, Opt_transparent_menubar))
 		{
 #  ifdef BACKGROUND_IMAGE
 			if (None != r->menuBar.pixmap)
@@ -475,7 +477,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 		}
 # endif	/* HAVE_MENUBAR */
 
-		if (r->Options & Opt_transparent_tabbar)
+		if (ISSET_OPTION(r, Opt_transparent_tabbar))
 		{
 # ifdef BACKGROUND_IMAGE
 			if (r->tabBar.hasPixmap)
@@ -500,7 +502,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 	else
 	{
 		DBG_MSG(1, (stderr, "set background transparency\n"));
-		r->Options |= Opt_transparent;
+		SET_OPTION(r, Opt_transparent);
 		XSetWindowBackgroundPixmap (r->Xdisplay, r->TermWin.parent,
 			ParentRelative);
 		for (i = 0; i <= LTAB(r); i ++)
@@ -510,17 +512,17 @@ rxvt_toggle_transparency (rxvt_t* r)
 		}
 # ifdef HAVE_SCROLLBARS
 		if (None != r->scrollBar.win &&
-			r->Options & Opt_transparent_scrollbar)
+			ISSET_OPTION(r, Opt_transparent_scrollbar))
 			XSetWindowBackgroundPixmap (r->Xdisplay,
 				r->scrollBar.win, ParentRelative);
 # endif
 # ifdef HAVE_MENUBAR
 		if (None != r->menuBar.win &&
-			r->Options & Opt_transparent_menubar)
+			ISSET_OPTION(r, Opt_transparent_menubar))
 			XSetWindowBackgroundPixmap (r->Xdisplay,
 				r->menuBar.win, ParentRelative);
 # endif
-		if (r->Options & Opt_transparent_tabbar)
+		if (ISSET_OPTION(r, Opt_transparent_tabbar))
 			XSetWindowBackgroundPixmap (r->Xdisplay,
 				r->tabBar.win, ParentRelative);
 
@@ -614,7 +616,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	/*
 	 * We dont' really have to check our parents if we're not transparent :)
 	 */
-	if (!(r->Options & Opt_transparent))
+	if (ISNOT_OPTION(r, Opt_transparent))
 		return have_changed;
 
 	DBG_MSG(2, (stderr, "rxvt_check_our_parent ()\n"));
@@ -639,7 +641,7 @@ rxvt_check_our_parents(rxvt_t *r)
 			"Root window has different depth. Disabling transparency");
 
 		r->h->am_pixmap_trans = 0;
-		r->Options &= ~( Opt_forceTransparent | Opt_transparent );
+		UNSET_OPTION(r, (Opt_forceTransparent | Opt_transparent));
 		return tempDisableTransparent( r );
 	}
 
@@ -721,7 +723,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	 * event, then we only refresh part of our window. This causes really ugly
 	 * effects.
 	 */
-	if( !r->h->am_transparent && (r->Options & Opt_forceTransparent) )
+	if( !r->h->am_transparent && ISSET_OPTION(r, Opt_forceTransparent) )
 	{
 		/*
 		 * Try "transparent transparency" legacy code.
@@ -1009,7 +1011,7 @@ rxvt_refresh_bg_image (rxvt_t* r, int page, Bool imediate)
 	DBG_MSG( 1, (stderr, "rxvt_refresh_bg_image\n"));
 
 # ifdef TRANSPARENT
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		if( imediate || !r->h->bgRefreshInterval )
 		{
@@ -1128,7 +1130,7 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
 		if( rxvt_menubar_visible( r ) )
 		{
 			/* Shade menubar */
-			if( r->Options & Opt_transparent_menubar )
+			if (ISSET_OPTION(r, Opt_transparent_menubar))
 				xrenderShadeIntersect( r, pic, r->menuBar.bg, r->TermWin.shade,
 						nx, ny, nw, nh,
 						0, 0, rw, rxvt_menubar_height(r));
@@ -1142,16 +1144,16 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
 		if( rxvt_tabbar_visible( r ) )
 		{
 			/* Shade tabbar */
-			if( r->Options & Opt_transparent_tabbar )
+			if (ISSET_OPTION(r, Opt_transparent_tabbar))
 				xrenderShadeIntersect( r, pic, r->tabBar.ibg, r->TermWin.shade,
 						nx, ny, nw, nh,
-						0, ry + ((r->Options2 & Opt2_bottomTabbar)
+						0, ry + (ISSET_OPTION2(r, Opt2_bottomTabbar)
 										? VT_HEIGHT(r) : 0),
 						rw, rxvt_tabbar_height( r ));
 
 			/* Reset coordinates to shade main window. */
 			rh -= rxvt_tabbar_height( r );
-			if( ! (r->Options2 & Opt2_bottomTabbar ) )
+			if ( ISNOT_OPTION2(r, Opt2_bottomTabbar) )
 				ry += rxvt_tabbar_height( r );
 		}
 
@@ -1159,16 +1161,16 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
 		if( rxvt_scrollbar_visible( r ) )
 		{
 			/* Shade scrollbar */
-			if( r->Options & Opt_transparent_scrollbar )
+			if (ISSET_OPTION(r, Opt_transparent_scrollbar))
 				xrenderShadeIntersect( r, pic, rxvt_scrollbar_bg(r),
 						r->TermWin.shade,
 						nx, ny, nw, nh,
-						(r->Options & Opt_scrollBar_right) ? VT_WIDTH(r) : 0, ry,
+						ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0, ry,
 						rxvt_scrollbar_width(r), VT_HEIGHT(r));
 
 			/* Reset coordinates to shade main window. */
 			rw -= rxvt_scrollbar_width(r);
-			if( !( r->Options & Opt_scrollBar_right ) )
+			if( ISNOT_OPTION(r, Opt_scrollBar_right) )
 				rx += rxvt_scrollbar_width(r);
 		}
 # endif

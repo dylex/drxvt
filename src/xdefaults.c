@@ -829,9 +829,9 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 			char*	OnOff[2] = {"False", "True"};
 
 			if (optList[i].doff < Rs_options2)
-				bval = (r->Options & optList[i].flag) ? 1 : 0;
+				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
 			else
-				bval = (r->Options2 & optList[i].flag) ? 1 : 0;
+				bval = ISSET_OPTION2(r, optList[i].flag) ? 1 : 0;
 			if (optList_isReverse(i))
 				bval = !bval;
 			fprintf( pf, "%s.%s:%.*s%s\n", name,
@@ -1038,16 +1038,16 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				if ((optList[entry].doff+profileNum) < Rs_options2)
 				{
 					if (flag == On)
-						r->Options |= (optList[entry].flag);
+						SET_OPTION(r, optList[entry].flag);
 					else
-						r->Options &= ~(optList[entry].flag);
+						UNSET_OPTION(r, optList[entry].flag);
 				}
 				else
 				{
 					if (flag == On)
-						r->Options2 |= (optList[entry].flag);
+						SET_OPTION2(r, optList[entry].flag);
 					else
-						r->Options2 &= ~(optList[entry].flag);
+						UNSET_OPTION2(r, optList[entry].flag);
 				}
 
 				if ((optList[entry].doff+profileNum) != -1)
@@ -1248,16 +1248,16 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 							if ((optList[entry].doff+profileNum) < Rs_options2)
 							{
 								if (s)
-									r->Options |= (optList[entry].flag);
+									SET_OPTION(r, optList[entry].flag);
 								else
-									r->Options &= ~(optList[entry].flag);
+									UNSET_OPTION(r, optList[entry].flag);
 							}
 							else
 							{
 								if (s)
-									r->Options2 |= (optList[entry].flag);
+									SET_OPTION2(r, optList[entry].flag);
 								else
-									r->Options2 &= ~(optList[entry].flag);
+									UNSET_OPTION2(r, optList[entry].flag);
 							}
 						}
 					}
@@ -1391,7 +1391,7 @@ rxvt_extract_resources (
 	 * Now read config from system wide config file.
 	 */
 	if(
-		!(r->Options2 & Opt2_noSysConfig) &&
+		ISNOT_OPTION2(r, Opt2_noSysConfig) &&
 		(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r") ) != NULL
 	  )
 	{
@@ -1437,8 +1437,8 @@ rxvt_extract_resources (
 	 * the boolean flag is set for each boolean options. Then if we compare
 	 * Options(2) to the flag, we always get TRUE!
 	 */
-	r->Options &= ~(Opt_Boolean | Opt_Reverse);
-	r->Options2 &= ~(Opt_Boolean | Opt_Reverse);
+	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse));
+	UNSET_OPTION2(r, (Opt_Boolean | Opt_Reverse));
 
 
 	/*

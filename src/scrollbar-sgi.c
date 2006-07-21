@@ -422,8 +422,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
 
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */

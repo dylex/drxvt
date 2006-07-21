@@ -80,8 +80,9 @@ rxvt_scrollbar_init_plain (rxvt_t* r)
 
 #ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #endif
 #ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -118,8 +119,8 @@ rxvt_scrollbar_show_plain(rxvt_t *r, int update __attribute__((unused)), int las
 
 	/* scrollbar slider */
 #ifdef TRANSPARENT
-	if ((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar))
+	if (ISSET_OPTION(r, Opt_transparent) &&
+		ISSET_OPTION(r, Opt_transparent_scrollbar))
 		clear = 1;
 	else
 #endif
@@ -132,7 +133,7 @@ rxvt_scrollbar_show_plain(rxvt_t *r, int update __attribute__((unused)), int las
 
 	scroller_len -= 1;
 
-    xsb = (r->Options & Opt_scrollBar_right) ? 1 : 0;
+    xsb = ISSET_OPTION(r, Opt_scrollBar_right) ? 1 : 0;
     if (last_top < r->scrollBar.top)
 		XClearArea(r->Xdisplay, r->scrollBar.win,
 			r->sb_shadow + xsb, last_top,

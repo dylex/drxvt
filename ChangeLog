@@ -15,6 +15,7 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		4. Disable slave macros in the macro chains if the first (master)
 		   macro is defined as dummy.
 		5. Fix off-focus fading. Thanks to Ken Zalewski for the report.
+		6. Add macros to check and set options.
 
 	* Enhancements:
 		1. Add --with-max-profiles to configure script as suggested

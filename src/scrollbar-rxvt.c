@@ -159,8 +159,9 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 	gcvalue.foreground = r->scrollBar.rxvt_fg;
 # ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -170,8 +171,9 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 	gcmask = GCForeground;
 # ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -184,8 +186,9 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 
 # ifdef TRANSPARENT
 	/* set background color when there's no transparent */
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 # endif
 # ifdef BACKGROUND_IMAGE
 	/* set background color when there's no bg image */
@@ -227,9 +230,8 @@ rxvt_scrollbar_show_rxvt(rxvt_t *r, int update __attribute__((unused)), int last
 	/* scrollbar slider */
 #ifdef TRANSPARENT
 	/* clear background when there's transparent */
-	if (
-		  (r->Options & Opt_transparent)
-		  && (r->Options & Opt_transparent_scrollbar)
+	if (ISSET_OPTION(r, Opt_transparent) &&
+		ISSET_OPTION(r, Opt_transparent_scrollbar)
 	   )
 	{
 		XClearArea (r->Xdisplay, r->scrollBar.win,

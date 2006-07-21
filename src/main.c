@@ -128,7 +128,7 @@ rxvt_init(int argc, const char *const *argv)
 	rxvt_create_show_windows(r, argc, argv);
 
 #ifdef TRANSPARENT
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		XSelectInput(r->Xdisplay, XROOT, PropertyChangeMask);
 		/*
@@ -266,7 +266,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
 
 			/* update child members */
 			PVTS(r, i)->dead = 1;
-			if (r->Options2 & Opt2_holdExit)
+			if (ISSET_OPTION2(r, Opt2_holdExit))
 				PVTS(r, i)->hold = 1;
 		}
 		else
@@ -371,7 +371,7 @@ rxvt_exit_request( rxvt_t *r )
 	}
 
 	/* Avoid exiting if some tab is in the secondary screen */
-	if( r->Options2 & Opt2_protectSecondary )
+	if(ISSET_OPTION2(r, Opt2_protectSecondary))
 	{
 		int i, dontExit = 0;
 
@@ -407,7 +407,7 @@ rxvt_clean_exit (rxvt_t* r)
 	rxvt_free_hidden (r);
 
 #ifdef HAVE_X11_SM_SMLIB_H
-	if (r->Options2 & Opt2_enableSessionMgt)
+	if (ISSET_OPTION2(r, Opt2_enableSessionMgt))
 		rxvt_session_exit (r);
 #endif
 
@@ -668,7 +668,7 @@ rxvt_privileged_utmp(rxvt_t* r, int page, char action)
 
 	if (PVTS(r, page)->next_utmp_action != action ||
 		(action != SAVE && action != RESTORE) ||
-		(r->Options & Opt_utmpInhibit) ||
+		ISSET_OPTION(r, Opt_utmpInhibit) ||
 		PVTS(r, page)->ttydev == NULL ||
 		*(PVTS(r, page)->ttydev) == (char) 0)
 		return;
@@ -862,7 +862,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	/*
 	 * If we should not use mfont, then we always use normal font
 	 */
-	if (r->Options2 & Opt2_xftNomFont)
+	if (ISSET_OPTION2(r, Opt2_xftNomFont))
 	{
 		r->TermWin.xftmpattern = r->TermWin.xftpattern;
 		r->TermWin.xftmfont = r->TermWin.xftfont;
@@ -917,7 +917,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 		return 0;
 
 	/* globaladvance */
-	if (r->Options2 & Opt2_xftGlobalAdvance)
+	if (ISSET_OPTION2(r, Opt2_xftGlobalAdvance))
 	{
 		XftPatternDel (r->TermWin.xftmpattern, FC_GLOBAL_ADVANCE);
 		XftPatternAddBool (r->TermWin.xftmpattern, FC_GLOBAL_ADVANCE, FcTrue);
@@ -972,7 +972,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 			)
 		r->TermWin.xftmono = 0;
 
-	else if (r->Options2 & Opt2_xftSlowOutput)
+	else if (ISSET_OPTION2(r, Opt2_xftSlowOutput))
 		r->TermWin.xftmono = 0;
 
 	DBG_MSG(1, (stderr, "xftmono is %d\n", r->TermWin.xftmono));
@@ -1035,19 +1035,19 @@ rxvt_init_font_xft (rxvt_t* r)
 	XftPatternAddBool (xp, XFT_MINSPACE, FcFalse);
 
 	/* antialias */
-	if (r->Options2 & Opt2_xftAntialias)
+	if (ISSET_OPTION2(r, Opt2_xftAntialias))
 		XftPatternAddBool (xp, XFT_ANTIALIAS, FcTrue);
 	else
 		XftPatternAddBool (xp, XFT_ANTIALIAS, FcFalse);
 
 	/* hinting */
-	if (r->Options2 & Opt2_xftHinting)
+	if (ISSET_OPTION2(r, Opt2_xftHinting))
 		XftPatternAddBool (xp, FC_HINTING, FcTrue);
 	else
 		XftPatternAddBool (xp, FC_HINTING, FcFalse);
 
 	/* autohint */
-	if (r->Options2 & Opt2_xftAutoHint)
+	if (ISSET_OPTION2(r, Opt2_xftAutoHint))
 		XftPatternAddBool (xp, FC_AUTOHINT, FcTrue);
 	else
 		XftPatternAddBool (xp, FC_AUTOHINT, FcFalse);
@@ -1155,7 +1155,7 @@ rxvt_init_font_xft (rxvt_t* r)
 		goto Failure;
 
 	/* globaladvance */
-	if (r->Options2 & Opt2_xftGlobalAdvance)
+	if (ISSET_OPTION2(r, Opt2_xftGlobalAdvance))
 	{
 		XftPatternDel (r->TermWin.xftpattern, FC_GLOBAL_ADVANCE);
 		XftPatternAddBool (r->TermWin.xftpattern, FC_GLOBAL_ADVANCE, FcTrue);
@@ -1420,7 +1420,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 
 #ifdef XFT_SUPPORT
 	/* Only load fixed font if we use freetype font */
-	if ((r->Options & Opt_xft) && r->TermWin.xftfont)
+	if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
 	{
 		rxvt_init_font_fixed (r);
 		return;
@@ -1938,7 +1938,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 
 #ifdef XFT_SUPPORT
 	/* Set font size when XFT is not enabled */
-	if (!((r->Options & Opt_xft) && r->TermWin.xftfont))
+	if (!(ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont))
 #endif
 	{
 #ifdef XFT_SUPPORT
@@ -1999,7 +1999,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	/* Resize the menubar font too. Only needed for X11 font. */
 	if(
 #ifdef XFT_SUPPORT
-		!(r->Options & Opt_xft) &&
+		ISNOT_OPTION(r, Opt_xft) &&
 #endif
 		r->menuBar.win != None)
 	{
@@ -2309,7 +2309,7 @@ Done:
 	   )
 	{
 #ifdef TRANSPARENT
-		if (!(r->Options & Opt_transparent))
+		if (ISNOT_OPTION(r, Opt_transparent))
 #endif
 		{
 #ifdef BACKGROUND_IMAGE
@@ -2336,7 +2336,7 @@ Done:
 	if (idx == Color_tint)
 	{
 #  ifdef TRANSPARENT
-		if (r->Options & Opt_transparent)
+		if (ISSET_OPTION(r, Opt_transparent))
 			/* reset background */
 			rxvt_check_our_parents (r);
 		else

@@ -71,7 +71,7 @@
 ** Otherwise, we set it to zero.
 */
 #define ZERO_SCROLLBACK(R, P)						\
-	if (!((R)->Options & Opt_scrollTtyOutputInhibit))	\
+	if (ISNOT_OPTION(R, Opt_scrollTtyOutputInhibit))	\
 		(R)->vts[(P)]->view_start = 0
 
 #define CLEAR_SELECTION(R)						\
@@ -878,7 +878,7 @@ rxvt_scr_change_screen(rxvt_t* r, int page, int scrn)
 #endif
 
 	/* Need to update tabbar buttons */
-	if (r->Options2 & Opt2_protectSecondary)
+	if (ISSET_OPTION2(r, Opt2_protectSecondary))
 		rxvt_tabbar_draw_buttons (r);
 
 	return scrn;
@@ -952,7 +952,7 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 			PVTS(r, page)->nscrolled = SVLINES;
 		else
 			PVTS(r, page)->nscrolled = (RUINT16T)nscrolled;
-		if ((r->Options & Opt_scrollWithBuffer) &&
+		if (ISSET_OPTION(r, Opt_scrollWithBuffer) &&
 			VSTART != 0 &&
 			VSTART != SVLINES)
 			rxvt_scr_page(r, page, UP, count);
@@ -2018,9 +2018,9 @@ rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 		if (PVTS(r, page)->bg.pixmap == None)
 #endif
 #if defined(TRANSPARENT)
-			if (!(r->Options & Opt_transparent)
-					|| (!r->h->am_transparent
-						&& !r->h->am_pixmap_trans) )
+			if ( ISNOT_OPTION(r, Opt_transparent) ||
+				 (!r->h->am_transparent && !r->h->am_pixmap_trans)
+				)
 #endif
 				XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
 					 r->PixColors[Color_bg]);
@@ -2306,11 +2306,11 @@ rxvt_scr_bell(rxvt_t *r, int page)
 
 # ifndef NO_MAPALERT
 #  ifdef MAPALERT_OPTION
-	if (r->Options & Opt_mapAlert)
+	if (ISSET_OPTION(r, Opt_mapAlert))
 #  endif
 		XMapWindow(r->Xdisplay, r->TermWin.parent);
 # endif
-	if (r->Options & Opt_visualBell)
+	if (ISSET_OPTION(r, Opt_visualBell))
 	{
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
 		/*
@@ -2610,9 +2610,9 @@ rxvt_set_clipping (rxvt_t* r, __attribute__((unused)) void *xftdraw,
 	 */
 	rect.x		=
 #ifdef XFT_SUPPORT
-					((r->Options & Opt_xft) && xftdraw) ? x + *offx :
+					(ISSET_OPTION(r, Opt_xft) && xftdraw) ? x + *offx :
 #endif
-						x;
+					x;
 	rect.y		= y;
 	rect.width	= width;
 	rect.height	= height;
@@ -2627,7 +2627,7 @@ rxvt_set_clipping (rxvt_t* r, __attribute__((unused)) void *xftdraw,
 	 * XSetClipRectangles (r->Xdisplay, gc, x, y-hy, &rectangle, 1, Unsorted);
 	 */
 #ifdef XFT_SUPPORT
-	if( (r->Options & Opt_xft) && xftdraw )
+	if( ISSET_OPTION(r, Opt_xft) && xftdraw )
 		XftDrawSetClip( xftdraw, region);
 #endif
 
@@ -2651,7 +2651,7 @@ rxvt_free_clipping (rxvt_t* r, void* xftdraw, GC gc, Region refreshRegion)
 	else XSetClipMask( r->Xdisplay, gc, None);
 
 # ifdef XFT_SUPPORT
-	if( (r->Options & Opt_xft) && xftdraw)
+	if( ISSET_OPTION(r, Opt_xft) && xftdraw)
 		XftDrawSetClip( xftdraw, refreshRegion );
 # endif	/* XFT_SUPPORT */
 }
@@ -2663,7 +2663,7 @@ rxvt_clear_area (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int
 {
 	/*
 #ifdef XFT_SUPPORT
-	if ((r->Options & Opt_xft) && PVTS(r, page)->xftvt)
+	if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
 	{
 		XftDrawRect (PVTS(r, page)->xftvt, &(r->XftColors[Color_bg]),
 			x, y, w, h);
@@ -2681,7 +2681,7 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
 {
 	/*
 #ifdef XFT_SUPPORT
-	if ((r->Options & Opt_xft) && PVTS(r, page)->xftvt)
+	if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
 	{
 		XftDrawRect (PVTS(r, page)->xftvt, &(r->XftColors[Color_bg]),
 			x, y, w, h);
@@ -2957,7 +2957,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	 */
 	adjust = (XftDrawString8 == xftdraw_string) ? 0 : 1;
 
-	if ((r->Options & Opt_xft) && PVTS(r, page)->xftvt && xftdraw_string)
+	if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt && xftdraw_string)
 	{
 		register int	loop;		/* loop iteration number */
 		register int	loopitem;	/* each iteration increasing # */
@@ -3068,7 +3068,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 # ifdef MULTICHAR_SET
 		else
 		if (
-			  !(r->Options2 & Opt2_xftSlowOutput)
+			  ISNOT_OPTION2(r, Opt2_xftSlowOutput)
 			  && (XftDrawStringUtf8 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -3089,7 +3089,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 		}
 		else
 		if (
-			  !(r->Options2 & Opt2_xftSlowOutput)
+			  ISNOT_OPTION2(r, Opt2_xftSlowOutput)
 			  && (XftDrawString16 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -3253,12 +3253,12 @@ rxvt_restore_bold_font (rxvt_t* r)
 # define MONO_BOLD_FG(x, fg)	MONO_BOLD(x)
 #else	/* NO_BRIGHTCOLOR */
 # define MONO_BOLD(x)														\
-	((r->Options2 & Opt2_veryBold) ?										\
+	(ISSET_OPTION2(r, Opt2_veryBold) ?										\
 	 ((x) & (RS_Bold|RS_Blink)) :											\
 	 (((x) & (RS_Bold | RS_fgMask)) == (RS_Bold | Color_fg))				\
 	)
 # define MONO_BOLD_FG(x, fg)												\
-	((r->Options2 & Opt2_veryBold) ?										\
+	(ISSET_OPTION2(r, Opt2_veryBold) ?										\
 	 MONO_BOLD(x) :															\
 	 (((x) & RS_Bold) && (fg) == Color_fg)									\
 	)
@@ -3344,7 +3344,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	** A: set up vars
 	*/
 #ifdef XFT_SUPPORT
-	if ((r->Options & Opt_xft) && PVTS(r, page)->xftvt)
+	if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
 	{
 		drawfunc = XFT_DRAW_STRING_8;
 		image_drawfunc = XFT_DRAW_IMAGE_STRING_8;
@@ -3371,7 +3371,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 	row_offset = SVLINES - VSTART;
 #ifdef XFT_SUPPORT
-	if (!((r->Options & Opt_xft) && r->TermWin.xftfont))
+	if (!(ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont))
 #endif
 	{
 		/* always go back to the base font - it's much safer */
@@ -3415,7 +3415,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		 */
 		XSetRegion( r->Xdisplay, r->TermWin.gc, h->refreshRegion);
 #ifdef XFT_SUPPORT
-		if( (r->Options & Opt_xft) && PVTS(r, page)->xftvt )
+		if( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 			XftDrawSetClip( PVTS(r, page)->xftvt, h->refreshRegion);
 #endif
 		/* Remember we don't need to call XClearArea on exposed regions */
@@ -3681,7 +3681,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			}
 
 #ifdef XFT_SUPPORT
-			if( (r->Options & Opt_xft) )
+			if( ISSET_OPTION(r, Opt_xft) )
 			{
 				/*
 				 * XXX This does not take into account Color_BD
@@ -3842,7 +3842,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						 r->TermWin.mfont->fid);
 					fontdiff = (r->TermWin.propfont & PROPFONT_MULTI);
 #ifdef XFT_SUPPORT
-					if ( (r->Options & Opt_xft) && PVTS(r, page)->xftvt )
+					if ( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 					{
 						drawfunc = XFT_DRAW_STRING_16;
 						image_drawfunc = XFT_DRAW_IMAGE_STRING_16;
@@ -3908,12 +3908,12 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				{
 					wbyte = 0;
 #ifdef XFT_SUPPORT
-					if (!((r->Options & Opt_xft) && r->TermWin.xftfont))
+					if (!(ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont))
 #endif
 					XSetFont(r->Xdisplay, r->TermWin.gc,
 						r->TermWin.font->fid);
 #ifdef XFT_SUPPORT
-					if ( (r->Options & Opt_xft) && PVTS(r, page)->xftvt )
+					if ( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 					{
 						drawfunc = XFT_DRAW_STRING_8;
 						image_drawfunc = XFT_DRAW_IMAGE_STRING_8;
@@ -4037,7 +4037,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						 * colored / blinking text.
 						 */
 #if 0
-						if (!(r->Options2 & Opt2_veryBold))
+						if (ISNOT_OPTION2(r, Opt2_veryBold))
 #endif
 						rend &= ~RS_Bold;	/* we've taken care of it */
 					}
@@ -4143,7 +4143,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				 * fore. Setting fore even when we're not using XFT
 				 * shouldn't make a difference, but why take a chance :)
 				 */
-				if( (r->Options & Opt_xft) && PVTS(r, page)->xftvt )
+				if( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 					fore = Color_BD;
 				else
 # endif
@@ -4156,13 +4156,13 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				 * If veryBold is not set, then don't render colored text in
 				 * bold.
 				 */
-				if (!(r->Options2 & Opt2_veryBold))
+				if (ISNOT_OPTION2(r, Opt2_veryBold))
 					rend &= ~RS_Bold;
 			}
 			else if (rend & RS_Uline && ISSET_PIXCOLOR( h, Color_UL) )
 			{
 # ifdef XFT_SUPPORT
-				if( (r->Options & Opt_xft) && PVTS(r, page)->xftvt )
+				if( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 					fore = Color_UL;
 				else
 # endif
@@ -4189,7 +4189,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			{
 				bfont = 1;
 # ifdef XFT_SUPPORT
-				if ((r->Options & Opt_xft) && r->TermWin.xftfont)
+				if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
 					rxvt_switch_bold_font (r);
 				else
 # endif
@@ -4202,7 +4202,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			{
 				bfont = 0;
 # ifdef XFT_SUPPORT
-				if ((r->Options & Opt_xft) && r->TermWin.xftfont)
+				if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
 					rxvt_restore_bold_font (r);
 				else
 # endif
@@ -4283,7 +4283,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			if (rend & RS_Uline)
 			{
 #ifdef XFT_SUPPORT
-				if ((r->Options & Opt_xft) && PVTS(r, page)->xftvt)
+				if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
 				{
 					if (r->TermWin.xftfont->descent > 1)
 						XDrawLine(r->Xdisplay, drawBuffer,
@@ -4413,7 +4413,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		 */
 		XSetClipMask( r->Xdisplay, r->TermWin.gc, None);
 #ifdef XFT_SUPPORT
-		if( (r->Options & Opt_xft) && PVTS( r, page)->xftvt)
+		if( ISSET_OPTION(r, Opt_xft) && PVTS( r, page)->xftvt)
 			XftDrawSetClip( PVTS( r, page)->xftvt, None);
 #endif
 	}
@@ -4461,7 +4461,7 @@ rxvt_scr_clear(rxvt_t* r, int page)
 	r->h->num_scr_allow = 0;
 	r->h->want_refresh = 1;
 #ifdef TRANSPARENT
-	if (r->Options & Opt_transparent)
+	if ISSET_OPTION(r, Opt_transparent)
 	{
 		if (r->TermWin.parent != None)
 			XClearWindow(r->Xdisplay, r->TermWin.parent);
@@ -5570,7 +5570,7 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, RINT32T col, RINT32T row, int 
 	else if (SEL(r).clicks == 3)
 	{
 #ifndef NO_FRILLS
-		if ((r->Options & Opt_tripleclickwords))
+		if (ISSET_OPTION(r, Opt_tripleclickwords))
 		{
 			int			 end_row;
 
@@ -5602,7 +5602,7 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, RINT32T col, RINT32T row, int 
 			SEL(r).beg.col = 0;
 			SEL(r).end.col = ncol;
 		}
-	}	/* if ((r->Options & Opt_tripleclickwords)) */
+	}	/* if (ISSET_OPTION(r, Opt_tripleclickwords)) */
 
 	if (button3 && buttonpress)
 	{

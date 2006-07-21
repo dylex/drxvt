@@ -88,8 +88,10 @@ unsigned char	macro_set_number	( unsigned char, unsigned char);
 void
 rxvt_toggle_verybold( rxvt_t *r )
 {
-	if (r->Options2 & Opt2_veryBold) r->Options2 &= ~Opt2_veryBold;
-	else r->Options2 |= Opt2_veryBold;
+	if (ISSET_OPTION2(r, Opt2_veryBold))
+		UNSET_OPTION2(r, Opt2_veryBold);
+	else
+		SET_OPTION2(r, Opt2_veryBold);
 
 	rxvt_scr_touch (r, ATAB(r), True);
 }
@@ -148,17 +150,17 @@ rxvt_toggle_subwin( rxvt_t *r, const unsigned char *str)
 		{
 			case '+':
 				/* Show buttons */
-				r->Options2 &= ~Opt2_hideButtons;
+				UNSET_OPTION2(r, Opt2_hideButtons);
 				break;
 
 			case '-':
 				/* Hide buttons */
-				r->Options2 |= Opt2_hideButtons;
+				SET_OPTION2(r, Opt2_hideButtons);
 				break;
 
 			default:
 				/* Toggle buttons */
-				r->Options2 ^= Opt2_hideButtons;
+				TOGGLE_OPTION2(r, Opt2_hideButtons);
 		}
 
 		/* Refresh tabbar */
@@ -743,7 +745,7 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 	     	   * When macros are disabled, only the toggle macros macro should
 	     	   * work.
 	     	   */
-	     	  ( r->Options2 & Opt2_disableMacros )
+	     	  ISSET_OPTION2(r, Opt2_disableMacros)
 	     	  && macro->action.type != MacroFnToggleMacros
 	        )
 	   )
@@ -859,7 +861,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 				if (
 					  tabno >=0 && tabno <=LTAB(r)
 					  && (
-						   !(r->Options2 & Opt2_protectSecondary)
+						   ISNOT_OPTION2(r, Opt2_protectSecondary)
 						   || PVTS(r, tabno)->current_screen == PRIMARY
 						 )
 				   )
@@ -989,20 +991,20 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		case MacroFnToggleBcst:
-			r->Options2 ^= Opt2_broadcast;
+			TOGGLE_OPTION2(r, Opt2_broadcast);
 			break;
 
 		case MacroFnToggleHold:
-			if (r->Options2 & Opt2_holdExit)
+			if (ISSET_OPTION2 (r, Opt2_holdExit))
 			{
 				int	k;
 				for (k = LTAB(r); k>= 0; k --)
 					if (PVTS(r, k)->dead && PVTS(r, k)->hold > 1)
 						rxvt_remove_page (r, k);
-				r->Options2 &= ~Opt2_holdExit;
+				UNSET_OPTION2 (r, Opt2_holdExit);
 			}
 			else
-				r->Options2 |= Opt2_holdExit;
+				SET_OPTION2(r, Opt2_holdExit);
 			break;
 
 		case MacroFnToggleFullscren:
@@ -1075,7 +1077,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		}
 
 		case MacroFnToggleMacros:
-			r->Options2 ^= Opt2_disableMacros;
+			TOGGLE_OPTION2(r, Opt2_disableMacros);
 			break;
 
 		default:

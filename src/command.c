@@ -352,7 +352,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 # endif
 
 # ifdef MULTICHAR_SET
-				if ((r->Options & Opt_mc_hack) && AVTS(r)->screen.cur.col > 0)
+				if (ISSET_OPTION(r, Opt_mc_hack) && AVTS(r)->screen.cur.col > 0)
 				{
 					int			 col, row;
 
@@ -455,7 +455,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 #endif
 
 #ifdef MULTICHAR_SET
-			if ( r->Options & Opt_mc_hack)
+			if (ISSET_OPTION(r, Opt_mc_hack))
 			{
 				/*
 				 * If we're on a multibyte char, and we move left / right, then
@@ -615,7 +615,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 #endif
 
 #ifdef MULTICHAR_SET
-			if (r->Options & Opt_mc_hack)
+			if (ISSET_OPTION(r, Opt_mc_hack))
 			{
 				int			 col, row;
 
@@ -715,7 +715,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 #endif	/* XK_KP_End */
 
 		case XK_End:
-			if (r->Options2 & Opt2_linuxHomeEndKey)
+			if (ISSET_OPTION2(r, Opt2_linuxHomeEndKey))
 				SET_TILDE_KEY_SEQ( kbuf, KS_END_LINUX);
 			else
 				SET_TILDE_KEY_SEQ( kbuf, KS_END);
@@ -735,7 +735,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 
 #endif	/* XK_KP_Home */
 		case XK_Home:
-			if (r->Options2 & Opt2_linuxHomeEndKey)
+			if (ISSET_OPTION2(r, Opt2_linuxHomeEndKey))
 				SET_TILDE_KEY_SEQ( kbuf, KS_HOME_LINUX);
 			else
 				SET_TILDE_KEY_SEQ( kbuf, KS_HOME);
@@ -1251,7 +1251,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		return;			/* not mapped */
 	}
 
-	if (r->Options & Opt_scrollTtyKeypress)
+	if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
 	{
 		if (AVTS(r)->view_start)
 		{
@@ -1351,9 +1351,9 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		for (dead = LTAB(r); dead >= 0; dead--)
 			/* only dead children that are not held */
 			if (PVTS(r, dead)->dead &&
-				(!(r->Options2 & Opt2_holdExit) ||
-				 (r->Options2 & Opt2_holdExit &&
-				  1 == PVTS(r, dead)->hold)))
+				( ISNOT_OPTION2(r, Opt2_holdExit) ||
+				 (ISSET_OPTION2(r, Opt2_holdExit) && 1 == PVTS(r, dead)->hold)
+				))
 				break;
 		assert (dead <= LTAB(r));	/* in case */
 
@@ -1407,8 +1407,8 @@ rxvt_find_cmd_child (rxvt_t* r, int* p_page)
 			assert (PVTS(r, k)->cmdbuf_base <= PVTS(r, k)->cmdbuf_endp);
 
 			if (
-					PVTS(r, k)->dead
-					&& !( (r->Options2 & Opt2_holdExit) && (PVTS(r, k)->hold > 1) )
+					PVTS(r, k)->dead && 
+					!( ISSET_OPTION2(r, Opt2_holdExit) && (PVTS(r, k)->hold > 1) )
 			   )
 			{
 
@@ -1604,7 +1604,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		want_keypress_time = 0;
 #endif	/* CURSOR_BLINK */
 #ifdef POINTER_BLANK
-		if (r->Options & Opt_pointerBlank)
+		if (ISSET_OPTION(r, Opt_pointerBlank))
 			want_motion_time = 0;
 #endif	/* POINTER_BLANK */
 
@@ -1618,7 +1618,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 
 #ifdef CURSOR_BLINK
-			if ( (r->Options & Opt_cursorBlink) && xev.type == KeyPress )
+			if ( ISSET_OPTION(r, Opt_cursorBlink) && xev.type == KeyPress )
 			{
 				if (h->hidden_cursor)
 				{
@@ -1631,7 +1631,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* CURSOR_BLINK */
 
 #ifdef POINTER_BLANK
-			if ( (r->Options & Opt_pointerBlank) && (h->pointerBlankDelay > 0) )
+			if ( ISSET_OPTION(r, Opt_pointerBlank) && (h->pointerBlankDelay > 0) )
 			{
 				if (
 						xev.type == MotionNotify || xev.type == ButtonPress
@@ -1719,7 +1719,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* CURSOR_BLINK */
 
 #ifdef POINTER_BLANK
-		if ((r->Options & Opt_pointerBlank) && want_motion_time)
+		if (ISSET_OPTION(r, Opt_pointerBlank) && want_motion_time)
 		{
 			(void) gettimeofday (&tp, NULL);
 			h->lastmotion.tv_sec = tp.tv_sec;
@@ -1796,7 +1796,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		for (i = 0; i <= LTAB(r); i ++)
 		{
 			/* remember to skip held childrens */
-			if ((r->Options2 & Opt2_holdExit) && (PVTS(r, i)->hold > 1))
+			if (ISSET_OPTION2(r, Opt2_holdExit) && (PVTS(r, i)->hold > 1))
 			{
 				DBG_MSG(2,(stderr," not listen on vt[%d].cmd_fd\n",i));
 				continue;
@@ -1871,7 +1871,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 			/*
 			 * Cursor only blinks when terminal window is focused.
 			 */
-			if ((r->Options & Opt_cursorBlink) && r->TermWin.focus)
+			if (ISSET_OPTION(r, Opt_cursorBlink) && r->TermWin.focus)
 			{
 				DBG_MSG(3, (stderr,"** get cursor time on select\n"));
 				(void)gettimeofday(&tp, NULL);
@@ -1901,7 +1901,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 			 * If we haven't moved the pointer for a while
 			 */
 			if (
-					(r->Options & Opt_pointerBlank)
+					ISSET_OPTION(r, Opt_pointerBlank)
 					&& (h->pointerBlankDelay > 0)
 					&& (AVTS(r)->hidden_pointer == 0)
 			   )
@@ -1956,7 +1956,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		 * wastes CPU.
 		 */
 #if 0
-		if (r->Options & Opt_cursorBlink)
+		if (ISSET_OPTION(r, Opt_cursorBlink))
 		 	h->want_refresh = 1;
 #endif
 #endif	/* CURSOR_BLINK */
@@ -2074,7 +2074,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 					DBG_MSG(1, (stderr,"signal lost on child %d\n",i));
 
 					PVTS(r, i)->dead = 1;
-					if (r->Options2 & Opt2_holdExit)
+					if (ISSET_OPTION2(r, Opt2_holdExit))
 						PVTS(r, i)->hold = 1;
 					*PVTS(r, i)->cmdbuf_endp = (char) 0;
 
@@ -2088,7 +2088,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 			/* highlight inactive tab if there is some input */
 			if (
-					!(r->Options2 & Opt2_hlTabOnBell)
+					ISNOT_OPTION2(r, Opt2_hlTabOnBell)
 					&& bufsiz != count
 					&& i != ATAB(r)
 			   )
@@ -2178,7 +2178,7 @@ rxvt_pointer_unblank(rxvt_t* r, int page)
 	XDefineCursor(r->Xdisplay, PVTS(r, page)->vt, r->term_pointer);
 	rxvt_recolour_cursor(r);
 #ifdef POINTER_BLANK
-	if (!(r->Options & Opt_pointerBlank))
+	if (ISNOT_OPTION(r, Opt_pointerBlank))
 		return;	/* no need to do anything */
 
 	PVTS(r, page)->hidden_pointer = 0;
@@ -2201,7 +2201,7 @@ void
 rxvt_pointer_blank(rxvt_t* r, int page)
 {
 	DBG_MSG(1, ( stderr, "Blanking pointer\n"));
-	if ((r->Options & Opt_pointerBlank) && (None != r->h->blank_pointer))
+	if (ISSET_OPTION(r, Opt_pointerBlank) && (None != r->h->blank_pointer))
 	{
 		XDefineCursor(r->Xdisplay, PVTS(r, page)->vt,
 			r->h->blank_pointer);
@@ -2305,7 +2305,7 @@ rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
 	gcvalue.background = r->PixColors[Color_bg];
 
 # ifdef TRANSPARENT
-	if (!(r->Options & Opt_transparent))
+	if (ISNOT_OPTION(r, Opt_transparent))
 # endif	/* TRANSPARENT */
 #ifdef BACKGROUND_IMAGE
 	if (None == PVTS(r, page)->pixmap)
@@ -2318,7 +2318,7 @@ rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
 	}
 
 #ifdef TRANSPARENT
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 		rxvt_check_our_parents(r);
 	else
 #endif	/* TRANSPARENT */
@@ -2711,7 +2711,7 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 	v = (ev->button == Button4) ? UP : DN;
 	if (ev->state & ShiftMask)
 		i = 1;
-	else if ((r->Options & Opt_mouseWheelScrollPage))
+	else if (ISSET_OPTION(r, Opt_mouseWheelScrollPage))
 		i = r->TermWin.nrow - 1;
 	else
 		i = 5;
@@ -2729,7 +2729,7 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 
 #  ifdef XFT_SUPPORT
 	/* disable screen refresh if XFT antialias is used to improve performance */
-	if (!((r->Options & Opt_xft) && (r->Options2 & Opt2_xftAntialias)))
+	if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION2(r, Opt2_xftAntialias)))
 #  endif	/* XFT_SUPPORT */
 		rxvt_scr_refresh(r, page, SMOOTH_REFRESH);
 #  ifdef HAVE_SCROLLBARS
@@ -2745,7 +2745,7 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 #  ifdef XFT_SUPPORT
 		/* disable screen refresh if XFT antialias is used to improve
 		 * performance */
-		if (!((r->Options & Opt_xft) && (r->Options2 & Opt2_xftAntialias)))
+		if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION2(r, Opt2_xftAntialias)))
 #  endif	/* XFT_SUPPORT */
 			rxvt_scr_refresh(r, page, SMOOTH_REFRESH);
 #  ifdef HAVE_SCROLLBARS
@@ -3068,7 +3068,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	 * screen. We should not move the window here, but only on ConfigureNotify
 	 * events
 	 */
-	if( r->Options2 & Opt2_smartResize )
+	if(ISSET_OPTION2(r, Opt2_smartResize))
 	{
 		/*
 		** resize by Marius Gedminas <marius.gedminas@uosis.mif.vu.lt>
@@ -3198,7 +3198,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 
 			/* Set the terminal incremental width and height */
 #ifndef NO_FRILLS
-			if( r->Options2 & Opt2_smoothResize )
+			if(ISSET_OPTION2(r, Opt2_smoothResize))
 			{
 				r->szHint.width_inc = 1;
 				r->szHint.height_inc = 1;
@@ -3236,12 +3236,12 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	XSetWMNormalHints (r->Xdisplay, r->TermWin.parent, &(r->szHint));
 
 	/* Set the terminal window starting position */
-	if (!(r->Options & Opt_scrollBar_right))
-		r->h->window_vt_x = (r->Options & Opt_scrollBar_right) ? 
+	if (ISNOT_OPTION(r, Opt_scrollBar_right))
+		r->h->window_vt_x = ISSET_OPTION(r, Opt_scrollBar_right) ? 
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 
 	r->h->window_vt_y = r->szHint.base_height - 2*r->TermWin.int_bwidth;
-	if (r->Options2 & Opt2_bottomTabbar)
+	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
 		r->h->window_vt_y -= rxvt_tabbar_height (r);
 
 	/*
@@ -3262,7 +3262,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	r->h->want_resize |= FORCE_RESIZE;
 
 #ifndef NO_FRILLS
-	while(  r->Options2 & Opt2_smartResize )
+	while(ISSET_OPTION2(r, Opt2_smartResize))
 	{
 		/*
 		 * Let's attempt to move the window so we don't push part of it off
@@ -3350,10 +3350,10 @@ rxvt_resize_on_font (rxvt_t* r, char* fontname)
 
 #ifdef XFT_SUPPORT
 	/* if use freetype font, disallow resize by now ;-) */
-	if ((r->Options & Opt_xft) && r->TermWin.xftfont)
+	if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
 		if (!rxvt_change_font_xft (r, fontname))
 			return ;
-	if (!(r->Options & Opt_xft))
+	if (ISNOT_OPTION(r, Opt_xft))
 #endif	/* XFT_SUPPORT */
 	/* X11 font resize */
 	if (!rxvt_change_font_x11 (r, fontname))
@@ -3633,7 +3633,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 	 * different from the current window position. If yes, then update
 	 * everything.
 	 */
-	if (r->Options & Opt_transparent)
+	if (ISSET_OPTION(r, Opt_transparent))
 	{
 		if(
 				!r->h->bgGrabbed
@@ -3774,7 +3774,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
 		 * transparency later on we don't have to worry about it
 		 */
 		refreshRootBGVars( r );
-		if (r->Options & Opt_transparent)
+		if (ISSET_OPTION(r, Opt_transparent))
 		{
 			/*
 			 * Let rxvt_check_our_parents worry about refreshRootBGVars failing.
@@ -3938,7 +3938,7 @@ rxvt_process_motionnotify (rxvt_t* r, XEvent* ev)
 
 	DBG_MSG(2, (stderr, "MotionNotify event\n"));
 #ifdef POINTER_BLANK
-	if ((r->Options & Opt_pointerBlank) && PVTS(r, page)->hidden_pointer)
+	if (ISSET_OPTION(r, Opt_pointerBlank) && PVTS(r, page)->hidden_pointer)
 		rxvt_pointer_unblank (r, page);
 #endif
 #ifdef HAVE_MENUBAR
@@ -5429,7 +5429,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * then the window title will already be set by
 			 * rxvt_tabbar_set_title(), so we only have to set it here if +stt.
 			 */
-			if( !(r->Options2 & Opt2_syncTabTitle ) )
+			if( ISNOT_OPTION2(r, Opt2_syncTabTitle ) )
 				rxvt_set_term_title(r, (const unsigned char*) str);
 #endif
 #else
@@ -5446,7 +5446,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * title, and NOT the other way around.
 			 */
 #if 0
-			if (r->Options2 & Opt2_syncTabIcon)
+			if (ISSET_OPTION2(r, Opt2_syncTabIcon))
 				rxvt_tabbar_set_title (r, ATAB(r),
 						(const unsigned char TAINTED*) str);
 #endif
@@ -5548,7 +5548,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 
 		case MRxvt_tabterm:		/* Set window and tab title */
 			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
-			if( r->Options2 & Opt2_syncTabTitle )
+			if( ISSET_OPTION2(r, Opt2_syncTabTitle))
 				/*
 				 * Window title will automatically be synced, so setting it
 				 * again is wasteful.
@@ -5646,7 +5646,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 					rxvt_hotkey_kill_tab(r, NULL);
 				}
 				else if( tabno >=0 && tabno <=LTAB(r)
-					&& ( !(r->Options2 & Opt2_protectSecondary) ||
+					&& ( ISNOT_OPTION2(r, Opt2_protectSecondary) ||
 						 PVTS(r, tabno)->current_screen == PRIMARY))
 				{
 					rxvt_kill_page (r, tabno);
@@ -5951,9 +5951,9 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 				break;
 			case 4:			/* smooth scrolling */
 				if (state)
-				r->Options &= ~Opt_jumpScroll;
+					UNSET_OPTION(r, Opt_jumpScroll);
 				else
-				r->Options |= Opt_jumpScroll;
+					SET_OPTION(r, Opt_jumpScroll);
 				break;
 			case 5:			/* reverse video */
 				rxvt_scr_rvideo_mode(r, page, state);
@@ -6021,16 +6021,16 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 #endif
 			case 1010:		/* scroll to bottom on TTY output inhibit */
 				if (state)
-					r->Options |= Opt_scrollTtyOutputInhibit;
+					SET_OPTION(r, Opt_scrollTtyOutputInhibit);
 				else
-					r->Options &= ~Opt_scrollTtyOutputInhibit;
+					UNSET_OPTION(r, Opt_scrollTtyOutputInhibit);
 				break;
 
 			case 1011:		/* scroll to bottom on key press */
 				if (state)
-					r->Options |= Opt_scrollTtyKeypress;
+					SET_OPTION(r, Opt_scrollTtyKeypress);
 				else
-					r->Options &= ~Opt_scrollTtyKeypress;
+					UNSET_OPTION(r, Opt_scrollTtyKeypress);
 				break;
 
 			case 1047:		/* secondary screen w/ clearing */
@@ -6275,7 +6275,7 @@ rxvt_main_loop(rxvt_t *r)
 					limit = h->refresh_limit * (r->TermWin.nrow - 1);
 					nlines++;
 					h->refresh_count++;
-					if (!(r->Options & Opt_jumpScroll) || (h->refresh_count >= limit))
+					if (ISNOT_OPTION(r, Opt_jumpScroll) || (h->refresh_count >= limit))
 					{
 						refreshnow = 1;
 						break;
@@ -6305,14 +6305,14 @@ rxvt_main_loop(rxvt_t *r)
 			if (refreshnow)
 			{
 				refreshnow = 0;
-				if ((r->Options & Opt_jumpScroll) &&
+				if (ISSET_OPTION(r, Opt_jumpScroll) &&
 						h->refresh_limit < REFRESH_PERIOD)
 					h->refresh_limit++;
 # ifdef XFT_SUPPORT
 				/* disable screen refresh if XFT antialias is used to improve
 				 * performance */
-				if (!((r->Options & Opt_xft) &&
-						(r->Options2 & Opt2_xftAntialias)))
+				if (!(ISSET_OPTION(r, Opt_xft) &&
+						ISSET_OPTION2(r, Opt2_xftAntialias)))
 # endif
 					rxvt_scr_refresh(r, page,
 							(h->refresh_type & ~CLIPPED_REFRESH));
@@ -6371,7 +6371,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 #define MAX_PTY_WRITE 128	/* 1/2 POSIX minimum MAX_INPUT */
 	register int	k, beg, end;
 
-	if (r->Options2 & Opt2_broadcast)
+	if (ISSET_OPTION2(r, Opt2_broadcast))
 	{
 		beg = 0; end = LTAB(r);
 	}

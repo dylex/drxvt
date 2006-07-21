@@ -151,7 +151,7 @@ rxvt_scrollbar_init(rxvt_t* r)
 			width = min(i, SB_WIDTH_MAXIMUM);
 
 # ifdef RXVT_SCROLLBAR
-	if (!(r->Options & Opt_scrollBar_floating) && style == R_SB_RXVT)
+	if (ISNOT_OPTION(r, Opt_scrollBar_floating) && style == R_SB_RXVT)
 		r->sb_shadow = SHADOW;
 # else
 	r->sb_shadow = 0;
@@ -239,7 +239,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 	DBG_MSG(1,(stderr,"Create scrollbar\n"));
 	assert (None != r->TermWin.parent);
 
-	sb_x = (r->Options & Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
+	sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
 	sb_y = r->h->window_vt_y;
 	sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
 	sb_h = VT_HEIGHT(r);	/* same height as vt window */
@@ -298,8 +298,9 @@ rxvt_scrollbar_create (rxvt_t* r)
 # ifdef BACKGROUND_IMAGE
 	r->scrollBar.pixmap = None;	/* initialize it to None */
 #  ifdef TRANSPARENT
-	if (!((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar)))
+	if (!(ISSET_OPTION(r, Opt_transparent) &&
+		  ISSET_OPTION(r, Opt_transparent_scrollbar)
+		))
 #  endif
 	if (r->h->rs[Rs_scrollbarPixmap])	{
 		long	w = 0, h = 0;
@@ -312,8 +313,8 @@ rxvt_scrollbar_create (rxvt_t* r)
 # endif
 
 # ifdef TRANSPARENT
-	if ((r->Options & Opt_transparent) &&
-		(r->Options & Opt_transparent_scrollbar))	{
+	if (ISSET_OPTION(r, Opt_transparent) &&
+		ISSET_OPTION(r, Opt_transparent_scrollbar))	{
 		XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
 			ParentRelative);
 	}
@@ -394,7 +395,7 @@ rxvt_scrollbar_resize(rxvt_t *r)
 	unsigned int	sb_w, sb_h;
 
 
-	sb_x = (r->Options & Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
+	sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
 	sb_y = r->h->window_vt_y;
 	sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
 	sb_h = VT_HEIGHT(r);	/* same height as vt window */

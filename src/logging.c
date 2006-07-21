@@ -222,7 +222,7 @@ rxvt_makeutent(rxvt_t *r, int page, const char *pty, const char *hostname)
 
 #ifdef WTMP_SUPPORT
 # ifdef WTMP_ONLY_ON_LOGIN
-    if (r->Options & Opt_loginShell)
+    if (ISSET_OPTION(r, Opt_loginShell))
 # endif
     {
 # ifdef HAVE_STRUCT_UTMP
@@ -245,7 +245,7 @@ rxvt_makeutent(rxvt_t *r, int page, const char *pty, const char *hostname)
 #endif	/* UTEMPTER_SUPPORT */
 
 #if defined(LASTLOG_SUPPORT) && defined(RXVT_LASTLOG_FILE)
-    if (r->Options & Opt_loginShell)
+    if (ISSET_OPTION(r, Opt_loginShell))
 		rxvt_update_lastlog(RXVT_LASTLOG_FILE, pty, hostname);
 #endif
 
@@ -312,7 +312,7 @@ rxvt_cleanutent(rxvt_t *r, int page)
      */
 #ifdef WTMP_SUPPORT
 # ifdef WTMP_ONLY_ON_LOGIN
-    if (r->Options & Opt_loginShell)
+    if (ISSET_OPTION(r, Opt_loginShell))
 # endif
     {
 # ifdef HAVE_STRUCT_UTMP

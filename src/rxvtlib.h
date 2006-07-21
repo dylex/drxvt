@@ -368,6 +368,37 @@ typedef enum {
 #define Opt_Reverse					(1LU<<30)
 #define Opt_Boolean					(1LU<<31)
 
+/* Macros to test whether an option has been set. 
+** TODO: unify ISSET_OPTION and ISSET_OPTION2. Can we do it?
+*/
+#define ISSET_OPTION(R, OPT)	\
+	((R)->Options & OPT)
+#define ISNOT_OPTION(R, OPT)		\
+	(!((R)->Options & OPT))
+
+#define ISSET_OPTION2(R, OPT)	\
+	((R)->Options2 & OPT)
+#define ISNOT_OPTION2(R, OPT)	\
+	(!((R)->Options2 & OPT))
+
+/* Macros to set and unset an option.
+** TODO: unify SET_OPTION and SET_OPTION2. Can we do it?
+*/
+#define SET_OPTION(R, OPT)	\
+	((R)->Options |= OPT)
+#define UNSET_OPTION(R, OPT)	\
+	((R)->Options &= ~OPT)
+#define TOGGLE_OPTION(R, OPT)	\
+	((R)->Options ^= OPT)
+
+#define SET_OPTION2(R, OPT)	\
+	((R)->Options2 |= OPT)
+#define UNSET_OPTION2(R, OPT)	\
+	((R)->Options2 &= ~OPT)
+#define TOGGLE_OPTION2(R, OPT)	\
+	((R)->Options2 ^= OPT)
+
+
 
 #define PROPFONT_NORMAL				(1<<0)
 #define PROPFONT_BOLD				(1<<1)
