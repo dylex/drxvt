@@ -903,7 +903,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	r->numlock_state = ( ev->state & r->h->ModNumLockMask );
 
 #ifdef USE_XIM
-	if (r->h->Input_Context != NULL)
+	if (NOT_NULL(r->h->Input_Context))
 	{
 		Status		  status_return;
 
@@ -1331,7 +1331,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 
 	msg = (char*) r->h->rs[Rs_holdExitText];
-	if (NULL == msg)
+	if (IS_NULL(msg))
 		msg = " -- Terminal finished, ESC to exit";
 
 
@@ -1396,7 +1396,7 @@ rxvt_find_cmd_child (rxvt_t* r, int* p_page)
 {
 	register int	k;
 
-	assert (NULL != p_page);
+	assert (NOT_NULL(p_page));
 	assert (-1 == *p_page);	/* in case */
 
 	if (r->vt_died > 0)
@@ -1652,7 +1652,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 
 #ifdef USE_XIM
-			if (r->h->Input_Context != NULL)
+			if (NOT_NULL(r->h->Input_Context))
 			{
 				if (!XFilterEvent(&xev, xev.xany.window))
 					rxvt_process_x_event(r, &xev);
@@ -2976,7 +2976,7 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 		r->h->want_refresh = 1; /* Cursor needs to be refreshed */
 
 #ifdef USE_XIM
-		if (r->h->Input_Context != NULL)
+		if (NOT_NULL(r->h->Input_Context))
 			XSetICFocus(r->h->Input_Context);
 #endif
 
@@ -3023,7 +3023,7 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 #endif
 
 #ifdef USE_XIM
-		if (r->h->Input_Context != NULL)
+		if (NOT_NULL(r->h->Input_Context))
 			XUnsetICFocus(r->h->Input_Context);
 #endif
 
@@ -4276,7 +4276,7 @@ rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 
 	FILE		   *stream = popen( pipeName ?: r->h->rs[Rs_print_pipe], "w" );
 
-	if (stream == NULL)
+	if (IS_NULL(stream))
 		rxvt_print_error("Can't open printer pipe %s",
 				r->h->rs[Rs_print_pipe] ?: pipeName );
 
@@ -4315,7 +4315,7 @@ rxvt_process_print_pipe( rxvt_t* r, int page )
 #endif	/* DEBUG */
 
 
-	if( ( fd = rxvt_popen_printer( r, NULL ) ) == NULL )
+	if (IS_NULL(fd = rxvt_popen_printer(r, NULL)))
 		return;
 
 	/*
@@ -5192,7 +5192,7 @@ rxvt_get_to_st(rxvt_t* r, int page, unsigned char *ends_how)
 	}
 
 	string[n++] = '\0';
-	if ((s = (unsigned char UNTAINTED *) STRNDUP (string, n)) == NULL)
+	if (IS_NULL(s = (unsigned char UNTAINTED *) STRNDUP (string, n)))
 		return NULL;
 	*ends_how = (ch == 0x5c ? C0_ESC : ch);
 
@@ -5290,7 +5290,7 @@ rxvt_process_osc_seq (rxvt_t* r, int page)
 void
 rxvt_xwsh_seq(rxvt_t* r, int op, const char *str)
 {
-	assert(str != NULL);
+	assert(NOT_NULL(str));
 	switch (op)
 	{
 		case Xwsh_title:
@@ -5416,7 +5416,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 #endif
 
 
-	assert(str != NULL);
+	assert(NOT_NULL(str));
 	switch (op)
 	{
 		case XTerm_title:	/* Set tab / term title */
@@ -5455,13 +5455,13 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 		case XTerm_Color:
 			for (buf = (char *)str; buf && *buf;)
 			{
-				if ((name = STRCHR(buf, ';')) == NULL)
+				if (IS_NULL(name = STRCHR(buf, ';')))
 					break;
 				*name++ = '\0';
 				color = atoi(buf);
 				if (color < 0 || color >= TOTAL_COLORS)
 					break;
-				if ((buf = STRCHR(name, ';')) != NULL)
+				if (NOT_NULL(buf = STRCHR(name, ';')))
 					*buf++ = '\0';
 				rxvt_set_window_color(r, page, color + minCOLOR, name);
 			}
@@ -5506,7 +5506,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 				rxvt_load_bg_pixmap(r, page, str);
 				rxvt_scr_touch(r, page, True);
 			}
-			while ((str = STRCHR(str, ';')) != NULL)
+			while (NOT_NULL(str = STRCHR(str, ';')))
 			{
 				str++;
 				changed += rxvt_scale_pixmap(r, page, str);
@@ -6396,7 +6396,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 		DBG_MSG(2, (stderr, "rxvt_tt_write %d (%s)\n", k,
 			d ? (char*) d: "nil"));
 
-		if (NULL == PVTS(r, k)->v_bufstr && len > 0)
+		if (IS_NULL(PVTS(r, k)->v_bufstr) && len > 0)
 		{
 			p = (len / MAX_PTY_WRITE + 1) * MAX_PTY_WRITE;
 			if (p <= 0) /* possible integer overflow */

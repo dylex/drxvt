@@ -17,6 +17,7 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		5. Fix off-focus fading. Thanks to Ken Zalewski for the report.
 		6. Add macros to check and set options.
 		7. Add macros to check and unset X resources.
+		8. Add macros to check and set NULL pointers.
 
 	* Enhancements:
 		1. Add --with-max-profiles to configure script as suggested

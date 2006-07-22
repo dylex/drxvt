@@ -164,7 +164,7 @@ rxvt_init(int argc, const char *const *argv)
 
 			s = STRCHR( s, ',' );
 		  }
-		while( s++ != NULL );
+		while (NULL != s++);
 	}
 
 
@@ -348,7 +348,7 @@ rxvt_free_hidden( rxvt_t* r )
 	if( r->h->Input_Context )   
 	{
 		XDestroyIC( r->h->Input_Context );
-		r->h->Input_Context = NULL; 
+		SET_NULL(r->h->Input_Context); 
 	}
 #endif
 }
@@ -440,26 +440,26 @@ rxvt_clean_exit (rxvt_t* r)
 
 	rxvt_tabbar_clean_exit (r);
 
-	if (NULL != r->TermWin.font)
+	if (NOT_NULL(r->TermWin.font))
 		XFreeFont (r->Xdisplay, r->TermWin.font);
 # ifndef NO_BOLDFONT
-	if (NULL != r->TermWin.bfont && r->TermWin.font != r->TermWin.bfont)
+	if (NOT_NULL(r->TermWin.bfont) && r->TermWin.font != r->TermWin.bfont)
 	{
 		XFreeFont (r->Xdisplay, r->TermWin.bfont);
-		r->TermWin.bfont = NULL;
+		SET_NULL(r->TermWin.bfont);
 	}
 # endif
 # ifdef MULTICHAR_SET
-	if (NULL != r->TermWin.mfont && r->TermWin.font != r->TermWin.mfont)
+	if (NOT_NULL(r->TermWin.mfont) && r->TermWin.font != r->TermWin.mfont)
 	{
 		XFreeFont (r->Xdisplay, r->TermWin.mfont);
-		r->TermWin.mfont = NULL;
+		SET_NULL(r->TermWin.mfont);
 	}
 # endif
-	r->TermWin.font = NULL;		/* clear font */
+	SET_NULL(r->TermWin.font);		/* clear font */
 
 # ifdef XFT_SUPPORT
-	if (NULL != r->TermWin.xftfont)
+	if (NOT_NULL(r->TermWin.xftfont))
 	{
 		XftFont *fn;
 
@@ -468,28 +468,28 @@ rxvt_clean_exit (rxvt_t* r)
 
 		if( (fn = r->TermWin.xftpfont) )
 		{
-			r->TermWin.xftpfont = NULL;
+			SET_NULL(r->TermWin.xftpfont);
 			xftFreeUnusedFont( r, fn);
 		}
 		if( (fn = r->TermWin.xftPfont) )
 		{
-			r->TermWin.xftPfont = NULL;
+			SET_NULL(r->TermWin.xftPfont);
 			xftFreeUnusedFont( r, fn);
 		}
 
 #  ifndef NO_BOLDFONT
 		fn = r->TermWin.xftbfont;
-		r->TermWin.xftbfont = NULL;
+		SET_NULL(r->TermWin.xftbfont);
 		xftFreeUnusedFont( r, fn);
 #  endif
 
 #  ifdef MULTICHAR_SET
 		fn = r->TermWin.xftmfont;
-		r->TermWin.xftmfont = NULL;
+		SET_NULL(r->TermWin.xftmfont);
 		xftFreeUnusedFont( r, fn);
 #  endif
 	}
-	r->TermWin.xftfont = NULL;	/* clear font */
+	SET_NULL(r->TermWin.xftfont);	/* clear font */
 
 	/*
 	 * XXX gi1242 2006-01-27: Xft bug. Patterns passed to XftFontOpenPattern
@@ -522,18 +522,18 @@ rxvt_clean_exit (rxvt_t* r)
 		UNSET_GC(r->TermWin.gc);
 	}
 	XCloseDisplay (r->Xdisplay);
-	r->Xdisplay = NULL;
+	SET_NULL(r->Xdisplay);
 
-	free (r->tabstop);			r->tabstop = NULL;
-	free (r->PixColors);		r->PixColors = NULL;
+	free (r->tabstop);			SET_NULL(r->tabstop);
+	free (r->PixColors);		SET_NULL(r->PixColors);
 # ifdef OFF_FOCUS_FADING
-	free (r->PixColorsUnfocus);	r->PixColorsUnfocus = NULL;
+	free (r->PixColorsUnfocus);	SET_NULL(r->PixColorsUnfocus);
 # endif
 # ifdef XFT_SUPPORT
-	free (r->XftColors);		r->XftColors = NULL;
+	free (r->XftColors);		SET_NULL(r->XftColors);
 # endif
-	free (r->h);				r->h = NULL;
-	free (r);					r = NULL;
+	free (r->h);				SET_NULL(r->h);
+	free (r);					SET_NULL(r);
 
 /* #endif */	/* DEBUG */
 
@@ -669,8 +669,8 @@ rxvt_privileged_utmp(rxvt_t* r, int page, char action)
 	if (PVTS(r, page)->next_utmp_action != action ||
 		(action != SAVE && action != RESTORE) ||
 		ISSET_OPTION(r, Opt_utmpInhibit) ||
-		PVTS(r, page)->ttydev == NULL ||
-		*(PVTS(r, page)->ttydev) == (char) 0)
+		IS_NULL(PVTS(r, page)->ttydev) ||
+		(char) 0 == *(PVTS(r, page)->ttydev))
 		return;
 
 	rxvt_privileges(RESTORE);
@@ -698,8 +698,8 @@ rxvt_privileged_ttydev(rxvt_t* r, int page, char action)
 	DBG_MSG(1,(stderr, "rxvt_privileged_ttydev %d (r, %c); waiting for: %c (pid: %d)\n", page, action, PVTS(r, page)->next_tty_action, getpid()));
 	if (PVTS(r, page)->next_tty_action != action ||
 		(action != SAVE && action != RESTORE) ||
-		PVTS(r, page)->ttydev == NULL ||
-		*(PVTS(r, page)->ttydev) == (char) 0)
+		IS_NULL(PVTS(r, page)->ttydev) ||
+		(char) 0 == *(PVTS(r, page)->ttydev))
 		return;
 
 	rxvt_privileges(RESTORE);
@@ -796,7 +796,7 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 		return ;
 
 	xp = XftPatternDuplicate (xpold);
-	if (NULL == xp)	
+	if (IS_NULL(xp))
 		return ;
 
 	/* set font weight */
@@ -805,16 +805,16 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 
 	r->TermWin.xftbpattern = XftFontMatch (r->Xdisplay, XSCREEN, xp, &fr);
 
-	if (NULL != r->TermWin.xftbpattern)
+	if (NOT_NULL(r->TermWin.xftbpattern))
 	{
 		r->TermWin.xftbfont =
 			XftFontOpenPattern (r->Xdisplay, r->TermWin.xftbpattern);
 
-		if (NULL == r->TermWin.xftbfont)
+		if (IS_NULL(r->TermWin.xftbfont))
 		{
 			/* fall back to normal font */
 			XftPatternDestroy (r->TermWin.xftbpattern);
-			r->TermWin.xftbpattern = NULL;
+			SET_NULL(r->TermWin.xftbpattern);
 		}
 # ifdef DEBUG
 		else
@@ -845,9 +845,9 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 # endif
 
 	/* temporary XftPattern */
-	assert (NULL != xp);
+	assert (NOT_NULL(xp));
 	/* actually opened normal font name */
-	assert (NULL != ofname);
+	assert (NOT_NULL(ofname));
 
 	/*
 	** Now try to open freetype mfont
@@ -856,7 +856,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 
 	/* font family */
 	mfname = (char*) r->h->rs[Rs_xftmfont];
-	if (NULL == mfname)
+	if (IS_NULL(mfname))
 		mfname = rxvt_fallback_mfont_xft (r);
 
 	/*
@@ -913,7 +913,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 
 	/* font pattern */
 	r->TermWin.xftmpattern = XftFontMatch (r->Xdisplay, XSCREEN, xp, &fr);
-	if (NULL == r->TermWin.xftmpattern)
+	if (IS_NULL(r->TermWin.xftmpattern))
 		return 0;
 
 	/* globaladvance */
@@ -933,7 +933,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	 */
 	XftPatternGetString (r->TermWin.xftmpattern, XFT_FAMILY, 0, &omfname);
 
-	assert (NULL != omfname);	/* shouldn't be NULL */
+	assert (NOT_NULL(omfname));	/* shouldn't be NULL */
 	len = STRLEN(mfname);
 	olen = STRLEN(omfname);
 
@@ -954,7 +954,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	r->TermWin.xftmfont = XftFontOpenPattern(r->Xdisplay,
 			r->TermWin.xftmpattern);
 	
-	if (NULL == r->TermWin.xftmfont)
+	if (IS_NULL(r->TermWin.xftmfont))
 		goto Failure;
 
 # ifdef DEBUG
@@ -995,7 +995,7 @@ Failure:
 	if (r->TermWin.xftmpattern)
 	{
 		XftPatternDestroy (r->TermWin.xftmpattern);
-		r->TermWin.xftmpattern = NULL;
+		SET_NULL(r->TermWin.xftmpattern);
 	}
 	return 0;
 }
@@ -1023,12 +1023,13 @@ rxvt_init_font_xft (rxvt_t* r)
 
 	DBG_MSG(2,(stderr, "load freetype font\n"));
 	xp = XftPatternCreate ();
-	if (NULL == xp)
+	if (IS_NULL(xp))
 		return 0;
 
 	/* font family */
 	fname = (char*) r->h->rs[Rs_xftfont];
-	if (NULL == fname) fname = DEFAULT_XFT_FONT_NAME;
+	if (IS_NULL(fname))
+		fname = DEFAULT_XFT_FONT_NAME;
 	XftPatternAddString (xp, XFT_FAMILY, fname);
 
 	/* No spacing between lines */
@@ -1151,7 +1152,7 @@ rxvt_init_font_xft (rxvt_t* r)
 
 	r->TermWin.xftpattern = XftFontMatch (r->Xdisplay, XSCREEN, xp, &fr);
 
-	if (NULL == r->TermWin.xftpattern)
+	if (IS_NULL(r->TermWin.xftpattern))
 		goto Failure;
 
 	/* globaladvance */
@@ -1170,7 +1171,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	 * font.
 	 */
 	XftPatternGetString (r->TermWin.xftpattern, XFT_FAMILY, 0, &ofname);
-	assert (NULL != ofname);	/* shouldn't be NULL */
+	assert (NOT_NULL(ofname));	/* shouldn't be NULL */
 
 	len = STRLEN(fname);
 	olen = STRLEN(ofname);
@@ -1193,14 +1194,16 @@ rxvt_init_font_xft (rxvt_t* r)
 	/*
 	 * Now open the prop font.
 	 */
-	if( r->h->rs[Rs_xftpfn] == NULL )
+	if (IS_NULL(r->h->rs[Rs_xftpfn]))
 		fname = DEFAULT_XFT_PFONT_NAME;
 	else if( !STRCASECMP( r->h->rs[Rs_xftpfn], "none"))
-		fname = NULL;
+		SET_NULL(fname);
 	else
 		fname = (char *) r->h->rs[Rs_xftpfn];
 
-	if( fname && r->TermWin.xftpfont == NULL && r->TermWin.xftPfont == NULL)
+	if (NOT_NULL(fname) &&
+		IS_NULL(r->TermWin.xftpfont) &&
+		IS_NULL(r->TermWin.xftPfont))
 	{
 		XftPattern *ppat = XftPatternDuplicate( xp );
 		XftPattern *match;
@@ -1260,7 +1263,7 @@ rxvt_init_font_xft (rxvt_t* r)
 					r->TermWin.xftpfont, r->TermWin.xftPfont));
 	}
 	
-	if (NULL == r->TermWin.xftfont)	
+	if (IS_NULL(r->TermWin.xftfont))
 		goto Failure;
 
 	r->TermWin.fwidth = r->TermWin.xftfont->max_advance_width;
@@ -1275,9 +1278,8 @@ rxvt_init_font_xft (rxvt_t* r)
 	 * usual font.
 	 */
 #ifdef MULTICHAR_SET
-	if (
-		  r->TermWin.xftpfont == NULL
-		  && isDoubleWidthFont( r->Xdisplay, r->TermWin.xftfont )
+	if (IS_NULL(r->TermWin.xftpfont) &&
+		isDoubleWidthFont(r->Xdisplay, r->TermWin.xftfont)
 	   )
 	{
 		/*
@@ -1363,7 +1365,7 @@ Failure:
 	if (r->TermWin.xftpattern && r->TermWin.xftpattern != xp)
 	{
 		XftPatternDestroy (r->TermWin.xftpattern);
-		r->TermWin.xftpattern = NULL;
+		SET_NULL(r->TermWin.xftpattern);
 	}
 	return 0;
 }
@@ -1380,7 +1382,7 @@ rxvt_init_font_fixed (rxvt_t* r)
 
 	DBG_MSG(1,(stderr, " load font (fixed)\n"));
 	xfont = XLoadQueryFont (r->Xdisplay, "fixed");
-	if (NULL == xfont)
+	if (IS_NULL(xfont))
 	{
 		rxvt_print_error("fatal error, aborting...");
 		exit(EXIT_FAILURE);
@@ -1391,7 +1393,7 @@ rxvt_init_font_fixed (rxvt_t* r)
 	/*
 	r->TermWin.bfont = r->TermWin.xftbfont? xfont : NULL;
 	*/
-	r->TermWin.bfont = NULL;
+	SET_NULL(r->TermWin.bfont);
 #endif
 #ifdef MULTICHAR_SET
 	r->TermWin.mfont = xfont;
@@ -1434,7 +1436,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	/* OK, now it's time to load the default font */
 	DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
 	xfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_font+idx]);
-	if (NULL == xfont)
+	if (IS_NULL(xfont))
 	{
 		/* failed to load font */
 		rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
@@ -1443,7 +1445,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 		r->h->rs[Rs_font+idx] = "fixed";
 		DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
 		xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_font+idx]);
-		if (NULL == xfont)
+		if (IS_NULL(xfont))
 		{
 			/* still failed to load font */
 			rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
@@ -1453,7 +1455,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 		}
 	}
 	/* Font loading succeeded */
-	if (NULL != xfont)
+	if (NOT_NULL(xfont))
 	{
 		r->TermWin.font = xfont;
 	}
@@ -1486,17 +1488,17 @@ rxvt_init_font_x11 (rxvt_t *r)
 #endif
 
 #ifndef NO_BOLDFONT
-	bfont = NULL;
+	SET_NULL(bfont);
 	if (ckfont)
 	{
 		/* try to load boldFont, fail silently */
-		if (NULL != r->h->rs[Rs_boldFont+idx])
+		if (NOT_NULL(r->h->rs[Rs_boldFont+idx]))
 		{
 			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
 			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
 		}
 
-		if (NULL != bfont)
+		if (NOT_NULL(bfont))
 		{
 			/* Loading bold font succeeded */
 			fw = rxvt_get_font_widest (bfont);
@@ -1524,7 +1526,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	/* load font or substitute */
 	DBG_MSG(1,(stderr, " load mfont (%s)\n", r->h->rs[Rs_mfont+idx]));
 	xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_mfont+idx]);
-	if (NULL == xfont)
+	if (IS_NULL(xfont))
 	{
 		char*	ptr;
 
@@ -1534,7 +1536,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 		ptr = rxvt_fallback_mfont_x11 (r);
 		DBG_MSG(1,(stderr, " load mfont (%s)\n", ptr));
 		xfont = XLoadQueryFont(r->Xdisplay, ptr);
-		if (NULL != xfont)
+		if (NOT_NULL(xfont))
 			r->h->rs[Rs_mfont+idx] = ptr;
 		else
 		{
@@ -1544,7 +1546,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 			goto Abort;
 		}
 	}
-	if (NULL != xfont)
+	if (NOT_NULL(xfont))
 	{
 		r->TermWin.mfont = xfont;
 	}
@@ -1706,13 +1708,13 @@ rxvt_change_font_xft (rxvt_t* r, const char* fontname)
 	** we cannot load new xft font. In that case, we can still
 	** fallback to the old font.
 	*/
-	xp = r->TermWin.xftpattern;	r->TermWin.xftpattern = NULL;
-	xf = r->TermWin.xftfont;	r->TermWin.xftfont	  = NULL;
-	pxf = r->TermWin.xftpfont;	r->TermWin.xftpfont	  = NULL;
-	Pxf = r->TermWin.xftPfont;	r->TermWin.xftPfont  = NULL;
+	xp = r->TermWin.xftpattern;	SET_NULL(r->TermWin.xftpattern);
+	xf = r->TermWin.xftfont;	SET_NULL(r->TermWin.xftfont);
+	pxf = r->TermWin.xftpfont;	SET_NULL(r->TermWin.xftpfont);
+	Pxf = r->TermWin.xftPfont;	SET_NULL(r->TermWin.xftPfont);
 # ifdef MULTICHAR_SET
-	mxp = r->TermWin.xftmpattern;	r->TermWin.xftmpattern = NULL;
-	mxf = r->TermWin.xftmfont;		r->TermWin.xftmfont = NULL;
+	mxp = r->TermWin.xftmpattern;	SET_NULL(r->TermWin.xftmpattern);
+	mxf = r->TermWin.xftmfont;		SET_NULL(r->TermWin.xftmfont);
 # endif
 	if (!rxvt_init_font_xft (r))
 	{
@@ -1834,7 +1836,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 					r->h->fnum = IDX2FNUM(idx);
 					break;
 			}
-			fontname = NULL;
+			SET_NULL(fontname);
 			break;
 
 		default:
@@ -1844,7 +1846,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 				if (!STRCMP (r->h->rs[Rs_font+idx], fontname))
 				{
 					r->h->fnum = IDX2FNUM(idx);
-					fontname = NULL;
+					SET_NULL(fontname);
 					break;
 				}
 			}
@@ -1860,7 +1862,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	** If fontname != NULL, it's some new font not in the rs_font.
 	** We try to load it and replace font in rs_font if succeed.
 	*/
-	if (NULL != fontname)
+	if (NOT_NULL(fontname))
 	{
 		xfont = XLoadQueryFont(r->Xdisplay, fontname);
 		if (xfont)
@@ -1869,7 +1871,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 			char* ptr = STRDUP (fontname);
 			if (ptr)
 			{
-				if (r->h->newfont[idx] != NULL)	
+				if (NOT_NULL(r->h->newfont[idx]))	
 					free (r->h->newfont[idx]);
 				r->h->newfont[idx] = ptr;
 				r->h->rs[Rs_font+idx] = r->h->newfont[idx];
@@ -1951,16 +1953,17 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 
 
 #ifndef NO_BOLDFONT
-	bfont = NULL;
+	SET_NULL(bfont);
 	if (ckfont)
 	{
 		if (r->TermWin.bfont)	{
 			XFreeFont (r->Xdisplay, r->TermWin.bfont);
-			r->TermWin.bfont = NULL;
+			SET_NULL(r->TermWin.bfont);
 		}
 
 		/* try to load boldFont, fail silently */
-		if (NULL == r->TermWin.bfont && NULL != r->h->rs[Rs_boldFont+idx])
+		if (IS_NULL(r->TermWin.bfont) &&
+			NOT_NULL(r->h->rs[Rs_boldFont+idx]))
 		{
 			DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
 			bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
@@ -2071,7 +2074,7 @@ rxvt_font_up_down(rxvt_t* r, int n, int direction)
 			}
 			p = r->h->rs[Rs_font + FNUM2IDX(r->h->fnum)];
 
-			if (p != NULL && STRLEN(p) > 1)
+			if (NOT_NULL(p) && STRLEN(p) > 1)
 				break;
 		}
 	}
@@ -2088,7 +2091,7 @@ rxvt_get_font_widest(XFontStruct *f)
 
 	if (f->min_bounds.width == f->max_bounds.width)
 		return f->min_bounds.width;
-	if (f->per_char == NULL)
+	if (IS_NULL(f->per_char))
 		return f->max_bounds.width;
 	for (i = f->max_char_or_byte2 - f->min_char_or_byte2; --i >= 0;)
 	{
@@ -2145,8 +2148,8 @@ rxvt_set_term_title (rxvt_t* r, const unsigned char *str)
 	XTextProperty	prop;
 
 	if (XGetWMName (r->Xdisplay, r->TermWin.parent, &prop) == 0)
-		prop.value = NULL;
-	if (NULL == prop.value || STRCMP(prop.value, str))
+		SET_NULL(prop.value);
+	if (IS_NULL(prop.value) || STRCMP(prop.value, str))
 #endif
 	{
 		rxvt_set_win_title (r, r->TermWin.parent, (char*) str);
@@ -2162,8 +2165,8 @@ rxvt_set_icon_name (rxvt_t* r, const unsigned char *str)
 
 #ifdef SMART_WINDOW_TITLE
 	if (XGetWMIconName(r->Xdisplay, r->TermWin.parent, &prop) == 0)
-		prop.value = NULL;
-	if (NULL == prop.value || STRCMP(prop.value, str))
+		SET_NULL(prop.value);
+	if (IS_NULL(prop.value) || STRCMP(prop.value, str))
 #endif
 	{
 		XChangeProperty (r->Xdisplay, r->TermWin.parent,
@@ -2194,7 +2197,7 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
 	DBG_MSG( 2, ( stderr, "rxvt_set_window_color( r, %d, %d, %s), ATAB=%d\n",
 				page, idx, color, ATAB(r) ) );
 
-	if (color == NULL || *color == '\0')
+	if (IS_NULL(color) || (char) 0 == *color)
 		return;
 
 	color_set = ISSET_PIXCOLOR(r->h, idx);
@@ -2422,7 +2425,7 @@ rxvt_set_colorfgbg(rxvt_t *r)
 # endif
 				/* if we wanted boldFont to have precedence */
 # if 0	/* was ifndef NO_BOLDFONT */
-				&& r->TermWin.bfont == NULL
+				&& IS_NULL(r->TermWin.bfont)
 # endif	
 		   )
 			r->h->colorfgbg = SET_FGCOLOR(r->h->colorfgbg, i);
@@ -2585,11 +2588,11 @@ rxvt_IM_is_running(rxvt_t *r)
 
 	/* get current locale modifier */
 	DBG_MSG(2, (stderr, "rxvt_IM_is_running ()\n"));
-	if ((p = XSetLocaleModifiers(NULL)) != NULL)
+	if (NOT_NULL(p = XSetLocaleModifiers(NULL)))
 	{
 		STRCPY(server, "@server=");
 		STRNCAT(server, &(p[4]), IMBUFSIZ - 9);	/* skip "@im=" */
-		if ((p = STRCHR(server + 1, '@')) != NULL)	/* first one only */
+		if (NOT_NULL(p = STRCHR(server + 1, '@')))	/* first one only */
 			*p = '\0';
 
 		atom = XInternAtom(r->Xdisplay, server, False);
@@ -2608,7 +2611,7 @@ rxvt_IM_send_spot (rxvt_t *r)
 	XPoint			spot;
 	XVaNestedList   preedit_attr;
 
-	if (r->h->Input_Context == NULL ||
+	if (IS_NULL(r->h->Input_Context) ||
 		!r->TermWin.focus ||
 		!(r->h->input_style & XIMPreeditPosition) ||
 		!(r->h->event_type == KeyPress ||
@@ -2641,7 +2644,7 @@ rxvt_IM_set_fontset (rxvt_t* r, int idx)
 		return;
 	DBG_MSG(1,(stderr, "rxvt_setTermFontSet()\n"));
 	prev_fontset = r->TermWin.fontset;
-	r->TermWin.fontset = NULL;
+	SET_NULL(r->TermWin.fontset);
 
 	length = 0;
 	if (r->h->rs[Rs_font + idx])
@@ -2652,8 +2655,8 @@ rxvt_IM_set_fontset (rxvt_t* r, int idx)
 # endif
 	/* possible integer overflow? */
 	assert (length >= 0 && length+1 > 0);
-	if (length == 0 || (string = rxvt_malloc(length + 1)) == NULL)
-		r->TermWin.fontset = NULL;
+	if (length == 0 || IS_NULL(string = rxvt_malloc(length + 1)))
+		SET_NULL(r->TermWin.fontset);
 	else
 	{
 		int				missing_charsetcount;
@@ -2678,13 +2681,13 @@ rxvt_IM_set_fontset (rxvt_t* r, int idx)
 						&missing_charsetcount,
 						&def_string);
 		free(string);
-		if (r->TermWin.fontset != NULL)
+		if (NOT_NULL(r->TermWin.fontset))
 			success = 1;
 	}
 
 	if (success)
 	{
-		if (prev_fontset != NULL)
+		if (NOT_NULL(prev_fontset))
 				XFreeFontSet(r->Xdisplay, prev_fontset);
 	}
 	else
@@ -2741,7 +2744,7 @@ rxvt_IM_destroy_callback(XIM xim __attribute__((unused)), XPointer client_data _
 {
 	rxvt_t			*r = rxvt_get_r();
 
-	r->h->Input_Context = NULL;
+	SET_NULL(r->h->Input_Context);
 	/* To avoid Segmentation Fault in C locale: Solaris only? */
 	if (STRCMP(r->h->locale, "C"))
 		XRegisterIMInstantiateCallback(r->Xdisplay, NULL, NULL, NULL,
@@ -2781,9 +2784,9 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
 			{
 				STRCPY(buf, "@im=");
 				STRNCAT(buf, s[i], IMBUFSIZ - 5);
-				if (
-						(p = XSetLocaleModifiers(buf)) != NULL
-						&& *p && (rxvt_IM_get_IC(r) == True)
+				if (NOT_NULL(p = XSetLocaleModifiers(buf)) &&
+					*p &&
+					(rxvt_IM_get_IC(r) == True)
 				   )
 				{
 					found = 1;
@@ -2799,7 +2802,7 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
 		return;
 
 	/* try with XMODIFIERS env. var. */
-	if ((p = XSetLocaleModifiers("")) != NULL && *p)
+	if (NOT_NULL(p = XSetLocaleModifiers("")) && *p)
 	{
 		rxvt_IM_get_IC(r);
 		return;
@@ -2807,7 +2810,7 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
 
 	/* try with no modifiers base IF the user didn't specify an IM */
 	if (!had_im &&
-		(p = XSetLocaleModifiers("@im=none")) != NULL &&
+		NOT_NULL(p = XSetLocaleModifiers("@im=none")) &&
 		*p &&
 		rxvt_IM_get_IC(r) == True)
 		return;
@@ -2836,13 +2839,13 @@ rxvt_IM_get_IC(rxvt_t *r)
 
 	DBG_MSG(1,(stderr, "rxvt_IM_get_IC()\n"));
 	xim = XOpenIM(r->Xdisplay, NULL, NULL, NULL);
-	if (xim == NULL)
+	if (IS_NULL(xim))
 	{
 		DBG_MSG(1,(stderr, "Unalbe to open IM\n"));
 		return False;
 	}
 
-	xim_styles = NULL;
+	SET_NULL(xim_styles);
 	if (
 			XGetIMValues(xim, XNQueryInputStyle, &xim_styles, NULL)
 			|| !xim_styles || !xim_styles->count_styles
@@ -2887,7 +2890,8 @@ rxvt_IM_get_IC(rxvt_t *r)
 	/* XXX: not sure why we need this (as well as IC one below) */
 	XSetIMValues(xim, XNDestroyCallback, &ximcallback, NULL);
 
-	preedit_attr = status_attr = NULL;
+	SET_NULL(preedit_attr);
+	SET_NULL(status_attr);
 
 	if (h->input_style & XIMPreeditPosition)
 	{
@@ -2937,7 +2941,7 @@ rxvt_IM_get_IC(rxvt_t *r)
 		XFree(preedit_attr);
 	if (status_attr)
 		XFree(status_attr);
-	if (h->Input_Context == NULL)
+	if (IS_NULL(h->Input_Context))
 	{
 		rxvt_print_error("failed to create input context");
 		XCloseIM(xim);
@@ -3006,7 +3010,8 @@ rxvt_IM_set_status_pos (rxvt_t *r)
 void
 rxvt_IM_resize(rxvt_t *r)
 {
-	if (r->h->Input_Context == NULL || !rxvt_IM_is_running(r)) return;
+	if (IS_NULL(r->h->Input_Context) || !rxvt_IM_is_running(r))
+		return;
 
 	if (r->h->input_style & XIMPreeditPosition)
 		rxvt_IM_send_size(r);

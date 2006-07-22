@@ -198,11 +198,11 @@ rxvt_makeutent(rxvt_t *r, int page, const char *pty, const char *hostname)
 # else
 		FILE           *fd0;
 
-		if ((fd0 = fopen(TTYTAB_FILENAME, "r")) != NULL) {
+		if (NOT_NULL(fd0 = fopen(TTYTAB_FILENAME, "r"))) {
 		    char            buf[256], name[256];
 
 		    buf[sizeof(buf) - 1] = '\0';
-		    for (i = 1; (fgets(buf, sizeof(buf) - 1, fd0) != NULL);) {
+		    for (i = 1; NOT_NULL(fgets(buf, sizeof(buf) - 1, fd0)); ) {
 				if (*buf == '#' || sscanf(buf, "%s", name) != 1)
 				    continue;
 				if (!STRCMP(ut->ut_line, name)) {

@@ -113,14 +113,15 @@ rxvt_toggle_verybold( rxvt_t *r )
 void
 rxvt_toggle_subwin( rxvt_t *r, const unsigned char *str)
 {
-	if(	str == NULL || *str == '\0' ||
+	if (IS_NULL(str) || (char) 0 == *str ||
 			STRCHR( str, 't') || STRCHR( str, 'T' ) )
 	{
 		/*
 		 * Backward compatibility -- If str is NULL or empty, then toggle the
 		 * tabbar visibility.
 		 */
-		if( rxvt_tabbar_visible (r) && ( str == NULL || *str != '+' ))
+		if (rxvt_tabbar_visible (r) &&
+			(IS_NULL(str) || '+' != *str))
 		{
 			/*
 			 * If the tabbar is visible, and we are not forced to show it then
@@ -128,7 +129,8 @@ rxvt_toggle_subwin( rxvt_t *r, const unsigned char *str)
 			 */
 			if( rxvt_tabbar_hide(r) ) rxvt_resize_on_subwin (r, HIDE_TABBAR);
 		}
-		else if( !rxvt_tabbar_visible( r ) && ( str == NULL || *str != '-' ))
+		else if (!rxvt_tabbar_visible (r) &&
+			(IS_NULL(str) || '-' != *str))
 		{
 			/*
 			 * If the tabbar is hidden, and we are not forced to hide it, then
@@ -265,7 +267,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 
 	Bool			addmacro = False;
 
-	if( arg == NULL )
+	if (IS_NULL(arg))
 	{
 		char *keyend;
 		int		n;
@@ -277,7 +279,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 			return 0;
 		str += n;		/* skip `macro.' */
 
-		if( (keyend = STRCHR( str, ':' )) == NULL )
+		if (IS_NULL(keyend = STRCHR( str, ':' )))
 			return -1;
 
 		n = min( keyend - str, NEWARGLIM - 1 );
@@ -307,7 +309,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 	/*
 	 * Breakup keyname into a keysym and modifier flags.
 	 */
-	if( (keyname_nomods = STRRCHR( keyname, '+' )) == NULL )
+	if (IS_NULL(keyname_nomods = STRRCHR( keyname, '+' )))
 	{
 		/* No modifiers specified */
 #ifdef UNSHIFTED_MACROS
@@ -525,7 +527,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	 * should either save action in to a global variable, or free it.
 	 */
 	assert( astring );
-	action.str = NULL;	/* Make sure rxvt_set_action won't free non-existent
+	SET_NULL(action.str);	/* Make sure rxvt_set_action won't free non-existent
 						   memory */
 	if( !rxvt_set_action( &action, astring) )
 		return 0; /* Failure: Probably unrecognized action type */
@@ -543,7 +545,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 				macroNames[ action.type ], action.len,
 				(action.type == MacroFnStr || action.type == MacroFnEsc) ?
 					"(escaped string)" :
-					((action.str == NULL) ? "(nil)" : (char*) action.str)));
+					(IS_NULL(action.str) ? "(nil)" : (char*) action.str)));
 
 	return 1;	/* Success */
 }
@@ -580,7 +582,7 @@ rxvt_cleanup_macros( rxvt_t *r )
 			r->macros[i].modFlags	= 0;
 
 			free( r->macros[i].action.str );
-			r->macros[i].action.str	= NULL; /* Probably unnecessary */
+			SET_NULL(r->macros[i].action.str); /* Probably unnecessary */
 
 			nDummyMacros++;
 		}
@@ -690,7 +692,7 @@ rxvt_set_action		(action_t *action, char *astring)
 	else
 	{
 		free( action->str );
-		action->str = NULL;
+		SET_NULL(action->str);
 	}
 	return True;
 }
@@ -732,7 +734,7 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 	     /*
 	      * No macro found.
 	      */
-	     macro == NULL
+	     IS_NULL(macro)
 	     || (
 	     	  /*
 	     	   * Primary only macro in secondary screen.
@@ -788,7 +790,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		case MacroFnNewTab:
-			if( action->str != NULL )
+			if (NOT_NULL(action->str))
 			{
 				/*
 				 * If the first word is quoted, use that as the title. Don't be
@@ -879,7 +881,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			/* Goto tab in position action->str */
 			int tabno;
 			
-			if( action->str != NULL && *(action->str) )
+			if (NOT_NULL(action->str) && *(action->str) )
 			{
 				tabno = atoi( (char*) action->str );
 
@@ -954,7 +956,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		case MacroFnCopy:
 #endif
 		case MacroFnPaste:
-			if( ev != NULL )
+			if (NOT_NULL(ev))
 				rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
 			break;
 
@@ -1016,10 +1018,10 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		case MacroFnSetTitle:
-			if( action->str != NULL )
+			if (NOT_NULL(action->str))
 				rxvt_tabbar_set_title( r, ATAB(r),
 						(unsigned char*) action->str);
-			else if( r->selection.text != NULL )
+			else if (NOT_NULL(r->selection.text))
 				rxvt_tabbar_set_title( r, ATAB(r),
 						(const unsigned char TAINTED*) r->selection.text);
 			break;
@@ -1059,13 +1061,13 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		{
 			char	cfile[PATH_MAX] = "";
 
-			if( action->str != NULL )
+			if (NOT_NULL(action->str))
 				STRNCPY( cfile, action->str, PATH_MAX-1 );
 			else
 			{
 				char*	home = getenv ("HOME");
 
-				if (NULL == home) return -1; /* Failure */
+				if (IS_NULL(home)) return -1; /* Failure */
 
 				snprintf (cfile, PATH_MAX-1, "%s/%s", home,
 						".mrxvtrc.save");

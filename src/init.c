@@ -665,7 +665,7 @@ rxvt_init_vars(rxvt_t *r)
 		/* Initialize vts_idx for each term_t structure */
 		r->vterm[i].vts_idx = -1;
 		/* Initialize each vts pointer */
-		r->vts[i] = NULL;
+		SET_NULL(r->vts[i]);
 	}
 
 	r->PixColors = (unsigned long*) rxvt_malloc(
@@ -678,46 +678,45 @@ rxvt_init_vars(rxvt_t *r)
 	r->XftColors = (XftColor*) rxvt_malloc (
 		sizeof (XftColor) * (TOTAL_COLORS));
 #endif
-	if(
-		 NULL == r->h || NULL == r->PixColors
+	if (IS_NULL(r->h) || IS_NULL(r->PixColors)
 #ifdef OFF_FOCUS_FADING
-		 || NULL == r->PixColorsUnfocus
+		 || IS_NULL(r->PixColorsUnfocus)
 #endif
 #ifdef XFT_SUPPORT
-		 || NULL == r->XftColors
+		 || IS_NULL(r->XftColors)
 #endif
 	  )
 		return -1;
 
 
-	r->Xdisplay = NULL;
+	SET_NULL(r->Xdisplay);
 #ifdef USE_XIM
-	r->TermWin.fontset = NULL;
+	SET_NULL(r->TermWin.fontset);
 #endif
-	r->TermWin.font = NULL;
+	SET_NULL(r->TermWin.font);
 #ifdef MULTICHAR_SET
-	r->TermWin.mfont = NULL;
+	SET_NULL(r->TermWin.mfont);
 #endif
 #ifndef NO_BOLDFONT
-	r->TermWin.bfont = NULL;
+	SET_NULL(r->TermWin.bfont);
 #endif
 
 #ifdef XFT_SUPPORT
-	r->TermWin.xftpattern	= NULL;
-	r->TermWin.xftfont		= NULL;
-	r->TermWin.xftpfont		= NULL;
-	r->TermWin.xftPfont		= NULL;
+	SET_NULL(r->TermWin.xftpattern);
+	SET_NULL(r->TermWin.xftfont);
+	SET_NULL(r->TermWin.xftpfont);
+	SET_NULL(r->TermWin.xftPfont);
 # ifndef NO_BOLDFONT
-	r->TermWin.xftbpattern	= NULL;
-	r->TermWin.xftbfont		= NULL;
+	SET_NULL(r->TermWin.xftbpattern);
+	SET_NULL(r->TermWin.xftbfont);
 	r->TermWin.bf_switched	= 0;
 # endif	/* NO_BOLDFONT */
 # ifdef MULTICHAR_SET
 #  ifdef HAVE_ICONV_H
 	r->TermWin.xfticonv = (iconv_t) -1;
 #  endif
-	r->TermWin.xftmpattern = NULL;
-	r->TermWin.xftmfont = NULL;
+	SET_NULL(r->TermWin.xftmpattern);
+	SET_NULL(r->TermWin.xftmfont);
 # endif	/* MULTICHAR_SET */
 #endif	/* XFT_SUPPORT */
 
@@ -734,20 +733,24 @@ rxvt_init_vars(rxvt_t *r)
 	h->locale = NULL;
 
 # ifdef HAVE_MENUBAR
-	r->h->BuildMenu = r->h->ActiveMenu = NULL;
-	r->h->popupMenu[0] = r->h->popupMenu[1] = r->h->popupMenu[2] = NULL;
+	SET_NULL(r->h->BuildMenu);
+	SET_NULL(r->h->ActiveMenu);
+	SET_NULL(r->h->popupMenu[0]);
+	SET_NULL(r->h->popupMenu[1]);
+	SET_NULL(r->h->popupMenu[2]);
 	r->h->showingMenu = 0;
 
 	/* Set the current menubar to empty defaults */
-	h->MenuBar.head = h->MenuBar.tail = NULL;
-	h->MenuBar.title = NULL;
+	SET_NULL(h->MenuBar.head);
+	SET_NULL(h->MenuBar.tail);
+	SET_NULL(h->MenuBar.title);
 # endif
 
 # ifdef USE_XIM
-	h->Input_Context = NULL;
+	SET_NULL(h->Input_Context);
 # endif
-	/* h->v_bufstr = NULL; */
-	h->buffer = NULL;
+	/* SET_NULL(h->v_bufstr); */
+	SET_NULL(h->buffer);
 #ifdef TRANSPARENT
 	h->am_pixmap_trans = 0;
 	h->am_transparent  = 0;
@@ -809,7 +812,7 @@ rxvt_init_vars(rxvt_t *r)
 	r->selection.op = SELECTION_CLEAR;
 	r->selection.screen = PRIMARY;
 	r->selection.clicks = 0;
-	r->selection.text = NULL;
+	SET_NULL(r->selection.text);
 	r->selection.len = 0;
 	r->selection.beg.row = 0;
 	r->selection.beg.col = 0;
@@ -834,10 +837,10 @@ rxvt_init_vars(rxvt_t *r)
 	h->last_bot = h->last_state = -1;
 
 #ifdef HAVE_X11_SM_SMLIB_H
-	r->TermWin.sm_conn = NULL;
-	r->TermWin.ice_conn = NULL;
+	SET_NULL(r->TermWin.sm_conn);
+	SET_NULL(r->TermWin.ice_conn);
 	r->TermWin.ice_fd = -1;
-	r->TermWin.sm_client_id = NULL;
+	SET_NULL(r->TermWin.sm_client_id);
 #endif
 
 	r->tabClicked = -1; /* No tab has been clicked by user */
@@ -999,30 +1002,30 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 	for( i = 0; i < r_argc; i++ )
 		r_argv[i] = (const char*) argv[i];
-	r_argv[i] = NULL;
+	SET_NULL(r_argv[i]);
 
 	if (r_argc == argc)
-		cmd_argv = NULL;
+		SET_NULL(cmd_argv);
 	else
 	{
 		cmd_argv = (const char **)rxvt_malloc(sizeof(char*) * (argc - r_argc));
 
 		for (i = 0; i < argc - r_argc - 1; i++)
 			cmd_argv[i] = (const char *)argv[i + r_argc + 1];
-		cmd_argv[i] = NULL;
+		SET_NULL(cmd_argv[i]);
 	}
 
 	/* clear all resources */
 	rs = r->h->rs;
 	for (i = 0; i < NUM_RESOURCES;)
-		rs[i++] = NULL;
+		SET_NULL(rs[i++]);
 
 	rs[Rs_name] = rxvt_r_basename( argv[0] );
 
 	/*
 	 * Open display, get options/resources and create the window
 	 */
-	if( ( rs[Rs_display_name] = getenv("DISPLAY") ) == NULL)
+	if (IS_NULL(rs[Rs_display_name] = getenv("DISPLAY")))
 		rs[Rs_display_name] = ":0";
 
 	rxvt_get_options( r, r_argc, r_argv );
@@ -1044,12 +1047,12 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	}
 #endif
 
-	if( r->Xdisplay == NULL )
+	if (IS_NULL(r->Xdisplay))
 	{
 		DBG_MSG( 1, ( stderr, "Open X display %s\n",
 					rs[Rs_display_name] ? rs[Rs_display_name] : "nil"));
 		r->Xdisplay = XOpenDisplay( rs[Rs_display_name] );
-		if( NULL == r->Xdisplay )
+		if (IS_NULL(r->Xdisplay))
 		{
 			rxvt_print_error( "can't open display %s", rs[Rs_display_name] );
 			exit( EXIT_FAILURE );
@@ -1456,10 +1459,10 @@ rxvt_init_env(rxvt_t *r)
 	*/
 	val = rxvt_network_display(r->h->rs[Rs_display_name]);
 	r->h->rs[Rs_display_name] = (const char *)val;
-	if (val == NULL)
+	if (IS_NULL(val))
 #endif				/* DISPLAY_IS_IP */
 	val = XDisplayString(r->Xdisplay);
-	if (r->h->rs[Rs_display_name] == NULL)
+	if (IS_NULL(r->h->rs[Rs_display_name]))
 		r->h->rs[Rs_display_name] = val;	/* use broken `:0' value */
 
 	i = STRLEN(val) + 9;
@@ -1499,7 +1502,7 @@ rxvt_init_env(rxvt_t *r)
 		putenv("COLORTERM=" COLORTERMENV "-mono");
 	else
 		putenv("COLORTERM=" COLORTERMENVFULL);
-	if (r->h->rs[Rs_term_name] != NULL)
+	if (NOT_NULL(r->h->rs[Rs_term_name]))
 	{
 		int		l = 6 + STRLEN(r->h->rs[Rs_term_name]);
 		if (l <= 0 || l > 1024)	/* possible integer overflow */
@@ -1538,7 +1541,7 @@ void
 rxvt_init_xlocale(rxvt_t *r)
 {
 #ifdef USE_XIM
-	if (r->h->locale == NULL)
+	if (IS_NULL(r->h->locale))
 		rxvt_print_error("Setting locale failed.");
 	else
 	{
@@ -2242,7 +2245,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 
 	/* not implemented yet */
 	*argc = 0;
-	if (NULL == string)
+	if (IS_NULL(string))
 		return NULL;
 
 #define MAX_ARGV	(64)
@@ -2262,7 +2265,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 		int		dq = 0;	/* double quote */
 		int		sq = 0;	/* single quote */
 		/* set default argument to NULL */
-		pret[i] = NULL;
+		SET_NULL(pret[i]);
 
 		/* skip any spaces and non-printable */
 		while (*pcur && 
@@ -2344,7 +2347,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 	if (pret[i])
 	{
 		*argc = i+1;
-		pret[i+1] = NULL;
+		SET_NULL(pret[i+1]);
 	}
 	else if (i)		/* non-empty argv */
 	{
@@ -2368,7 +2371,7 @@ NotMatch:
 	*argc = 0;
 	{
 		char **s;
-		for( s = pret; *s != NULL; s++) free(*s);
+		for( s = pret; NOT_NULL(*s); s++) free(*s);
 	}
 
 	free (pret);
@@ -2411,7 +2414,7 @@ rxvt_switch_fgbg_color( rxvt_t *r, int page )
 termenv_t
 rxvt_get_termenv( const char *env )
 {
-	if (NULL == env)
+	if (IS_NULL(env))
 		return (TERMENV_XTERM);
 	else if (0 == STRCASECMP (env, "xterm"))
 		return (TERMENV_XTERM);
@@ -2479,9 +2482,9 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef XFT_SUPPORT
-	PVTS(r, page)->xftvt = NULL;
+	SET_NULL(PVTS(r, page)->xftvt);
 #endif
-	PVTS(r, page)->tab_title = NULL;
+	SET_NULL(PVTS(r, page)->tab_title);
 #ifdef BACKGROUND_IMAGE
 	UNSET_PIXMAP(PVTS(r, page)->pixmap);
 	UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
@@ -2550,10 +2553,10 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 		PVTS(r, page)->cmdbuf_base;
 	
 	/* Initialize write out buffer */
-	PVTS(r, page)->v_buffer =
-		PVTS(r, page)->v_bufstr =
-		PVTS(r, page)->v_bufptr =
-		PVTS(r, page)->v_bufend = NULL;
+	SET_NULL(PVTS(r, page)->v_buffer);
+	SET_NULL(PVTS(r, page)->v_bufstr);
+	SET_NULL(PVTS(r, page)->v_bufptr);
+	SET_NULL(PVTS(r, page)->v_bufend);
 
 	/* Initialize checksum */
 	PVTS(r, page)->checksum = times (&tp);
@@ -2573,14 +2576,14 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 	assert (PVTS(r, page)->tab_title);
 
 	free (PVTS(r, page)->tab_title);
-	PVTS(r, page)->tab_title = NULL;
+	SET_NULL(PVTS(r, page)->tab_title);
 
 #ifdef XFT_SUPPORT
 	if (ISSET_OPTION(r, Opt_xft))
 	{
 		if (PVTS(r, page)->xftvt)
 			XftDrawDestroy (PVTS(r, page)->xftvt);
-		PVTS(r, page)->xftvt = NULL;
+		SET_NULL(PVTS(r, page)->xftvt);
 	}
 #endif
 	assert (IS_WIN(PVTS(r, page)->vt));
@@ -2625,7 +2628,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	/*
 	 * Set the tab title
 	 */
-	if( title == NULL )
+	if (IS_NULL(title))
 		title = DEFAULT_TAB_TITLE;
 	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP( title, MAX_TAB_TXT );
 
@@ -2660,7 +2663,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	{
 		PVTS(r, page)->xftvt = XftDrawCreate (r->Xdisplay,
 			PVTS(r, page)->vt, XVISUAL, XCMAP);
-		assert (NULL != PVTS(r, page)->xftvt);
+		assert (NOT_NULL(PVTS(r, page)->xftvt));
 	}
 #endif
 
@@ -2702,12 +2705,12 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 # endif
 	{
 		const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
-		if( pf != NULL )
+		if (NOT_NULL(pf))
 		{
 			/* Load pixmap for each individual tab */
 			const char *p = pf;
 
-			if( (p = STRCHR(p, ';')) != NULL )
+			if (NOT_NULL(p = STRCHR(p, ';')))
 			{
 				p++;
 				rxvt_scale_pixmap(r, page, p);
@@ -2738,7 +2741,7 @@ getProfileOption( rxvt_t *r, int profile, int resource )
 	 * Profile 0 is default, so if the profile option is unset, fall back to
 	 * profile 0.
 	 */
-	return (r->h->rs[resource + profile] != NULL) ?
+	return NOT_NULL(r->h->rs[resource + profile]) ?
 		r->h->rs[resource + profile] : r->h->rs[resource];
 }
 
@@ -3089,9 +3092,9 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			PropModeReplace, (unsigned char*) &(r->TermWin.parent), 1L);
 
 # ifdef HAVE_X11_SM_SMLIB_H
-	if (
-		  NULL != r->TermWin.sm_conn && NULL != r->TermWin.sm_client_id
-		  && STRCMP (r->TermWin.sm_client_id, "")
+	if (NOT_NULL(r->TermWin.sm_conn) &&
+		NOT_NULL(r->TermWin.sm_client_id) &&
+		STRCMP (r->TermWin.sm_client_id, "")
 	   )
 	{
 		if (IS_ATOM(r->h->xa[XA_SM_CLIENT_ID]))
@@ -3197,7 +3200,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 * menu (so that the tab list will be popped up on control clicks and right
 	 * clicks on the tabbar).
 	 */
-	if( r->h->popupMenu[0] == NULL )
+	if (IS_NULL(r->h->popupMenu[0]))
 	{
 		DBG_MSG( 3, ( stderr, "Setting popup menu 1 to a tab list\n" ) );
 		r->h->popupMenu[0] = (menu_t *) rxvt_calloc( 1, sizeof(menu_t) );
@@ -3469,7 +3472,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 
 #ifndef __QNX__
 	/* command interpreter path */
-	if( argv != NULL )
+	if (NOT_NULL(argv))
 	{
 # ifdef DEBUG_VERBOSE
 		int			i;
@@ -3483,15 +3486,14 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	{
 		const char	 *argv0, *shell;
 
-		if( NULL == (shell = getenv("SHELL")) || ((char) 0 == *shell) )
+		if (IS_NULL(shell = getenv("SHELL")) || ((char) 0 == *shell) )
 		{
 # ifdef HAVE_GETPWUID
 			struct passwd* pwent = getpwuid( getuid () );
 
-			if(
-				 (NULL == pwent)
-				 || ( NULL == (shell = pwent->pw_shell) )
-				 || *shell == '\0'
+			if (IS_NULL(pwent) ||
+				IS_NULL(shell = pwent->pw_shell) ||
+				(char) 0 == *shell
 			  )
 # endif	/* HAVE_GETPWUID */
 				shell = "/bin/sh";
@@ -3523,7 +3525,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 		{
 			if (access(argv[0], X_OK) == -1)
 			{
-				if (STRCHR(argv[0], '/') == NULL)
+				if (IS_NULL(STRCHR(argv[0], '/')))
 				{
 					searchenv(argv[0], "PATH", fullcommand);
 					if (fullcommand[0] != '\0')
@@ -3538,7 +3540,8 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 		}
 		else
 		{
-			if ((command = getenv("SHELL")) == NULL || *command == '\0')
+			if (IS_NULL(command = getenv("SHELL")) || 
+				(char) 0 == *command)
 				command = "/bin/sh";
 
 			arg_a[0] = my_basename(command);

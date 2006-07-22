@@ -135,14 +135,14 @@ rxvt_menuitem_find(const menu_t *menu, const unsigned char *name)
 	menuitem_t	 *item;
 
 #ifdef DEBUG
-	assert(name != NULL);
-	assert(menu != NULL);
+	assert(NOT_NULL(name));
+	assert(NOT_NULL(menu));
 #endif
 
 	DBG_MSG( 2, (stderr, "rxvt_menuitem_find(%s) ... ", name));
 
 	/* find the last item in the menu, this is good for separators */
-	for (item = menu->tail; item != NULL; item = item->prev)
+	for (item = menu->tail; NOT_NULL(item); item = item->prev)
 	{
 		DBG_MSG(4, ( stderr, "%d", item->entry.itemType));
 
@@ -173,14 +173,14 @@ rxvt_menuitem_free(rxvt_t *r, menu_t *menu, menuitem_t *item)
 	menuitem_t	 *prev, *next;
 
 #ifdef DEBUG
-	assert(menu != NULL);
+	assert(NOT_NULL(menu));
 #endif
 	DBG_MSG( 2, (stderr, "rxvt_menuitem_free()\n"));
 
 	prev = item->prev;
 	next = item->next;
-	if (prev != NULL) prev->next = next;
-	if (next != NULL) next->prev = prev;
+	if (NOT_NULL(prev)) prev->next = next;
+	if (NOT_NULL(next)) next->prev = prev;
 
 	/* new head, tail */
 	if (menu->tail == item) menu->tail = prev;
@@ -190,17 +190,17 @@ rxvt_menuitem_free(rxvt_t *r, menu_t *menu, menuitem_t *item)
 	{
 		case MenuSubMenu:
 			rxvt_menu_delete(r, item->entry.submenu.menu);
-			item->entry.submenu.menu = NULL;
+			SET_NULL(item->entry.submenu.menu);
 			break;
 
 		case MenuItem:
 			free(item->entry.action.str);
-			item->entry.action.str = NULL;
+			SET_NULL(item->entry.action.str);
 			break;
 	}
 
-	if (item->name != NULL) free(item->name);
-	if (item->name2 != NULL) free(item->name2);
+	if (NOT_NULL(item->name)) free(item->name);
+	if (NOT_NULL(item->name2)) free(item->name2);
 	free(item);
 }
 
@@ -364,7 +364,7 @@ rxvt_menuarrow_free(rxvt_t *r, unsigned char name)
 			action_t	   *act = &(r->h->MenuBar.arrows[i]);
 
 			free(act->str);
-			act->str = NULL;
+			SET_NULL(act->str);
 			act->len = 0;
 
 			act->type = MenuLabel;
@@ -404,7 +404,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 	MEMSET(parse, 0, sizeof(parse));
 
 /* fprintf(stderr, "add arrows = `%s'\n", string); */
-	for (p = string; p != NULL && *p; string = p)
+	for (p = string; NOT_NULL(p) && *p; string = p)
 	{
 	p = (string + 3);
 	/* fprintf(stderr, "parsing at %s\n", string); */
@@ -441,7 +441,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 		while (1)
 		{
 			p = (unsigned char*) STRCHR(next, '<');
-			if (p != NULL)
+			if (NOT_NULL(p))
 			{
 				if (p[1] && p[2] == '>')
 				break;
@@ -449,7 +449,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 			}
 			else
 			{
-				if (beg.str == NULL)	/* no end needed */
+				if (IS_NULL(beg.str))	/* no end needed */
 				p = (unsigned char*) STRCHR(next, '\0');
 				break;
 			}
@@ -457,7 +457,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 		}
 	}
 
-	if (p == NULL)
+	if (IS_NULL(p))
 		return;
 	cur->len = (p - string);
 	}
@@ -531,11 +531,11 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 	DBG_MSG( 2, (stderr, "rxvt_menuitem_add()\n"));
 
 #ifdef DEBUG
-	assert(name != NULL);
-	assert(action != NULL);
+	assert(NOT_NULL(name));
+	assert(NOT_NULL(action));
 #endif
 
-	if (menu == NULL) return NULL;
+	if (IS_NULL(menu)) return NULL;
 
 	if (isSeparator(name))
 	{
@@ -549,24 +549,24 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 		 * add/replace existing menu item
 		 */
 		item = rxvt_menuitem_find(menu, name);
-		if (item != NULL)
+		if (NOT_NULL(item))
 		{
-			if (item->name2 != NULL && name2 != NULL)
+			if (NOT_NULL(item->name2) && NOT_NULL(name2))
 			{
 				free(item->name2);
 				item->len2 = 0;
-				item->name2 = NULL;
+				SET_NULL(item->name2);
 			}
 			switch (item->entry.itemType)
 			{
 				case MenuSubMenu:
 					rxvt_menu_delete(r, item->entry.submenu.menu);
-					item->entry.submenu.menu = NULL;
+					SET_NULL(item->entry.submenu.menu);
 					break;
 					
 				case MenuItem:
 					free(item->entry.action.str);
-					item->entry.action.str = NULL;
+					SET_NULL(item->entry.action.str);
 				break;
 			}
 			goto Item_Found;
@@ -576,11 +576,11 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 	/* allocate a new itemect */
 	item = (menuitem_t *) rxvt_malloc( sizeof( menuitem_t) );
 
-	item->entry.action.str = NULL; /* If not null will be freed by
+	SET_NULL(item->entry.action.str); /* If not null will be freed by
 									 rxvt_action_set */
 
 	item->len2 = 0;
-	item->name2 = NULL;
+	SET_NULL(item->name2);
 
 	len = STRLEN(name);
 	/* possible integer overflow? */
@@ -593,25 +593,25 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 
 	/* add to tail of list */
 	item->prev = menu->tail;
-	item->next = NULL;
+	SET_NULL(item->next);
 
-	if (menu->tail != NULL)
+	if (NOT_NULL(menu->tail))
 		(menu->tail)->next = item;
 	menu->tail = item;
 
 	/* fix head */
-	if (menu->head == NULL)
+	if (IS_NULL(menu->head))
 		menu->head = item;
 
 	/*
 	 * add action
 	 */
 Item_Found:
-	if (name2 != NULL && item->name2 == NULL)
+	if (NOT_NULL(name2) && IS_NULL(item->name2))
 	{
 		len = STRLEN(name2);
 		if (len == 0)
-			item->name2 = NULL;
+			SET_NULL(item->name2);
 		else
 		{
 			/* possible integer overflow? */
@@ -624,7 +624,7 @@ Item_Found:
 	item->entry.itemType = MenuLabel;
 	len = STRLEN(action);
 
-	if (len == 0 && item->name2 != NULL)
+	if (len == 0 && NOT_NULL(item->name2))
 	{
 		action = item->name2;
 		len = item->len2;
@@ -637,7 +637,7 @@ Item_Found:
 		/* str = rxvt_malloc(len + 1); */
 
 		STRCPY(str, action);
-		item->entry.action.str = NULL;
+		SET_NULL(item->entry.action.str);
 
 		if( rxvt_set_action( &(item->entry.action), str) )
 			item->entry.itemType = MenuItem;
@@ -666,17 +666,17 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 	DBG_MSG( 2, (stderr, "rxvt_menu_find_base()\n"));
 
 #ifdef DEBUG
-	assert(menu != NULL);
+	assert(NOT_NULL(menu));
 #endif
 
 	if (path[0] == '\0')
 	return path;
 
-	if (STRCHR(path, '/') != NULL)
+	if (NOT_NULL(STRCHR(path, '/')))
 	{
 		unsigned char		   *p = path;
 
-		while ((p = (unsigned char*) STRCHR(p, '/')) != NULL)
+		while (NOT_NULL(p = (unsigned char*) STRCHR(p, '/')))
 		{
 			p++;
 			if (*p == '/')
@@ -685,9 +685,9 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 		if (path[0] == '/')
 		{
 			path++;
-			*menu = NULL;
+			SET_NULL(*menu);
 		}
-		while ((p = (unsigned char*) STRCHR(path, '/')) != NULL)
+		while (NOT_NULL(p = (unsigned char*) STRCHR(path, '/')))
 		{
 			p[0] = '\0';
 			if (path[0] == '\0')
@@ -698,7 +698,7 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 			}
 			else if (!STRCMP(path, DOTS))
 			{
-				if (*menu != NULL)
+				if (NOT_NULL(*menu))
 					*menu = (*menu)->parent;
 			}
 			else
@@ -718,15 +718,15 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 	if (!STRCMP(path, DOTS))
 	{
 		path += STRLEN(DOTS);
-		if (*menu != NULL)
+		if (NOT_NULL(*menu))
 			*menu = (*menu)->parent;
 		return path;
 	}
 
 	/* find this menu */
-	if (*menu == NULL)
+	if (IS_NULL(*menu))
 	{
-		for (m = r->h->MenuBar.tail; m != NULL; m = m->prev)
+		for (m = r->h->MenuBar.tail; NOT_NULL(m); m = m->prev)
 		{
 			if (!STRCMP(path, m->name))
 			break;
@@ -735,7 +735,7 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 	else
 	{
 		/* find this menu */
-		for (item = (*menu)->tail; item != NULL; item = item->prev)
+		for (item = (*menu)->tail; NOT_NULL(item); item = item->prev)
 		{
 			if (
 					item->entry.itemType == MenuSubMenu
@@ -747,7 +747,7 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 			}
 		}
 	}
-	if (m != NULL)
+	if (NOT_NULL(m))
 	{
 		*menu = m;
 		path += STRLEN(path);
@@ -769,17 +769,17 @@ rxvt_menu_delete(rxvt_t *r, menu_t *menu)
 	assert( menu != r->h->ActiveMenu ); /* Shouldn't delete current menu */
 
 	/* delete the entire menu */
-	if (menu == NULL) return NULL;
+	if (IS_NULL(menu)) return NULL;
 
 	parent = menu->parent;
 
 	/* unlink MENU */
 	prev = menu->prev;
 	next = menu->next;
-	if (prev != NULL) prev->next = next;
-	if (next != NULL) next->prev = prev;
+	if (NOT_NULL(prev)) prev->next = next;
+	if (NOT_NULL(next)) next->prev = prev;
 
-	if (parent == NULL)
+	if (IS_NULL(parent))
 	{
 		/*
 		 * If we got here, then this menu is either a popup menu, or a pulldown
@@ -799,18 +799,18 @@ rxvt_menu_delete(rxvt_t *r, menu_t *menu)
 		 * Move all subsequent entries of the menubar to the left. Popups don't
 		 * have next or prev set, so no worries doing this
 		 */
-		for (next = menu->next; next != NULL; next = next->next)
+		for (next = menu->next; NOT_NULL(next); next = next->next)
 			next->x -= width;
 	}
 	else
 	{
-		for (item = parent->tail; item != NULL; item = item->prev)
+		for (item = parent->tail; NOT_NULL(item); item = item->prev)
 		{
 			if (item->entry.itemType == MenuSubMenu
 					&& item->entry.submenu.menu == menu)
 			{
 				/* Unlink from the parent menu */
-				item->entry.submenu.menu = NULL;
+				SET_NULL(item->entry.submenu.menu);
 				rxvt_menuitem_free(r, menu->parent, item);
 				break;
 			}
@@ -818,7 +818,7 @@ rxvt_menu_delete(rxvt_t *r, menu_t *menu)
 	}
 
 	item = menu->tail;
-	while (item != NULL)
+	while (NOT_NULL(item))
 	{
 		menuitem_t	 *p = item->prev;
 
@@ -839,9 +839,9 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 	menu_t		 *menu;
 
 	DBG_MSG( 2, (stderr, "rxvt_menu_add(): Adding menu %s to parent %s\n",
-			path, parent ? parent->name : "(nil)"));
+			path, NOT_NULL(parent) ? parent->name : "(nil)"));
 
-	if (STRCHR(path, '/') != NULL)
+	if (NOT_NULL(STRCHR(path, '/')))
 	{
 		unsigned char	*p;
 
@@ -849,9 +849,9 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 		{
 			/* shouldn't happen */
 			path++;
-			parent = NULL;
+			SET_NULL(parent);
 		}
-		while ((p = (unsigned char*) STRCHR(path, '/')) != NULL)
+		while (NOT_NULL(p = (unsigned char*) STRCHR(path, '/')))
 		{
 			p[0] = '\0';
 			if (path[0] == '\0')
@@ -862,7 +862,7 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 		}
 	}
 	if (!STRCMP(path, DOTS))
-		return (parent != NULL ? parent->parent : parent);
+		return (NOT_NULL(parent) ? parent->parent : parent);
 
 	if (!STRCMP(path, DOT) || path[0] == '\0')
 		return parent;
@@ -879,14 +879,16 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 	STRCPY(menu->name, path);
 
 	/* initialize head/tail */
-	menu->head = menu->tail = NULL;
-	menu->prev = menu->next = NULL;
+	SET_NULL(menu->head);
+	SET_NULL(menu->tail);
+	SET_NULL(menu->prev);
+	SET_NULL(menu->next);
 
 	UNSET_WIN(menu->win);
 	menu->x = menu->y = menu->height = 0;
-	menu->item = NULL;
+	SET_NULL(menu->item);
 
-	if (parent == NULL)
+	if (IS_NULL(parent))
 	{
 		/* Add menus named PopupButton%d to popupMenu[%d] */
 		if(
@@ -909,12 +911,12 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 			 * Add this menu as a the last pulldown menu in the menubar.
 			 */
 			menu->prev = r->h->MenuBar.tail;
-			if (r->h->MenuBar.tail != NULL)
+			if (NOT_NULL(r->h->MenuBar.tail))
 				r->h->MenuBar.tail->next = menu;
 			r->h->MenuBar.tail = menu;
 
 			/* fix head */
-			if (r->h->MenuBar.head == NULL)
+			if (IS_NULL(r->h->MenuBar.head))
 				r->h->MenuBar.head = menu;
 
 			if (menu->prev)
@@ -929,9 +931,10 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 		item = rxvt_menuitem_add(r, parent, path, (unsigned char*) "",
 				(unsigned char*) "");
 		
-		if (item == NULL)
+		if (IS_NULL(item))
 		{
-			if( menu->name != NULL) free( menu->name );
+			if (NOT_NULL(menu->name))
+				free( menu->name );
 			free(menu);
 			return parent;
 		}
@@ -1061,17 +1064,17 @@ rxvt_print_menu_ancestors(menu_t *menu)
 {
 	DBG_MSG( 2, (stderr, "rxvt_print_menu_ancestors()\n"));
 
-	if (menu == NULL)
+	if (IS_NULL(menu))
 	{
 		fprintf(stderr, "Top Level menu\n");
 		return;
 	}
 	fprintf(stderr, "menu %s ", menu->name);
-	if (menu->parent != NULL)
+	if (NOT_NULL(menu->parent))
 	{
 		menuitem_t	 *item;
 
-		for (item = menu->parent->head; item != NULL; item = item->next)
+		for (item = menu->parent->head; NOT_NULL(item); item = item->next)
 		{
 			if (
 					item->entry.type == MenuSubMenu
@@ -1081,7 +1084,7 @@ rxvt_print_menu_ancestors(menu_t *menu)
 				break;
 			}
 		}
-		if (item == NULL)
+		if (IS_NULL(item))
 		{
 			fprintf(stderr, "is an orphan!\n");
 			return;
@@ -1107,17 +1110,17 @@ rxvt_print_menu_descendants(menu_t *menu)
 		level++;
 		parent = parent->parent;
 	  }
-	while (parent != NULL);
+	while (NOT_NULL(parent));
 
 	for (i = 0; i < level; i++)
 	fprintf(stderr, ">");
 	fprintf(stderr, "%s\n", menu->name);
 
-	for (item = menu->head; item != NULL; item = item->next)
+	for (item = menu->head; NOT_NULL(item); item = item->next)
 	{
 		if (item->entry.type == MenuSubMenu)
 		{
-			if (item->entry.submenu.menu == NULL)
+			if (IS_NULL(item->entry.submenu.menu))
 				fprintf(stderr, "> %s == NULL\n", item->name);
 			else
 			rxvt_print_menu_descendants(item->entry.submenu.menu);
@@ -1192,7 +1195,7 @@ rxvt_menu_show(rxvt_t *r)
 
 	DBG_MSG( 2, (stderr, "rxvt_menu_show()\n"));
 
-	if (ActiveMenu == NULL)
+	if (IS_NULL(ActiveMenu))
 		return;
 
 	/*
@@ -1207,12 +1210,12 @@ rxvt_menu_show(rxvt_t *r)
 	  )
 		rxvt_build_tablist( r, ActiveMenu );
 
-	if (ActiveMenu->parent == NULL)
+	if (IS_NULL(ActiveMenu->parent))
 	{
 		register int	h;
 
 		/* find the height */
-		for (h = 0, item = ActiveMenu->head; item != NULL; item = item->next)
+		for (h = 0, item = ActiveMenu->head; NOT_NULL(item); item = item->next)
 			h += isSeparator(item->name) ? HEIGHT_SEPARATOR
 					 : HEIGHT_TEXT + 2 * SHADOW;
 		ActiveMenu->height = h + 2 * SHADOW;
@@ -1305,7 +1308,7 @@ rxvt_menu_show(rxvt_t *r)
 		0, 0, amenu_width, ActiveMenu->height);
 
 	/* determine the correct right-alignment */
-	for (xright = 0, item = ActiveMenu->head; item != NULL; item = item->next)
+	for (xright = 0, item = ActiveMenu->head; NOT_NULL(item); item = item->next)
 		if( item->name2 && item->len )
 		{
 			int width = PTEXTWIDTH( r, item->name2, item->len2);
@@ -1313,7 +1316,7 @@ rxvt_menu_show(rxvt_t *r)
 			if( xright < width ) xright = width;
 		}
 
-	for (y = 0, item = ActiveMenu->head; item != NULL; item = item->next)
+	for (y = 0, item = ActiveMenu->head; NOT_NULL(item); item = item->next)
 	{
 		const int		xoff = (SHADOW + HSPACE_PIXEL/2);
 		register int	h;
@@ -1362,7 +1365,7 @@ rxvt_menu_show(rxvt_t *r)
 				x1 = ActiveMenu->x + amenu_width - TRIANGLE_WIDTH - xoff;
 
 				/* find the height of this submenu */
-				for (h = 0, it = menu->head; it != NULL; it = it->next)
+				for (h = 0, it = menu->head; NOT_NULL(it); it = it->next)
 					h += isSeparator(it->name) ? HEIGHT_SEPARATOR
 								   : HEIGHT_TEXT + 2 * SHADOW;
 				menu->height = h + 2 * SHADOW;
@@ -1385,7 +1388,7 @@ rxvt_menu_show(rxvt_t *r)
 				menu->y = (y1 < 0 ? 0 : y1);
 			}
 			else if (item->name2 && !STRCMP(name, item->name2))
-				name = NULL;
+				SET_NULL(name);
 
 
 			if (item->entry.itemType == MenuLabel)
@@ -1501,15 +1504,17 @@ rxvt_menu_display(rxvt_t *r, void (*update)(rxvt_t *))
 
 	DBG_MSG( 2, (stderr, "rxvt_menu_display()\n"));
 
-	if (ActiveMenu == NULL) return;
+	if (IS_NULL(ActiveMenu))
+		return;
+
 	if (IS_WIN(ActiveMenu->win))
 	{
 		XDestroyWindow(r->Xdisplay, ActiveMenu->win);
 		UNSET_WIN(ActiveMenu->win);
 	}
-	ActiveMenu->item = NULL;
+	SET_NULL(ActiveMenu->item);
 
-	if (ActiveMenu->parent == NULL &&
+	if (IS_NULL(ActiveMenu->parent) &&
 			!(r->h->showingMenu & POPUP_MENU) )
 		/*
 		 * 2006-01-30 gi1242: Just clearing the shadow will be enough. But with
@@ -1556,11 +1561,11 @@ rxvt_menu_clear(rxvt_t *r, menu_t *menu)
 {
 	DBG_MSG( 2, (stderr, "rxvt_menu_clear()\n"));
 
-	if (menu != NULL)
+	if (NOT_NULL(menu))
 	{
 		menuitem_t	 *item = menu->tail;
 
-		while (item != NULL)
+		while (NOT_NULL(item))
 		{
 			rxvt_menuitem_free(r, menu, item);
 			/* it didn't get freed ... why? */
@@ -1579,19 +1584,20 @@ rxvt_menubar_clear(rxvt_t *r)
 	menu_t		 *menu = r->h->MenuBar.tail;
 	DBG_MSG( 2, (stderr, "rxvt_menubar_clear()\n"));
 
-	while (menu != NULL)
+	while (NOT_NULL(menu))
 	{
 		menu_t		 *prev = menu->prev;
 
 		rxvt_menu_delete(r, menu);
 		menu = prev;
 	}
-	r->h->MenuBar.head = r->h->MenuBar.tail = NULL;
+	SET_NULL(r->h->MenuBar.head);
+	SET_NULL(r->h->MenuBar.tail);
 
 	if (r->h->MenuBar.title)
 	{
 		free(r->h->MenuBar.title);
-		r->h->MenuBar.title = NULL;
+		SET_NULL(r->h->MenuBar.title);
 	}
 	rxvt_menuarrow_free(r, 0);	/* remove all arrow functions */
 }
@@ -1662,14 +1668,14 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 	DBG_MSG( 2, (stderr, "rxvt_menu_select() (%d)\n",
 				ev->type));
 
-	if (ActiveMenu == NULL) return 0;
+	if (IS_NULL(ActiveMenu)) return 0;
 
 	XQueryPointer(r->Xdisplay, ActiveMenu->win,
 		  &unused_root, &unused_child,
 		  &unused_root_x, &unused_root_y,
 		  &(ev->x), &(ev->y), &unused_mask);
 
-	if (ActiveMenu->parent != NULL && (ev->x < 0 || ev->y < 0))
+	if (NOT_NULL(ActiveMenu->parent) && (ev->x < 0 || ev->y < 0))
 	{
 		rxvt_menu_hide(r);
 		return 1;
@@ -1679,7 +1685,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 	y = SHADOW;
 	if (ev->x >= 0 && ev->x <= (amenu_width - SHADOW))
 	{
-		for (item = ActiveMenu->head; item != NULL; item = item->next)
+		for (item = ActiveMenu->head; NOT_NULL(item); item = item->next)
 		{
 			int			 h = HEIGHT_TEXT + 2 * SHADOW;
 
@@ -1689,7 +1695,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 			y += h;
 		}
 	}
-	if (item == NULL && ev->type == ButtonRelease)
+	if (IS_NULL(item) && ev->type == ButtonRelease)
 	{
 		rxvt_menu_hide_all(r);
 		return 0;
@@ -1699,7 +1705,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 	this_y = y - SHADOW;
 
 	/* erase the last item */
-	if (ActiveMenu->item != NULL || ev->type == ButtonRelease)
+	if (NOT_NULL(ActiveMenu->item) || ev->type == ButtonRelease)
 	{
 		if (ActiveMenu->item && ActiveMenu->item != thisitem)
 		{
@@ -1708,7 +1714,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 			 * release.
 			 */
 			for (y = 0, item = ActiveMenu->head;
-					item != NULL;
+					NOT_NULL(item);
 					item = item->next)
 			{
 				int			 h;
@@ -1784,7 +1790,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 DoMenu:
 	ActiveMenu->item = thisitem;
 	y = this_y;
-	if (thisitem != NULL)
+	if (NOT_NULL(thisitem))
 	{
 		item = ActiveMenu->item;
 		if (item->entry.itemType != MenuLabel)
@@ -1819,7 +1825,7 @@ rxvt_menubar_select(rxvt_t *r, XButtonEvent *ev)
 	/* determine the pulldown menu corresponding to the X index */
 	if ( ev->y >= 0 && ev->y <= (rxvt_menubar_height(r)-MENUBAR_MARGIN) )
 	{
-		for (menu = r->h->MenuBar.head; menu != NULL; menu = menu->next)
+		for (menu = r->h->MenuBar.head; NOT_NULL(menu); menu = menu->next)
 		{
 			int w = HSPACE_PIXEL + PTEXTWIDTH( r, menu->name, menu->len);
 
@@ -1833,7 +1839,7 @@ rxvt_menubar_select(rxvt_t *r, XButtonEvent *ev)
 			break;
 
 		case ButtonPress:
-			if (menu == NULL && r->h->Arrows_x && ev->x >= r->h->Arrows_x)
+			if (IS_NULL(menu) && r->h->Arrows_x && ev->x >= r->h->Arrows_x)
 			{
 				int			 i;
 
@@ -1874,7 +1880,7 @@ rxvt_menubar_select(rxvt_t *r, XButtonEvent *ev)
 		/*
 		 * press menubar or move to a new entry
 		 */
-		if (menu != NULL && menu != r->h->ActiveMenu)
+		if (NOT_NULL(menu) && menu != r->h->ActiveMenu)
 		{
 			rxvt_menu_hide_all(r);	/* pop down old menu */
 			r->h->ActiveMenu = menu;
@@ -2130,7 +2136,7 @@ rxvt_menubar_draw_labels( rxvt_t *r)
 	XClearWindow(r->Xdisplay, r->menuBar.win);
 
 	x = 0;
-	for (menu = r->h->MenuBar.head; menu != NULL; menu = menu->next)
+	for (menu = r->h->MenuBar.head; NOT_NULL(menu); menu = menu->next)
 	{
 		unsigned short	 len = menu->len;
 
@@ -2231,7 +2237,7 @@ rxvt_menubar_draw_labels( rxvt_t *r)
 							break;	/* literal '%' */
 					}
 
-					if (s != NULL)
+					if (NOT_NULL(s))
 						while (*s && len < sizeof(title) - 1)
 						title[len++] = *s++;
 					break;
@@ -2298,10 +2304,10 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 	DBG_MSG( 2, (stderr, "rxvt_menubar_dispatcher()\n"));
 
 #if 0
-	if (rxvt_menubar_visible(r) && r->h->ActiveMenu != NULL)
+	if (rxvt_menubar_visible(r) && NOT_NULL(r->h->ActiveMenu))
 		rxvt_menubar_expose(r);
 	else
-		r->h->ActiveMenu = NULL;
+		SET_NULL(r->h->ActiveMenu);
 #endif
 
 	cmd = *str;
@@ -2334,7 +2340,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 					do
 					  {
 						next++;
-						if ((next = (unsigned char*) STRCHR(next, ':')) == NULL)
+						if (IS_NULL(next = (unsigned char*) STRCHR(next, ':')))
 							return;	/* parse error */
 					  }
 					while (next[1] != ']');
@@ -2345,7 +2351,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 				}
 				else
 				{
-					if ((next = (unsigned char*) STRCHR(next, ']')) == NULL)
+					if (IS_NULL(next = (unsigned char*) STRCHR(next, ']')))
 						return;	/* parse error */
 					/* remove and skip ']' */
 					*next = '\0';
@@ -2398,7 +2404,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 						name = rxvt_realloc(r->h->MenuBar.title,
 							STRLEN(str) + 1);
 
-						if (name != NULL)
+						if (NOT_NULL(name))
 						{
 							STRCPY(name, str);
 							r->h->MenuBar.title = name;
@@ -2407,7 +2413,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 					else
 					{
 						free(r->h->MenuBar.title);
-						r->h->MenuBar.title = NULL;
+						SET_NULL(r->h->MenuBar.title);
 					}
 				}
 				else if ((n = rxvt_str_match( (char*) str, "pixmap:")) != 0)
@@ -2424,7 +2430,8 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 				 * current menu, instead of the menubar.
 				 */
 #if 0
-				r->h->BuildMenu = r->h->ActiveMenu = NULL;
+				SET_NULL(r->h->BuildMenu);
+				SET_NULL(r->h->ActiveMenu);
 				rxvt_menubar_expose(r);
 #endif
 			}
@@ -2438,17 +2445,16 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 		case '-':
 			path = name = str;
 
-			name2 = NULL;
+			SET_NULL(name2);
 			/* parse STR, allow spaces inside (name)  */
 			if (path[0] != '\0')
 			{
 				name = (unsigned char*) STRCHR(path, MENUITEM_BEG);
 				str = (unsigned char*) STRCHR(path, MENUITEM_END);
-				if (name != NULL || str != NULL)
+				if (NOT_NULL(name) || NOT_NULL(str))
 				{
-					if (
-							name == NULL || str == NULL || str <= (name + 1)
-							|| (name > path && name[-1] != '/')
+					if (IS_NULL(name) || IS_NULL(str) || str <= (name + 1) ||
+						(name > path && name[-1] != '/')
 					   )
 					{
 						rxvt_print_error("menu error <%s>\n", path);
@@ -2459,7 +2465,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 						name2 = (str + 2);
 						str = (unsigned char*) STRCHR(name2, MENUITEM_END);
 
-						if (str == NULL)
+						if (IS_NULL(str))
 						{
 							rxvt_print_error("menu error <%s>\n", path);
 							break;
@@ -2493,7 +2499,8 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 						int			 len;
 
 						DBG_MSG( 3, ( stderr, "Current menu %s\n",
-							r->h->BuildMenu ? r->h->BuildMenu->name : "(nil)"));
+							NOT_NULL(r->h->BuildMenu) ? r->h->BuildMenu->name :
+							"(nil)"));
 
 						path = rxvt_menu_find_base(r, &(r->h->BuildMenu), path);
 						len = STRLEN(path);
@@ -2514,7 +2521,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 								rxvt_menu_add(r, r->h->BuildMenu, path);
 					}
 
-					if (name != NULL && name[0] != '\0')
+					if (NOT_NULL(name) && name[0] != '\0')
 						rxvt_menuitem_add(r, r->h->BuildMenu,
 							  (STRCMP(name, SEPARATOR_NAME) ?
 									name : (unsigned char *) ""),
@@ -2522,13 +2529,12 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 					break;
 
 				case '-':		/* delete menu entry */
-					if (
-							!STRCMP(path, "/*")
-							&& (name == NULL || name[0] == '\0')
+					if ( !STRCMP(path, "/*") &&
+						(IS_NULL(name) || name[0] == '\0')
 					   )
 					{
 						rxvt_menubar_clear(r);
-						r->h->BuildMenu = NULL;
+						SET_NULL(r->h->BuildMenu);
 						break;
 					}
 					else if (path[0] != '\0')
@@ -2552,16 +2558,16 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 						}
 						else if (path[0] != '\0')
 						{
-							r->h->BuildMenu = NULL;
+							SET_NULL(r->h->BuildMenu);
 							break;
 						}
 						else
 							r->h->BuildMenu = menu;
 					}
 
-					if (r->h->BuildMenu != NULL)
+					if (NOT_NULL(r->h->BuildMenu))
 					{
-						if (name == NULL || name[0] == '\0')
+						if (IS_NULL(name) || name[0] == '\0')
 							r->h->BuildMenu =
 								rxvt_menu_delete(r, r->h->BuildMenu);
 						else
@@ -2573,16 +2579,15 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 							n1 = STRCMP(name, SEPARATOR_NAME)
 									? name : (unsigned char*) "";
 							item = rxvt_menuitem_find(BuildMenu, n1);
-							if (
-									item != NULL
-									&& item->entry.itemType != MenuSubMenu
+							if (NOT_NULL(item) &&
+								item->entry.itemType != MenuSubMenu
 							   )
 							{
 								rxvt_menuitem_free(r, BuildMenu, item);
 
 								/* fix up the width */
 								BuildMenu->lwidth = BuildMenu->rwidth = 0;
-								for (item = BuildMenu->head; item != NULL;
+								for (item = BuildMenu->head; NOT_NULL(item);
 										item = item->next)
 								{
 									unsigned short l;
@@ -2680,7 +2685,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 
 	file = (unsigned char*) rxvt_File_find( (char*) filename,
 			".menu", r->h->rs[Rs_path]);
-	if (file == NULL)
+	if (IS_NULL(file))
 	{
 		rxvt_print_error( "Could not open file %s", filename);
 		return;
@@ -2688,14 +2693,15 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 
 	fp = fopen( (char*) file, "rb");
 	free(file);
-	if (fp == NULL)
+	if (IS_NULL(fp))
 		return;
 
 	/* semi-colon delimited */
-	if ((tag = (unsigned char*) STRCHR(filename, ';')) != NULL)
+	if (NOT_NULL(tag = (unsigned char*) STRCHR(filename, ';')))
 	{
 		tag++;
-		if (*tag == '\0') tag = NULL;
+		if (*tag == '\0')
+			SET_NULL(tag);
 	}
 
 # ifdef DEBUG_MENU
@@ -2704,8 +2710,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 		fprintf(stderr, "looking for [menu:%s]\n", tag);
 # endif
 
-	while ((p = (unsigned char*) fgets( (char*) buffer, sizeof(buffer), fp))
-				!= NULL)
+	while (NOT_NULL(p = (unsigned char*) fgets( (char*) buffer, sizeof(buffer), fp)))
 	{
 		int			 n;
 
@@ -2734,7 +2739,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 
 
 	/* found [menu], [menu:???] tag */
-	while (p != NULL)
+	while (NOT_NULL(p))
 	{
 		int			 n;
 
@@ -2843,7 +2848,7 @@ rxvt_menubar_resize(rxvt_t *r)
 	/*
 	 * All submenus now need to be traversed and resized.
 	 */
-	for (menu = r->h->MenuBar.head; menu != NULL; menu = menu->next)
+	for (menu = r->h->MenuBar.head; NOT_NULL(menu); menu = menu->next)
 	{
 		resizeSubMenus( r, menu );
 
@@ -2871,7 +2876,7 @@ resizeSubMenus( rxvt_t *r, menu_t *menu)
 
 	menu->lwidth = menu->rwidth = 0;
 
-	for( item = menu->head; item != NULL; item = item->next)
+	for( item = menu->head; NOT_NULL(item); item = item->next)
 	{
 		unsigned short width;
 		
