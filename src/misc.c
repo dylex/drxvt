@@ -79,7 +79,7 @@ rxvt_print_error(const char *fmt,...)
 int
 rxvt_str_match(const char *s1, const char *s2)
 {
-	if( s1 == NULL || s2 == NULL)
+	if( IS_NULL(s1) || IS_NULL(s2))
 		return 0;
 	else
 	{
@@ -164,7 +164,7 @@ rxvt_str_escaped(char *str)
     char            ch, *s, *d;
     int             i, num, append = 0;
 
-    if (str == NULL || *str == '\0') return 0;
+    if (IS_NULL(str) || *str == '\0') return 0;
 
     d = s = str;
 
@@ -257,7 +257,7 @@ rxvt_splitcommastring(const char *cs)
     const char     *s, *t;
     char          **ret;
 
-    if( (s = cs) == NULL )
+    if( IS_NULL(s = cs))
 		s = "";
 
     for( n=1, t=s; *t; t++)
@@ -336,12 +336,12 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
 		if (!access(name, R_OK))
 			return STRDUP(name);
     }
-    for (path = pathlist; path != NULL && *path != '\0'; path = p)
+    for (path = pathlist; NOT_NULL(path) && *path != '\0'; path = p)
 	{
 		int             n;
 
 		/* colon delimited */
-		if ((p = STRCHR(path, ':')) == NULL)
+		if (IS_NULL(p = STRCHR(path, ':')))
 			p = STRCHR(path, '\0');
 
 		n = (p - path);
@@ -375,7 +375,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 {
     char           *f;
 
-    if (file == NULL || *file == '\0')
+    if (IS_NULL(file) || *file == '\0')
 	return NULL;
 
 	do
