@@ -766,8 +766,10 @@ rxvt_init_vars(rxvt_t *r)
 	/* Back to undocumented code :) */
 	h->MEvent.time = CurrentTime;
 	h->MEvent.button = AnyButton;
-	r->Options = DEFAULT_OPTIONS;
-	r->Options2 = DEFAULT_OPTIONS2;
+	r->Options[0] = DEFAULT_OPTIONS;
+	r->Options[1] = DEFAULT_OPTIONS2;
+	r->Options[2] = DEFAULT_OPTIONS3;
+	r->Options[3] = DEFAULT_OPTIONS4;
 	h->want_refresh = 1;
 	h->want_clip_refresh = 0;
 	/*
@@ -1401,8 +1403,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	 * using autohideTabbar will only display the tabbar if there are multiple
 	 * tabs. The user can hide / show the tabbar using a macro at will.
 	 */
-	if(ISSET_OPTION2(r, Opt2_autohideTabbar))
-		SET_OPTION2(r, Opt2_hideTabbar);
+	if(ISSET_OPTION(r, Opt2_autohideTabbar))
+		SET_OPTION(r, Opt2_hideTabbar);
 
 	/* Cleanup the macro list */
 	rxvt_cleanup_macros( r );
@@ -2036,7 +2038,7 @@ rxvt_init_win_size( rxvt_t *r )
 
 	/* Calculate the terminal increment width and height */
 #ifndef NO_FRILLS
-	if( ISSET_OPTION2(r, Opt2_smoothResize))
+	if( ISSET_OPTION(r, Opt2_smoothResize))
 	{
 		r->szHint.width_inc = 1;
 		r->szHint.height_inc = 1;
@@ -2059,7 +2061,7 @@ rxvt_init_win_size( rxvt_t *r )
 	if (ISSET_OPTION(r, Opt_showMenu))
 		r->szHint.base_height += rxvt_menubar_rheight (r);
 #endif
-	if (ISNOT_OPTION2(r, Opt2_hideTabbar))
+	if (ISNOT_OPTION(r, Opt2_hideTabbar))
 		r->szHint.base_height += rxvt_tabbar_rheight (r);
 
 	/* Set the terminal minimal width and height */
@@ -2071,7 +2073,7 @@ rxvt_init_win_size( rxvt_t *r )
 	{
 		r->TermWin.ncol = BOUND_POSITIVE_INT16(w);
 #ifndef NO_FRILLS
-		if( ISSET_OPTION2(r, Opt2_smoothResize) )
+		if( ISSET_OPTION(r, Opt2_smoothResize) )
 		{
 			/* For smoothResize, w as a pixel width (if large enough) */
 			if(r->TermWin.ncol > r->szHint.base_width + r->TermWin.fwidth)
@@ -2090,7 +2092,7 @@ rxvt_init_win_size( rxvt_t *r )
 	{
 		r->TermWin.nrow = BOUND_POSITIVE_INT16(h);
 #ifndef NO_FRILLS
-		if(ISSET_OPTION2(r, Opt2_smoothResize))
+		if(ISSET_OPTION(r, Opt2_smoothResize))
 		{
 			/* For smoothResize, w as a pixel height (if large enough) */
 			if(r->TermWin.nrow > r->szHint.base_height + r->TermWin.fheight)
@@ -2147,7 +2149,7 @@ rxvt_init_win_size( rxvt_t *r )
 	r->h->window_vt_x = (ISSET_OPTION(r, Opt_scrollBar_right)) ? 
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 	r->h->window_vt_y = r->szHint.base_height - 2*r->TermWin.int_bwidth;
-	if (ISSET_OPTION2(r, Opt2_bottomTabbar) && ISNOT_OPTION2(r, Opt2_hideTabbar))
+	if (ISSET_OPTION(r, Opt2_bottomTabbar) && ISNOT_OPTION(r, Opt2_hideTabbar))
 		r->h->window_vt_y -= rxvt_tabbar_rheight (r);
 }
 
@@ -3019,7 +3021,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 
 # ifdef HAVE_X11_SM_SMLIB_H
-	if (ISSET_OPTION2(r, Opt2_enableSessionMgt))
+	if (ISSET_OPTION(r, Opt2_enableSessionMgt))
 		rxvt_session_init (r);
 # endif
 
@@ -3058,7 +3060,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	XSetCommand (r->Xdisplay, r->TermWin.parent, (char**) argv, argc);
 
 	/* override redirect */
-	if (ISSET_OPTION2(r, Opt2_overrideRedirect))
+	if (ISSET_OPTION(r, Opt2_overrideRedirect))
 	{
 		XSetWindowAttributes	attrib;
 		attrib.override_redirect = True;
@@ -3072,7 +3074,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 		PropModeReplace, (unsigned char*) &pid, 1);
 #endif
 
-	if (ISSET_OPTION2(r, Opt2_borderLess))
+	if (ISSET_OPTION(r, Opt2_borderLess))
 	{
 		rxvt_set_borderless (r);
 	}
@@ -3211,7 +3213,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 # endif
 
 	rxvt_tabbar_create (r);
-	if (ISNOT_OPTION2(r, Opt2_hideTabbar))
+	if (ISNOT_OPTION(r, Opt2_hideTabbar))
 		rxvt_tabbar_show (r);
 
 	XMapWindow (r->Xdisplay, r->TermWin.parent);
@@ -3220,14 +3222,14 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	 * We have to wait till our window is mapped before we can set the maximized
 	 * or fullscreen options.
 	 */
-	if( ISSET_OPTION2(r, Opt2_maximized))
+	if( ISSET_OPTION(r, Opt2_maximized))
 		ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 			_NET_WM_STATE_ADD,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", True),
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE_MAXIMIZED_VERT", True),
 			0, 0);
-	else if (ISSET_OPTION2 (r, Opt2_fullscreen))
+	else if (ISSET_OPTION (r, Opt2_fullscreen))
 		ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
 			XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 			_NET_WM_STATE_ADD,

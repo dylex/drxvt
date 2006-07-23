@@ -15,7 +15,8 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 		4. Disable slave macros in the macro chains if the first (master)
 		   macro is defined as dummy.
 		5. Fix off-focus fading. Thanks to Ken Zalewski for the report.
-		6. Add macros to check and set options.
+		6. Add macros to check and set options. Extend the number of 
+		   options.
 		7. Add macros to check and unset X resources.
 		8. Add macros to check and set NULL pointers.
 

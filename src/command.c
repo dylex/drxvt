@@ -715,7 +715,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 #endif	/* XK_KP_End */
 
 		case XK_End:
-			if (ISSET_OPTION2(r, Opt2_linuxHomeEndKey))
+			if (ISSET_OPTION(r, Opt2_linuxHomeEndKey))
 				SET_TILDE_KEY_SEQ( kbuf, KS_END_LINUX);
 			else
 				SET_TILDE_KEY_SEQ( kbuf, KS_END);
@@ -735,7 +735,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 
 #endif	/* XK_KP_Home */
 		case XK_Home:
-			if (ISSET_OPTION2(r, Opt2_linuxHomeEndKey))
+			if (ISSET_OPTION(r, Opt2_linuxHomeEndKey))
 				SET_TILDE_KEY_SEQ( kbuf, KS_HOME_LINUX);
 			else
 				SET_TILDE_KEY_SEQ( kbuf, KS_HOME);
@@ -1351,8 +1351,8 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		for (dead = LTAB(r); dead >= 0; dead--)
 			/* only dead children that are not held */
 			if (PVTS(r, dead)->dead &&
-				( ISNOT_OPTION2(r, Opt2_holdExit) ||
-				 (ISSET_OPTION2(r, Opt2_holdExit) && 1 == PVTS(r, dead)->hold)
+				( ISNOT_OPTION(r, Opt2_holdExit) ||
+				 (ISSET_OPTION(r, Opt2_holdExit) && 1 == PVTS(r, dead)->hold)
 				))
 				break;
 		assert (dead <= LTAB(r));	/* in case */
@@ -1408,7 +1408,7 @@ rxvt_find_cmd_child (rxvt_t* r, int* p_page)
 
 			if (
 					PVTS(r, k)->dead && 
-					!( ISSET_OPTION2(r, Opt2_holdExit) && (PVTS(r, k)->hold > 1) )
+					!( ISSET_OPTION(r, Opt2_holdExit) && (PVTS(r, k)->hold > 1) )
 			   )
 			{
 
@@ -1796,7 +1796,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		for (i = 0; i <= LTAB(r); i ++)
 		{
 			/* remember to skip held childrens */
-			if (ISSET_OPTION2(r, Opt2_holdExit) && (PVTS(r, i)->hold > 1))
+			if (ISSET_OPTION(r, Opt2_holdExit) && (PVTS(r, i)->hold > 1))
 			{
 				DBG_MSG(2,(stderr," not listen on vt[%d].cmd_fd\n",i));
 				continue;
@@ -2074,7 +2074,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 					DBG_MSG(1, (stderr,"signal lost on child %d\n",i));
 
 					PVTS(r, i)->dead = 1;
-					if (ISSET_OPTION2(r, Opt2_holdExit))
+					if (ISSET_OPTION(r, Opt2_holdExit))
 						PVTS(r, i)->hold = 1;
 					*PVTS(r, i)->cmdbuf_endp = (char) 0;
 
@@ -2088,7 +2088,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 			/* highlight inactive tab if there is some input */
 			if (
-					ISNOT_OPTION2(r, Opt2_hlTabOnBell)
+					ISNOT_OPTION(r, Opt2_hlTabOnBell)
 					&& bufsiz != count
 					&& i != ATAB(r)
 			   )
@@ -2730,7 +2730,7 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 
 #  ifdef XFT_SUPPORT
 	/* disable screen refresh if XFT antialias is used to improve performance */
-	if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION2(r, Opt2_xftAntialias)))
+	if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION(r, Opt2_xftAntialias)))
 #  endif	/* XFT_SUPPORT */
 		rxvt_scr_refresh(r, page, SMOOTH_REFRESH);
 #  ifdef HAVE_SCROLLBARS
@@ -2746,7 +2746,7 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 #  ifdef XFT_SUPPORT
 		/* disable screen refresh if XFT antialias is used to improve
 		 * performance */
-		if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION2(r, Opt2_xftAntialias)))
+		if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION(r, Opt2_xftAntialias)))
 #  endif	/* XFT_SUPPORT */
 			rxvt_scr_refresh(r, page, SMOOTH_REFRESH);
 #  ifdef HAVE_SCROLLBARS
@@ -3069,7 +3069,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	 * screen. We should not move the window here, but only on ConfigureNotify
 	 * events
 	 */
-	if(ISSET_OPTION2(r, Opt2_smartResize))
+	if(ISSET_OPTION(r, Opt2_smartResize))
 	{
 		/*
 		** resize by Marius Gedminas <marius.gedminas@uosis.mif.vu.lt>
@@ -3199,7 +3199,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 
 			/* Set the terminal incremental width and height */
 #ifndef NO_FRILLS
-			if(ISSET_OPTION2(r, Opt2_smoothResize))
+			if(ISSET_OPTION(r, Opt2_smoothResize))
 			{
 				r->szHint.width_inc = 1;
 				r->szHint.height_inc = 1;
@@ -3242,7 +3242,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 
 	r->h->window_vt_y = r->szHint.base_height - 2*r->TermWin.int_bwidth;
-	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
+	if (ISSET_OPTION(r, Opt2_bottomTabbar))
 		r->h->window_vt_y -= rxvt_tabbar_height (r);
 
 	/*
@@ -3263,7 +3263,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	r->h->want_resize |= FORCE_RESIZE;
 
 #ifndef NO_FRILLS
-	while(ISSET_OPTION2(r, Opt2_smartResize))
+	while(ISSET_OPTION(r, Opt2_smartResize))
 	{
 		/*
 		 * Let's attempt to move the window so we don't push part of it off
@@ -5429,7 +5429,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * then the window title will already be set by
 			 * rxvt_tabbar_set_title(), so we only have to set it here if +stt.
 			 */
-			if( ISNOT_OPTION2(r, Opt2_syncTabTitle ) )
+			if( ISNOT_OPTION(r, Opt2_syncTabTitle ) )
 				rxvt_set_term_title(r, (const unsigned char*) str);
 #endif
 #else
@@ -5446,7 +5446,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * title, and NOT the other way around.
 			 */
 #if 0
-			if (ISSET_OPTION2(r, Opt2_syncTabIcon))
+			if (ISSET_OPTION(r, Opt2_syncTabIcon))
 				rxvt_tabbar_set_title (r, ATAB(r),
 						(const unsigned char TAINTED*) str);
 #endif
@@ -5548,7 +5548,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 
 		case MRxvt_tabterm:		/* Set window and tab title */
 			rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
-			if( ISSET_OPTION2(r, Opt2_syncTabTitle))
+			if( ISSET_OPTION(r, Opt2_syncTabTitle))
 				/*
 				 * Window title will automatically be synced, so setting it
 				 * again is wasteful.
@@ -5646,7 +5646,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 					rxvt_hotkey_kill_tab(r, NULL);
 				}
 				else if( tabno >=0 && tabno <=LTAB(r)
-					&& ( ISNOT_OPTION2(r, Opt2_protectSecondary) ||
+					&& ( ISNOT_OPTION(r, Opt2_protectSecondary) ||
 						 PVTS(r, tabno)->current_screen == PRIMARY))
 				{
 					rxvt_kill_page (r, tabno);
@@ -6312,7 +6312,7 @@ rxvt_main_loop(rxvt_t *r)
 				/* disable screen refresh if XFT antialias is used to improve
 				 * performance */
 				if (!(ISSET_OPTION(r, Opt_xft) &&
-						ISSET_OPTION2(r, Opt2_xftAntialias)))
+						ISSET_OPTION(r, Opt2_xftAntialias)))
 # endif
 					rxvt_scr_refresh(r, page,
 							(h->refresh_type & ~CLIPPED_REFRESH));
@@ -6371,7 +6371,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 #define MAX_PTY_WRITE 128	/* 1/2 POSIX minimum MAX_INPUT */
 	register int	k, beg, end;
 
-	if (ISSET_OPTION2(r, Opt2_broadcast))
+	if (ISSET_OPTION(r, Opt2_broadcast))
 	{
 		beg = 0; end = LTAB(r);
 	}

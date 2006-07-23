@@ -106,7 +106,7 @@
 
 /* width of tabbar that can be used to draw tabs */
 #define TAB_SPACE		(TWIN_WIDTH(r)- \
-	(ISSET_OPTION2(r, Opt2_hideButtons) ? 0 : 1) * \
+	(ISSET_OPTION(r, Opt2_hideButtons) ? 0 : 1) * \
 	(4 * (BTN_WIDTH+BTN_SPACE) + TAB_BORDER))
 
 
@@ -708,7 +708,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 			int				clear = 0;	/* use ClearArea or FillRectangle */
 
-			if (ISSET_OPTION2(r, Opt2_bottomTabbar))
+			if (ISSET_OPTION(r, Opt2_bottomTabbar))
 			{
 				/* Top tabbar line & left of active tab */
 				SET_POINT( points[0], 0, TAB_TOPOFF);
@@ -735,7 +735,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 				SET_POINT( points[7], TWIN_WIDTH(r), TAB_TOPOFF);
 			}
 
-			else	/* if (ISSET_OPTION2(r, Opt2_bottomTabbar)) */
+			else	/* if (ISSET_OPTION(r, Opt2_bottomTabbar)) */
 			{
 				/*
 				 * Coordinates for the draw bottom line to the left of active
@@ -841,7 +841,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			 */
 			CHOOSE_GC_FG( r, r->tabBar.delimit);
 
-			if (ISSET_OPTION2(r, Opt2_bottomTabbar))
+			if (ISSET_OPTION(r, Opt2_bottomTabbar))
 			{
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
@@ -870,7 +870,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 						x + PVTS(r, page)->tab_width, TAB_TOPOFF + 1);
 			}
 
-			else /* if (ISSET_OPTION2(r, Opt2_bottomTabbar)) */
+			else /* if (ISSET_OPTION(r, Opt2_bottomTabbar)) */
 			{
 				/* Left vertical line */
 				XDrawLine( r->Xdisplay, r->tabBar.win, r->tabBar.gc,
@@ -903,7 +903,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 			CHOOSE_GC_FG( r, r->tabBar.ifg);
 			draw_title (r, PVTS(r, page)->tab_title,
 					x + TXT_XOFF,
-					ISSET_OPTION2(r, Opt2_bottomTabbar) ?
+					ISSET_OPTION(r, Opt2_bottomTabbar) ?
 					 		TXT_YOFF : ATAB_EXTRA + TXT_YOFF,
 					page, region);
 
@@ -969,7 +969,7 @@ rxvt_tabbar_highlight_tab (rxvt_t* r, short page, Bool force)
 
 	/* Set dimensions of the highlighted tab rectangle */
 	sx = x + ( TXT_XOFF / 2 );
-	sy = ISSET_OPTION2(r, Opt2_bottomTabbar)	?
+	sy = ISSET_OPTION(r, Opt2_bottomTabbar)	?
 				TAB_TOPOFF + 1					:
 				TAB_TOPOFF + ATAB_EXTRA + 1;
 	rw = PVTS(r, page)->tab_width - TXT_XOFF;
@@ -1004,12 +1004,12 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 		return;
 
 	/* whether the buttons are hidden */
-	if (ISSET_OPTION2(r, Opt2_hideButtons))
+	if (ISSET_OPTION(r, Opt2_hideButtons))
 		return;
 
 	topoff = BTN_TOPOFF;
 #if 0
-	frame = ISNOT_OPTION2(r, Opt2_bottomTabbar) ?
+	frame = ISNOT_OPTION(r, Opt2_bottomTabbar) ?
 				r->tabBar.frame : r->tabBar.delimit;
 #endif
 	frame = r->tabBar.frame;
@@ -1027,7 +1027,7 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 					img_d[XPM_TERM] : img_e[XPM_TERM];
 				break;
 			case XPM_CLOSE:
-				img[XPM_CLOSE] = (ISSET_OPTION2(r, Opt2_protectSecondary) &&
+				img[XPM_CLOSE] = (ISSET_OPTION(r, Opt2_protectSecondary) &&
 								PRIMARY != AVTS(r)->current_screen) ?
 						img_d[XPM_CLOSE] : img_e[XPM_CLOSE];
 				break;
@@ -1168,7 +1168,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 		 && command == NULL	/* No command specified (e.g. via NewTab macro) */
 		 && (
 			   LTAB(r)== 0							/* First tab */
-			   || ISSET_OPTION2(r, Opt2_cmdAllTabs)	/* -at option */
+			   || ISSET_OPTION(r, Opt2_cmdAllTabs)	/* -at option */
 		    )
 	  )
 		argv = cmd_argv;
@@ -1356,18 +1356,18 @@ rxvt_append_page( rxvt_t* r, int profile,
 	 */
 	if(
 		 !r->tabBar.state && LTAB(r) == 1
-		 && ISSET_OPTION2(r, Opt2_autohideTabbar)
+		 && ISSET_OPTION(r, Opt2_autohideTabbar)
 		 && rxvt_tabbar_show( r )
 	  )
 		rxvt_resize_on_subwin( r, SHOW_TABBAR);
 
 	/* synchronize terminal title with tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
+	if (ISSET_OPTION(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r,
 				(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
+	if (ISSET_OPTION(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name (r,
 				(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
@@ -1471,7 +1471,7 @@ rxvt_remove_page (rxvt_t* r, short page)
 	/* redraw the tabs and buttons */
 	if (r->tabBar.state)
 	{
-		if( LTAB(r) == 0 && ISSET_OPTION2(r, Opt2_autohideTabbar) 
+		if( LTAB(r) == 0 && ISSET_OPTION(r, Opt2_autohideTabbar) 
 				&& rxvt_tabbar_hide( r ))
 			/*
 			 * Only one tab left. Auto hide tabbar.
@@ -1491,11 +1491,11 @@ rxvt_remove_page (rxvt_t* r, short page)
 	/* rxvt_scr_touch (r, ATAB(r), True); */
 
 	/* synchronize terminal title with tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
+	if (ISSET_OPTION(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
+	if (ISSET_OPTION(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
@@ -1537,12 +1537,12 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
 	}
 
 	/* synchronize terminal title with active tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabTitle) &&
+	if (ISSET_OPTION(r, Opt2_syncTabTitle) &&
 		(page == ATAB(r)))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabIcon) &&
+	if (ISSET_OPTION(r, Opt2_syncTabIcon) &&
 		(page == ATAB(r)))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
@@ -1592,11 +1592,11 @@ rxvt_activate_page (rxvt_t* r, short index)
 	DBG_MSG(1,(stderr,"active page is %d\n",ATAB(r)));
 
 	/* synchronize terminal title with tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabTitle))
+	if (ISSET_OPTION(r, Opt2_syncTabTitle))
 		rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
 	/* synchronize icon name to tab title */
-	if (ISSET_OPTION2(r, Opt2_syncTabIcon))
+	if (ISSET_OPTION(r, Opt2_syncTabIcon))
 		rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
@@ -1617,7 +1617,7 @@ rxvt_tabbar_resize (rxvt_t* r)
 #ifdef HAVE_MENUBAR
 	sy += rxvt_menubar_height (r);
 #endif
-	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
+	if (ISSET_OPTION(r, Opt2_bottomTabbar))
 		sy += VT_HEIGHT(r);
 	XMoveResizeWindow  (r->Xdisplay, r->tabBar.win,
 		sx, sy, TWIN_WIDTH(r), rxvt_tabbar_rheight (r));
@@ -1697,7 +1697,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	/* let's decode where the user click */
 	z = TWIN_WIDTH(r) - x;
 	if (
-			ISNOT_OPTION2(r, Opt2_hideButtons)
+			ISNOT_OPTION(r, Opt2_hideButtons)
 			&& z < 4*(BTN_WIDTH+BTN_SPACE)
 			&& (z%(BTN_WIDTH+BTN_SPACE)) > BTN_SPACE
 	   )
@@ -1725,8 +1725,8 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 				break;
 
 			case 2 : /* delete the active vt if it's in primary screen */
-				if (ISNOT_OPTION2(r, Opt2_protectSecondary) ||
-					( ISSET_OPTION2(r, Opt2_protectSecondary) &&
+				if (ISNOT_OPTION(r, Opt2_protectSecondary) ||
+					( ISSET_OPTION(r, Opt2_protectSecondary) &&
 					  PRIMARY == AVTS(r)->current_screen
 					))
 					rxvt_kill_page (r, ATAB(r));
@@ -2036,7 +2036,7 @@ rxvt_tabbar_create (rxvt_t* r)
 #ifdef HAVE_MENUBAR
 	sy += rxvt_menubar_height (r);
 #endif
-	if (ISSET_OPTION2(r, Opt2_bottomTabbar))
+	if (ISSET_OPTION(r, Opt2_bottomTabbar))
 		sy += VT_HEIGHT(r);
 	/*
 	 * create the window of the tabbar. Use ifg and ibg for the background of

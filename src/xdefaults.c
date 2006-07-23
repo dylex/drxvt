@@ -831,7 +831,7 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 			if (optList[i].doff < Rs_options2)
 				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
 			else
-				bval = ISSET_OPTION2(r, optList[i].flag) ? 1 : 0;
+				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
 			if (optList_isReverse(i))
 				bval = !bval;
 			fprintf( pf, "%s.%s:%.*s%s\n", name,
@@ -1045,9 +1045,9 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 				else
 				{
 					if (flag == On)
-						SET_OPTION2(r, optList[entry].flag);
+						SET_OPTION(r, optList[entry].flag);
 					else
-						UNSET_OPTION2(r, optList[entry].flag);
+						UNSET_OPTION(r, optList[entry].flag);
 				}
 
 				if ((optList[entry].doff+profileNum) != -1)
@@ -1255,9 +1255,9 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 							else
 							{
 								if (s)
-									SET_OPTION2(r, optList[entry].flag);
+									SET_OPTION(r, optList[entry].flag);
 								else
-									UNSET_OPTION2(r, optList[entry].flag);
+									UNSET_OPTION(r, optList[entry].flag);
 							}
 						}
 					}
@@ -1391,7 +1391,7 @@ rxvt_extract_resources (
 	 * Now read config from system wide config file.
 	 */
 	if(
-		ISNOT_OPTION2(r, Opt2_noSysConfig) &&
+		ISNOT_OPTION(r, Opt2_noSysConfig) &&
 		(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r") ) != NULL
 	  )
 	{
@@ -1437,8 +1437,10 @@ rxvt_extract_resources (
 	 * the boolean flag is set for each boolean options. Then if we compare
 	 * Options(2) to the flag, we always get TRUE!
 	 */
-	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse));
-	UNSET_OPTION2(r, (Opt_Boolean | Opt_Reverse));
+	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION1));
+	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION2));
+	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION3));
+	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION4));
 
 
 	/*

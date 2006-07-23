@@ -878,7 +878,7 @@ rxvt_scr_change_screen(rxvt_t* r, int page, int scrn)
 #endif
 
 	/* Need to update tabbar buttons */
-	if (ISSET_OPTION2(r, Opt2_protectSecondary))
+	if (ISSET_OPTION(r, Opt2_protectSecondary))
 		rxvt_tabbar_draw_buttons (r);
 
 	return scrn;
@@ -3070,7 +3070,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 # ifdef MULTICHAR_SET
 		else
 		if (
-			  ISNOT_OPTION2(r, Opt2_xftSlowOutput)
+			  ISNOT_OPTION(r, Opt2_xftSlowOutput)
 			  && (XftDrawStringUtf8 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -3091,7 +3091,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 		}
 		else
 		if (
-			  ISNOT_OPTION2(r, Opt2_xftSlowOutput)
+			  ISNOT_OPTION(r, Opt2_xftSlowOutput)
 			  && (XftDrawString16 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -3255,12 +3255,12 @@ rxvt_restore_bold_font (rxvt_t* r)
 # define MONO_BOLD_FG(x, fg)	MONO_BOLD(x)
 #else	/* NO_BRIGHTCOLOR */
 # define MONO_BOLD(x)														\
-	(ISSET_OPTION2(r, Opt2_veryBold) ?										\
+	(ISSET_OPTION(r, Opt2_veryBold) ?										\
 	 ((x) & (RS_Bold|RS_Blink)) :											\
 	 (((x) & (RS_Bold | RS_fgMask)) == (RS_Bold | Color_fg))				\
 	)
 # define MONO_BOLD_FG(x, fg)												\
-	(ISSET_OPTION2(r, Opt2_veryBold) ?										\
+	(ISSET_OPTION(r, Opt2_veryBold) ?										\
 	 MONO_BOLD(x) :															\
 	 (((x) & RS_Bold) && (fg) == Color_fg)									\
 	)
@@ -4039,7 +4039,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						 * colored / blinking text.
 						 */
 #if 0
-						if (ISNOT_OPTION2(r, Opt2_veryBold))
+						if (ISNOT_OPTION(r, Opt2_veryBold))
 #endif
 						rend &= ~RS_Bold;	/* we've taken care of it */
 					}
@@ -4158,7 +4158,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				 * If veryBold is not set, then don't render colored text in
 				 * bold.
 				 */
-				if (ISNOT_OPTION2(r, Opt2_veryBold))
+				if (ISNOT_OPTION(r, Opt2_veryBold))
 					rend &= ~RS_Bold;
 			}
 			else if (rend & RS_Uline && ISSET_PIXCOLOR( h, Color_UL) )

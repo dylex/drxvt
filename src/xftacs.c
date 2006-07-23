@@ -54,8 +54,8 @@
  *
  *----------------------------------------------------------------------------*/
 
-#include <X11/Xlib.h>
-#include <X11/Xft/Xft.h>
+#include "../config.h"
+#include "rxvt.h"
 
 #include <xftacs.h>
 
@@ -483,7 +483,7 @@ xftDrawACSChars(
 	    str++;
 	    x += font_width;
 	}
-	else if( (p = lines[*str]) != NULL)
+	else if( NOT_NULL(p = lines[*str]))
 	{
 	    /*
 	     * Draw character using segments in lines[*str]

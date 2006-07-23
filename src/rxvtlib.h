@@ -280,81 +280,88 @@ typedef enum {
 #define Screen_WrapNext		(1<<4)	/* need to wrap for next char? */
 #define Screen_DefaultFlags	(Screen_VisibleCursor|Screen_Autowrap)
 
+
+#define IS_OPTION1			(0x00000000)
+#define IS_OPTION2			(0x00000001)
+#define IS_OPTION3			(0x00000002)
+#define IS_OPTION4			(0x00000003)
+#define OPTION_MASK			(0x00000003)
+#define MAX_OPTION_ARRAY		(4)
+
 /* rxvt_vars.Options */
-#define	Opt_console					(1LU<<0)
-#define Opt_loginShell				(1LU<<1)
-#define Opt_iconic					(1LU<<2)
-#define Opt_visualBell				(1LU<<3)
-#define Opt_mapAlert				(1LU<<4)
-#define Opt_reverseVideo			(1LU<<5)
-#define Opt_utmpInhibit				(1LU<<6)
-#define Opt_scrollBar				(1LU<<7)
-#define Opt_scrollBar_right			(1LU<<8)
-#define Opt_scrollBar_floating		(1LU<<9)
-#define Opt_meta8					(1LU<<10)
-#define Opt_scrollTtyOutputInhibit	(1LU<<11)
-#define Opt_scrollTtyKeypress		(1LU<<12)
-#define Opt_transparent				(1LU<<13)
-#define Opt_forceTransparent		(1LU<<14)
-#define Opt_mc_hack					(1LU<<15)
-#define Opt_tripleclickwords		(1LU<<16)
-#define Opt_scrollWithBuffer		(1LU<<17)
-#define Opt_jumpScroll				(1LU<<18)
-#define Opt_mouseWheelScrollPage	(1LU<<19)
-#define Opt_pointerBlank			(1LU<<20)
-#define Opt_cursorBlink				(1LU<<21)
+#define	Opt_console			((1LU<<2) | IS_OPTION1)
+#define Opt_loginShell			((1LU<<3) | IS_OPTION1)
+#define Opt_iconic			((1LU<<4) | IS_OPTION1)
+#define Opt_visualBell			((1LU<<5) | IS_OPTION1)
+#define Opt_mapAlert			((1LU<<6) | IS_OPTION1)
+#define Opt_reverseVideo		((1LU<<7) | IS_OPTION1)
+#define Opt_utmpInhibit			((1LU<<8) | IS_OPTION1)
+#define Opt_scrollBar			((1LU<<9) | IS_OPTION1)
+#define Opt_scrollBar_right		((1LU<<10) | IS_OPTION1)
+#define Opt_scrollBar_floating		((1LU<<11) | IS_OPTION1)
+#define Opt_meta8			((1LU<<12) | IS_OPTION1)
+#define Opt_scrollTtyOutputInhibit	((1LU<<13) | IS_OPTION1)
+#define Opt_scrollTtyKeypress		((1LU<<14) | IS_OPTION1)
+#define Opt_transparent			((1LU<<15) | IS_OPTION1)
+#define Opt_forceTransparent		((1LU<<16) | IS_OPTION1)
+#define Opt_mc_hack			((1LU<<17) | IS_OPTION1)
+#define Opt_tripleclickwords		((1LU<<18) | IS_OPTION1)
+#define Opt_scrollWithBuffer		((1LU<<19) | IS_OPTION1)
+#define Opt_jumpScroll			((1LU<<20) | IS_OPTION1)
+#define Opt_mouseWheelScrollPage	((1LU<<21) | IS_OPTION1)
+#define Opt_pointerBlank		((1LU<<22) | IS_OPTION1)
+#define Opt_cursorBlink			((1LU<<23) | IS_OPTION1)
 #ifdef HAVE_SCROLLBARS
-# define Opt_transparent_scrollbar	(1LU<<22)
+# define Opt_transparent_scrollbar	((1LU<<24) | IS_OPTION1)
 #endif
 #ifdef HAVE_MENUBAR
-# define Opt_transparent_menubar	(1LU<<23)
-# define Opt_showMenu				(1LU<<24)
+# define Opt_transparent_menubar	((1LU<<25) | IS_OPTION1)
+# define Opt_showMenu			((1LU<<26) | IS_OPTION1)
 #endif
-#define Opt_transparent_tabbar		(1LU<<25)
-#define Opt_tabPixmap				(1LU<<26)
+#define Opt_transparent_tabbar		((1LU<<27) | IS_OPTION1)
+#define Opt_tabPixmap			((1LU<<28) | IS_OPTION1)
 #ifdef XFT_SUPPORT
-# define Opt_xft					(1LU<<27)
+# define Opt_xft			((1LU<<29) | IS_OPTION1)
 #endif
 #define DEFAULT_OPTIONS		\
 	(Opt_scrollBar | Opt_jumpScroll)
 
 /* rxvt_vars.Options2 */
-#define Opt2_protectSecondary		(1LU<<0)
-/* #define Opt2_cmdInitTabs			(1LU<<1) OBSOLETE */
-#define Opt2_cmdAllTabs   			(1LU<<2)
+#define Opt2_protectSecondary		((1LU<<2) | IS_OPTION2)
+#define Opt2_cmdAllTabs   		((1LU<<3) | IS_OPTION2)
 #ifdef XFT_SUPPORT
 # ifdef MULTICHAR_SET
-#  define Opt2_xftNomFont			(1LU<<3)
-#  define Opt2_xftSlowOutput		(1LU<<4)
+#  define Opt2_xftNomFont		((1LU<<4) | IS_OPTION2)
+#  define Opt2_xftSlowOutput		((1LU<<5) | IS_OPTION2)
 # endif
-# define Opt2_xftAntialias			(1LU<<5)
-# define Opt2_xftHinting			(1LU<<6)
-# define Opt2_xftAutoHint			(1LU<<7)
-# define Opt2_xftGlobalAdvance		(1LU<<8)
+# define Opt2_xftAntialias		((1LU<<6) | IS_OPTION2)
+# define Opt2_xftHinting		((1LU<<7) | IS_OPTION2)
+# define Opt2_xftAutoHint		((1LU<<8) | IS_OPTION2)
+# define Opt2_xftGlobalAdvance		((1LU<<9) | IS_OPTION2)
 #endif
-#define Opt2_syncTabTitle			(1LU<<9)
-#define Opt2_syncTabIcon			(1LU<<10)
-#define Opt2_hideTabbar				(1LU<<11)
-#define Opt2_bottomTabbar			(1LU<<12)
-#define Opt2_borderLess				(1LU<<13)
-#define Opt2_overrideRedirect		(1LU<<14)
-#define Opt2_holdExit				(1LU<<15)
-#define Opt2_broadcast				(1LU<<16)
-#define Opt2_hideButtons			(1LU<<17)
-#define Opt2_veryBold				(1LU<<18)
-#define Opt2_noSysConfig			(1LU<<19)
-#define Opt2_disableMacros			(1LU<<20)
+#define Opt2_syncTabTitle		((1LU<<10) | IS_OPTION2)
+#define Opt2_syncTabIcon		((1LU<<11) | IS_OPTION2)
+#define Opt2_hideTabbar			((1LU<<12) | IS_OPTION2)
+#define Opt2_bottomTabbar		((1LU<<13) | IS_OPTION2)
+#define Opt2_borderLess			((1LU<<14) | IS_OPTION2)
+#define Opt2_overrideRedirect		((1LU<<15) | IS_OPTION2)
+#define Opt2_holdExit			((1LU<<16) | IS_OPTION2)
+#define Opt2_broadcast			((1LU<<17) | IS_OPTION2)
+#define Opt2_hideButtons		((1LU<<18) | IS_OPTION2)
+#define Opt2_veryBold			((1LU<<19) | IS_OPTION2)
+#define Opt2_noSysConfig		((1LU<<20) | IS_OPTION2)
+#define Opt2_disableMacros		((1LU<<21) | IS_OPTION2)
 #ifdef HAVE_X11_SM_SMLIB_H
-# define Opt2_enableSessionMgt		(1LU<<21)
+# define Opt2_enableSessionMgt		((1LU<<22) | IS_OPTION2)
 #endif
-/* #define Opt2_tabShell				(1LU<<22) */
-#define Opt2_linuxHomeEndKey		(1LU<<23)
-#define Opt2_hlTabOnBell			(1LU<<24)
-#define Opt2_smoothResize			(1LU<<25)
-#define Opt2_smartResize			(1LU<<26)
-#define Opt2_autohideTabbar			(1LU<<27)
-#define Opt2_maximized				(1LU<<28)
-#define Opt2_fullscreen				(1LU<<29)
+#define Opt2_linuxHomeEndKey		((1LU<<23) | IS_OPTION2)
+#define Opt2_hlTabOnBell		((1LU<<24) | IS_OPTION2)
+#define Opt2_smoothResize		((1LU<<25) | IS_OPTION2)
+#define Opt2_smartResize		((1LU<<26) | IS_OPTION2)
+#define Opt2_autohideTabbar		((1LU<<27) | IS_OPTION2)
+#define Opt2_maximized			((1LU<<28) | IS_OPTION2)
+#define Opt2_fullscreen			((1LU<<29) | IS_OPTION2)
+
 
 #ifdef XFT_SUPPORT
 # define DEFAULT_OPTIONS2	\
@@ -364,39 +371,31 @@ typedef enum {
 	(Opt2_veryBold | Opt2_smartResize)
 #endif
 
+#define DEFAULT_OPTIONS3	\
+    (IS_OPTION3)
+#define DEFAULT_OPTIONS4	\
+    (IS_OPTION4)
+
 /* place holder used for parsing command-line options */
-#define Opt_Reverse					(1LU<<30)
-#define Opt_Boolean					(1LU<<31)
+#define Opt_Reverse			(1LU<<30)
+#define Opt_Boolean			(1LU<<31)
 
-/* Macros to test whether an option has been set. 
-** TODO: unify ISSET_OPTION and ISSET_OPTION2. Can we do it?
-*/
+/* Macros to test whether an option has been set.  */
 #define ISSET_OPTION(R, OPT)	\
-	((R)->Options & OPT)
-#define ISNOT_OPTION(R, OPT)		\
-	(!((R)->Options & OPT))
+    ((R)->Options[OPT & OPTION_MASK] & (~OPTION_MASK & OPT))
 
-#define ISSET_OPTION2(R, OPT)	\
-	((R)->Options2 & OPT)
-#define ISNOT_OPTION2(R, OPT)	\
-	(!((R)->Options2 & OPT))
+#define ISNOT_OPTION(R, OPT)	\
+    (!((R)->Options[OPT & OPTION_MASK] & (~OPTION_MASK & OPT)))
 
-/* Macros to set and unset an option.
-** TODO: unify SET_OPTION and SET_OPTION2. Can we do it?
-*/
-#define SET_OPTION(R, OPT)	\
-	((R)->Options |= OPT)
-#define UNSET_OPTION(R, OPT)	\
-	((R)->Options &= ~OPT)
+/* Macros to set and unset an option.  */
+#define SET_OPTION(R, OPT)  	\
+    ((R)->Options[OPT & OPTION_MASK] |= (OPT & ~OPTION_MASK))
+
+#define UNSET_OPTION(R, OPT)  	\
+    ((R)->Options[OPT & OPTION_MASK] &= ~(OPT & ~OPTION_MASK))
+
 #define TOGGLE_OPTION(R, OPT)	\
-	((R)->Options ^= OPT)
-
-#define SET_OPTION2(R, OPT)	\
-	((R)->Options2 |= OPT)
-#define UNSET_OPTION2(R, OPT)	\
-	((R)->Options2 &= ~OPT)
-#define TOGGLE_OPTION2(R, OPT)	\
-	((R)->Options2 ^= OPT)
+    ((R)->Options[OPT & OPTION_MASK] ^= (OPT & ~OPTION_MASK))
 
 
 
@@ -827,8 +826,7 @@ typedef struct rxvt_vars {
 #endif
 	tabBar_t		tabBar;
 	Display*		Xdisplay;
-	unsigned long   Options;
-	unsigned long   Options2;
+	unsigned long   Options[MAX_OPTION_ARRAY];
 	XSizeHints      szHint;
 
 	/* macros */

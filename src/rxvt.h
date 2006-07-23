@@ -539,12 +539,9 @@ typedef char*		XPointer;
 /* Macros to check NULL pointers. This is solely to make the code more
 ** readable/pretty
 */
-#define IS_NULL(PTR)	\
-	(NULL == (PTR))
-#define NOT_NULL(PTR)	\
-	(NULL != (PTR))
-#define SET_NULL(PTR)	\
-	((PTR) = NULL)
+#define IS_NULL(PTR)	(NULL == (PTR))
+#define NOT_NULL(PTR)	(NULL != (PTR))
+#define SET_NULL(PTR)	((PTR) = NULL)
 
 /*
  *****************************************************************************
