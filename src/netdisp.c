@@ -88,7 +88,7 @@ rxvt_network_display (const char *display)
 				int			l;
 				char*		colon = STRCHR(display, ':');
 
-				if (colon == NULL)
+				if (IS_NULL(colon))
 				    colon = ":0.0";
 
 				/* possible integer overflow */

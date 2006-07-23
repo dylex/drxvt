@@ -697,7 +697,7 @@ rxvt_usage(int type)
 		case 0:			/* brief listing */
 			fprintf(stdout, " [-help] [--help]\n");
 			for (col = 1, i = 0; i < optList_size(); i++)
-				if (optList[i].desc != NULL)
+				if (NOT_NULL(optList[i].desc))
 				{
 					int			 len = 0;
 
@@ -707,7 +707,7 @@ rxvt_usage(int type)
 						if (len > 0)
 							len++;	/* account for space */
 					}
-					assert(optList[i].opt != NULL);
+					assert(NOT_NULL(optList[i].opt));
 
 					len += 4 + STRLEN(optList[i].opt) +
 						(optList_isBool(i) ? 2: 0);
@@ -730,9 +730,9 @@ rxvt_usage(int type)
 			fprintf(stdout, " [options] [-e command args]\n\n"
 				"where options include:\n");
 			for (i = 0; i < optList_size(); i++)
-				if (optList[i].desc != NULL)
+				if (NOT_NULL(optList[i].desc))
 				{
-					assert(optList[i].opt != NULL);
+					assert(NOT_NULL(optList[i].opt));
 
 					fprintf(stdout, "  %s%s %-*s%s%s\n",
 						(optList_isBool(i) ? "-/+" : "-"), optList[i].opt,
@@ -765,7 +765,7 @@ rxvt_usage(int type)
 
 #else
 			for (i = 0; i < optList_size(); i++)
-				if (optList[i].kw != NULL)
+				if (NOT_NULL(optList[i].kw))
 					fprintf(stdout, "  %s: %*s%s\n",
 						optList[i].kw,
 						(INDENT - STRLEN(optList[i].kw)), "", /* XXX */
@@ -799,12 +799,12 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 
 	char		*tabs="\t\t\t\t\t";
 
-	if (NULL == pf)
+	if (IS_NULL(pf))
 		return 0;
 	
 	for (i = 0; i < optList_size(); i ++)
 	{
-		if (NULL == optList[i].kw)
+		if (IS_NULL(optList[i].kw))
 			continue;
 		if (-1 == optList[i].doff)
 			continue;
@@ -1062,7 +1062,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 			{
 				const char	*str = argv[++i];
 
-				if( str != NULL )
+				if (NOT_NULL(str))
 					rxvt_parse_macros( r, opt + sizeof( "macro." ) - 1,
 							str, False); /* Replace previous macros */
 			}
@@ -1131,11 +1131,11 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 
 	DBG_MSG(1, (stderr, "rxvt_get_xdefaults (%s)\n", name));
 
-	if (stream == NULL)
+	if (IS_NULL(stream))
 		return;
 	len = STRLEN(name);
 
-	while ((str = fgets(buffer, sizeof(buffer), stream)) != NULL)
+	while (NOT_NULL(str = fgets(buffer, sizeof(buffer), stream)))
 	{
 		unsigned int	entry, n;
 
@@ -1169,7 +1169,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 				char	kw[256];
 				int		profileNum = 0;	/* default is no offset */
 
-				if (optList[entry].kw == NULL)
+				if (IS_NULL(optList[entry].kw))
 					continue;
 				STRNCPY (kw, optList[entry].kw, sizeof(kw)-1);
 				kw[sizeof(kw)-1] = (char) 0;
@@ -1290,7 +1290,7 @@ rxvt_extract_resources (
 	/* Compute the path of the possibly available localized Rxvt file */ 
 	char		   *localepath = NULL;
 
-	if (r->h->locale != NULL)
+	if (NOT_NULL(r->h->locale))
 	{
 		/* XXX: must limit length of string */
 
@@ -1311,7 +1311,7 @@ rxvt_extract_resources (
 	if (r->h->rs[Rs_confFile])
 		fd = fopen( r->h->rs[Rs_confFile], "r" );
 
-	if( NULL == fd && NULL != ( home = getenv("HOME") ) )
+	if (IS_NULL(fd) && NOT_NULL(home = getenv("HOME")))
 	{
 		unsigned int	i, len = STRLEN(home) + 2;
 		char*			f = NULL;
@@ -1326,7 +1326,7 @@ rxvt_extract_resources (
 
 			sprintf( f, "%s/%s", home, xnames[i] );
 
-			if( (fd = fopen(f, "r")) != NULL )
+			if (NOT_NULL(fd = fopen(f, "r"))))
 				break;
 		}
 		free(f);
@@ -1360,7 +1360,7 @@ rxvt_extract_resources (
 #if 0
 	rxvt_get_xdefaults(r, fd, "");	/* partial match */
 #endif
-	if (fd != NULL)
+	if (NOT_NULL(fd))
 		fclose(fd);
 
 #  if defined(XAPPLOADDIR) && defined(USE_XAPPLOADDIR)
@@ -1368,10 +1368,10 @@ rxvt_extract_resources (
 		FILE*	ad = NULL;
 
 #   if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
-		if (localepath == NULL || (ad = fopen(localepath, "r")) == NULL)
+		if (IS_NULL(localepath) || IS_NULL(ad = fopen(localepath, "r")))
 #   endif
 			ad = fopen(XAPPLOADDIR "/" APL_SUBCLASS, "r");
-		if (ad != NULL)
+		if (NOT_NULL(ad))
 		{
 			rxvt_get_xdefaults(r, ad, APL_SUBCLASS);
 #if 0
@@ -1390,10 +1390,8 @@ rxvt_extract_resources (
 	/*
 	 * Now read config from system wide config file.
 	 */
-	if(
-		ISNOT_OPTION(r, Opt2_noSysConfig) &&
-		(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r") ) != NULL
-	  )
+	if (ISNOT_OPTION(r, Opt2_noSysConfig) &&
+	    NOT_NULL(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r")))
 	{
 		rxvt_get_xdefaults( r, fd, APL_SUBCLASS );
 		fclose(fd);
