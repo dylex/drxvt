@@ -115,15 +115,24 @@ void             rxvt_cleanutent                  __PROTO((rxvt_t* r, int page))
 /* End prototypes of logging.c */
 
 
+/* Begin prototypes of rxvtmem.c */
+#ifdef OUR_MALLOC
+void             rxvt_mem_init                    __PROTO((void));
+void             rxvt_mem_exit                    __PROTO((void));
+#endif /* OUR_MALLOC */
+void*            rxvt_malloc                      __PROTO((size_t size));
+void*            rxvt_calloc                      __PROTO((size_t number, size_t size));
+void*            rxvt_realloc                     __PROTO((void *ptr, size_t size));
+void             rxvt_free                        __PROTO((void *ptr));
+/* End prototypes of rxvtmem.c */
+
+
 /* Begin prototypes of main.c */
 void             rxvt_privileges                  __PROTO((int mode));
 RETSIGTYPE       rxvt_Child_signal                __PROTO((int sig __attribute__((unused))));
 RETSIGTYPE       rxvt_Exit_signal                 __PROTO((int sig));
 void			 rxvt_exit_request                __PROTO((rxvt_t*));
 void             rxvt_clean_exit                  __PROTO((rxvt_t* r));
-void*            rxvt_malloc                      __PROTO((size_t size));
-void*            rxvt_calloc                      __PROTO((size_t number, size_t size));
-void*            rxvt_realloc                     __PROTO((void *ptr, size_t size));
 void             rxvt_privileged_utmp             __PROTO((rxvt_t* r, int page, char action));
 void             rxvt_privileged_ttydev           __PROTO((rxvt_t* r, int page, char action));
 void             rxvt_tt_winsize                  __PROTO((int fd, unsigned short col, unsigned short row, pid_t pid));
