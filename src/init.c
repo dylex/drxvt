@@ -3208,7 +3208,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 		r->h->popupMenu[0] = (menu_t *) rxvt_calloc( 1, sizeof(menu_t) );
 
 		r->h->popupMenu[0]->len		= sizeof( "Switch to tab" );
-		r->h->popupMenu[0]->name	= STRDUP( "Switch to tab" );
+		r->h->popupMenu[0]->name	= (unsigned char*) STRDUP ("Switch to tab");
 	}
 # endif
 

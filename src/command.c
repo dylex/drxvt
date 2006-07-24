@@ -1234,7 +1234,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 
 #ifdef GREEK_SUPPORT
 			if (r->h->greek_mode)
-				len = greek_xlat(kbuf, len);
+				len = greek_xlat( (char*) kbuf, len);
 #endif	/* GREEK_SUPPORT */
 		}	/* else */
 
