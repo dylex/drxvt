@@ -1089,7 +1089,6 @@ enum {
     Rs_term_name,
     Rs_iconName,
     Rs_geometry,
-    Rs_reverseVideo,
     Rs_color,
     _Rs_color = Rs_color + TOTAL_COLORS, /*+ 2 * MAX_PAGES - 1,*/
     Rs_font,
@@ -1098,7 +1097,6 @@ enum {
     Rs_mfont,
     _Rs_mfont = Rs_mfont + MAX_NFONTS - 1,
     Rs_multichar_encoding,
-    Rs_mc_hack,
 #endif
     Rs_name,
     Rs_title,
@@ -1110,7 +1108,6 @@ enum {
 
 #ifdef BACKGROUND_IMAGE
 	Rs_tabbarPixmap,	/* tabbar background pixmap */
-	Rs_tabPixmap,		/* use tabbar bg pixmap for tabs */
 # if 0 /* appicon not yet implemented */
 	Rs_appIcon,			/* use pixmap as application icon */
 # endif
@@ -1118,7 +1115,6 @@ enum {
 
 #ifdef HAVE_MENUBAR
     Rs_menu,
-    Rs_showMenu,
 # ifdef BACKGROUND_IMAGE
 	Rs_menubarPixmap,
 # endif
@@ -1133,7 +1129,6 @@ enum {
     Rs_greektoggle_key,
 #endif
 #ifdef XFT_SUPPORT
-	Rs_xft,		/* Use XFT? */
 	Rs_xftfont,	/* Font name, family */
 # ifdef MULTICHAR_SET
 	Rs_xftmfont,/* Multichar font name, family */
@@ -1147,21 +1142,13 @@ enum {
 	Rs_xftpfn,	/* Propotionally spaced Xft font (for tabbar / menubar) */
 	Rs_xftpsz,	/* Size of propotionally spaced Xft font */
 #endif
-    Rs_loginShell,
-    Rs_jumpScroll,
 #ifdef HAVE_SCROLLBARS
-    Rs_scrollBar,
-    Rs_scrollBar_right,
-    Rs_scrollBar_floating,
     Rs_scrollBar_align,
 # ifdef BACKGROUND_IMAGE
 	Rs_scrollbarPixmap,
 # endif
 #endif	/* HAVE_SCROLLBARS */
     Rs_scrollBar_style,
-    Rs_scrollTtyOutputInhibit,
-    Rs_scrollTtyKeypress,
-    Rs_scrollWithBuffer,
 
 	Rs_tabfg,	/* active tab foreground */
 	Rs_tabbg,	/* active tab background */
@@ -1185,20 +1172,9 @@ enum {
 	Rs_bgRefreshInterval,
 #endif
 
-    Rs_utmpInhibit,
-    Rs_visualBell,
 	Rs_bellCommand,
 	Rs_holdExitText,
 	Rs_desktop,
-#if ! defined(NO_MAPALERT) && defined(MAPALERT_OPTION)
-    Rs_mapAlert,
-#endif
-#ifdef META8_OPTION
-    Rs_meta8,
-#endif
-#ifdef MOUSE_WHEEL
-    Rs_mouseWheelScrollPage,
-#endif
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,
 #endif
@@ -1215,17 +1191,6 @@ enum {
 #endif
 	Rs_opacity,			/* transluscent window opacity degree */
 	Rs_opacityDegree,	/* opacity change degree */
-#ifdef TRANSPARENT
-    Rs_transparent,
-    Rs_forceTransparent,
-# ifdef HAVE_SCROLLBARS
-    Rs_transparent_scrollbar,
-# endif
-# ifdef HAVE_MENUBAR
-    Rs_transparent_menubar,
-# endif
-    Rs_transparent_tabbar,
-#endif
 #ifndef NO_FRILLS
     Rs_ext_bwidth,
     Rs_int_bwidth,
@@ -1241,10 +1206,7 @@ enum {
     Rs_modifier,
 	Rs_confFile,
     Rs_answerbackstring,
-    Rs_tripleclickwords,
-    Rs_cursorBlink,
     Rs_cursorBlinkInterval,
-    Rs_pointerBlank,
     Rs_pointerBlankDelay,
 	Rs_smClientID,
 	Rs_initProfiles,
@@ -1272,44 +1234,10 @@ enum {
 	 * set / clear these boolean options.
 	 */
 	Rs_options2,
-	Rs2_protectSecondary,
 	Rs2_cmdInitTabs,
-	Rs2_cmdAllTabs,
 #ifdef XFT_SUPPORT
-# ifdef MULTICHAR_SET
-	Rs2_xftNomFont,		/* do not use mfont */
-	Rs2_xftSlowOutput,	/* slow mode output */
-# endif
-	Rs2_xftaa,			/* antialias */
-	Rs2_xftht,			/* hinting */
-	Rs2_xftah,			/* autohint */
-	Rs2_xftga,			/* global advance */
 	Rs2_xftwd,			/* width */
 #endif
-	Rs2_hlTabOnBell,
-	Rs2_syncTabTitle,
-	Rs2_syncTabIcon,
-	Rs2_hideTabbar,
-	Rs2_autohideTabbar,
-	Rs2_bottomTabbar,
-	Rs2_hideButtons,
-	Rs2_borderLess,
-	Rs2_maximized,
-	Rs2_fullscreen,
-#ifndef NO_FRILLS
-	Rs2_smoothResize,
-	Rs2_smartResize,
-#endif
-	Rs2_overrideRedirect,
-	Rs2_holdExit,
-	Rs2_broadcast,
-	Rs2_veryBold,
-	Rs2_noSysConfig,		/* Replacement for disableDefaultHotkeys */
-	Rs2_disableMacros,		/* Replacement for disableHotkeys */
-#ifdef HAVE_X11_SM_SMLIB_H
-	Rs2_enableSessionMgt,
-#endif
-	Rs2_linuxHomeEndKey,
     NUM_RESOURCES
 } ;
 

@@ -210,8 +210,10 @@ typedef struct {
  *              Each line is length TermWin.ncol
  *   tlen:      The length of the line or -1 for wrapped lines.
  *   rend:      Contains rendition information: font, bold, colour, etc.
- * * Note: Each line for both text and rend are only allocated on demand, and
+ *	 
+ *	 NOTE: Each line for both text and rend are only allocated on demand, and
  *         text[x] is allocated <=> rend[x] is allocated  for all x.
+ *
  *   row:       Cursor row position                   : 0 <= row < TermWin.nrow
  *   col:       Cursor column position                : 0 <= col < TermWin.ncol
  *   tscroll:   Scrolling region top row inclusive    : 0 <= row < TermWin.nrow

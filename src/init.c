@@ -3422,7 +3422,8 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	/* init terminal attributes */
 	SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
 
-	if (ISSET_OPTION(r, Opt_console))		/* be virtual console, fail silently */
+	if (ISSET_OPTION(r, Opt_console))				/* be virtual console, fail
+													   silently */
 	{
 #ifdef TIOCCONS
 		unsigned int	on = 1;

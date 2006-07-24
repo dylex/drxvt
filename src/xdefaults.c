@@ -80,6 +80,7 @@ static const char *const xnames[3] = {
 #define RSTRG(rsp, kw, arg, multiple)					\
 	{0, (rsp), (kw), NULL, (arg), NULL, (multiple)}
 
+#if 0 /* Old macros for boolean options */
 /* BOOL() - regular boolean `-/+' flag */
 #define BOOL(rsp, kw, opt, flag, desc, multiple)				\
 	{(Opt_Boolean|(flag)), (rsp), (kw), (opt), NULL, (desc), (multiple)}
@@ -87,12 +88,22 @@ static const char *const xnames[3] = {
 /* SWCH() - `-' flag */
 #define SWCH(opt, flag, desc, multiple)					\
 	{(flag), -1, NULL, (opt), NULL, (desc), (multiple)}
+#else
+/* BOOL() - regular boolean `-/+' flag */
+#define BOOL(kw, opt, flag, desc)					\
+	{(flag), -1, (kw), (opt), NULL, (desc), 0}
+
+/* SWCH() - `-' flag */
+#define SWCH(kw, opt, flag, desc)					\
+	{(flag), -1, (kw), (opt), NULL, (desc), 0}
+#endif
+
 
 /* convenient macros */
 #define optList_STRLEN(i)						\
 	(optList[i].flag ? 0 : (optList[i].arg ? STRLEN(optList[i].arg) : 1))
 #define optList_isBool(i)					\
-	(optList[i].flag & Opt_Boolean)
+	(optList[i].flag)
 #define optList_isReverse(i)				\
 	(optList[i].flag & Opt_Reverse)
 #define optList_isMultiple(i)				\
@@ -107,7 +118,8 @@ static const struct {
 	const char*		opt;		/* option */
 	const char*		arg;		/* argument */
 	const char*		desc;		/* description */
-	const char		multiple;	/* multiple values for profiles */
+
+	const char		BOOLVAR( multiple, 1 );	/* multiple values for profiles */
 } optList[] = {
 	/* Options for each profile */
 #ifdef BACKGROUND_IMAGE
@@ -128,22 +140,22 @@ static const struct {
 
 	STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
 	STRG(Rs_minVisibleTabs, "minVisibleTabs", "mvt", "number", "minimum # of tabs to keep visible (requires xftpfn)", 0),
-	BOOL(Rs2_hlTabOnBell, "highlightTabOnBell", "htb", 
-		Opt2_hlTabOnBell, "highlighting inactive tabs only when bell sounds", 0),
-	BOOL(Rs2_syncTabTitle, "syncTabTitle", "stt",
-		Opt2_syncTabTitle, "synchronizing terminal title with tab title", 0),
-	BOOL(Rs2_hideTabbar, "hideTabbar", "ht",
-		Opt2_hideTabbar, "hiding tabbar on initialization", 0),
-	BOOL(Rs2_autohideTabbar, "autohideTabbar", "aht", Opt2_autohideTabbar,
-		"auto hide/show the tabbar depending on number of open tabs", 0),
-	BOOL(Rs2_bottomTabbar, "bottomTabbar", "bt",
-		Opt2_bottomTabbar, "showing tabbar at bottom", 0),
-	BOOL(Rs2_hideButtons, "hideButtons", "hb",
-		Opt2_hideButtons, "hide buttons on tabbar", 0),
-	BOOL(Rs2_syncTabIcon, "syncTabIcon", "sti",
-		Opt2_syncTabIcon, "synchronizing icon name with tab title", 0),
-	BOOL(Rs2_veryBold, "veryBoldFont", "vbf",
-		Opt2_veryBold, "showing color text with bold font", 0),
+	BOOL( "highlightTabOnBell", "htb", Opt2_hlTabOnBell,
+			"highlighting inactive tabs only when bell sounds" ),
+	BOOL( "syncTabTitle", "stt", Opt2_syncTabTitle,
+			"synchronizing terminal title with tab title" ),
+	BOOL( "hideTabbar", "ht", Opt2_hideTabbar,
+			"hiding tabbar on initialization" ),
+	BOOL( "autohideTabbar", "aht", Opt2_autohideTabbar,
+			"auto hide/show the tabbar depending on number of open tabs" ),
+	BOOL( "bottomTabbar", "bt", Opt2_bottomTabbar,
+			"showing tabbar at bottom" ),
+	BOOL( "hideButtons", "hb", Opt2_hideButtons,
+			"hide buttons on tabbar" ),
+	BOOL( "syncTabIcon", "sti", Opt2_syncTabIcon,
+			"synchronizing icon name with tab title" ),
+	BOOL( "veryBoldFont", "vbf", Opt2_veryBold,
+			"showing color text with bold font" ),
 
 
 	STRG(Rs_display_name, NULL, "d", NULL, NULL, 0),
@@ -152,15 +164,13 @@ static const struct {
 	STRG(Rs_title, "title", "title", "string", "title name for window", 0),
 	STRG(Rs_geometry, NULL, "g", NULL, NULL, 0),
 	STRG(Rs_geometry, "geometry", "geometry", "geometry", "size (in characters) and position", 0),
-	SWCH("C", Opt_console, "intercept console messages", 0),
-	SWCH("iconic", Opt_iconic, "start iconic", 0),
-	BOOL(Rs2_maximized, "maximized", "m", Opt2_maximized, "Start maximized", 0),
-	BOOL(Rs2_fullscreen, "fullscreen", "fs", Opt2_fullscreen, "Start fullscreen", 0),
-	/* -ic is used for appIcon */
-	/* SWCH("ic", Opt_iconic, NULL, 0), */
-	BOOL(Rs_reverseVideo, "reverseVideo", "rv", Opt_reverseVideo, "reverse video", 0),
-	BOOL(Rs_loginShell, "loginShell", "ls", Opt_loginShell, "login shell", 0),
-	BOOL(Rs_jumpScroll, "jumpScroll", "j", Opt_jumpScroll, "jump scrolling", 0),
+	BOOL( "interceptConsole", "C", Opt_console, "intercept console messages" ),
+	BOOL( "startIconic", "iconic", Opt_iconic, "start iconic" ),
+	BOOL( "maximized", "m", Opt2_maximized, "Start maximized" ),
+	BOOL( "fullscreen", "fs", Opt2_fullscreen, "Start fullscreen" ),
+	BOOL( "reverseVideo", "rv", Opt_reverseVideo, "reverse video" ),
+	BOOL( "loginShell", "ls", Opt_loginShell, "login shell" ),
+	BOOL( "jumpScroll", "j", Opt_jumpScroll, "jump scrolling" ),
 
 #ifdef TINTING_SUPPORT
 	STRG(Rs_color + Color_tint, "tintColor", "tint", "color", "tint color", 0),
@@ -177,11 +187,10 @@ static const struct {
 #endif
 
 #ifdef HAVE_SCROLLBARS
-	BOOL(Rs_scrollBar, "scrollBar", "sb", Opt_scrollBar, "scrollbar", 0),
-	BOOL(Rs_scrollBar_right, "scrollbarRight", "sr",
-		Opt_scrollBar_right, "scrollbar right", 0),
-	BOOL(Rs_scrollBar_floating, "scrollbarFloating", "st",
-		Opt_scrollBar_floating, "scrollbar without a trough", 0),
+	BOOL( "scrollBar", "sb", Opt_scrollBar, "scrollbar" ),
+	BOOL( "scrollbarRight", "sr", Opt_scrollBar_right, "scrollbar right" ),
+	BOOL( "scrollbarFloating", "st", Opt_scrollBar_floating,
+			"scrollbar without a trough" ),
 	STRG(Rs_scrollBar_thickness, "scrollbarThickness", "sbt", "number",
 		"scrollbar thickness/width in pixels", 0),
 	STRG(Rs_scrollBar_style, "scrollbarStyle", "ss", "mode",
@@ -193,12 +202,12 @@ static const struct {
 		"file[;geom]", "scrollbar background image", 0),
 # endif
 #endif
-	BOOL(Rs_scrollTtyOutputInhibit, "scrollTtyOutputInhibit", "si",
-		Opt_scrollTtyOutputInhibit, "scroll-on-tty-output inhibit", 0),
-	BOOL(Rs_scrollTtyKeypress, "scrollTtyKeypress", "sk",
-		Opt_scrollTtyKeypress, "scroll-on-keypress", 0),
-	BOOL(Rs_scrollWithBuffer, "scrollWithBuffer", "sw",
-		Opt_scrollWithBuffer, "scroll-with-buffer", 0),
+	BOOL( "scrollTtyOutputInhibit", "si", Opt_scrollTtyOutputInhibit,
+			"scroll-on-tty-output inhibit" ),
+	BOOL( "scrollTtyKeypress", "sk", Opt_scrollTtyKeypress,
+			"scroll-on-keypress" ),
+	BOOL( "scrollWithBuffer", "sw", Opt_scrollWithBuffer,
+			"scroll-with-buffer" ),
 
 	STRG(Rs_opacity, "opacity", "o", "%",
 		"transluscent window (true transparent) opaque degree", 0),
@@ -206,55 +215,56 @@ static const struct {
 		"transluscent window opaque degree interval", 0),
 
 #ifdef TRANSPARENT
-	BOOL(Rs_transparent, "transparent", "tr", Opt_transparent, "transparent", 0),
-	BOOL(Rs_forceTransparent, "transparentForce", "trf",
-		Opt_forceTransparent, "forcefully transparent", 0),
-	SWCH("tr", Opt_transparent, NULL, 0),
+	BOOL( "transparent", "tr", Opt_transparent, "transparent" ),
+	BOOL( "transparentForce", "trf", Opt_forceTransparent,
+			"forcefully transparent" ),
 # ifdef HAVE_SCROLLBARS
-	BOOL(Rs_transparent_scrollbar, "transparentScrollbar", "trs",
-		Opt_transparent_scrollbar, "transparent scrollbar", 0),
+	BOOL( "transparentScrollbar", "trs", Opt_transparent_scrollbar,
+			"transparent scrollbar" ),
 # endif
 # ifdef HAVE_MENUBAR
-	BOOL(Rs_transparent_menubar, "transparentMenubar", "trm",
-		Opt_transparent_menubar, "transparent menubar", 0),
+	BOOL( "transparentMenubar", "trm", Opt_transparent_menubar,
+			"transparent menubar" ),
 # endif
-	BOOL(Rs_transparent_tabbar, "transparentTabbar", "trt",
-		Opt_transparent_tabbar, "transparent tabbar", 0),
+	BOOL( "transparentTabbar", "trt", Opt_transparent_tabbar,
+			"transparent tabbar" ),
 #endif	/* TRANSPARENT */
 
 #ifdef BACKGROUND_IMAGE
 	STRG(Rs_tabbarPixmap, "tabbarPixmap", "tbpixmap", "file[;geom]", "tabbar background image", 0),
-	BOOL(Rs_tabPixmap, "tabUsePixmap", "tupixmap", Opt_tabPixmap, "use tabbar background image for tabs", 0),
+	BOOL( "tabUsePixmap", "tupixmap", Opt_tabPixmap,
+			"use tabbar background image for tabs" ),
 # if 0 /* App icon not yet implemented */
 	STRG(Rs_appIcon, "appIcon", "ic", "file[;geom]", "application icon file", 0),
 #endif
 #endif	/* BACKGROUND_IMAGE */
 
-	BOOL(Rs_utmpInhibit, "utmpInhibit", "ut", Opt_utmpInhibit,
-		"utmp inhibit - do not log to utmp", 0),
+	BOOL( "utmpInhibit", "ut", Opt_utmpInhibit,
+			"utmp inhibit - do not log to utmp" ),
 	STRG(Rs_confFile, NULL, "cf", "file",
 		"X resource configuration file instead of ~/.mrxvtrc", 0),
 
 #ifndef NO_BELL
-	BOOL(Rs_visualBell, "visualBell", "vb",
-		Opt_visualBell, "visual bell", 0),
+	BOOL( "visualBell", "vb", Opt_visualBell,
+			"visual bell" ),
 # if ! defined(NO_MAPALERT) && defined(MAPALERT_OPTION)
-	BOOL(Rs_mapAlert, "mapAlert", NULL, Opt_mapAlert, NULL, 0),
+	BOOL( "mapAlert", NULL, Opt_mapAlert, NULL ),
 # endif
 #endif
 #ifdef META8_OPTION
-	BOOL(Rs_meta8, "meta8", "m8", Opt_meta8, "meta8", 0),
+	BOOL( "meta8", "m8", Opt_meta8, "meta8" ),
 #endif
 #ifdef MOUSE_WHEEL
-	BOOL(Rs_mouseWheelScrollPage, "mouseWheelScrollPage", "mp",
-		Opt_mouseWheelScrollPage, "mouse wheel scrolling a page", 0),
+	BOOL( "mouseWheelScrollPage", "mp", Opt_mouseWheelScrollPage,
+			"mouse wheel scrolling a page" ),
 #endif
 #ifdef MULTICHAR_SET
-	BOOL(Rs_mc_hack, "multibyte_cursor", "mcc", Opt_mc_hack,
-		"Multibyte character cursor movement", 0),
+	BOOL( "multibyte_cursor", "mcc", Opt_mc_hack,
+			"Multibyte character cursor movement" ),
 #endif
 #ifndef NO_FRILLS
-	BOOL(Rs_tripleclickwords, "tripleclickwords", "tcw", Opt_tripleclickwords, "triple click word selection", 0),
+	BOOL( "tripleclickwords", "tcw", Opt_tripleclickwords,
+			"triple click word selection" ),
 #endif
 	STRG(Rs_color + Color_ufbg, "ufBackground", "ufbg", "color", "unfocused background color", 0),
 #ifdef TEXT_SHADOW
@@ -310,7 +320,7 @@ static const struct {
 #ifdef HAVE_MENUBAR
 	STRG(Rs_menu, "menu", "menu",
 		"filename[;tag]", "menubar definition file", 0),
-	BOOL(Rs_showMenu, "showMenu", "showmenu", Opt_showMenu, "show menubar", 0),
+	BOOL( "showMenu", "showmenu", Opt_showMenu, "show menubar" ),
 # ifdef BACKGROUND_IMAGE
 	STRG(Rs_menubarPixmap, "menubarPixmap", "mbpixmap",
 		"file[;geom]", "menubar background image", 0),
@@ -390,25 +400,25 @@ static const struct {
 #endif				/* MULTICHAR_SET */
 
 #ifdef XFT_SUPPORT
-	BOOL(Rs_xft, "xft", "xft", Opt_xft, "use freetype font", 0),
+	BOOL( "xft", "xft", Opt_xft, "use freetype font" ),
 	STRG(Rs_xftfont, "xftFont", "xftfn", "fontname", "freetype font", 0),
 # ifdef MULTICHAR_SET
 	STRG(Rs_xftmfont, "xftmFont", "xftfm", "fontname", "freetype multichar font", 0),
 	STRG(Rs_xftmsz, "xftmSize", "xftmsz", "number",
 		"freetype multichar font size", 0),
-	BOOL(Rs2_xftNomFont, "xftNomFont", "xftnfm", Opt2_xftNomFont,
-		"use freetype font as freetype mfont", 0),
-	BOOL(Rs2_xftSlowOutput, "xftSlowOutput", "xftslow", Opt2_xftSlowOutput,
-		"multichar string display in slow mode for better visual effect", 0),
+	BOOL( "xftNomFont", "xftnfm", Opt2_xftNomFont,
+			"use freetype font as freetype mfont" ),
+	BOOL( "xftSlowOutput", "xftslow", Opt2_xftSlowOutput,
+			"multichar string display in slow mode for better visual effect" ),
 # endif
-	BOOL(Rs2_xftaa, "xftAntialias", "xftaa", Opt2_xftAntialias,
-		"antialias of freetype font", 0),
-	BOOL(Rs2_xftht, "xftHinting", "xftht", Opt2_xftHinting,
-		"hinting of freetype font", 0),
-	BOOL(Rs2_xftah, "xftAutoHint", "xftah", Opt2_xftAutoHint,
-		"autohint of freetype font", 0),
-	BOOL(Rs2_xftga, "xftGlobalAdvance", "xftga", Opt2_xftGlobalAdvance,
-		"global advance of freetype font", 0),
+	BOOL( "xftAntialias", "xftaa", Opt2_xftAntialias,
+			"antialias of freetype font" ),
+	BOOL( "xftHinting", "xftht", Opt2_xftHinting,
+			"hinting of freetype font" ),
+	BOOL( "xftAutoHint", "xftah", Opt2_xftAutoHint,
+			"autohint of freetype font" ),
+	BOOL( "xftGlobalAdvance", "xftga", Opt2_xftGlobalAdvance,
+			"global advance of freetype font" ),
 	STRG(Rs_xftwt, "xftWeight", "xftwt", "style",
 		"weight style = light|medium|bold", 0),
 	STRG(Rs_xftst, "xftSlant", "xftst", "style",
@@ -426,10 +436,10 @@ static const struct {
 		"size of propotional freetype font", 0),
 #endif
 
-	BOOL(Rs2_cmdAllTabs, "cmdAllTabs", "at",
-		Opt2_cmdAllTabs, "running -e command for all tabs", 0),
-	BOOL(Rs2_protectSecondary, "protectSecondary", "ps",
-		Opt2_protectSecondary, "protecting tab that uses the secondary screen from being closed", 0),
+	BOOL( "cmdAllTabs", "at", Opt2_cmdAllTabs,
+			"running -e command for all tabs" ),
+	BOOL( "protectSecondary", "ps", Opt2_protectSecondary,
+			"protecting tab that uses the secondary screen from being closed" ),
 
 #ifdef MULTICHAR_SET
 	STRG(Rs_multichar_encoding, "multichar_encoding", "km", "mode",
@@ -453,20 +463,20 @@ static const struct {
 	STRG(Rs_title, NULL, "T", NULL, NULL, 0),	/* short form */
 	STRG(Rs_iconName, "iconName", "in", "string",
 		"icon name for window", 0),
-	BOOL(Rs2_borderLess, "borderLess", "bl", Opt2_borderLess,
-		"borderless window", 0),
-	BOOL(Rs2_overrideRedirect, "overrideRedirect", "or",
-		Opt2_overrideRedirect, "override_redirect flag", 0),
+	BOOL( "borderLess", "bl", Opt2_borderLess,
+			"borderless window" ),
+	BOOL( "overrideRedirect", "or", Opt2_overrideRedirect,
+			"override_redirect flag" ),
 	STRG(Rs_bellCommand, "bellCommand", "blc",
 		"string", "command to execute instead of beeping", 0),
-	BOOL(Rs2_holdExit, "holdExit", "hold",
-		Opt2_holdExit, "hold after terminal exits", 0),
+	BOOL( "holdExit", "hold", Opt2_holdExit,
+			"hold after terminal exits" ),
 	STRG(Rs_holdExitText, "holdExitText", "het",
 		"string", "text to show while holding the terminal", 0),
 	STRG(Rs_desktop, "desktop", "desktop",
 		"number", "desktop to place the program", 0),
-	BOOL(Rs2_broadcast, "broadcast", "bcst",
-		Opt2_broadcast, "broadcast input to all terminals", 0),
+	BOOL( "broadcast", "bcst", Opt2_broadcast,
+			"broadcast input to all terminals" ),
 
 #ifndef NO_FRILLS
 	STRG(Rs_ext_bwidth, "externalBorder", "w", "number",
@@ -477,23 +487,23 @@ static const struct {
 		"internal border in pixels", 0),
 
 	/* Reposition window on resize to stay on screen */
-	BOOL(Rs2_smartResize,  "smartResize", NULL, Opt2_smartResize,
-			NULL, 0),
+	BOOL( "smartResize", NULL, Opt2_smartResize,
+			NULL ),
 	/* Resize window smooothly (not in character steps) */
-	BOOL(Rs2_smoothResize, "smoothResize", NULL, Opt2_smoothResize,
-			NULL, 0),
+	BOOL( "smoothResize", NULL, Opt2_smoothResize,
+			NULL ),
 #endif
 #ifndef NO_LINESPACE
 	STRG(Rs_lineSpace, "lineSpace", "lsp", "number", "number of extra pixels between rows", 0),
 #endif
 
 #ifdef POINTER_BLANK
-	BOOL(Rs_pointerBlank, "pointerBlank", "pb", Opt_pointerBlank, 
-		"blank pointer", 0),
+	BOOL( "pointerBlank", "pb", Opt_pointerBlank,
+			"blank pointer" ),
 	RSTRG(Rs_pointerBlankDelay, "pointerBlankDelay", "number", 0),
 #endif
 #ifdef CURSOR_BLINK
-	BOOL(Rs_cursorBlink, "cursorBlink", "bc", Opt_cursorBlink, "blinking cursor", 0),
+	BOOL( "cursorBlink", "bc", Opt_cursorBlink, "blinking cursor" ),
 	STRG(Rs_cursorBlinkInterval, "cursorBlinkInterval", "bci",
 		"number", "cursor blinking interval (ms)", 0),
 #endif
@@ -513,13 +523,12 @@ static const struct {
 	RSTRG(Rs_print_pipe, "printPipe", "string", 0),
 #endif
 
-	BOOL(Rs2_noSysConfig, "noSysConfig", "nsc",
-		Opt2_noSysConfig, "reading /etc/mrxvt/mrxvtrc.", 0),
-	BOOL(Rs2_disableMacros, "disableMacros", "dm",
-		Opt2_disableMacros, "all keyboard shortcuts (macros)", 0),
-
-	BOOL(Rs2_linuxHomeEndKey, "linuxHomeEndKey", "lk",
-		Opt2_linuxHomeEndKey, "enable Linux console Home/End keys", 0),
+	BOOL( "noSysConfig", "nsc", Opt2_noSysConfig,
+			"reading /etc/mrxvt/mrxvtrc." ),
+	BOOL( "disableMacros", "dm", Opt2_disableMacros,
+			"all keyboard shortcuts (macros)" ),
+	BOOL( "linuxHomeEndKey", "lk", Opt2_linuxHomeEndKey,
+			"enable Linux console Home/End keys" ),
 
 	STRG(Rs_modifier, "modifier", "mod", "modifier",
 		"meta modifier = alt|meta|hyper|super|mod1|...|mod5", 0),
@@ -536,8 +545,8 @@ static const struct {
 	RSTRG(Rs_answerbackstring, "answerbackString", "string", 0),
 
 #ifdef HAVE_X11_SM_SMLIB_H
-	BOOL(Rs2_enableSessionMgt, "sessionMgt", "sm",
-		Opt2_enableSessionMgt, "enabling X session management", 0),
+	BOOL( "sessionMgt", "sm", Opt2_enableSessionMgt,
+			"enabling X session management" ),
 	STRG(Rs_smClientID, "smClientID", "sid", "string",
 		"client id of mrxvt for X session management", 0),
 #endif	/* HAVE_X11_SM_SMLIB_H */
@@ -752,8 +761,8 @@ rxvt_usage(int type)
 
 #ifdef DEBUG_VERBOSE
 			/*
-			 * Print short options, long options and descriptions so we can generate
-			 * man page.
+			 * Print short options, long options and descriptions so we can
+			 * generate man page.
 			 */
 			for (i = 0; i < optList_size(); i++)
 				fprintf( stdout, "%3d. %s	%s	%s	%s	%d\n", i,
@@ -828,10 +837,19 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 			int		bval;
 			char*	OnOff[2] = {"False", "True"};
 
+			/*
+			 * 2006-07-24 gi1242: Huh? The if and else part execute the same
+			 * code. WTF.
+			 */
+#if 0
 			if (optList[i].doff < Rs_options2)
 				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
 			else
 				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
+#else
+			bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
+#endif /* if 0 */
+
 			if (optList_isReverse(i))
 				bval = !bval;
 			fprintf( pf, "%s.%s:%.*s%s\n", name,
@@ -1229,37 +1247,48 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 					rxvt_str_trim(str);
 					n = STRLEN(str);
 
-					/* Only set the resource if it's not already set */
-					if( !r->h->rs[optList[entry].doff+profileNum] )
+					/*
+					 * Only set the resource if it's not already set. We read
+					 * config file items in reverse order (most significant to
+					 * least significant). So if a resource is already set, then
+					 * we should not over ride it.
+					 */
+					if( optList_isBool( entry ) )
 					{
+						/*
+						 * Boolean options: We dont' need to duplicate the
+						 * argument of the resource string. That only wastes
+						 * memory.
+						 *
+						 * We just copy the mask into our "flag" argument,
+						 * provided we have not already set it.
+						 */
+						// XXX Don't change previously set options
 						int		s;
 
-						r->h->rs[optList[entry].doff+profileNum] =
-							n ? STRDUP( str ) : emptyResource;
-						if (optList_isBool(entry))
-						{
-							s = STRCASECMP(str, "true") == 0 ||
-								STRCASECMP(str, "yes") == 0 ||
-								STRCASECMP(str, "on") == 0 ||
-								STRCASECMP(str, "1") == 0;
-							if (optList_isReverse(entry))
-								s = !s;
+						s = STRCASECMP(str, "true") == 0 ||
+							STRCASECMP(str, "yes") == 0 ||
+							STRCASECMP(str, "on") == 0 ||
+							STRCASECMP(str, "1") == 0;
+						if (optList_isReverse(entry))
+							s = !s;
 
-							if ((optList[entry].doff+profileNum) < Rs_options2)
-							{
-								if (s)
-									SET_OPTION(r, optList[entry].flag);
-								else
-									UNSET_OPTION(r, optList[entry].flag);
-							}
-							else
-							{
-								if (s)
-									SET_OPTION(r, optList[entry].flag);
-								else
-									UNSET_OPTION(r, optList[entry].flag);
-							}
-						}
+						if (s)
+							SET_OPTION(r, optList[entry].flag);
+						else
+							UNSET_OPTION(r, optList[entry].flag);
+					}
+
+					else if( IS_NULL( r->h->rs[ optList[entry].doff
+															+ profileNum ] ) )
+					{
+						/*
+						 * Regular option, that has not previously been set.
+						 * The argument needs to be duplicated and stored.
+						 */
+						r->h->rs[optList[entry].doff+profileNum] =
+							n && !optList_isBool(entry) ?
+								STRDUP( str ) : emptyResource;
 					}
 					break;
 				}	/* if( str[n] =':' ...) */
