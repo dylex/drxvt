@@ -1326,7 +1326,7 @@ rxvt_extract_resources (
 
 			sprintf( f, "%s/%s", home, xnames[i] );
 
-			if (NOT_NULL(fd = fopen(f, "r"))))
+			if (NOT_NULL(fd = fopen(f, "r")))
 				break;
 		}
 		free(f);
