@@ -25,9 +25,48 @@
 
 
 #ifdef OUR_MALLOC
-void	rxvt_mem_check	(void);
-#endif
 
+struct block_head_t;
+struct block_head_t
+{
+#ifdef _DEBUG
+    RUINT32T		    magic;/* magic number */
+#endif
+    struct block_head_t*    next; /* next block */
+};
+
+
+/*
+ * Note: the name trunk_head_t is somewhat misleading. Actually it resides
+ * at the END of each allocated trunk.
+ */
+struct trunk_head_t;
+struct trunk_head_t
+{
+#ifdef _DEBUG
+    RUINT32T	magic;  /* magic number */
+#endif
+    struct trunk_head_t*    prev; /* prev trunk with the same block size */
+    struct trunk_head_t*    next; /* next trunk with the same block size */
+    struct block_head_t*    fblock; /* first free block in this trunk */
+    RUINT16T	bmax;   /* max # of free blocks in this trunk */
+    RUINT16T	fcount; /* # of free blocks in this trunk */
+    RUINT16T	bsize;  /* block size to allocate */
+};
+
+
+/*
+ * Header for trunk list of each block size
+ */
+struct trunk_list_t;
+struct trunk_list_t
+{
+    RUINT16T		    block_size;
+    struct trunk_head_t*    first_trunk;
+};
+
+
+#endif /* OUR_MALLOC */
 
 #endif	/* __RXVTMEM_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

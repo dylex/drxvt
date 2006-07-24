@@ -26,7 +26,6 @@ mrxvt_SOURCES =		command.h			\
 			   		feature.h			\
 			   		init.h				\
 			   		menubar.h			\
-			   		rxvtmem.h			\
 			   		protos.h			\
 			   		rxvt.h				\
 			   		rxvtlib.h
@@ -156,7 +155,6 @@ MRXVT_H =			../config.h					\
 					menubar.h					\
 					protos.h					\
 					rxvt.h						\
-					rxvtmem.h					\
 					rxvtlib.h
 
 MRXVT_PIXMAPS =		left.xbm					\
@@ -193,7 +191,7 @@ netdisp.o:			$(MRXVT_H) 							netdisp.c
 pixmap.o:			$(MRXVT_H) 							pixmap.c
 ptytty.o:			$(MRXVT_H) 							ptytty.c
 rxvt.o:				$(MRXVT_H) 							rxvt.c
-rxvtmem.o:			$(MRXVT_H) 							rxvtmem.c
+rxvtmem.o:			$(MRXVT_H) 							rxvtmem.h rxvtmem.c
 screen.o:			$(MRXVT_H) $(XFTACS_H)				screen.c
 scrollbar-next.o:	$(MRXVT_H) 							scrollbar-next.c
 scrollbar-plain.o:	$(MRXVT_H) 							scrollbar-plain.c

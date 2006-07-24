@@ -119,6 +119,7 @@ void             rxvt_cleanutent                  __PROTO((rxvt_t* r, int page))
 #ifdef OUR_MALLOC
 void             rxvt_mem_init                    __PROTO((void));
 void             rxvt_mem_exit                    __PROTO((void));
+void             rxvt_init_trunk_size             __PROTO((size_t, size_t, size_t));
 #endif /* OUR_MALLOC */
 void*            rxvt_malloc                      __PROTO((size_t size));
 void*            rxvt_calloc                      __PROTO((size_t number, size_t size));
