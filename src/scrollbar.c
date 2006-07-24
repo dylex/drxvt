@@ -151,7 +151,7 @@ rxvt_scrollbar_init(rxvt_t* r)
 			width = min(i, SB_WIDTH_MAXIMUM);
 
 # ifdef RXVT_SCROLLBAR
-	if (ISNOT_OPTION(r, Opt_scrollBar_floating) && style == R_SB_RXVT)
+	if (NOTSET_OPTION(r, Opt_scrollBar_floating) && style == R_SB_RXVT)
 		r->sb_shadow = SHADOW;
 # else
 	r->sb_shadow = 0;

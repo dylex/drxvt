@@ -191,7 +191,7 @@ tempDisableTransparent( rxvt_t *r)
 		r->h->am_transparent = 0;
 		r->h->want_full_refresh = 1;
 
-		if( ISNOT_OPTION(r, Opt_forceTransparent) )
+		if( NOTSET_OPTION(r, Opt_forceTransparent) )
 		{
 			XSetWindowBackground( r->Xdisplay, r->TermWin.parent,
 					r->h->global_bg );
@@ -617,7 +617,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	/*
 	 * We dont' really have to check our parents if we're not transparent :)
 	 */
-	if (ISNOT_OPTION(r, Opt_transparent))
+	if (NOTSET_OPTION(r, Opt_transparent))
 		return have_changed;
 
 	DBG_MSG(2, (stderr, "rxvt_check_our_parent ()\n"));
@@ -1154,7 +1154,7 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
 
 			/* Reset coordinates to shade main window. */
 			rh -= rxvt_tabbar_height( r );
-			if ( ISNOT_OPTION(r, Opt2_bottomTabbar) )
+			if ( NOTSET_OPTION(r, Opt2_bottomTabbar) )
 				ry += rxvt_tabbar_height( r );
 		}
 
@@ -1171,7 +1171,7 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
 
 			/* Reset coordinates to shade main window. */
 			rw -= rxvt_scrollbar_width(r);
-			if( ISNOT_OPTION(r, Opt_scrollBar_right) )
+			if( NOTSET_OPTION(r, Opt_scrollBar_right) )
 				rx += rxvt_scrollbar_width(r);
 		}
 # endif

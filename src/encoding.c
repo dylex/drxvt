@@ -400,7 +400,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
 	** iconv. Otherwise, xfticonv is -1
 	*/
 	if (ENC_NOENC != r->encoding_method &&
-		ISNOT_OPTION(r, Opt2_xftNomFont))
+		NOTSET_OPTION(r, Opt2_xftNomFont))
 		r->TermWin.xfticonv = iconv_open ("UTF-8",
 								rxvt_encoding_name(r));
 # endif

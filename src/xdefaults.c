@@ -813,9 +813,13 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 	
 	for (i = 0; i < optList_size(); i ++)
 	{
-		if (IS_NULL(optList[i].kw))
-			continue;
-		if (-1 == optList[i].doff)
+		if(
+			 IS_NULL( optList[i].kw ) ||		/* Options without a keyword
+												   can't be written */
+			 ( optList[i].doff == -1 && !optList_isBool(i) )
+												/* Boolean options don't require
+												 * a data offset. */
+		  )
 			continue;
 
 		if( optList[i].multiple)
@@ -837,18 +841,7 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 			int		bval;
 			char*	OnOff[2] = {"False", "True"};
 
-			/*
-			 * 2006-07-24 gi1242: Huh? The if and else part execute the same
-			 * code. WTF.
-			 */
-#if 0
-			if (optList[i].doff < Rs_options2)
-				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
-			else
-				bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
-#else
 			bval = ISSET_OPTION(r, optList[i].flag) ? 1 : 0;
-#endif /* if 0 */
 
 			if (optList_isReverse(i))
 				bval = !bval;
@@ -1419,7 +1412,7 @@ rxvt_extract_resources (
 	/*
 	 * Now read config from system wide config file.
 	 */
-	if (ISNOT_OPTION(r, Opt2_noSysConfig) &&
+	if (NOTSET_OPTION(r, Opt2_noSysConfig) &&
 	    NOT_NULL(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r")))
 	{
 		rxvt_get_xdefaults( r, fd, APL_SUBCLASS );
@@ -1464,10 +1457,10 @@ rxvt_extract_resources (
 	 * the boolean flag is set for each boolean options. Then if we compare
 	 * Options(2) to the flag, we always get TRUE!
 	 */
-	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION1));
-	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION2));
-	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION3));
-	UNSET_OPTION(r, (Opt_Boolean | Opt_Reverse | IS_OPTION4));
+	UNSET_OPTION(r, ( Opt_Reverse | IS_OPTION1 ) );
+	UNSET_OPTION(r, ( Opt_Reverse | IS_OPTION2 ) );
+	UNSET_OPTION(r, ( Opt_Reverse | IS_OPTION3 ) );
+	UNSET_OPTION(r, ( Opt_Reverse | IS_OPTION4 ) );
 
 
 	/*

@@ -863,7 +863,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 				if (
 					  tabno >=0 && tabno <=LTAB(r)
 					  && (
-						   ISNOT_OPTION(r, Opt2_protectSecondary)
+						   NOTSET_OPTION(r, Opt2_protectSecondary)
 						   || PVTS(r, tabno)->current_screen == PRIMARY
 						 )
 				   )

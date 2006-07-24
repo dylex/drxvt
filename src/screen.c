@@ -71,7 +71,7 @@
 ** Otherwise, we set it to zero.
 */
 #define ZERO_SCROLLBACK(R, P)						\
-	if (ISNOT_OPTION(R, Opt_scrollTtyOutputInhibit))	\
+	if (NOTSET_OPTION(R, Opt_scrollTtyOutputInhibit))	\
 		(R)->vts[(P)]->view_start = 0
 
 #define CLEAR_SELECTION(R)						\
@@ -2018,7 +2018,7 @@ rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 		if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
 #endif
 #if defined(TRANSPARENT)
-			if ( ISNOT_OPTION(r, Opt_transparent) ||
+			if ( NOTSET_OPTION(r, Opt_transparent) ||
 				 (!r->h->am_transparent && !r->h->am_pixmap_trans)
 				)
 #endif
@@ -3070,7 +3070,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 # ifdef MULTICHAR_SET
 		else
 		if (
-			  ISNOT_OPTION(r, Opt2_xftSlowOutput)
+			  NOTSET_OPTION(r, Opt2_xftSlowOutput)
 			  && (XftDrawStringUtf8 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -3091,7 +3091,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 		}
 		else
 		if (
-			  ISNOT_OPTION(r, Opt2_xftSlowOutput)
+			  NOTSET_OPTION(r, Opt2_xftSlowOutput)
 			  && (XftDrawString16 == xftdraw_string)
 			  && (
 				  r->TermWin.xftmfont->max_advance_width ==
@@ -4039,7 +4039,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 						 * colored / blinking text.
 						 */
 #if 0
-						if (ISNOT_OPTION(r, Opt2_veryBold))
+						if (NOTSET_OPTION(r, Opt2_veryBold))
 #endif
 						rend &= ~RS_Bold;	/* we've taken care of it */
 					}
@@ -4158,7 +4158,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 				 * If veryBold is not set, then don't render colored text in
 				 * bold.
 				 */
-				if (ISNOT_OPTION(r, Opt2_veryBold))
+				if (NOTSET_OPTION(r, Opt2_veryBold))
 					rend &= ~RS_Bold;
 			}
 			else if (rend & RS_Uline && ISSET_PIXCOLOR( h, Color_UL) )

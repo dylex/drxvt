@@ -1351,7 +1351,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		for (dead = LTAB(r); dead >= 0; dead--)
 			/* only dead children that are not held */
 			if (PVTS(r, dead)->dead &&
-				( ISNOT_OPTION(r, Opt2_holdExit) ||
+				( NOTSET_OPTION(r, Opt2_holdExit) ||
 				 (ISSET_OPTION(r, Opt2_holdExit) && 1 == PVTS(r, dead)->hold)
 				))
 				break;
@@ -2088,7 +2088,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 			/* highlight inactive tab if there is some input */
 			if (
-					ISNOT_OPTION(r, Opt2_hlTabOnBell)
+					NOTSET_OPTION(r, Opt2_hlTabOnBell)
 					&& bufsiz != count
 					&& i != ATAB(r)
 			   )
@@ -2178,7 +2178,7 @@ rxvt_pointer_unblank(rxvt_t* r, int page)
 	XDefineCursor(r->Xdisplay, PVTS(r, page)->vt, r->term_pointer);
 	rxvt_recolour_cursor(r);
 #ifdef POINTER_BLANK
-	if (ISNOT_OPTION(r, Opt_pointerBlank))
+	if (NOTSET_OPTION(r, Opt_pointerBlank))
 		return;	/* no need to do anything */
 
 	PVTS(r, page)->hidden_pointer = 0;
@@ -2306,7 +2306,7 @@ rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
 	gcvalue.background = r->PixColors[Color_bg];
 
 # ifdef TRANSPARENT
-	if (ISNOT_OPTION(r, Opt_transparent))
+	if (NOTSET_OPTION(r, Opt_transparent))
 # endif	/* TRANSPARENT */
 #ifdef BACKGROUND_IMAGE
 	if (NOT_PIXMAP(PVTS(r, page)->pixmap))
@@ -3237,7 +3237,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	XSetWMNormalHints (r->Xdisplay, r->TermWin.parent, &(r->szHint));
 
 	/* Set the terminal window starting position */
-	if (ISNOT_OPTION(r, Opt_scrollBar_right))
+	if (NOTSET_OPTION(r, Opt_scrollBar_right))
 		r->h->window_vt_x = ISSET_OPTION(r, Opt_scrollBar_right) ? 
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 
@@ -3354,7 +3354,7 @@ rxvt_resize_on_font (rxvt_t* r, char* fontname)
 	if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
 		if (!rxvt_change_font_xft (r, fontname))
 			return ;
-	if (ISNOT_OPTION(r, Opt_xft))
+	if (NOTSET_OPTION(r, Opt_xft))
 #endif	/* XFT_SUPPORT */
 	/* X11 font resize */
 	if (!rxvt_change_font_x11 (r, fontname))
@@ -5429,7 +5429,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 			 * then the window title will already be set by
 			 * rxvt_tabbar_set_title(), so we only have to set it here if +stt.
 			 */
-			if( ISNOT_OPTION(r, Opt2_syncTabTitle ) )
+			if( NOTSET_OPTION(r, Opt2_syncTabTitle ) )
 				rxvt_set_term_title(r, (const unsigned char*) str);
 #endif
 #else
@@ -5646,7 +5646,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 					rxvt_hotkey_kill_tab(r, NULL);
 				}
 				else if( tabno >=0 && tabno <=LTAB(r)
-					&& ( ISNOT_OPTION(r, Opt2_protectSecondary) ||
+					&& ( NOTSET_OPTION(r, Opt2_protectSecondary) ||
 						 PVTS(r, tabno)->current_screen == PRIMARY))
 				{
 					rxvt_kill_page (r, tabno);
@@ -6275,7 +6275,7 @@ rxvt_main_loop(rxvt_t *r)
 					limit = h->refresh_limit * (r->TermWin.nrow - 1);
 					nlines++;
 					h->refresh_count++;
-					if (ISNOT_OPTION(r, Opt_jumpScroll) || (h->refresh_count >= limit))
+					if (NOTSET_OPTION(r, Opt_jumpScroll) || (h->refresh_count >= limit))
 					{
 						refreshnow = 1;
 						break;

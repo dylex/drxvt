@@ -1944,7 +1944,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	/* Resize the menubar font too. Only needed for X11 font. */
 	if(
 #ifdef XFT_SUPPORT
-		ISNOT_OPTION(r, Opt_xft) &&
+		NOTSET_OPTION(r, Opt_xft) &&
 #endif
 		IS_WIN(r->menuBar.win))
 	{
@@ -2254,7 +2254,7 @@ Done:
 	   )
 	{
 #ifdef TRANSPARENT
-		if (ISNOT_OPTION(r, Opt_transparent))
+		if (NOTSET_OPTION(r, Opt_transparent))
 #endif
 		{
 #ifdef BACKGROUND_IMAGE

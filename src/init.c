@@ -2061,7 +2061,7 @@ rxvt_init_win_size( rxvt_t *r )
 	if (ISSET_OPTION(r, Opt_showMenu))
 		r->szHint.base_height += rxvt_menubar_rheight (r);
 #endif
-	if (ISNOT_OPTION(r, Opt2_hideTabbar))
+	if (NOTSET_OPTION(r, Opt2_hideTabbar))
 		r->szHint.base_height += rxvt_tabbar_rheight (r);
 
 	/* Set the terminal minimal width and height */
@@ -2149,7 +2149,7 @@ rxvt_init_win_size( rxvt_t *r )
 	r->h->window_vt_x = (ISSET_OPTION(r, Opt_scrollBar_right)) ? 
 			0 : r->szHint.base_width - 2*r->TermWin.int_bwidth;
 	r->h->window_vt_y = r->szHint.base_height - 2*r->TermWin.int_bwidth;
-	if (ISSET_OPTION(r, Opt2_bottomTabbar) && ISNOT_OPTION(r, Opt2_hideTabbar))
+	if (ISSET_OPTION(r, Opt2_bottomTabbar) && NOTSET_OPTION(r, Opt2_hideTabbar))
 		r->h->window_vt_y -= rxvt_tabbar_rheight (r);
 }
 
@@ -2516,7 +2516,7 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 		PVTS(r, page)->PrivateModes |= PrivMode_TtyOutputInh;
 	if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
 		PVTS(r, page)->PrivateModes |= PrivMode_Keypress;
-	if (ISNOT_OPTION(r, Opt_jumpScroll))
+	if (NOTSET_OPTION(r, Opt_jumpScroll))
 		PVTS(r, page)->PrivateModes |= PrivMode_smoothScroll;
 #ifndef NO_BACKSPACE_KEY
 	if (STRCMP(r->h->key_backspace, "DEC") == 0)
@@ -2703,7 +2703,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	 */
 #ifdef BACKGROUND_IMAGE
 # ifdef TRANSPARENT
-	if( ISNOT_OPTION(r,  Opt_transparent) )
+	if( NOTSET_OPTION(r,  Opt_transparent) )
 # endif
 	{
 		const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
@@ -2720,7 +2720,7 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 			rxvt_load_bg_pixmap(r, page, pf);
 			/* rxvt_scr_touch(r, page, True); */
 		}
-	} /* if( ISNOT_OPTION(r,  Opt_transparent) ) */
+	} /* if( NOTSET_OPTION(r,  Opt_transparent) ) */
 #endif
 
 	XMapWindow (r->Xdisplay, PVTS(r, page)->vt);
@@ -3151,7 +3151,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	r->h->bar_pointer = XCreateFontCursor(r->Xdisplay, XC_left_ptr);
 
 #ifdef POINTER_BLANK
-	if (ISNOT_OPTION(r, Opt_pointerBlank))
+	if (NOTSET_OPTION(r, Opt_pointerBlank))
 		UNSET_CURSOR(r->h->blank_pointer);
 	else
 		r->h->blank_pointer = XCreateGlyphCursor(r->Xdisplay,
@@ -3162,7 +3162,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 	/* graphics context for the vt window */
 #ifdef XFT_SUPPORT
-	if (ISNOT_OPTION(r, Opt_xft))
+	if (NOTSET_OPTION(r, Opt_xft))
 #endif
 	gcvalue.font = r->TermWin.font->fid;
 	gcvalue.foreground = r->PixColors[Color_fg];
@@ -3170,7 +3170,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	gcvalue.graphics_exposures = 1;
 	gcmask = GCForeground | GCBackground | GCGraphicsExposures;
 #ifdef XFT_SUPPORT
-	if (ISNOT_OPTION(r, Opt_xft))
+	if (NOTSET_OPTION(r, Opt_xft))
 #endif
 	gcmask |= GCFont;
 	r->TermWin.gc = XCreateGC(r->Xdisplay, r->TermWin.parent,
@@ -3213,7 +3213,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 # endif
 
 	rxvt_tabbar_create (r);
-	if (ISNOT_OPTION(r, Opt2_hideTabbar))
+	if (NOTSET_OPTION(r, Opt2_hideTabbar))
 		rxvt_tabbar_show (r);
 
 	XMapWindow (r->Xdisplay, r->TermWin.parent);

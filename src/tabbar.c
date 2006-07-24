@@ -1009,7 +1009,7 @@ rxvt_tabbar_draw_buttons (rxvt_t* r)
 
 	topoff = BTN_TOPOFF;
 #if 0
-	frame = ISNOT_OPTION(r, Opt2_bottomTabbar) ?
+	frame = NOTSET_OPTION(r, Opt2_bottomTabbar) ?
 				r->tabBar.frame : r->tabBar.delimit;
 #endif
 	frame = r->tabBar.frame;
@@ -1697,7 +1697,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	/* let's decode where the user click */
 	z = TWIN_WIDTH(r) - x;
 	if (
-			ISNOT_OPTION(r, Opt2_hideButtons)
+			NOTSET_OPTION(r, Opt2_hideButtons)
 			&& z < 4*(BTN_WIDTH+BTN_SPACE)
 			&& (z%(BTN_WIDTH+BTN_SPACE)) > BTN_SPACE
 	   )
@@ -1725,7 +1725,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 				break;
 
 			case 2 : /* delete the active vt if it's in primary screen */
-				if (ISNOT_OPTION(r, Opt2_protectSecondary) ||
+				if (NOTSET_OPTION(r, Opt2_protectSecondary) ||
 					( ISSET_OPTION(r, Opt2_protectSecondary) &&
 					  PRIMARY == AVTS(r)->current_screen
 					))
@@ -2139,7 +2139,7 @@ rxvt_tabbar_create (rxvt_t* r)
 		);
 
 #ifdef XFT_SUPPORT
-	if (ISNOT_OPTION(r, Opt_xft))
+	if (NOTSET_OPTION(r, Opt_xft))
 #endif
 	XSetFont (r->Xdisplay, r->tabBar.gc, r->TermWin.font->fid);
 
