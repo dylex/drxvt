@@ -782,13 +782,13 @@ typedef struct _profile_t
 {
 	unsigned long		fg, bg;
 #ifdef XFT_SUPPORT
-	XftColor			xftfg, xftbg;
+	XftColor		xftfg, xftbg;
 #endif
 #ifdef OFF_FOCUS_FADING
 	unsigned long		fg_fade, bg_fade;
 #endif
 
-	int					saveLines;
+	int			saveLines;
 
 	/*
 	 * Each profile also has a tab title, and command associated to it. However
@@ -817,64 +817,64 @@ typedef struct rxvt_vars {
 	 * Exposed items
 	 *   Changes to structure here require library version number change
 	 */
-    TermWin_t       TermWin;
+    TermWin_t		TermWin;
 #ifdef HAVE_SCROLLBARS
-    scrollBar_t     scrollBar;
+    scrollBar_t		scrollBar;
 #endif
 #ifdef HAVE_MENUBAR
-    menuBar_t       menuBar;
+    menuBar_t		menuBar;
 #endif
-	tabBar_t		tabBar;
-	Display*		Xdisplay;
-	unsigned long   Options[MAX_OPTION_ARRAY];
+	tabBar_t	tabBar;
+	Display*	Xdisplay;
+	RUINT32T	Options[MAX_OPTION_ARRAY];
 	XSizeHints      szHint;
 
 	/* macros */
-	macros_t		*macros;	/* array of all user defind macros */
+	macros_t*	macros;	/* array of all user defind macros */
 	unsigned short	nmacros,	/* Number of macros defined */
 					maxMacros;	/* max # of macros that can be stored in memory
 								   pointed to by "macros" */
 
 	Colormap        Xcmap;
 #ifdef OFF_FOCUS_FADING
-	unsigned long	*PixColorsUnfocus;		/* Array of size TOTAL_COLORS */
+	unsigned long*	PixColorsUnfocus;		/* Array of size TOTAL_COLORS */
 	/* PixColorsUnfocus and PixColor has been switched */
-	char			color_switched;
+	char		color_switched;
 #endif
 	/* Bg and UfBg has been switched */
-	char			ufbg_switched;
-	unsigned long	*PixColors;				/* Array of size TOTAL_COLORS */
+	char		ufbg_switched;
+	unsigned long*	PixColors;				/* Array of size TOTAL_COLORS */
 #ifdef XFT_SUPPORT
-    XftColor*		XftColors;	/* number of colors + 2 * NPAGES */
+	XftColor*	XftColors;	/* number of colors + 2 * NPAGES */
 #endif
-	short			numPixColors;	/* TOTAL_COLORS */
+	short		numPixColors;	/* TOTAL_COLORS */
 
-	profile_t		profile[MAX_PROFILES];
+	profile_t	profile[MAX_PROFILES];
 
-	Cursor			term_pointer; /* cursor for vt window */
-	int				Xdepth;
-	int				sb_shadow;	/* scrollbar shadow width */
-	int				Xfd;		/* file descriptor of X connection */
+	Cursor		term_pointer; /* cursor for vt window */
+	int		Xdepth;
+	int		sb_shadow;	/* scrollbar shadow width */
+	int		Xfd;		/* file descriptor of X connection */
 
 	/* term_t structures and pointers */
-	term_t			vterm[MAX_PAGES];
-	term_t*			vts[MAX_PAGES];
+	term_t		vterm[MAX_PAGES];
+	term_t*		vts[MAX_PAGES];
 
 	short			tabClicked;		/* Tab clicked by user. Used for moving tabs
 									   by drag and dropping. */
 
 	/* number of children that have died */
-	short			vt_died;
+	short		vt_died;
 
-	int				num_fds;	/* number of fd to monitor */
+	int		num_fds;	/* number of fd to monitor */
 	selection_t     selection;
-	sstyle_t		selection_style;
-	int				numlock_state;
-	char*			tabstop;	/* per location: 1 == tab-stop */
+	sstyle_t	selection_style;
+	int		numlock_state;
+	char*		tabstop;	/* per location: 1 == tab-stop */
 	enum enc_label  encoding_method;
 
-	char**			global_argv;
-	int				global_argc;
+	char**		global_argv;
+	int		global_argc;
 } rxvt_t;
 
 
