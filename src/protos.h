@@ -120,11 +120,13 @@ void             rxvt_cleanutent                  __PROTO((rxvt_t* r, int page))
 void             rxvt_mem_init                    __PROTO((void));
 void             rxvt_mem_exit                    __PROTO((void));
 void             rxvt_init_trunk_size             __PROTO((size_t, size_t, size_t));
+void             rxvt_free                        __PROTO((void *ptr));
+#else
+# define	 rxvt_free(x)	free(x)
 #endif /* OUR_MALLOC */
 void*            rxvt_malloc                      __PROTO((size_t size));
 void*            rxvt_calloc                      __PROTO((size_t number, size_t size));
 void*            rxvt_realloc                     __PROTO((void *ptr, size_t size));
-void             rxvt_free                        __PROTO((void *ptr));
 /* End prototypes of rxvtmem.c */
 
 

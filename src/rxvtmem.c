@@ -490,19 +490,19 @@ rxvt_free(void* ptr)
 void*
 rxvt_malloc(size_t size)
 {
-	void*		p;
+    void*   p;
 
-	/* see AC_FUNC_MALLOC macro in autoconf documentation */
-	if (0 == size)
-		size = 1;
+    /* see AC_FUNC_MALLOC macro in autoconf documentation */
+    if (0 == size)
+	size = 1;
 
-	p = malloc(size);
-	if (p)
-		return p;
+    p = malloc(size);
+    if (p)
+	return p;
 
-	fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
-	exit(EXIT_FAILURE);
-	/* NOTREACHED */
+    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    exit(EXIT_FAILURE);
+    /* NOTREACHED */
 }
 
 
@@ -510,15 +510,15 @@ rxvt_malloc(size_t size)
 void*
 rxvt_calloc(size_t number, size_t size)
 {
-	void*		p;
+    void*   p;
 
-	p = calloc(number, size);
-	if (p)
-		return p;
+    p = calloc(number, size);
+    if (p)
+	return p;
 
-	fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
-	exit(EXIT_FAILURE);
-	 /* NOTREACHED */
+    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    exit(EXIT_FAILURE);
+    /* NOTREACHED */
 }
 
 
@@ -526,28 +526,19 @@ rxvt_calloc(size_t number, size_t size)
 void*
 rxvt_realloc(void *ptr, size_t size)
 {
-	void*		p;
+    void*   p;
 
-	if (ptr)
-		p = realloc(ptr, size);
-	else
-		p = malloc(size);
-	if (p)
-		return p;
+    if (ptr)
+	p = realloc(ptr, size);
+    else
+	p = malloc(size);
+    if (p)
+	return p;
 
-	fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
-	exit(EXIT_FAILURE);
-	/* NOTREACHED */
+    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    exit(EXIT_FAILURE);
+    /* NOT REACHED */
 }
-
-
-/* EXTPROTO */
-void
-rxvt_free(void* ptr)
-{
-    free (ptr);
-}
-
 
 #endif	/* OUR_MALLOC */
 
