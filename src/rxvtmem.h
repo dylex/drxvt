@@ -27,20 +27,44 @@
 #ifdef OUR_MALLOC
 
 struct block_head_t;
+struct trunk_head_t;
+struct trunk_list_t;
+
+
+#ifdef _DEBUG
+#define TRUNK_MAGIC		(0x41414141)
+#define BLOCK_MAGIC		(0x43434343)
+#endif
+
+
+/*
+ * This structure has two states: (1) when it records a free block, u.next
+ * stores the address of next block's head; (2) when it records a block
+ * in use, u.trunk stores the address of the trunk it belonds to.
+ */
 struct block_head_t
 {
 #ifdef _DEBUG
-    RUINT32T		    magic;/* magic number */
+    RUINT32T	magic_f;	/* magic number */
 #endif
-    struct block_head_t*    next; /* next block */
+    union
+	{
+		struct block_head_t*	next;	/* next block */
+		struct trunk_head_t*	trunk;	/* address of trunk_head */
+	} u;
+#ifdef _DEBUG
+    RUINT32T    magic_e;	/* magic number */
+#endif
 };
+
+#define BHEAD_OFFSET	(sizeof (struct block_head_t))
+#define SYS_MALLOC_PTR	(-1)
 
 
 /*
  * Note: the name trunk_head_t is somewhat misleading. Actually it resides
  * at the END of each allocated trunk.
  */
-struct trunk_head_t;
 struct trunk_head_t
 {
 #ifdef _DEBUG
@@ -58,7 +82,6 @@ struct trunk_head_t
 /*
  * Header for trunk list of each block size
  */
-struct trunk_list_t;
 struct trunk_list_t
 {
     RUINT16T		    block_size;
