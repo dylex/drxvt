@@ -367,13 +367,6 @@ rxvt_malloc(size_t size)
 
     /* now return the free block, BUT skip the block_head_t first */
     block ++;
-    /* in theory, we should zero out the memory as malloc. but we will
-     * not do it as it help us catch bugs as we fill in memory something
-     * strange.
-     */
-#if 0
-    MEMSET(block, 0, size);
-#endif
     return block;
 }
 
@@ -382,15 +375,22 @@ rxvt_malloc(size_t size)
 void*
 rxvt_calloc(size_t number, size_t size)
 {
+    void*	ptr;
+    size_t	total = number * size;
+
 #ifdef DEBUG
     assert (memory_initialized);
 #endif
 
     /* possible overflow? */
-    assert (number * size >= number);
-    assert (number * size >= size);
+    assert (total >= 0 && size > 0);
+    assert ((total / size) == number);
 
-    return rxvt_malloc (number * size);
+    ptr = rxvt_malloc (total);
+    /* calloc requires us to zero out the memory, slow call */
+    MEMSET(ptr, 0, total);
+
+    return (ptr);
 }
 
 
