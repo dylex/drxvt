@@ -34,6 +34,7 @@ struct trunk_list_t;
 #ifdef DEBUG
 #define TRUNK_MAGIC		(0x41414141)
 #define BLOCK_MAGIC		(0x43434343)
+#define MEMORY_MAGIC		(0x47474747)
 #endif
 
 /* special pointer to indicate that the block is allocated using system
