@@ -838,7 +838,7 @@ typedef struct rxvt_vars {
 	/* macros */
 	macros_t*	macros;	/* array of all user defind macros */
 	unsigned short	nmacros,	/* Number of macros defined */
-					maxMacros;	/* max # of macros that can be stored in memory
+			maxMacros;	/* max # of macros that can be stored in memory
 								   pointed to by "macros" */
 
 	Colormap        Xcmap;

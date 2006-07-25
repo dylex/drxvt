@@ -194,14 +194,14 @@ rxvt_menuitem_free(rxvt_t *r, menu_t *menu, menuitem_t *item)
 			break;
 
 		case MenuItem:
-			free(item->entry.action.str);
+			rxvt_free(item->entry.action.str);
 			SET_NULL(item->entry.action.str);
 			break;
 	}
 
-	if (NOT_NULL(item->name)) free(item->name);
-	if (NOT_NULL(item->name2)) free(item->name2);
-	free(item);
+	if (NOT_NULL(item->name)) rxvt_free(item->name);
+	if (NOT_NULL(item->name2)) rxvt_free(item->name2);
+	rxvt_free(item);
 }
 
 #if 0 /* {{{ Obsolete: macro action dispatch / set are much better. */
@@ -363,7 +363,7 @@ rxvt_menuarrow_free(rxvt_t *r, unsigned char name)
 		{
 			action_t	   *act = &(r->h->MenuBar.arrows[i]);
 
-			free(act->str);
+			rxvt_free(act->str);
 			SET_NULL(act->str);
 			act->len = 0;
 
@@ -553,7 +553,7 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 		{
 			if (NOT_NULL(item->name2) && NOT_NULL(name2))
 			{
-				free(item->name2);
+				rxvt_free(item->name2);
 				item->len2 = 0;
 				SET_NULL(item->name2);
 			}
@@ -565,7 +565,7 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 					break;
 					
 				case MenuItem:
-					free(item->entry.action.str);
+					rxvt_free(item->entry.action.str);
 					SET_NULL(item->entry.action.str);
 				break;
 			}
@@ -826,8 +826,8 @@ rxvt_menu_delete(rxvt_t *r, menu_t *menu)
 		item = p;
 	}
 
-	free(menu->name);
-	free(menu);
+	rxvt_free(menu->name);
+	rxvt_free(menu);
 
 	return parent;
 }
@@ -934,8 +934,8 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 		if (IS_NULL(item))
 		{
 			if (NOT_NULL(menu->name))
-				free( menu->name );
-			free(menu);
+				rxvt_free( menu->name );
+			rxvt_free(menu);
 			return parent;
 		}
 #ifdef DEBUG
@@ -1596,7 +1596,7 @@ rxvt_menubar_clear(rxvt_t *r)
 
 	if (r->h->MenuBar.title)
 	{
-		free(r->h->MenuBar.title);
+		rxvt_free(r->h->MenuBar.title);
 		SET_NULL(r->h->MenuBar.title);
 	}
 	rxvt_menuarrow_free(r, 0);	/* remove all arrow functions */
@@ -2412,7 +2412,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 					}
 					else
 					{
-						free(r->h->MenuBar.title);
+						rxvt_free(r->h->MenuBar.title);
 						SET_NULL(r->h->MenuBar.title);
 					}
 				}
@@ -2692,7 +2692,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 	}
 
 	fp = fopen( (char*) file, "rb");
-	free(file);
+	rxvt_free(file);
 	if (IS_NULL(fp))
 		return;
 

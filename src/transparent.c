@@ -1542,7 +1542,7 @@ shade_ximage (rxvt_t* r, XImage* srcImage)
 		}
 	}
 
-	free (lookup);
+	rxvt_free (lookup);
 }
 /* }}}2 */
 # endif	 /* HAVE_LIBXRENDER */

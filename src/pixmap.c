@@ -93,7 +93,7 @@ rxvt_scale_pixmap(rxvt_t *r, int page, const char *geom)
 			min(bgpixmap->w, 9999), min(bgpixmap->h, 9999),
 			min(bgpixmap->x, 9999), min(bgpixmap->y, 9999));
 		rxvt_xterm_seq(r, page, XTerm_title, str, CHAR_ST);
-		free(str);
+		rxvt_free(str);
 		return 0;
 	}
 
@@ -162,7 +162,7 @@ rxvt_scale_pixmap(rxvt_t *r, int page, const char *geom)
 		changed++;
 	}
 	}
-	free(str);
+	rxvt_free(str);
 	return changed;
 }
 
@@ -472,7 +472,7 @@ rxvt_load_pixmap(rxvt_t *r, const char *file, long* pwidth, long* pheight)
 		/* empty to suppress compile error */
 	}
 
-	free(f);
+	rxvt_free(f);
 	if (NOT_PIXMAP(pixmap))	{
 		char		   *p;
 		/* semi-colon delimited */

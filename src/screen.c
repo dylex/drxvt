@@ -431,26 +431,26 @@ rxvt_scr_delete_row (rxvt_t* r, int page)
 		if (PSCR(r, page).text[q])
 		{
 			assert(PSCR(r, page).rend[q]);
-			free(PSCR(r, page).text[q]);
+			rxvt_free(PSCR(r, page).text[q]);
 			PSCR(r, page).text[q] = NULL;
-			free(PSCR(r, page).rend[q]);
+			rxvt_free(PSCR(r, page).rend[q]);
 			PSCR(r, page).rend[q] = NULL;
 		}
 #if NSCREENS
 		if (PVTS(r, page)->swap.text[p])
 		{
 			assert(PVTS(r, page)->swap.rend[p]);
-			free(PVTS(r, page)->swap.text[p]);
+			rxvt_free(PVTS(r, page)->swap.text[p]);
 			PVTS(r, page)->swap.text[p] = NULL;
-			free(PVTS(r, page)->swap.rend[p]);
+			rxvt_free(PVTS(r, page)->swap.rend[p]);
 			PVTS(r, page)->swap.rend[p] = NULL;
 		}
 #endif
 		assert (PVTS(r, page)->drawn_text[p]);
 		assert (PVTS(r, page)->drawn_rend[p]);
-		free(PVTS(r, page)->drawn_text[p]);
+		rxvt_free(PVTS(r, page)->drawn_text[p]);
 		PVTS(r, page)->drawn_text[p] = NULL;
-		free(PVTS(r, page)->drawn_rend[p]);
+		rxvt_free(PVTS(r, page)->drawn_rend[p]);
 		PVTS(r, page)->drawn_rend[p] = NULL;
 	}
 
@@ -692,10 +692,10 @@ rxvt_scr_release(rxvt_t* r, int page)
 		if (PSCR(r, page).text[i])
 		{
 			/* then so is PSCR(r, page).rend[i] */
-			free(PSCR(r, page).text[i]);
+			rxvt_free(PSCR(r, page).text[i]);
 			PSCR(r, page).text[i] = NULL;
 			assert(PSCR(r, page).rend[i]);
-			free(PSCR(r, page).rend[i]);
+			rxvt_free(PSCR(r, page).rend[i]);
 			PSCR(r, page).rend[i] = NULL;
 		}
 	}
@@ -703,33 +703,33 @@ rxvt_scr_release(rxvt_t* r, int page)
 	for (i = 0; i < r->TermWin.nrow; i++)
 	{
 		/* if (PVTS(r, page)->drawn_text[i]) */
-			free(PVTS(r, page)->drawn_text[i]);
+			rxvt_free(PVTS(r, page)->drawn_text[i]);
 		PVTS(r, page)->drawn_text[i] = NULL;
 		/* if (PVTS(r, page)->drawn_rend[i]) */
-			free(PVTS(r, page)->drawn_rend[i]);
+			rxvt_free(PVTS(r, page)->drawn_rend[i]);
 		PVTS(r, page)->drawn_rend[i] = NULL;
 #if NSCREENS
 		/* if (PVTS(r, page)->swap.text[i]) */
-			free(PVTS(r, page)->swap.text[i]);
+			rxvt_free(PVTS(r, page)->swap.text[i]);
 		PVTS(r, page)->swap.text[i] = NULL;
 		/* if (PVTS(r, page)->swap.rend[i])) */
-			free(PVTS(r, page)->swap.rend[i]);
+			rxvt_free(PVTS(r, page)->swap.rend[i]);
 		PVTS(r, page)->swap.rend[i] = NULL;
 #endif
 	}
 
-	free(PSCR(r, page).text); PSCR(r, page).text = NULL;
-	free(PSCR(r, page).tlen); PSCR(r, page).tlen = NULL;
-	free(PSCR(r, page).rend); PSCR(r, page).rend = NULL;
-	free(PVTS(r, page)->drawn_text);  PVTS(r, page)->drawn_text = NULL;
-	free(PVTS(r, page)->drawn_rend);  PVTS(r, page)->drawn_rend = NULL;
+	rxvt_free(PSCR(r, page).text); PSCR(r, page).text = NULL;
+	rxvt_free(PSCR(r, page).tlen); PSCR(r, page).tlen = NULL;
+	rxvt_free(PSCR(r, page).rend); PSCR(r, page).rend = NULL;
+	rxvt_free(PVTS(r, page)->drawn_text);  PVTS(r, page)->drawn_text = NULL;
+	rxvt_free(PVTS(r, page)->drawn_rend);  PVTS(r, page)->drawn_rend = NULL;
 #if NSCREENS
-	free(PVTS(r, page)->swap.text);   PVTS(r, page)->swap.text = NULL;
-	free(PVTS(r, page)->swap.tlen);   PVTS(r, page)->swap.tlen = NULL;
-	free(PVTS(r, page)->swap.rend);   PVTS(r, page)->swap.rend = NULL;
+	rxvt_free(PVTS(r, page)->swap.text);   PVTS(r, page)->swap.text = NULL;
+	rxvt_free(PVTS(r, page)->swap.tlen);   PVTS(r, page)->swap.tlen = NULL;
+	rxvt_free(PVTS(r, page)->swap.rend);   PVTS(r, page)->swap.rend = NULL;
 #endif
-	free(PVTS(r, page)->buf_text);	PVTS(r, page)->buf_text = NULL;
-	free(PVTS(r, page)->buf_rend);	PVTS(r, page)->buf_rend = NULL;
+	rxvt_free(PVTS(r, page)->buf_text);	PVTS(r, page)->buf_text = NULL;
+	rxvt_free(PVTS(r, page)->buf_rend);	PVTS(r, page)->buf_rend = NULL;
 
 	/* next rxvt_scr_reset will be the first time initialization */
 	PVTS(r, page)->init_screen = 0;
@@ -4620,7 +4620,7 @@ rxvt_PasteIt(rxvt_t* r, int page, const unsigned char *data, unsigned int nitems
 				ds[j] = '\r';
 		rxvt_tt_write(r, page, ds, (int)n);
 	}
-	free(ds);
+	rxvt_free(ds);
 }
 
 
@@ -4884,7 +4884,7 @@ rxvt_process_selectionclear(rxvt_t* r, int page)
 
 	r->h->want_refresh = 1;
 	if (SEL(r).text)
-		free(SEL(r).text);
+		rxvt_free(SEL(r).text);
 	SEL(r).text = NULL;
 	SEL(r).len = 0;
 	CLEAR_SELECTION(r);
@@ -5067,12 +5067,12 @@ rxvt_selection_make(rxvt_t* r, int page, Time tm)
 	*str = '\0';
 	if ((i = STRLEN((char *)new_selection_text)) == 0)
 	{
-		free(new_selection_text);
+		rxvt_free(new_selection_text);
 		return;
 	}
 	SEL(r).len = i;
 	if (SEL(r).text)
-		free(SEL(r).text);
+		rxvt_free(SEL(r).text);
 	SEL(r).text = new_selection_text;
 
 	XSetSelectionOwner(r->Xdisplay, XA_PRIMARY, PVTS(r, page)->vt, tm);

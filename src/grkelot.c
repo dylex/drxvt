@@ -162,9 +162,9 @@ kstate_end(void)
 	int			 i;
 
 	for (i = 0; i < pStateNow->num_xlat; i++)
-	free(pStateNow->xlat[i].pval);
+	rxvt_free(pStateNow->xlat[i].pval);
 	if (pStateNow->num_xlat > 0)
-	free(pStateNow->xlat);
+	rxvt_free(pStateNow->xlat);
 }
 
 /*
@@ -260,7 +260,7 @@ kstate_add_xlat(char *str)
 	xlat->pval = calloc(i, sizeof(K_XLAT));
 	if (NOT_NULL(xlat->pval))
 		MEMCPY(xlat->pval, pval_tmp, i * sizeof(u_int));
-	free(pval_tmp);
+	rxvt_free(pval_tmp);
 	pStateNow->num_xlat++;
 }
 

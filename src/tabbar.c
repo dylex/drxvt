@@ -1271,7 +1271,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 
 		/* Glibc extension to getcwd: When passed a null pointer it allocates
 		 * memory for the path. So we need to free it now. */
-		free( cwd );
+		rxvt_free( cwd );
 	}
 	else
 		LVTS(r)->cmd_fd = rxvt_run_command (r, LTAB(r), (const char**) argv);
@@ -1285,8 +1285,8 @@ rxvt_append_page( rxvt_t* r, int profile,
 	{
 		char **s;
 
-		for( s = argv; *s != NULL; s++) free(*s);
-		free( argv );
+		for( s = argv; *s != NULL; s++) rxvt_free(*s);
+		rxvt_free( argv );
 	}
 
 	/*
@@ -1395,13 +1395,13 @@ rxvt_remove_page (rxvt_t* r, short page)
 
 	/* free virtual terminal related resources */
 	assert (PVTS(r, page)->ttydev);
-	free (PVTS(r, page)->ttydev);
+	rxvt_free (PVTS(r, page)->ttydev);
 	assert (PVTS(r, page)->cmd_fd >= 0);
 	close (PVTS(r, page)->cmd_fd);
 
 	if (PVTS(r, page)->v_buffer)
 	{
-		free (PVTS(r, page)->v_buffer);
+		rxvt_free (PVTS(r, page)->v_buffer);
 		PVTS(r, page)->v_buffer = NULL;
 	}
 
@@ -1519,7 +1519,7 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
 	 */
 	if (NULL != n_title)
 	{
-		free (PVTS(r, page)->tab_title);
+		rxvt_free (PVTS(r, page)->tab_title);
 		PVTS(r, page)->tab_title = n_title;
 
 		/* Compute the new width of the tab */
@@ -2194,13 +2194,13 @@ rxvt_tabbar_clean_exit (rxvt_t* r)
 
 	/* free resource strings */
 	if (r->tabBar.rsfg)
-		free ((void*) r->h->rs[Rs_tabfg]);
+		rxvt_free ((void*) r->h->rs[Rs_tabfg]);
 	if (r->tabBar.rsbg)
-		free ((void*) r->h->rs[Rs_tabbg]);
+		rxvt_free ((void*) r->h->rs[Rs_tabbg]);
 	if (r->tabBar.rsifg)
-		free ((void*) r->h->rs[Rs_itabfg]);
+		rxvt_free ((void*) r->h->rs[Rs_itabfg]);
 	if (r->tabBar.rsibg)
-		free ((void*) r->h->rs[Rs_itabbg]);
+		rxvt_free ((void*) r->h->rs[Rs_itabbg]);
 
 	if (IS_GC(r->tabBar.gc))
 	{
@@ -2332,7 +2332,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 				rxvt_alloc_xft_color (r, xcol.pixel, &(r->tabBar.xftfg));
 #endif
 				if (r->tabBar.rsfg)		/* free previous string */
-					free ((void*) r->h->rs[Rs_tabfg]);
+					rxvt_free ((void*) r->h->rs[Rs_tabfg]);
 				r->h->rs[Rs_tabfg] = STRDUP(str);
 				r->tabBar.rsfg = 1;		/* free resource string later */
 				changed = 1;
@@ -2348,7 +2348,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 			{
 				r->tabBar.bg = xcol.pixel;
 				if (r->tabBar.rsbg)		/* free previous string */
-					free ((void*) r->h->rs[Rs_tabbg]);
+					rxvt_free ((void*) r->h->rs[Rs_tabbg]);
 				r->h->rs[Rs_tabbg] = STRDUP(str);
 				r->tabBar.rsbg = 1;		/* free resource string later */
 				changed = 1;
@@ -2367,7 +2367,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 				rxvt_alloc_xft_color (r, xcol.pixel, &(r->tabBar.xftifg));
 #endif
 				if (r->tabBar.rsifg)	/* free previous string */
-					free ((void*) r->h->rs[Rs_itabfg]);
+					rxvt_free ((void*) r->h->rs[Rs_itabfg]);
 				r->h->rs[Rs_itabfg] = STRDUP(str);
 				r->tabBar.rsifg = 1;	/* free resource string later */
 				changed = 1;
@@ -2382,7 +2382,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 			{
 				r->tabBar.ibg = xcol.pixel;
 				if (r->tabBar.rsibg)	/* free previous string */
-					free ((void*) r->h->rs[Rs_itabbg]);
+					rxvt_free ((void*) r->h->rs[Rs_itabbg]);
 				r->h->rs[Rs_itabbg] = STRDUP(str);
 				r->tabBar.rsibg = 1;	/* free resource string later */
 				changed = 1;

@@ -159,7 +159,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
                      RootWindow(display, DefaultScreen(display)),
                      &win_attr) == 0) {
         fclose(ifile);
-        free(buf);
+        rxvt_free(buf);
                  return -1;
     }
 
@@ -492,7 +492,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
       }
     }
     image->data = data1;
-    free(buf);
+    rxvt_free(buf);
     pix = XCreatePixmap(display,window, vwidth,vheight,display_depth);
     *pixmap = pix;
     XPutImage(display,pix,gc,image,0,0,0,0,vwidth,vheight);
@@ -501,7 +501,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
     jpeg_destroy_decompress(&jinf);
 
     if (image->data != NULL){
-      free(image->data);
+      rxvt_free(image->data);
       image->data = NULL;
     }
     XDestroyImage(image);

@@ -114,7 +114,7 @@ rxvt_init(int argc, const char *const *argv)
 	/* Initialize vars in "r" */
 	if (rxvt_init_vars(r) < 0)
 	{
-		free(r);
+		rxvt_free(r);
 		return NULL;
 	}
 
@@ -524,16 +524,16 @@ rxvt_clean_exit (rxvt_t* r)
 	XCloseDisplay (r->Xdisplay);
 	SET_NULL(r->Xdisplay);
 
-	free (r->tabstop);			SET_NULL(r->tabstop);
-	free (r->PixColors);		SET_NULL(r->PixColors);
+	rxvt_free (r->tabstop);			SET_NULL(r->tabstop);
+	rxvt_free (r->PixColors);		SET_NULL(r->PixColors);
 # ifdef OFF_FOCUS_FADING
-	free (r->PixColorsUnfocus);	SET_NULL(r->PixColorsUnfocus);
+	rxvt_free (r->PixColorsUnfocus);	SET_NULL(r->PixColorsUnfocus);
 # endif
 # ifdef XFT_SUPPORT
-	free (r->XftColors);		SET_NULL(r->XftColors);
+	rxvt_free (r->XftColors);		SET_NULL(r->XftColors);
 # endif
-	free (r->h);				SET_NULL(r->h);
-	free (r);					SET_NULL(r);
+	rxvt_free (r->h);				SET_NULL(r->h);
+	rxvt_free (r);					SET_NULL(r);
 
 /* #endif */	/* DEBUG */
 
@@ -1814,7 +1814,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 			if (ptr)
 			{
 				if (NOT_NULL(r->h->newfont[idx]))	
-					free (r->h->newfont[idx]);
+					rxvt_free (r->h->newfont[idx]);
 				r->h->newfont[idx] = ptr;
 				r->h->rs[Rs_font+idx] = r->h->newfont[idx];
 			}
@@ -2059,8 +2059,8 @@ rxvt_set_utf8_property (rxvt_t* r, Atom prop, Window win, const char* str)
 		r->h->xa[XA_UTF8_STRING], 8, PropModeReplace,
 		(unsigned char*) s, STRLEN (s));
 
-	free (s);
-	free (ws);
+	rxvt_free (s);
+	rxvt_free (ws);
 # endif /* !defined (OS_FREEBSD) ||... */
 #endif	/* HAVE_WCHAR_H */
 }
@@ -2467,7 +2467,7 @@ rxvt_alloc_color( rxvt_t* r, XColor *screen_in_out, const char *colour )
 				}
 			}
 			*screen_in_out = colors[best_pixel];
-			free(colors);
+			rxvt_free(colors);
 
 			res = XAllocColor(r->Xdisplay, XCMAP, screen_in_out);
 		}
@@ -2622,7 +2622,7 @@ rxvt_IM_set_fontset (rxvt_t* r, int idx)
 						&missing_charsetlist,
 						&missing_charsetcount,
 						&def_string);
-		free(string);
+		rxvt_free(string);
 		if (NOT_NULL(r->TermWin.fontset))
 			success = 1;
 	}
@@ -2737,8 +2737,8 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
 			}
 		}
 		for (i = 0; s[i]; i++)
-			free(s[i]);
-		free(s);
+			rxvt_free(s[i]);
+		rxvt_free(s);
 	}
 	if (found)
 		return;
@@ -2817,8 +2817,8 @@ rxvt_IM_get_IC(rxvt_t *r)
 			}
 	}
 	for (i = 0; s[i]; i++)
-		free(s[i]);
-	free(s);
+		rxvt_free(s[i]);
+	rxvt_free(s);
 	XFree(xim_styles);
 
 	if (!found)

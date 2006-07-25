@@ -409,7 +409,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 			sprintf( homepath, "%s/.%s", envpath, PACKAGE_NAME);
 			f = rxvt_File_search_path( homepath, file, ext);
 
-			free( homepath);
+			rxvt_free( homepath);
 		}
 		if( f ) break;
 

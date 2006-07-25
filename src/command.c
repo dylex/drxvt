@@ -5213,7 +5213,7 @@ rxvt_process_dcs_seq(rxvt_t* r, int page)
 	/* Not handled yet */
 	s = rxvt_get_to_st (r, page, &eh);
 	if (s)
-		free(s);
+		rxvt_free(s);
 	return;
 }
 
@@ -5265,7 +5265,7 @@ rxvt_process_osc_seq (rxvt_t* r, int page)
 			else
 				rxvt_xterm_seq(r, page, arg, (char*) s, eh);
 
-			free(s);
+			rxvt_free(s);
 		}
 	}
 }

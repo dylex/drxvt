@@ -347,7 +347,7 @@ rxvt_session_init (rxvt_t* r)
 	}
 	else {
 		r->TermWin.sm_client_id = STRDUP (client_id);
-		free (client_id);
+		rxvt_free (client_id);
 	}
 }
 

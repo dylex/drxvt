@@ -182,7 +182,7 @@ fprintf(stderr,"png read error: out of memory..\n");
     }
     png_read_image(png_ptr, png_row_ptrs);
     png_read_end(png_ptr,NULL);
-    free(png_row_ptrs);
+    rxvt_free(png_row_ptrs);
 
     vwidth = *w;
     vheight = *h;
@@ -563,14 +563,14 @@ fprintf(stderr,"png read error: out of memory..\n");
       }
     }
     image->data = data1;
-    free(buf);
+    rxvt_free(buf);
 
     pix = XCreatePixmap(display,window, vwidth,vheight,display_depth);
     *pixmap = pix;
     XPutImage(display,pix,gc,image,0,0,0,0,vwidth,vheight);
 
     if (image->data != NULL){
-      free(image->data);
+      rxvt_free(image->data);
       image->data = NULL;
     }
     XDestroyImage(image);

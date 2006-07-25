@@ -518,7 +518,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	else
 	{
 		/* Macro action string needs to be freed (as it will be replaced) */
-		free( r->macros[replaceIndex].action.str );
+		rxvt_free( r->macros[replaceIndex].action.str );
 	}
 
 
@@ -581,7 +581,7 @@ rxvt_cleanup_macros( rxvt_t *r )
 			r->macros[i].keysym		= 0;
 			r->macros[i].modFlags	= 0;
 
-			free( r->macros[i].action.str );
+			rxvt_free( r->macros[i].action.str );
 			SET_NULL(r->macros[i].action.str); /* Probably unnecessary */
 
 			nDummyMacros++;
@@ -691,7 +691,7 @@ rxvt_set_action		(action_t *action, char *astring)
 	}
 	else
 	{
-		free( action->str );
+		rxvt_free( action->str );
 		SET_NULL(action->str);
 	}
 	return True;

@@ -1031,7 +1031,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 		rs[Rs_display_name] = ":0";
 
 	rxvt_get_options( r, r_argc, r_argv );
-	free( r_argv ); /* XXX memory leak? */
+	rxvt_free( r_argv ); /* XXX memory leak? */
 
 #ifdef LOCAL_X_IS_UNIX
 	if( rs[Rs_display_name][0] == ':' )
@@ -1045,7 +1045,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 		val[l-1] = (char) 0;
 		DBG_MSG(1, (stderr, "Open X display %s\n", val));
 		r->Xdisplay = XOpenDisplay(val);
-		free(val);
+		rxvt_free(val);
 	}
 #endif
 
@@ -2359,7 +2359,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 	{
 #if 0
 		/* 2006-02-23 gi1242: Also need to free the char* pointers in pret? */
-		free (pret);
+		rxvt_free (pret);
 		return NULL;
 #endif
 		goto NotMatch;
@@ -2373,10 +2373,10 @@ NotMatch:
 	*argc = 0;
 	{
 		char **s;
-		for( s = pret; NOT_NULL(*s); s++) free(*s);
+		for( s = pret; NOT_NULL(*s); s++) rxvt_free(*s);
 	}
 
-	free (pret);
+	rxvt_free (pret);
 	return NULL;
 }
 
@@ -2577,7 +2577,7 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 	assert (page < MAX_PAGES);
 	assert (PVTS(r, page)->tab_title);
 
-	free (PVTS(r, page)->tab_title);
+	rxvt_free (PVTS(r, page)->tab_title);
 	SET_NULL(PVTS(r, page)->tab_title);
 
 #ifdef XFT_SUPPORT
@@ -3567,7 +3567,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 					_SPAWN_SETSID | _SPAWN_TCSETPGRP,
 					command, arg_v, environ, iov_a, 0);
 		if (login)
-			free(login);
+			rxvt_free(login);
 		close(PVTS(r, page)->tty_fd);
 		return PVTS(r, page)->cmd_fd;
 	}

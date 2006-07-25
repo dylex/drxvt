@@ -1351,7 +1351,7 @@ rxvt_extract_resources (
 			if (NOT_NULL(fd = fopen(f, "r")))
 				break;
 		}
-		free(f);
+		rxvt_free(f);
 	}
 
 	/*
@@ -1444,7 +1444,7 @@ rxvt_extract_resources (
 # if defined XAPPLOADDIR
 #  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
 	/* Free the path of the possibly available localized Rxvt file */ 
-	free(localepath);
+	rxvt_free(localepath);
 #  endif
 # endif
 
