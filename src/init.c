@@ -733,12 +733,12 @@ rxvt_init_vars(rxvt_t *r)
     h->locale = NULL;
 
 # ifdef HAVE_MENUBAR
-    SET_NULL(r->h->BuildMenu);
-    SET_NULL(r->h->ActiveMenu);
-    SET_NULL(r->h->popupMenu[0]);
-    SET_NULL(r->h->popupMenu[1]);
-    SET_NULL(r->h->popupMenu[2]);
-    r->h->showingMenu = 0;
+    SET_NULL(h->BuildMenu);
+    SET_NULL(h->ActiveMenu);
+    SET_NULL(h->popupMenu[0]);
+    SET_NULL(h->popupMenu[1]);
+    SET_NULL(h->popupMenu[2]);
+    h->showingMenu = 0;
 
     /* Set the current menubar to empty defaults */
     SET_NULL(h->MenuBar.head);
