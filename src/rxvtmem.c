@@ -69,12 +69,10 @@ static int   use_our_malloc = 1;
 static struct trunk_list_t	g_trunk_list[] =
 {
     {16,   0, {0}, (struct trunk_head_t*) NULL},
-    {32,   0, {0}, (struct trunk_head_t*) NULL},
-    {64,   0, {0}, (struct trunk_head_t*) NULL},
-    {128,  0, {0}, (struct trunk_head_t*) NULL},
-    {256,  0, {0}, (struct trunk_head_t*) NULL},
+    {48,   0, {0}, (struct trunk_head_t*) NULL},
+    {80,   0, {0}, (struct trunk_head_t*) NULL},
+    {320,  0, {0}, (struct trunk_head_t*) NULL},
     {512,  0, {0}, (struct trunk_head_t*) NULL},
-    {1024, 0, {0}, (struct trunk_head_t*) NULL},
     {0,    0, {0}, (struct trunk_head_t*) NULL},
 };
 static unsigned int	g_trunk_list_num;
@@ -118,6 +116,7 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
 
 #ifdef DEBUG
     tk_head->magic = TRUNK_MAGIC;
+    tk_head->tbyte = 0;
 #endif
     bmax = ((size_t) tk_head - (size_t) tk_head->begin) /
 	    ((size_t) block_size + BHEAD_OFFSET);
@@ -311,6 +310,8 @@ rxvt_malloc(size_t size)
 #ifdef DEBUG
 	assert (BLOCK_MAGIC == block->magic_f);
 	assert (BLOCK_MAGIC == block->magic_e);
+	block->bbyte = size;
+	tklist->first_trunk->tbyte += size;
 #endif
 	/* adjust information in trunk_head */
 	tklist->first_trunk->fblock = block->u.next;
@@ -325,6 +326,14 @@ rxvt_malloc(size_t size)
 	/* if no free block left in the trunk */
 	if (0 == tklist->first_trunk->fcount)	
 	{
+#ifdef DEBUG
+	    /* print out statistics for the trunk */
+	    DBG_MSG(1, (stderr, "--Trunk of block size %d: %d bytes used (%d%%)\n",
+		tklist->block_size, tklist->first_trunk->tbyte,
+		tklist->first_trunk->tbyte * 100 / tklist->u.tsize));
+#endif
+
+
 	    if (IS_NULL(tklist->first_trunk->next))	
 	    {
 		/* no free trunk in this trunk list, allocate a new trunk */
@@ -493,6 +502,7 @@ rxvt_free(void* ptr)
     {
 #ifdef DEBUG
 	assert (TRUNK_MAGIC == tk_head->magic);
+	tk_head->tbyte -= block->bbyte;
 # ifdef DEBUG_MEMORY
 	MEMSET (ptr, MEMORY_MAGIC, tk_head->list->block_size);
 # endif

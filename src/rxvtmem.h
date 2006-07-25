@@ -54,6 +54,7 @@ struct block_head_t
 {
 #ifdef DEBUG
     RUINT32T	magic_f;	/* magic number */
+    size_t	bbyte;		/* allocated bytes */
 #endif
     union
 	{
@@ -73,6 +74,7 @@ struct trunk_head_t
 {
 #ifdef DEBUG
     RUINT32T	magic;  /* magic number */
+    size_t	tbyte;  /* total allocated bytes in this trunk */
 #endif
     struct block_head_t*	begin;/* begin address of the trunk. this is
 								   * ONLY used by get_trunk, init_trunk
@@ -113,12 +115,12 @@ struct trunk_list_t
 #define THEAD_OFFSET	(sizeof (struct block_head_t))
 #define BHEAD_OFFSET	(sizeof (struct block_head_t))
 
-/* 64KB is the default trunk size */
-#define DEFAULT_TRUNK_SIZE	(1UL << 16)
-/* 4KB is the minimal trunk size, or 1KB? */
-#define MINIMAL_TRUNK_SIZE	(1UL << 12)
-/* 4MB is the maximal trunk size, are you crazy?! */
-#define MAXIMAL_TRUNK_SIZE	(1UL << 22)
+/* 4KB is the default trunk size */
+#define DEFAULT_TRUNK_SIZE	(1UL << 12)
+/* 1KB is the minimal trunk size, or 1KB? */
+#define MINIMAL_TRUNK_SIZE	(1UL << 10)
+/* 1MB is the maximal trunk size, are you crazy?! */
+#define MAXIMAL_TRUNK_SIZE	(1UL << 20)
 
 
 #endif /* OUR_MALLOC */
