@@ -1715,13 +1715,17 @@ struct rxvt_hidden {
 # define STRLEN(x)		strlen((const char *)(x))
 # define STRNCAT(x, y, z)	strncat((char *)(x), (const char *)(y), (z))
 
-# ifdef HAVE_STRDUP
+/* if use our own malloc function, we must NOT use system provided
+ * strdup or strndup because we want to free the memory allocated
+ * by strdup/strndup using our free function
+ */
+# if defined(HAVE_STRDUP) && !defined(OUR_MALLOC)
 #  define STRDUP(x)		strdup((const char *)(x))
 # else
 #  define STRDUP(x)		ma_strdup((const char *)(x))
 # endif
 
-# ifdef HAVE_STRNDUP
+# if defined(HAVE_STRNDUP) && !defined(OUR_MALLOC)
 #  define STRNDUP(x, z)		strndup((const char TAINTED *)(x), (size_t) (z))
 # else
 #  define STRNDUP(x, z)		ma_strndup((const char TAINTED *)(x), (size_t) (z))
