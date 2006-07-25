@@ -31,10 +31,17 @@ struct trunk_head_t;
 struct trunk_list_t;
 
 
-#ifdef _DEBUG
+#ifdef DEBUG
 #define TRUNK_MAGIC		(0x41414141)
 #define BLOCK_MAGIC		(0x43434343)
 #endif
+
+/* special pointer to indicate that the block is allocated using system
+ * wide malloc instead of our trunk/block system. It means that we will
+ * waste some memory on tracking these memory blocks before initializing
+ * our track/block system.
+ */
+#define SYS_MALLOC_PTR	(-1)
 
 
 /*
@@ -44,7 +51,7 @@ struct trunk_list_t;
  */
 struct block_head_t
 {
-#ifdef _DEBUG
+#ifdef DEBUG
     RUINT32T	magic_f;	/* magic number */
 #endif
     union
@@ -52,14 +59,10 @@ struct block_head_t
 		struct block_head_t*	next;	/* next block */
 		struct trunk_head_t*	trunk;	/* address of trunk_head */
 	} u;
-#ifdef _DEBUG
+#ifdef DEBUG
     RUINT32T    magic_e;	/* magic number */
 #endif
 };
-
-#define BHEAD_OFFSET	(sizeof (struct block_head_t))
-#define SYS_MALLOC_PTR	(-1)
-
 
 /*
  * Note: the name trunk_head_t is somewhat misleading. Actually it resides
@@ -67,15 +70,21 @@ struct block_head_t
  */
 struct trunk_head_t
 {
-#ifdef _DEBUG
+#ifdef DEBUG
     RUINT32T	magic;  /* magic number */
 #endif
+    struct block_head_t*	begin;/* begin address of the trunk. this is
+								   * ONLY used by get_trunk, init_trunk
+								   * and free trunk, and NOTHING ELSE!!!
+								   */
+
     struct trunk_head_t*    prev; /* prev trunk with the same block size */
     struct trunk_head_t*    next; /* next trunk with the same block size */
+    struct trunk_list_t*    list; /* entry in the trunk list of this trunk*/
     struct block_head_t*    fblock; /* first free block in this trunk */
     RUINT16T	bmax;   /* max # of free blocks in this trunk */
     RUINT16T	fcount; /* # of free blocks in this trunk */
-    RUINT16T	bsize;  /* block size to allocate */
+    RUINT16T	bsize;  /* block size to allocate (exclude head) */
 };
 
 
@@ -84,9 +93,31 @@ struct trunk_head_t
  */
 struct trunk_list_t
 {
-    RUINT16T		    block_size;
+    RUINT16T		    block_size;	/* block size for this trunk list */
+    RUINT16T		    trunk_count;/* how many trunks allocated */
+	union
+	{
+		size_t		    bnum;	/* number of blocks to allocate, used
+								 * before rxvt_mem_init
+								 */
+		size_t			tsize;	/* actual trunk size (exclude head)
+								 * after rxvt_mem_init
+								 */
+	} u;
     struct trunk_head_t*    first_trunk;
 };
+
+
+/* size of trunk_head_t and block_head_t */
+#define THEAD_OFFSET	(sizeof (struct block_head_t))
+#define BHEAD_OFFSET	(sizeof (struct block_head_t))
+
+/* 64KB is the default trunk size */
+#define DEFAULT_TRUNK_SIZE	(1UL << 16)
+/* 4KB is the minimal trunk size, or 1KB? */
+#define MINIMAL_TRUNK_SIZE	(1UL << 12)
+/* 4MB is the maximal trunk size, are you crazy?! */
+#define MAXIMAL_TRUNK_SIZE	(1UL << 22)
 
 
 #endif /* OUR_MALLOC */

@@ -46,51 +46,55 @@
 
 #ifdef OUR_MALLOC
 
+#ifdef DEBUG
+static int   memory_initialized = 0;
+#endif
+
 /* Use use our malloc function only if we bypass the memory check */
-static int   use_our_malloc = 0;
-
-/* Determine the optimal trunk size we want to use */
-static size_t g_trunk_size;
-
-/* EXTPROTO */
-void
-rxvt_init_trunk_size(size_t col, size_t row, size_t scroll)
-{
-    /* we should change this later based on col/row/scroll */
-    g_trunk_size = (64UL << 10);
-}
+static int   use_our_malloc = 1;
 
 
 
+/* Several notes:
+ * . Block size must be aligned to 8 (64bit)!!! Or we will enforce it.
+ * . Block size must be in increasing order!!! Or there will be crash.
+ *   no kidding ;)
+ * . The last entry must have block size 0. Or we are going to access
+ *   all the memory available, and of course crash in the end ;-)
+ */
 static struct trunk_list_t	g_trunk_list[] =
 {
-    {16,   (struct trunk_head_t*) NULL},
-    {32,   (struct trunk_head_t*) NULL},
-    {64,   (struct trunk_head_t*) NULL},
-    {128,  (struct trunk_head_t*) NULL},
-    {256,  (struct trunk_head_t*) NULL},
-    {512,  (struct trunk_head_t*) NULL},
-    {1024, (struct trunk_head_t*) NULL},
-    {0,    (struct trunk_head_t*) NULL},
+    {16,   0, {0}, (struct trunk_head_t*) NULL},
+    {32,   0, {0}, (struct trunk_head_t*) NULL},
+    {64,   0, {0}, (struct trunk_head_t*) NULL},
+    {128,  0, {0}, (struct trunk_head_t*) NULL},
+    {256,  0, {0}, (struct trunk_head_t*) NULL},
+    {512,  0, {0}, (struct trunk_head_t*) NULL},
+    {1024, 0, {0}, (struct trunk_head_t*) NULL},
+    {0,    0, {0}, (struct trunk_head_t*) NULL},
 };
 static unsigned int	g_trunk_list_num;
 
 
 /* INTPROTO */
 struct trunk_head_t*
-get_trunk()
+get_trunk(size_t trunk_size)
 {
     struct trunk_head_t*    tk_head;
-    void*		    ptr;
+    void*				    ptr;
 
 
-    if (IS_NULL(ptr = malloc (g_trunk_size + sizeof (struct trunk_head_t))))    
+    if (IS_NULL(ptr = malloc (trunk_size + THEAD_OFFSET)))    
 	{
 		fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
 		exit(EXIT_FAILURE);
     }
 
-    tk_head = (struct trunk_head_t*) ((RUINT32T) ptr + g_trunk_size);
+    tk_head = (struct trunk_head_t*) ((size_t) ptr + trunk_size);
+	/* set the real beginning of trunk. this should only be used by
+	 * init_trunk and free_trunk
+	 */
+	tk_head->begin = (struct block_head_t*) ptr;
     return tk_head;
 }
 
@@ -101,20 +105,21 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
 {
     struct block_head_t*    block;
     RUINT16T		    i;
-    RUINT32T		    bmax;
+    size_t			    bmax;
 
 
     assert (NOT_NULL(tk_head));
     assert (0 != block_size);
 
 
-#ifdef _DEBUG
+#ifdef DEBUG
     tk_head->magic = TRUNK_MAGIC;
 #endif
-    bmax = g_trunk_size / ((size_t) block_size + BHEAD_OFFSET);
+    bmax = ((size_t) tk_head - (size_t) tk_head->begin) /
+		   ((size_t) block_size + BHEAD_OFFSET);
     assert (bmax <= 0x0000ffff); /* in case of overflow */
     tk_head->bmax = (RUINT16T) bmax;
-    block = (struct block_head_t*) ((RUINT32T) tk_head - g_trunk_size);
+    block = tk_head->begin;
     tk_head->fblock = block;
     tk_head->fcount = tk_head->bmax;
     tk_head->bsize = block_size;
@@ -122,11 +127,11 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
     /* initialize free block link list inside the trunk */
     for (i = 0; i < tk_head->bmax - 1; i ++)    
 	{
-#ifdef _DEBUG
+#ifdef DEBUG
 		block->magic_f = BLOCK_MAGIC;
 		block->magic_e = BLOCK_MAGIC;
 #endif
-		block->u.next = (struct block_head_t*) ((RUINT32T) block + block_size + BHEAD_OFFSET);
+		block->u.next = (struct block_head_t*) ((size_t) block + block_size + BHEAD_OFFSET);
 		block = block->u.next;
     }
     block->u.next = NULL; /* not necessary if we use tk_head->fcount */
@@ -137,16 +142,12 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
 void
 free_trunk(struct trunk_head_t* tk_head)
 {
-    void*   ptr;
-
-
     assert (NOT_NULL(tk_head));
-#ifdef _DEBUG
+#ifdef DEBUG
     assert (TRUNK_MAGIC == tk_head->magic);
 #endif
 
-    ptr = (void*) ((RUINT32T) tk_head - g_trunk_size);
-    free (ptr);
+    free ((void*) tk_head->begin);
 }
 
 
@@ -158,26 +159,61 @@ rxvt_mem_init(void)
     struct trunk_list_t*    tklist;
 
 
-    /* check the behavior of memory management systems */
-    rxvt_init_trunk_size (0, 0, 0);
+#ifdef DEBUG
+	memory_initialized = 1;
+#endif
+
 
     /* use system malloc */
     if (!use_our_malloc)
 		return;
-
-    assert (g_trunk_size);
 
     /* allocate and initialize trunk memory */
     for (i = 0, tklist = g_trunk_list;
 		0 != tklist->block_size;
 		tklist ++, i++)   
     {
-		tklist->first_trunk = get_trunk ();
+		size_t		tsize;
+
+		if (tklist->block_size & 0x07)	{
+			/* block is not aligned to 8, we'll align it */
+			tklist->block_size &= ~(0x07);
+			tklist->block_size += 8;
+		}
+		/* really bad size, want to overflow us? ;-) */
+		if (tklist->block_size > MINIMAL_TRUNK_SIZE)
+			tklist->block_size = MINIMAL_TRUNK_SIZE;
+
+
+		if (0 == tklist->u.bnum)
+			tsize = DEFAULT_TRUNK_SIZE;
+		else	
+		{
+			/* really bad number, want to overflow us? ;-) */
+			if (tklist->u.bnum > 0x0000ffff)
+				tklist->u.bnum = 0x0000ffff;
+
+			/* get *optimal*  real trunk size */
+			tsize = (tklist->block_size + BHEAD_OFFSET) * tklist->u.bnum;
+			if (tsize > MAXIMAL_TRUNK_SIZE)
+				tsize = MAXIMAL_TRUNK_SIZE;
+			if (tsize < MINIMAL_TRUNK_SIZE)
+				tsize = MINIMAL_TRUNK_SIZE;
+		}
+
+		/* OK, this supposes to be the optimal size */
+		tklist->u.tsize = tsize;
+
+		tklist->first_trunk = get_trunk (tsize),
+		tklist->first_trunk->list = tklist,
+		tklist->trunk_count ++; /* increase trunk counter */
+
 		init_trunk (tklist->first_trunk, tklist->block_size);
 		SET_NULL(tklist->first_trunk->next);
 		SET_NULL(tklist->first_trunk->prev);
     }
     g_trunk_list_num = i;
+
 }
 
 
@@ -187,12 +223,14 @@ rxvt_mem_exit (void)
 {
     /* use system malloc */
     if (!use_our_malloc)
-	return;
+		return;
+
+#ifdef DEBUG
+	assert (memory_initialized);
+#endif
 
     {
 		struct trunk_list_t*	tklist;
-
-		assert (g_trunk_size);
 
 		for (tklist = g_trunk_list; 0 != tklist->block_size; tklist ++)	
 		{
@@ -200,11 +238,13 @@ rxvt_mem_exit (void)
 
 		    while (NOT_NULL(tk_head = tklist->first_trunk))  
 		    {
-#ifdef _DEBUG
+#ifdef DEBUG
 				assert (TRUNK_MAGIC == tk_head->magic);
 #endif
 				tklist->first_trunk = tk_head->next; /* new first trunk */
-				free_trunk (tk_head);
+
+				free_trunk (tk_head),
+				tklist->trunk_count --; /* decrease trunk counter */
 			}
 		}
     }
@@ -217,8 +257,14 @@ rxvt_malloc(size_t size)
 {
 	struct block_head_t*	block;
 
-    /* use system malloc */
-    if (!use_our_malloc)	{
+
+#ifdef DEBUG
+	assert (memory_initialized);
+#endif
+
+    if (!use_our_malloc || /* use system malloc, or request size is big */
+		(size > g_trunk_list[g_trunk_list_num - 1].block_size))
+	{
 		if (0 == size)
 			size = 1;
 
@@ -227,7 +273,7 @@ rxvt_malloc(size_t size)
 		    exit(EXIT_FAILURE);
 		}
 
-#ifdef _DEBUG
+#ifdef DEBUG
 		block->magic_f = BLOCK_MAGIC;
 		block->magic_e = BLOCK_MAGIC;
 #endif
@@ -237,26 +283,24 @@ rxvt_malloc(size_t size)
 	else
     {
 		struct trunk_list_t*	tklist;
-
+		register int			idx;
 
 		assert (size <= (size_t) g_trunk_list[g_trunk_list_num - 1].block_size);
 
 		/* look for appropriate block_info entry */
-		for (tklist = &g_trunk_list[g_trunk_list_num - 2];
-			(tklist > g_trunk_list) && (size > tklist->block_size);
-			tklist --)
+		for (idx = 0;
+			 (idx < g_trunk_list_num) && (size > g_trunk_list[idx].block_size);
+			 idx ++)
 			;
-
+		tklist = &g_trunk_list[idx];
 		assert (tklist->first_trunk);
-#ifdef _DEBUG
+#ifdef DEBUG
 		assert (TRUNK_MAGIC == tklist->first_trunk->magic);
 #endif
 
 		/* find the free block */
 		block = tklist->first_trunk->fblock;
-		/* set the address of trunk head so that we can find it in free */
-		block->u.trunk = tklist->first_trunk;
-#ifdef _DEBUG
+#ifdef DEBUG
 		assert (BLOCK_MAGIC == block->magic_f);
 		assert (BLOCK_MAGIC == block->magic_e);
 #endif
@@ -264,13 +308,24 @@ rxvt_malloc(size_t size)
 		tklist->first_trunk->fblock = block->u.next;
 		tklist->first_trunk->fcount --;
 
+		/* Set the address of trunk head so that we can find it in free.
+		 * Notice that u.trunk is the placehold for u.next when block is
+		 * free!!!
+		 */
+		block->u.trunk = tklist->first_trunk;
+
 		/* if no free block left in the trunk */
 		if (0 == tklist->first_trunk->fcount)	
 		{
 			if (IS_NULL(tklist->first_trunk->next))	
 			{
 				/* no free trunk in this trunk list, allocate a new trunk */
-				struct trunk_head_t*	new_trunk = get_trunk ();
+				struct trunk_head_t*	new_trunk;
+				
+				new_trunk = get_trunk (tklist->u.tsize),
+				new_trunk->list = tklist,
+				tklist->trunk_count ++;	/* increase trunk counter */
+
 				init_trunk (new_trunk, tklist->block_size);
 				SET_NULL(new_trunk->next);
 				SET_NULL(new_trunk->prev);
@@ -289,7 +344,7 @@ rxvt_malloc(size_t size)
 				 */
 				struct trunk_head_t*	remove = tklist->first_trunk;
 				tklist->first_trunk = remove->next;
-#ifdef _DEBUG
+#ifdef DEBUG
 				assert (TRUNK_MAGIC == tklist->first_trunk->magic);
 #endif
 				SET_NULL(tklist->first_trunk->prev);
@@ -312,6 +367,10 @@ rxvt_malloc(size_t size)
 void*
 rxvt_calloc(size_t number, size_t size)
 {
+#ifdef DEBUG
+	assert (memory_initialized);
+#endif
+
 	/* possible overflow? */
 	assert (number * size >= number);
 	assert (number * size >= size);
@@ -327,13 +386,17 @@ rxvt_realloc(void* ptr, size_t size)
 	struct trunk_head_t*	tk_head;
 
 
+#ifdef DEBUG
+	assert (memory_initialized);
+#endif
+
 	if (IS_NULL(ptr))
 		return (rxvt_malloc (size));
 
 	/* find the real block head structure */
 	block = (struct block_head_t*) ptr;
 	block --;
-#ifdef _DEBUG
+#ifdef DEBUG
 	assert (BLOCK_MAGIC == block->magic_f);
 	assert (BLOCK_MAGIC == block->magic_e);
 #endif
@@ -350,7 +413,7 @@ rxvt_realloc(void* ptr, size_t size)
 			fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
 			exit(EXIT_FAILURE);
 		}
-#ifdef _DEBUG
+#ifdef DEBUG
 		block->magic_f = BLOCK_MAGIC;
 		block->magic_e = BLOCK_MAGIC; 
 #endif
@@ -362,7 +425,7 @@ rxvt_realloc(void* ptr, size_t size)
 	else
     {
 		/* now do some serious business about reallocating this ptr */
-#ifdef _DEBUG
+#ifdef DEBUG
 		assert (TRUNK_MAGIC == tk_head->magic);
 #endif
 		/* nothing to do if this block is actually big enough */
@@ -386,7 +449,12 @@ rxvt_free(void* ptr)
 	struct trunk_head_t*	tk_head;
 
 
+#ifdef DEBUG
+	assert (memory_initialized);
+#endif
+
     if (IS_NULL(ptr))	{
+		assert (NOT_NULL(ptr)); /* generate core dump */
         fprintf(stderr, APL_NAME ": free NULL pointer.  Aborting");
         exit(EXIT_FAILURE);
     }
@@ -395,7 +463,7 @@ rxvt_free(void* ptr)
 	/* find the block_head_t structure */
 	block --;
 
-#ifdef _DEBUG
+#ifdef DEBUG
 	assert (BLOCK_MAGIC == block->magic_f);
 	assert (BLOCK_MAGIC == block->magic_e);
 #endif
@@ -410,11 +478,14 @@ rxvt_free(void* ptr)
     }
 	else
     {
-#ifdef _DEBUG
+#ifdef DEBUG
 		assert (TRUNK_MAGIC == tk_head->magic);
 #endif
 
-		/* insert the block of ptr to the head of free block link list */
+		/* Insert the block of ptr to the head of free block link list.
+		 * Notice that u.next is the placeholder for u.trunk when block
+		 * is in use!!!
+		 */
 		block->u.next = tk_head->fblock;
 		tk_head->fblock = block;
 		/* increase free block counter */
@@ -426,13 +497,13 @@ rxvt_free(void* ptr)
 			 * allocated previously
 			 */
 			struct trunk_list_t*    tklist;
-			tklist = &g_trunk_list[tk_head->bsize];
+			tklist = tk_head->list;
 
 			assert (IS_NULL(tk_head->prev));
 			assert (IS_NULL(tk_head->next));
 
 			assert (NOT_NULL(tklist->first_trunk));
-#ifdef _DEBUG
+#ifdef DEBUG
 			assert (TRUNK_MAGIC == tklist->first_trunk->magic);
 #endif
 			tk_head->next = tklist->first_trunk;
@@ -449,34 +520,38 @@ rxvt_free(void* ptr)
 			 * list.
 			 */
 			struct trunk_list_t*    tklist;
-			tklist = &g_trunk_list[tk_head->bsize];
+			tklist = tk_head->list;
 
 			if (tklist->first_trunk == tk_head)	
 			{
 				/* this trunk is the first in trunk list */
 				if (NOT_NULL(tk_head->next))    {
-#ifdef _DEBUG
+#ifdef DEBUG
 					assert (TRUNK_MAGIC == tk_head->next->magic);
 #endif
 					tklist->first_trunk = tk_head->next;
 					tklist->first_trunk->prev = NULL;
-					free_trunk (tk_head);
+
+					free_trunk (tk_head),
+					tklist->trunk_count --; /* decrease trunk counter */
 				}
 			}
 			else    
 			{
 				/* this trunk is not the first in trunk list */
-#ifdef _DEBUG
+#ifdef DEBUG
 				assert (TRUNK_MAGIC == tk_head->prev->magic);
 #endif
 				tk_head->prev->next = tk_head->next;
 				if (NOT_NULL(tk_head->next))	{
-#ifdef _DEBUG
+#ifdef DEBUG
 					assert (TRUNK_MAGIC == tk_head->next->magic);
 #endif
 					tk_head->next->prev = tk_head->prev;
 				}
-				free_trunk (tk_head);
+
+				free_trunk (tk_head),
+				tklist->trunk_count --; /* decrease trunk counter */
 			}
 		}
 	}
@@ -538,6 +613,15 @@ rxvt_realloc(void *ptr, size_t size)
     fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
     exit(EXIT_FAILURE);
     /* NOT REACHED */
+}
+
+
+/* EXTPROTO */
+void
+rxvt_free(void* ptr)
+{
+    assert (NOT_NULL(ptr)); /* generate core dump */
+    free (ptr);
 }
 
 #endif	/* OUR_MALLOC */
