@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	scrollbar-plain.c
+ * File:    scrollbar-plain.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -46,65 +46,65 @@
 
 
 #define CHOOSE_GC_FG(R, PIXCOL)	\
-	XSetForeground ((R)->Xdisplay, (R)->scrollBar.gc, (PIXCOL))
+    XSetForeground ((R)->Xdisplay, (R)->scrollBar.gc, (PIXCOL))
 
 
 /* EXTPROTO */
 void
 rxvt_scrollbar_init_plain (rxvt_t* r)
 {
-	XGCValues       gcvalue;
-	unsigned long	gcmask;
+    XGCValues       gcvalue;
+    unsigned long   gcmask;
 
 
-	UNSET_GC(r->scrollBar.gc);
+    UNSET_GC(r->scrollBar.gc);
 
-	/* Initialize the colors */
+    /* Initialize the colors */
 #ifdef KEEP_SCROLLCOLOR
-	r->scrollBar.plain_fg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
-		r->PixColors[Color_scroll] : r->PixColors[Color_bg];
+    r->scrollBar.plain_fg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
+	r->PixColors[Color_scroll] : r->PixColors[Color_bg];
 
-	r->scrollBar.plain_bg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
-		r->PixColors[Color_trough] : r->PixColors[Color_bg];
+    r->scrollBar.plain_bg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
+	r->PixColors[Color_trough] : r->PixColors[Color_bg];
 #else
-	/*
-	 * Draw in uglyass reverse video
-	 */
-	r->scrollBar.plain_fg = r->PixColors[Color_bg];
-	r->scrollBar.plain_bg = r->PixColors[Color_fg];
+    /*
+     * Draw in uglyass reverse video
+     */
+    r->scrollBar.plain_fg = r->PixColors[Color_bg];
+    r->scrollBar.plain_bg = r->PixColors[Color_fg];
 #endif
 
-	/* Create GC */
-	gcmask = GCForeground;
-	gcvalue.foreground = r->scrollBar.plain_fg;
+    /* Create GC */
+    gcmask = GCForeground;
+    gcvalue.foreground = r->scrollBar.plain_fg;
 
 #ifdef TRANSPARENT
-	/* set background color when there's no transparent */
-	if (!(ISSET_OPTION(r, Opt_transparent) &&
-		  ISSET_OPTION(r, Opt_transparent_scrollbar)
-		))
+    /* set background color when there's no transparent */
+    if (!(ISSET_OPTION(r, Opt_transparent) &&
+	  ISSET_OPTION(r, Opt_transparent_scrollbar)
+	))
 #endif
 #ifdef BACKGROUND_IMAGE
-	/* set background color when there's no bg image */
-	if (NOT_PIXMAP(r->scrollBar.pixmap))
+    /* set background color when there's no bg image */
+    if (NOT_PIXMAP(r->scrollBar.pixmap))
 #endif
-	{
-		gcmask  |= GCBackground;
-		gcvalue.background = r->scrollBar.plain_bg;
-		XSetWindowBackground (r->Xdisplay, r->scrollBar.win,
-			r->scrollBar.plain_bg);
-	}
+    {
+	gcmask  |= GCBackground;
+	gcvalue.background = r->scrollBar.plain_bg;
+	XSetWindowBackground (r->Xdisplay, r->scrollBar.win,
+	    r->scrollBar.plain_bg);
+    }
 
-	r->scrollBar.gc = XCreateGC (r->Xdisplay, r->scrollBar.win,
-			gcmask, &gcvalue);
-	assert (IS_GC(r->scrollBar.gc));
+    r->scrollBar.gc = XCreateGC (r->Xdisplay, r->scrollBar.win,
+	    gcmask, &gcvalue);
+    assert (IS_GC(r->scrollBar.gc));
 }
 
 
 void
 rxvt_scrollbar_exit_plain (rxvt_t* r)
 {
-	/* No resources to free */
+    /* No resources to free */
 }
 
 
@@ -112,55 +112,55 @@ rxvt_scrollbar_exit_plain (rxvt_t* r)
 int
 rxvt_scrollbar_show_plain(rxvt_t *r, int update __attribute__((unused)), int last_top, int last_bot, int scroller_len)
 {
-    int			xsb = 0;
-    int			sbwidth = r->scrollBar.width - 1;
-	int			clear = 0;	/* Call XClearArea? */
+    int		xsb = 0;
+    int		sbwidth = r->scrollBar.width - 1;
+    int		clear = 0;  /* Call XClearArea? */
 
 
-	/* scrollbar slider */
+    /* scrollbar slider */
 #ifdef TRANSPARENT
-	if (ISSET_OPTION(r, Opt_transparent) &&
-		ISSET_OPTION(r, Opt_transparent_scrollbar))
-		clear = 1;
-	else
+    if (ISSET_OPTION(r, Opt_transparent) &&
+	ISSET_OPTION(r, Opt_transparent_scrollbar))
+	clear = 1;
+    else
 #endif
 #ifdef BACKGROUND_IMAGE
-	if (IS_PIXMAP(r->scrollBar.pixmap))
-		clear = 1;
-	else
+    if (IS_PIXMAP(r->scrollBar.pixmap))
+	clear = 1;
+    else
 #endif
-		clear = 0;
+	clear = 0;
 
-	scroller_len -= 1;
+    scroller_len -= 1;
 
     xsb = ISSET_OPTION(r, Opt_scrollBar_right) ? 1 : 0;
     if (last_top < r->scrollBar.top)
-		XClearArea(r->Xdisplay, r->scrollBar.win,
-			r->sb_shadow + xsb, last_top,
-			sbwidth + 1-xsb, (r->scrollBar.top - last_top), False);
+	XClearArea(r->Xdisplay, r->scrollBar.win,
+	    r->sb_shadow + xsb, last_top,
+	    sbwidth + 1-xsb, (r->scrollBar.top - last_top), False);
 
     if (r->scrollBar.bot < last_bot)
-		XClearArea(r->Xdisplay, r->scrollBar.win,
-			r->sb_shadow + xsb, r->scrollBar.bot,
-			sbwidth + 1-xsb, (last_bot - r->scrollBar.bot + clear), False);
+	XClearArea(r->Xdisplay, r->scrollBar.win,
+	    r->sb_shadow + xsb, r->scrollBar.bot,
+	    sbwidth + 1-xsb, (last_bot - r->scrollBar.bot + clear), False);
 
 
-	CHOOSE_GC_FG(r, r->scrollBar.plain_fg);
-	if (clear)	{
-		/* transparent background or background image */
-		XClearArea (r->Xdisplay, r->scrollBar.win,
-			r->sb_shadow + xsb, r->scrollBar.top,
-			sbwidth, scroller_len,
-			False);
-		XDrawRectangle(r->Xdisplay, r->scrollBar.win, r->scrollBar.gc,
-			r->sb_shadow + xsb, r->scrollBar.top,
-			sbwidth - xsb, scroller_len);
-	}
-	else	{
-		XFillRectangle(r->Xdisplay, r->scrollBar.win, r->scrollBar.gc,
-			r->sb_shadow + xsb, r->scrollBar.top,
-			sbwidth, scroller_len);
-	}
+    CHOOSE_GC_FG(r, r->scrollBar.plain_fg);
+    if (clear)	{
+	/* transparent background or background image */
+	XClearArea (r->Xdisplay, r->scrollBar.win,
+	    r->sb_shadow + xsb, r->scrollBar.top,
+	    sbwidth, scroller_len,
+	    False);
+	XDrawRectangle(r->Xdisplay, r->scrollBar.win, r->scrollBar.gc,
+	    r->sb_shadow + xsb, r->scrollBar.top,
+	    sbwidth - xsb, scroller_len);
+    }
+    else    {
+	XFillRectangle(r->Xdisplay, r->scrollBar.win, r->scrollBar.gc,
+	    r->sb_shadow + xsb, r->scrollBar.top,
+	    sbwidth, scroller_len);
+    }
 
     return 1;
 }

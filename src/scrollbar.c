@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	scrollbar.c
+ * File:    scrollbar.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -46,23 +46,23 @@
 ** Note: These beg/end values save the length of scrollbar
 ** EXCLUDING the top/bottom arrow button if there are!!!
 */
-#define R_SCROLLBEG_PLAIN	(0)
-#define R_SCROLLEND_PLAIN	VT_HEIGHT(r)
+#define R_SCROLLBEG_PLAIN   (0)
+#define R_SCROLLEND_PLAIN   VT_HEIGHT(r)
 
-#define R_SCROLLBEG_XTERM	(0)
-#define R_SCROLLEND_XTERM	VT_HEIGHT(r)
+#define R_SCROLLBEG_XTERM   (0)
+#define R_SCROLLEND_XTERM   VT_HEIGHT(r)
 
-#define R_SCROLLBEG_NEXT	(0)
-#define R_SCROLLEND_NEXT	(VT_HEIGHT(r) - (NEXT_SB_TBTN_HEIGHT + \
-							NEXT_SB_PAD))
+#define R_SCROLLBEG_NEXT    (0)
+#define R_SCROLLEND_NEXT    (VT_HEIGHT(r) - (NEXT_SB_TBTN_HEIGHT + \
+			    NEXT_SB_PAD))
 
-#define R_SCROLLBEG_RXVT	(r->scrollBar.width + 1) + r->sb_shadow
-#define R_SCROLLEND_RXVT	(VT_HEIGHT(r) - R_SCROLLBEG_RXVT - \
-							((r->sb_shadow)<<1))
+#define R_SCROLLBEG_RXVT    (r->scrollBar.width + 1) + r->sb_shadow
+#define R_SCROLLEND_RXVT    (VT_HEIGHT(r) - R_SCROLLBEG_RXVT - \
+			    ((r->sb_shadow)<<1))
 
-#define R_SCROLLBEG_SGI		(SGI_SB_BUTTON_HEIGHT)
-#define R_SCROLLEND_SGI		(VT_HEIGHT(r) - R_SCROLLBEG_SGI - \
-							((r->sb_shadow)<<1))
+#define R_SCROLLBEG_SGI	    (SGI_SB_BUTTON_HEIGHT)
+#define R_SCROLLEND_SGI	    (VT_HEIGHT(r) - R_SCROLLBEG_SGI - \
+			    ((r->sb_shadow)<<1))
 
 /*----------------------------------------------------------------------*/
 
@@ -70,127 +70,127 @@
 void
 rxvt_scrollbar_init(rxvt_t* r)
 {
-	char*		scrollalign = (char*) r->h->rs[Rs_scrollBar_align];
-	char*		scrollstyle = (char*) r->h->rs[Rs_scrollBar_style];
-	char*		thickness = (char*) r->h->rs[Rs_scrollBar_thickness];
-	int			i;
-	short		style = R_SB_UNKNOWN, width = 0;
+    char*	scrollalign = (char*) r->h->rs[Rs_scrollBar_align];
+    char*	scrollstyle = (char*) r->h->rs[Rs_scrollBar_style];
+    char*	thickness = (char*) r->h->rs[Rs_scrollBar_thickness];
+    int		i;
+    short	style = R_SB_UNKNOWN, width = 0;
 
 
-	if (scrollstyle) {
-		/* use specified style by default */
+    if (scrollstyle) {
+	/* use specified style by default */
 # ifdef PLAIN_SCROLLBAR
-		if (0 == STRNCASECMP (scrollstyle, "plain", 5))
-			style = R_SB_PLAIN;
+	if (0 == STRNCASECMP (scrollstyle, "plain", 5))
+	    style = R_SB_PLAIN;
 # endif
 # ifdef XTERM_SCROLLBAR
-		if (0 == STRNCASECMP (scrollstyle, "xterm", 5))
-			style = R_SB_XTERM;
+	if (0 == STRNCASECMP (scrollstyle, "xterm", 5))
+	    style = R_SB_XTERM;
 # endif
 # ifdef RXVT_SCROLLBAR
-		if (0 == STRNCASECMP (scrollstyle, "rxvt", 4))
-			style = R_SB_RXVT;
+	if (0 == STRNCASECMP (scrollstyle, "rxvt", 4))
+	    style = R_SB_RXVT;
 # endif
 # ifdef NEXT_SCROLLBAR
-		if (0 == STRNCASECMP (scrollstyle, "next", 4))
-			style = R_SB_NEXT;
+	if (0 == STRNCASECMP (scrollstyle, "next", 4))
+	    style = R_SB_NEXT;
 # endif
 # ifdef SGI_SCROLLBAR
-		if (0 == STRNCASECMP (scrollstyle, "sgi", 3))
-			style = R_SB_SGI;
+	if (0 == STRNCASECMP (scrollstyle, "sgi", 3))
+	    style = R_SB_SGI;
 # endif
-	}
+    }
 
-	/*
-	** If something goes wrong with default style, or default style
-	** is not specified by the user, we decide it.
-	*/
-	if (R_SB_UNKNOWN == style || !scrollstyle)	{
+    /*
+    ** If something goes wrong with default style, or default style
+    ** is not specified by the user, we decide it.
+    */
+    if (R_SB_UNKNOWN == style || !scrollstyle)	{
 # ifdef PLAIN_SCROLLBAR
-		style = R_SB_PLAIN;	/* may be overrided below */
+	style = R_SB_PLAIN; /* may be overrided below */
 # endif
 # ifdef XTERM_SCROLLBAR
-		style = R_SB_XTERM;	/* may be overrided below */
+	style = R_SB_XTERM; /* may be overrided below */
 # endif
 # ifdef RXVT_SCROLLBAR
-		style = R_SB_RXVT;	/* may be overrided below */
+	style = R_SB_RXVT;  /* may be overrided below */
 # endif
 # ifdef NEXT_SCROLLBAR
-		style = R_SB_NEXT;
+	style = R_SB_NEXT;
 # endif
 # ifdef SGI_SCROLLBAR
-		if (R_SB_UNKNOWN == style)
-			style = R_SB_SGI;
+	if (R_SB_UNKNOWN == style)
+	    style = R_SB_SGI;
 # endif
-		assert (R_SB_UNKNOWN != style);	/* impossible case */
-	}
+	assert (R_SB_UNKNOWN != style);	/* impossible case */
+    }
 
-	switch (style)	{
-	case R_SB_PLAIN:
-		width = SB_WIDTH_PLAIN;
-		break;
-	case R_SB_XTERM:
-		width = SB_WIDTH_XTERM;
-		break;
-	case R_SB_RXVT:
-		width = SB_WIDTH_RXVT;
-		break;
-	case R_SB_NEXT:
-		width = SB_WIDTH_NEXT;
-		break;
-	case R_SB_SGI:
-		width = SB_WIDTH_SGI;
-		break;
-	default :
-		assert (0);	/* should not reach here */
-	}
+    switch (style)  {
+    case R_SB_PLAIN:
+	width = SB_WIDTH_PLAIN;
+	break;
+    case R_SB_XTERM:
+	width = SB_WIDTH_XTERM;
+	break;
+    case R_SB_RXVT:
+	width = SB_WIDTH_RXVT;
+	break;
+    case R_SB_NEXT:
+	width = SB_WIDTH_NEXT;
+	break;
+    case R_SB_SGI:
+	width = SB_WIDTH_SGI;
+	break;
+    default :
+	assert (0); /* should not reach here */
+    }
 
 
-	if (style != R_SB_NEXT)	/* dishonour request - for now */
-		if (thickness && (i = atoi(thickness)) >= SB_WIDTH_MINIMUM)
-			width = min(i, SB_WIDTH_MAXIMUM);
+    if (style != R_SB_NEXT) /* dishonour request - for now */
+	if (thickness && (i = atoi(thickness)) >= SB_WIDTH_MINIMUM)
+	    width = min(i, SB_WIDTH_MAXIMUM);
 
 # ifdef RXVT_SCROLLBAR
-	if (NOTSET_OPTION(r, Opt_scrollBar_floating) && style == R_SB_RXVT)
-		r->sb_shadow = SHADOW;
+    if (NOTSET_OPTION(r, Opt_scrollBar_floating) && style == R_SB_RXVT)
+	r->sb_shadow = SHADOW;
 # else
-	r->sb_shadow = 0;
+    r->sb_shadow = 0;
 # endif
 
-	r->scrollBar.style = style;
-	r->scrollBar.width = width;
+    r->scrollBar.style = style;
+    r->scrollBar.width = width;
 
-	/* r->h->scrollbar_align = R_SB_ALIGN_CENTRE; */
-	if (scrollalign) {
-		if (STRNCASECMP(scrollalign, "top", 3) == 0)
-			r->h->scrollbar_align = R_SB_ALIGN_TOP;
-		else if (STRNCASECMP(scrollalign, "bottom", 6) == 0)
-			r->h->scrollbar_align = R_SB_ALIGN_BOTTOM;
-	}
+    /* r->h->scrollbar_align = R_SB_ALIGN_CENTRE; */
+    if (scrollalign) {
+	if (STRNCASECMP(scrollalign, "top", 3) == 0)
+	    r->h->scrollbar_align = R_SB_ALIGN_TOP;
+	else if (STRNCASECMP(scrollalign, "bottom", 6) == 0)
+	    r->h->scrollbar_align = R_SB_ALIGN_BOTTOM;
+    }
 # if defined(PLAIN_SCROLLBAR)
-	if (r->scrollBar.style == R_SB_PLAIN)
-		r->scrollBar.update = rxvt_scrollbar_show_plain;
+    if (r->scrollBar.style == R_SB_PLAIN)
+	r->scrollBar.update = rxvt_scrollbar_show_plain;
 # endif
 # if defined(XTERM_SCROLLBAR)
-	if (r->scrollBar.style == R_SB_XTERM)
-		r->scrollBar.update = rxvt_scrollbar_show_xterm;
+    if (r->scrollBar.style == R_SB_XTERM)
+	r->scrollBar.update = rxvt_scrollbar_show_xterm;
 # endif
 # if defined(NEXT_SCROLLBAR)
-	if (r->scrollBar.style == R_SB_NEXT)
-		r->scrollBar.update = rxvt_scrollbar_show_next;
+    if (r->scrollBar.style == R_SB_NEXT)
+	r->scrollBar.update = rxvt_scrollbar_show_next;
 # endif
 # if defined(RXVT_SCROLLBAR)
-	if (r->scrollBar.style == R_SB_RXVT) 
-		r->scrollBar.update = rxvt_scrollbar_show_rxvt;
+    if (r->scrollBar.style == R_SB_RXVT) 
+	r->scrollBar.update = rxvt_scrollbar_show_rxvt;
 # endif
 # if defined(SGI_SCROLLBAR)
-	if (r->scrollBar.style == R_SB_SGI) 
-		r->scrollBar.update = rxvt_scrollbar_show_sgi;
+    if (r->scrollBar.style == R_SB_SGI) 
+	r->scrollBar.update = rxvt_scrollbar_show_sgi;
 # endif
 
 
-	UNSET_WIN(r->scrollBar.win);
-	r->scrollBar.state = 0;
+    UNSET_WIN(r->scrollBar.win);
+    r->scrollBar.state = 0;
 }
 
 
@@ -201,14 +201,14 @@ rxvt_scrollbar_init(rxvt_t* r)
 int
 rxvt_scrollbar_hide (rxvt_t* r)
 {
-	int		changed = 0;
-	assert (IS_WIN(r->scrollBar.win));
-	changed = r->scrollBar.state;
-	XUnmapWindow(r->Xdisplay, r->scrollBar.win);
-	r->scrollBar.state = 0;
-	/* scrollbar_setIdle(); */
+    int	    changed = 0;
+    assert (IS_WIN(r->scrollBar.win));
+    changed = r->scrollBar.state;
+    XUnmapWindow(r->Xdisplay, r->scrollBar.win);
+    r->scrollBar.state = 0;
+    /* scrollbar_setIdle(); */
 
-	return (changed);
+    return (changed);
 }
 
 
@@ -219,12 +219,12 @@ rxvt_scrollbar_hide (rxvt_t* r)
 int
 rxvt_scrollbar_show (rxvt_t* r)
 {
-	int		changed = 0;
-	assert (IS_WIN(r->scrollBar.win));
-	changed = !r->scrollBar.state;
-	XMapWindow(r->Xdisplay, r->scrollBar.win);
-	r->scrollBar.state = 1;
-	return (changed);
+    int	    changed = 0;
+    assert (IS_WIN(r->scrollBar.win));
+    changed = !r->scrollBar.state;
+    XMapWindow(r->Xdisplay, r->scrollBar.win);
+    r->scrollBar.state = 1;
+    return (changed);
 }
 
 
@@ -232,116 +232,116 @@ rxvt_scrollbar_show (rxvt_t* r)
 void
 rxvt_scrollbar_create (rxvt_t* r)
 {
-	int				sb_x, sb_y;
-	unsigned int	sb_w, sb_h;
+    int		    sb_x, sb_y;
+    unsigned int    sb_w, sb_h;
 
 
-	DBG_MSG(1,(stderr,"Create scrollbar\n"));
-	assert (IS_WIN(r->TermWin.parent));
+    DBG_MSG(1,(stderr,"Create scrollbar\n"));
+    assert (IS_WIN(r->TermWin.parent));
 
-	sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
-	sb_y = r->h->window_vt_y;
-	sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
-	sb_h = VT_HEIGHT(r);	/* same height as vt window */
+    sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
+    sb_y = r->h->window_vt_y;
+    sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
+    sb_h = VT_HEIGHT(r);    /* same height as vt window */
 
-	/* set scrollbar parameters */
+    /* set scrollbar parameters */
 # ifdef PLAIN_SCROLLBAR
-	if (r->scrollBar.style == R_SB_PLAIN) {
-		r->scrollBar.beg = R_SCROLLBEG_PLAIN;
-		r->scrollBar.end = R_SCROLLEND_PLAIN;
-	}
+    if (r->scrollBar.style == R_SB_PLAIN) {
+	r->scrollBar.beg = R_SCROLLBEG_PLAIN;
+	r->scrollBar.end = R_SCROLLEND_PLAIN;
+    }
 # endif
 # ifdef XTERM_SCROLLBAR
-	if (r->scrollBar.style == R_SB_XTERM) {
-		r->scrollBar.beg = R_SCROLLBEG_XTERM;
-		r->scrollBar.end = R_SCROLLEND_XTERM;
-	}
+    if (r->scrollBar.style == R_SB_XTERM) {
+	r->scrollBar.beg = R_SCROLLBEG_XTERM;
+	r->scrollBar.end = R_SCROLLEND_XTERM;
+    }
 # endif
 # ifdef NEXT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_NEXT) {
-		r->scrollBar.beg = R_SCROLLBEG_NEXT;
-		r->scrollBar.end = R_SCROLLEND_NEXT;
-	}
+    if (r->scrollBar.style == R_SB_NEXT) {
+	r->scrollBar.beg = R_SCROLLBEG_NEXT;
+	r->scrollBar.end = R_SCROLLEND_NEXT;
+    }
 # endif
 # ifdef RXVT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_RXVT) {
-		r->scrollBar.beg = R_SCROLLBEG_RXVT;
-		r->scrollBar.end = R_SCROLLEND_RXVT;
-	}
+    if (r->scrollBar.style == R_SB_RXVT) {
+	r->scrollBar.beg = R_SCROLLBEG_RXVT;
+	r->scrollBar.end = R_SCROLLEND_RXVT;
+    }
 # endif
 # ifdef SGI_SCROLLBAR
-	if (r->scrollBar.style == R_SB_SGI) {
-		r->scrollBar.beg = R_SCROLLBEG_SGI;
-		r->scrollBar.end = R_SCROLLEND_SGI;
-	}
+    if (r->scrollBar.style == R_SB_SGI) {
+	r->scrollBar.beg = R_SCROLLBEG_SGI;
+	r->scrollBar.end = R_SCROLLEND_SGI;
+    }
 # endif
 
 
-	r->scrollBar.win = XCreateSimpleWindow(r->Xdisplay,
-						r->TermWin.parent,
-						sb_x, sb_y, sb_w, sb_h,
-						0,
-						r->PixColors[Color_fg],
-						r->PixColors[Color_bg]);
-	assert (IS_WIN(r->scrollBar.win));
+    r->scrollBar.win = XCreateSimpleWindow(r->Xdisplay,
+			r->TermWin.parent,
+			sb_x, sb_y, sb_w, sb_h,
+			0,
+			r->PixColors[Color_fg],
+			r->PixColors[Color_bg]);
+    assert (IS_WIN(r->scrollBar.win));
 
 # ifdef DEBUG_X
-	rxvt_set_win_title (r, r->scrollBar.win, "scrollbar");
+    rxvt_set_win_title (r, r->scrollBar.win, "scrollbar");
 # endif
 
-	XDefineCursor(r->Xdisplay, r->scrollBar.win, r->h->bar_pointer);
-	XSelectInput(r->Xdisplay, r->scrollBar.win,
-				(ExposureMask | ButtonPressMask | ButtonReleaseMask
-				| Button1MotionMask | Button2MotionMask
-				| Button3MotionMask));
+    XDefineCursor(r->Xdisplay, r->scrollBar.win, r->h->bar_pointer);
+    XSelectInput(r->Xdisplay, r->scrollBar.win,
+		(ExposureMask | ButtonPressMask | ButtonReleaseMask
+		| Button1MotionMask | Button2MotionMask
+		| Button3MotionMask));
 
 # ifdef BACKGROUND_IMAGE
-	UNSET_PIXMAP(r->scrollBar.pixmap);	/* initialize it to None */
+    UNSET_PIXMAP(r->scrollBar.pixmap);	/* initialize it to None */
 #  ifdef TRANSPARENT
-	if (!(ISSET_OPTION(r, Opt_transparent) &&
-		  ISSET_OPTION(r, Opt_transparent_scrollbar)
-		))
+    if (!(ISSET_OPTION(r, Opt_transparent) &&
+	  ISSET_OPTION(r, Opt_transparent_scrollbar)
+	))
 #  endif
-	if (r->h->rs[Rs_scrollbarPixmap])	{
-		long	w = 0, h = 0;
-		r->scrollBar.pixmap = rxvt_load_pixmap (r,
-								r->h->rs[Rs_scrollbarPixmap], &w, &h);
-		if (IS_PIXMAP(r->scrollBar.pixmap))
-			XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
-				r->scrollBar.pixmap);
-	}
+    if (r->h->rs[Rs_scrollbarPixmap])	{
+	long	w = 0, h = 0;
+	r->scrollBar.pixmap = rxvt_load_pixmap (r,
+				r->h->rs[Rs_scrollbarPixmap], &w, &h);
+	if (IS_PIXMAP(r->scrollBar.pixmap))
+	    XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
+		r->scrollBar.pixmap);
+    }
 # endif
 
 # ifdef TRANSPARENT
-	if (ISSET_OPTION(r, Opt_transparent) &&
-		ISSET_OPTION(r, Opt_transparent_scrollbar))	{
-		XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
-			ParentRelative);
-	}
+    if (ISSET_OPTION(r, Opt_transparent) &&
+	ISSET_OPTION(r, Opt_transparent_scrollbar)) {
+	XSetWindowBackgroundPixmap (r->Xdisplay, r->scrollBar.win,
+	    ParentRelative);
+    }
 # endif
-	r->scrollBar.state = 0;
+    r->scrollBar.state = 0;
 
 
-	/* Final initialization of the scrollbars */
+    /* Final initialization of the scrollbars */
 # ifdef PLAIN_SCROLLBAR
-	if (r->scrollBar.style == R_SB_PLAIN)
-		rxvt_scrollbar_init_plain (r);
+    if (r->scrollBar.style == R_SB_PLAIN)
+	rxvt_scrollbar_init_plain (r);
 # endif
 # ifdef XTERM_SCROLLBAR
-	if (r->scrollBar.style == R_SB_XTERM)
-		rxvt_scrollbar_init_xterm (r);
+    if (r->scrollBar.style == R_SB_XTERM)
+	rxvt_scrollbar_init_xterm (r);
 # endif
 # ifdef RXVT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_RXVT)
-		rxvt_scrollbar_init_rxvt (r);
+    if (r->scrollBar.style == R_SB_RXVT)
+	rxvt_scrollbar_init_rxvt (r);
 # endif
 # ifdef NEXT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_NEXT)
-		rxvt_scrollbar_init_next (r);
+    if (r->scrollBar.style == R_SB_NEXT)
+	rxvt_scrollbar_init_next (r);
 # endif
 # ifdef SGI_SCROLLBAR
-	if (r->scrollBar.style == R_SB_SGI)
-		rxvt_scrollbar_init_sgi (r);
+    if (r->scrollBar.style == R_SB_SGI)
+	rxvt_scrollbar_init_sgi (r);
 # endif
 }
 
@@ -350,39 +350,39 @@ rxvt_scrollbar_create (rxvt_t* r)
 void
 rxvt_scrollbar_clean_exit (rxvt_t* r)
 {
-	UNSET_WIN(r->scrollBar.win);	/* Destroyed by XDestroySubwindows */
+    UNSET_WIN(r->scrollBar.win);    /* Destroyed by XDestroySubwindows */
 
-	if (IS_GC(r->scrollBar.gc))	{
-		XFreeGC (r->Xdisplay, r->scrollBar.gc);
-		UNSET_GC(r->scrollBar.gc);
-	}
+    if (IS_GC(r->scrollBar.gc))	{
+	XFreeGC (r->Xdisplay, r->scrollBar.gc);
+	UNSET_GC(r->scrollBar.gc);
+    }
 
 #ifdef BACKGROUND_IMAGE
-	if (IS_PIXMAP(r->scrollBar.pixmap))	{
-		XFreePixmap (r->Xdisplay, r->scrollBar.pixmap);
-		UNSET_PIXMAP(r->scrollBar.pixmap);
-	}
+    if (IS_PIXMAP(r->scrollBar.pixmap))	{
+	XFreePixmap (r->Xdisplay, r->scrollBar.pixmap);
+	UNSET_PIXMAP(r->scrollBar.pixmap);
+    }
 #endif
 
 # ifdef PLAIN_SCROLLBAR
-	if (r->scrollBar.style == R_SB_PLAIN)
-		rxvt_scrollbar_exit_plain (r);
+    if (r->scrollBar.style == R_SB_PLAIN)
+	rxvt_scrollbar_exit_plain (r);
 # endif
 # ifdef XTERM_SCROLLBAR
-	if (r->scrollBar.style == R_SB_XTERM)
-		rxvt_scrollbar_exit_xterm (r);
+    if (r->scrollBar.style == R_SB_XTERM)
+	rxvt_scrollbar_exit_xterm (r);
 # endif
 # ifdef RXVT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_RXVT)
-		rxvt_scrollbar_exit_rxvt (r);
+    if (r->scrollBar.style == R_SB_RXVT)
+	rxvt_scrollbar_exit_rxvt (r);
 # endif
 # ifdef NEXT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_NEXT)
-		rxvt_scrollbar_exit_next (r);
+    if (r->scrollBar.style == R_SB_NEXT)
+	rxvt_scrollbar_exit_next (r);
 # endif
 # ifdef SGI_SCROLLBAR
-	if (r->scrollBar.style == R_SB_SGI)
-		rxvt_scrollbar_exit_sgi (r);
+    if (r->scrollBar.style == R_SB_SGI)
+	rxvt_scrollbar_exit_sgi (r);
 # endif
 }
 
@@ -391,50 +391,50 @@ rxvt_scrollbar_clean_exit (rxvt_t* r)
 void
 rxvt_scrollbar_resize(rxvt_t *r)
 {
-	int				sb_x, sb_y;
-	unsigned int	sb_w, sb_h;
+    int		    sb_x, sb_y;
+    unsigned int    sb_w, sb_h;
 
 
-	sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
-	sb_y = r->h->window_vt_y;
-	sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
-	sb_h = VT_HEIGHT(r);	/* same height as vt window */
-	XMoveResizeWindow (r->Xdisplay, r->scrollBar.win,
-		sb_x, sb_y, sb_w, sb_h);
+    sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;
+    sb_y = r->h->window_vt_y;
+    sb_w = rxvt_scrollbar_rwidth (r);	/* real scrollbar width */
+    sb_h = VT_HEIGHT(r);    /* same height as vt window */
+    XMoveResizeWindow (r->Xdisplay, r->scrollBar.win,
+	sb_x, sb_y, sb_w, sb_h);
 
 
 # ifdef PLAIN_SCROLLBAR
-	if (r->scrollBar.style == R_SB_PLAIN) {
-		r->scrollBar.beg = R_SCROLLBEG_PLAIN;
-		r->scrollBar.end = R_SCROLLEND_PLAIN;
-	}
+    if (r->scrollBar.style == R_SB_PLAIN) {
+	r->scrollBar.beg = R_SCROLLBEG_PLAIN;
+	r->scrollBar.end = R_SCROLLEND_PLAIN;
+    }
 # endif
 # ifdef XTERM_SCROLLBAR
-	if (r->scrollBar.style == R_SB_XTERM) {
-		r->scrollBar.beg = R_SCROLLBEG_XTERM;
-		r->scrollBar.end = R_SCROLLEND_XTERM;
-	}
+    if (r->scrollBar.style == R_SB_XTERM) {
+	r->scrollBar.beg = R_SCROLLBEG_XTERM;
+	r->scrollBar.end = R_SCROLLEND_XTERM;
+    }
 # endif
 # ifdef NEXT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_NEXT) {
-		r->scrollBar.beg = R_SCROLLBEG_NEXT;
-		r->scrollBar.end = R_SCROLLEND_NEXT;
-	}
+    if (r->scrollBar.style == R_SB_NEXT) {
+	r->scrollBar.beg = R_SCROLLBEG_NEXT;
+	r->scrollBar.end = R_SCROLLEND_NEXT;
+    }
 # endif
 # ifdef RXVT_SCROLLBAR
-	if (r->scrollBar.style == R_SB_RXVT) {
-		r->scrollBar.beg = R_SCROLLBEG_RXVT;
-		r->scrollBar.end = R_SCROLLEND_RXVT;
-	}
+    if (r->scrollBar.style == R_SB_RXVT) {
+	r->scrollBar.beg = R_SCROLLBEG_RXVT;
+	r->scrollBar.end = R_SCROLLEND_RXVT;
+    }
 # endif
 # ifdef SGI_SCROLLBAR
-	if (r->scrollBar.style == R_SB_SGI) {
-		r->scrollBar.beg = R_SCROLLBEG_SGI;
-		r->scrollBar.end = R_SCROLLEND_SGI;
-	}
+    if (r->scrollBar.style == R_SB_SGI) {
+	r->scrollBar.beg = R_SCROLLBEG_SGI;
+	r->scrollBar.end = R_SCROLLEND_SGI;
+    }
 # endif
 
-	rxvt_scrollbar_update(r, 0);
+    rxvt_scrollbar_update(r, 0);
 }
 
 
@@ -442,7 +442,7 @@ rxvt_scrollbar_resize(rxvt_t *r)
 int
 rxvt_scrollbar_visible(rxvt_t *r)
 {
-	return (IS_WIN(r->scrollBar.win) && r->scrollBar.state);
+    return (IS_WIN(r->scrollBar.win) && r->scrollBar.state);
 }
 
 
@@ -453,51 +453,51 @@ rxvt_scrollbar_visible(rxvt_t *r)
 int
 rxvt_scrollbar_update (rxvt_t* r, int update)
 {
-	int			 ret = 0;
-	int			 top, bot, len, adj;
+    int		 ret = 0;
+    int		 top, bot, len, adj;
 
-	if (!rxvt_scrollbar_visible(r))
-		return 0;
+    if (!rxvt_scrollbar_visible(r))
+	return 0;
 
-	if (update) {
-		/* first line in the view */
-		top = (AVTS(r)->nscrolled - AVTS(r)->view_start);
-		/* last line in the view */
-		bot = top + (r->TermWin.nrow - 1);
-		/* total lines in scroll and view */
-		len = max((AVTS(r)->nscrolled + (r->TermWin.nrow - 1)), 1);
-		adj = (((bot - top) * scrollbar_size()) % len) > 0 ? 1 : 0;
+    if (update) {
+	/* first line in the view */
+	top = (AVTS(r)->nscrolled - AVTS(r)->view_start);
+	/* last line in the view */
+	bot = top + (r->TermWin.nrow - 1);
+	/* total lines in scroll and view */
+	len = max((AVTS(r)->nscrolled + (r->TermWin.nrow - 1)), 1);
+	adj = (((bot - top) * scrollbar_size()) % len) > 0 ? 1 : 0;
 
-		/*
-		** scrollBar.beg  : beginning of scrollbar, always 0
-		** scrollBar.end  : end of scrollbar excluding buttons
-		** scrollbar_size : scrollbar length excluding minimal height
-		**
-		** scrollBar.top  : beginning of scroller
-		** scrollBar.bot  : end of scroller
-		** scroller_len  : length of scroller
-		*/
-		r->scrollBar.top = (r->scrollBar.beg + (top * scrollbar_size()) / len);
-		r->h->scroller_len = ((bot - top) * scrollbar_size()) / len +
-								scrollbar_minheight() + adj;
-		r->scrollBar.bot = (r->scrollBar.top + r->h->scroller_len);
+	/*
+	** scrollBar.beg  : beginning of scrollbar, always 0
+	** scrollBar.end  : end of scrollbar excluding buttons
+	** scrollbar_size : scrollbar length excluding minimal height
+	**
+	** scrollBar.top  : beginning of scroller
+	** scrollBar.bot  : end of scroller
+	** scroller_len  : length of scroller
+	*/
+	r->scrollBar.top = (r->scrollBar.beg + (top * scrollbar_size()) / len);
+	r->h->scroller_len = ((bot - top) * scrollbar_size()) / len +
+				scrollbar_minheight() + adj;
+	r->scrollBar.bot = (r->scrollBar.top + r->h->scroller_len);
 
-		/* no change */
-		if (r->scrollBar.top == r->h->last_top &&
-			r->scrollBar.bot == r->h->last_bot &&
-			(r->scrollBar.state == r->h->last_state ||
-			 !scrollbar_isUpDn()))
-			return 0;
-	}
+	/* no change */
+	if (r->scrollBar.top == r->h->last_top &&
+	    r->scrollBar.bot == r->h->last_bot &&
+	    (r->scrollBar.state == r->h->last_state ||
+	     !scrollbar_isUpDn()))
+	    return 0;
+    }
 
-	ret = r->scrollBar.update(r, update, r->h->last_top, r->h->last_bot,
-					r->h->scroller_len);
+    ret = r->scrollBar.update(r, update, r->h->last_top, r->h->last_bot,
+		    r->h->scroller_len);
 
-	r->h->last_top = r->scrollBar.top;
-	r->h->last_bot = r->scrollBar.bot;
-	r->h->last_state = r->scrollBar.state;
+    r->h->last_top = r->scrollBar.top;
+    r->h->last_bot = r->scrollBar.bot;
+    r->h->last_state = r->scrollBar.state;
 
-	return ret;
+    return ret;
 }
 
 
@@ -505,9 +505,9 @@ rxvt_scrollbar_update (rxvt_t* r, int update)
 unsigned short
 rxvt_scrollbar_width(rxvt_t *r)
 {
-	if (NOT_WIN(r->scrollBar.win) || !r->scrollBar.state)
-		return 0;
-	return (r->scrollBar.width + r->sb_shadow * 2);
+    if (NOT_WIN(r->scrollBar.win) || !r->scrollBar.state)
+	return 0;
+    return (r->scrollBar.width + r->sb_shadow * 2);
 }
 
 
@@ -515,7 +515,7 @@ rxvt_scrollbar_width(rxvt_t *r)
 unsigned short
 rxvt_scrollbar_rwidth(rxvt_t *r)
 {
-	return (r->scrollBar.width + r->sb_shadow * 2);
+    return (r->scrollBar.width + r->sb_shadow * 2);
 }
 
 
@@ -523,7 +523,7 @@ rxvt_scrollbar_rwidth(rxvt_t *r)
 int
 rxvt_is_scrollbar_win(rxvt_t *r, Window w)
 {
-	return (w == r->scrollBar.win);
+    return (w == r->scrollBar.win);
 }
 
 /*
@@ -531,24 +531,24 @@ rxvt_is_scrollbar_win(rxvt_t *r, Window w)
  */
 /* EXTPROTO */
 unsigned long rxvt_scrollbar_bg( rxvt_t *r ) {
-	switch (r->scrollBar.style)	{
+    switch (r->scrollBar.style)	{
 #  ifdef PLAIN_SCROLLBAR
-		case R_SB_PLAIN: return r->scrollBar.plain_bg;
+	case R_SB_PLAIN: return r->scrollBar.plain_bg;
 #  endif
 #  ifdef XTERM_SCROLLBAR
-		case R_SB_XTERM: return r->scrollBar.xterm_bg;
+	case R_SB_XTERM: return r->scrollBar.xterm_bg;
 #  endif
 #  ifdef RXVT_SCROLLBAR
-		case R_SB_RXVT:  return r->scrollBar.rxvt_bg;
+	case R_SB_RXVT:  return r->scrollBar.rxvt_bg;
 #  endif
 #  ifdef NEXT_SCROLLBAR
-		case R_SB_NEXT:  return r->scrollBar.next_bg;
+	case R_SB_NEXT:  return r->scrollBar.next_bg;
 #  endif
 #  ifdef SGI_SCROLLBAR
-		case R_SB_SGI:   return r->scrollBar.sgi_bg;
+	case R_SB_SGI:   return r->scrollBar.sgi_bg;
 #  endif
-		default: assert (0); return r->h->global_bg;
-	}	/* switch */
+	default: assert (0); return r->h->global_bg;
+    }	/* switch */
 }
 
 #endif /* HAVE_SCROLLBARS */

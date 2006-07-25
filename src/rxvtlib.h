@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	rxvtlib.h
+ * File:    rxvtlib.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -44,10 +44,10 @@
 #if (SIZEOF_INT_P == 8)
 /* we have 8 byte pointers on 64bit systems */
 # if (SIZEOF_INT == 8)
-typedef int				intp_t;
+typedef int		intp_t;
 typedef unsigned int	u_intp_t;
 # elif (SIZEOF_LONG == 8)
-typedef long			intp_t;
+typedef long		intp_t;
 typedef unsigned long	u_intp_t;
 # else
 #  error No 8 byte integer type available
@@ -60,17 +60,17 @@ typedef unsigned long	u_intp_t;
  * after slight modification. :-)
  */
 # ifdef HAVE_INTTYPES_H
-typedef intptr_t		intp_t;
-typedef uintptr_t		u_intp_t;
+typedef intptr_t	intp_t;
+typedef uintptr_t	u_intp_t;
 # else
 /* whatever normal size corresponds to a integer pointer */
-typedef RINT32T			intp_t;
+typedef RINT32T		intp_t;
 /* whatever normal size corresponds to a unsigned integer pointer */
-typedef RUINT32T		u_intp_t;
+typedef RUINT32T	u_intp_t;
 # endif	/* HAVE_INTTYPES_H */
 #endif
 /* type of unicode_t */
-typedef RUINT32T		unicode_t;
+typedef RUINT32T	unicode_t;
 
 
 /*****************************************************************************
@@ -78,8 +78,8 @@ typedef RUINT32T		unicode_t;
  *                      DO NOT TOUCH ANYTHING BELOW HERE                     *
  *****************************************************************************/
 
-struct rxvt_vars;		/* defined later on */
-struct rxvt_hidden;		/* not defined here */
+struct rxvt_vars;	/* defined later on */
+struct rxvt_hidden;	/* not defined here */
 
 typedef struct {
     RINT32T         row;
@@ -88,9 +88,9 @@ typedef struct {
 
 typedef unsigned char text_t;
 #if defined(TTY_256COLOR) || defined(MULTICHAR_SET)
-# define rend_t		RUINT32T
+# define rend_t	    RUINT32T
 #else
-# define rend_t		RUINT16T
+# define rend_t	    RUINT16T
 #endif
 
 /*
@@ -103,101 +103,101 @@ typedef unsigned char text_t;
  */
 
 typedef struct {
-	RUINT16T		fwidth,		/* font width  [pixels] */
-					fheight;	/* font height [pixels] */
+    RUINT16T	    fwidth,	/* font width  [pixels] */
+		    fheight;	/* font height [pixels] */
 #ifdef XFT_SUPPORT
-	RUINT16T		pwidth,		/* propotionally spaced font width / height */
-					pheight;
+    RUINT16T	    pwidth,	/* propotionally spaced font width / height */
+		    pheight;
 #endif
-	RUINT16T		propfont;	/* font proportional flags */
-	RUINT16T		ncol;		/* window columns [characters] */
-	RUINT16T		nrow;		/* window rows [characters] */
-	RUINT16T		mapped; 	/* TermWin is mapped? */
-	RUINT16T		int_bwidth; /* internal border width */
-	RUINT16T		ext_bwidth; /* external border width */
+    RUINT16T	    propfont;	/* font proportional flags */
+    RUINT16T	    ncol;	/* window columns [characters] */
+    RUINT16T	    nrow;	/* window rows [characters] */
+    RUINT16T	    mapped; 	/* TermWin is mapped? */
+    RUINT16T	    int_bwidth; /* internal border width */
+    RUINT16T	    ext_bwidth; /* external border width */
 
-	RUINT16T		maxTabWidth,	/* max width of tab title to display */
-					minVisibleTabs;	/* Minimum number of tabs to try and keep
-									   visible */
+    RUINT16T	    maxTabWidth,    /* max width of tab title to display */
+		    minVisibleTabs; /* Minimum number of tabs to try and keep
+				       visible */
 #ifndef NO_LINESPACE
-	RUINT16T		lineSpace;	/* space between rows */
+    RUINT16T	    lineSpace;	/* space between rows */
 #endif
 
-	char			BOOLVAR(focus,1);	/* window is focused? */
-	char			enter;	/* pointer is in window? */
+    char	    BOOLVAR(focus,1);	/* window is focused? */
+    char	    enter;  /* pointer is in window? */
 
-	Window			parent;	/* parent window */
-	GC				gc;		/* GC for drawing text */
-	XFontStruct*	font;	/* main font structure */
+    Window	    parent; /* parent window */
+    GC		    gc;	    /* GC for drawing text */
+    XFontStruct*    font;   /* main font structure */
 #ifndef NO_BOLDFONT
-	XFontStruct*	bfont;	/* bold font */
+    XFontStruct*    bfont;  /* bold font */
 #endif
 #ifdef MULTICHAR_SET
-	XFontStruct*	mfont;	/* Multichar font structure */
+    XFontStruct*    mfont;  /* Multichar font structure */
 #endif
 #ifdef USE_XIM
-	XFontSet		fontset;
+    XFontSet	    fontset;
 #endif
 #ifdef XFT_SUPPORT
-	XftPattern*		xftpattern;
-	XftFont			*xftfont, *xftpfont, *xftPfont;
+    XftPattern*	    xftpattern;
+    XftFont	    *xftfont, *xftpfont, *xftPfont;
 # ifdef MULTICHAR_SET
-	XftPattern*		xftmpattern;
-	XftFont*		xftmfont;
-	int				xftmsize;
+    XftPattern*	    xftmpattern;
+    XftFont*	    xftmfont;
+    int		    xftmsize;
 #  ifdef HAVE_ICONV_H
-	iconv_t			xfticonv;
+    iconv_t	    xfticonv;
 #  endif
 # endif
 # ifndef NO_BOLDFONT
-	XftPattern*		xftbpattern;
-	XftFont*		xftbfont;
-	char			bf_switched;/* bold and normal font switched? */
+    XftPattern*	    xftbpattern;
+    XftFont*	    xftbfont;
+    char	    bf_switched;/* bold and normal font switched? */
 # endif
-	char			xftfnmono;	/* font is mono? */
-	char			xftmono;	/* font and mfont are mono? */
-	int				xftsize, xftpsize;
+    char	    xftfnmono;	/* font is mono? */
+    char	    xftmono;	/* font and mfont are mono? */
+    int		    xftsize, xftpsize;
 #endif	/* XFT_SUPPORT */
 
-# define PARENT_NUMBER		(6)
-	int				opacity;	/* transluscent window opaque degree */
-	int				opacity_degree;	/* opaque change degree */
+# define PARENT_NUMBER	    (6)
+    int		    opacity;	/* transluscent window opaque degree */
+    int		    opacity_degree; /* opaque change degree */
 
 #ifdef TRANSPARENT
-	Window			parenttree[PARENT_NUMBER];
+    Window	    parenttree[PARENT_NUMBER];
 #endif
 
 #ifdef TINTING_SUPPORT
-	int				shade;	/* tinting shade percentage */
+    int		    shade;  /* tinting shade percentage */
 #endif
 
 #ifdef OFF_FOCUS_FADING
-	int				fade;	/* off-focus fading percentage */
+    int		    fade;   /* off-focus fading percentage */
 #endif
 
 #ifdef TEXT_SHADOW
     enum {
-		SHADOW_NONE = 0,
-		SHADOW_LEFT,
-		SHADOW_RIGHT,
-		SHADOW_TOP,
-		SHADOW_BOTTOM,
-		SHADOW_TOPLEFT,
-		SHADOW_BOTRIGHT,
-		SHADOW_TOPRIGHT,
-		SHADOW_BOTLEFT,
-	} shadow_mode;
-	unsigned long	shadow;	/* text shadow color */
+	SHADOW_NONE = 0,
+	SHADOW_LEFT,
+	SHADOW_RIGHT,
+	SHADOW_TOP,
+	SHADOW_BOTTOM,
+	SHADOW_TOPLEFT,
+	SHADOW_BOTRIGHT,
+	SHADOW_TOPRIGHT,
+	SHADOW_BOTLEFT,
+    } shadow_mode;
+    unsigned long   shadow; /* text shadow color */
 # ifdef XFT_SUPPORT
-    XftColor		xftshadow;
+    XftColor	    xftshadow;
 # endif
 #endif
 
 #ifdef HAVE_X11_SM_SMLIB_H
-	SmcConn			sm_conn;
-	IceConn			ice_conn;
-	int				ice_fd;
-	char*			sm_client_id;
+    SmcConn	    sm_conn;
+    IceConn	    ice_conn;
+    int		    ice_fd;
+    char*	    sm_client_id;
 #endif
 } TermWin_t;
 
@@ -210,8 +210,8 @@ typedef struct {
  *              Each line is length TermWin.ncol
  *   tlen:      The length of the line or -1 for wrapped lines.
  *   rend:      Contains rendition information: font, bold, colour, etc.
- *	 
- *	 NOTE: Each line for both text and rend are only allocated on demand, and
+ *   
+ *   NOTE: Each line for both text and rend are only allocated on demand, and
  *         text[x] is allocated <=> rend[x] is allocated  for all x.
  *
  *   row:       Cursor row position                   : 0 <= row < TermWin.nrow
@@ -235,37 +235,37 @@ typedef struct {
  *     normal `unscrolled' screen region
  */
 typedef struct {
-    text_t**		text;		/* _all_ the text */
-    RINT16T*		tlen;		/* length of each text line */
-    rend_t**		rend;		/* rendition, uses RS_ flags */
-    row_col_t       cur;		/* cursor position on the screen */
-    RUINT16T		tscroll;	/* top of settable scroll region */
-    RUINT16T		bscroll;	/* bottom of settable scroll region */
-    RUINT16T		charset;	/* character set number [0..3] */
-    unsigned int	flags;		/* see below */
-    row_col_t		s_cur;		/* saved cursor position */
-    RUINT16T		s_charset;	/* saved character set number [0..3] */
-    char			s_charset_char;
-    rend_t			s_rstyle;	/* saved rendition style */
+    text_t**	    text;	/* _all_ the text */
+    RINT16T*	    tlen;	/* length of each text line */
+    rend_t**	    rend;	/* rendition, uses RS_ flags */
+    row_col_t       cur;	/* cursor position on the screen */
+    RUINT16T	    tscroll;	/* top of settable scroll region */
+    RUINT16T	    bscroll;	/* bottom of settable scroll region */
+    RUINT16T	    charset;	/* character set number [0..3] */
+    unsigned int    flags;	/* see below */
+    row_col_t	    s_cur;	/* saved cursor position */
+    RUINT16T	    s_charset;	/* saved character set number [0..3] */
+    char	    s_charset_char;
+    rend_t	    s_rstyle;	/* saved rendition style */
 } screen_t;
 
 
 typedef struct {
-    unsigned char*	text;	/* selected text */
-    RUINT32T		len;	/* length of selected text */
+    unsigned char*  text;   /* selected text */
+    RUINT32T	    len;    /* length of selected text */
     enum {
-		SELECTION_CLEAR = 0,/* nothing selected */
-		SELECTION_INIT,		/* marked a point */
-		SELECTION_BEGIN,	/* started a selection */
-		SELECTION_CONT,		/* continued selection */
-		SELECTION_DONE		/* selection put in CUT_BUFFER0 */
-    } op;					/* current operation */
-	short			vt;		/* VT that has the selection */
-    short           screen;	/* screen being used */
-    short           clicks;	/* number of clicks */
-    row_col_t       beg;	/* beginning of selection <= mark */
-    row_col_t       mark;	/* point of initial click <= end */
-    row_col_t       end;	/* one character past end point */
+	SELECTION_CLEAR = 0,/* nothing selected */
+	SELECTION_INIT,	    /* marked a point */
+	SELECTION_BEGIN,    /* started a selection */
+	SELECTION_CONT,	    /* continued selection */
+	SELECTION_DONE	    /* selection put in CUT_BUFFER0 */
+    } op;		    /* current operation */
+    short	    vt;	    /* VT that has the selection */
+    short           screen; /* screen being used */
+    short           clicks; /* number of clicks */
+    row_col_t       beg;    /* beginning of selection <= mark */
+    row_col_t       mark;   /* point of initial click <= end */
+    row_col_t       end;    /* one character past end point */
 } selection_t;
 
 typedef enum {
@@ -275,20 +275,20 @@ typedef enum {
 /* ------------------------------------------------------------------------- */
 
 /* screen_t flags */
-#define Screen_Relative			(1<<0)	/* relative origin mode flag */
+#define Screen_Relative		(1<<0)	/* relative origin mode flag */
 #define Screen_VisibleCursor	(1<<1)	/* cursor visible? */
-#define Screen_Autowrap			(1<<2)	/* auto-wrap flag */
-#define Screen_Insert			(1<<3)	/* insert mode (vs. overstrike) */
-#define Screen_WrapNext			(1<<4)	/* need to wrap for next char? */
-#define Screen_DefaultFlags		(Screen_VisibleCursor|Screen_Autowrap)
+#define Screen_Autowrap		(1<<2)	/* auto-wrap flag */
+#define Screen_Insert		(1<<3)	/* insert mode (vs. overstrike) */
+#define Screen_WrapNext		(1<<4)	/* need to wrap for next char? */
+#define Screen_DefaultFlags	(Screen_VisibleCursor|Screen_Autowrap)
 
 
-#define IS_OPTION1					(0x00000000)
-#define IS_OPTION2					(0x00000001)
-#define IS_OPTION3					(0x00000002)
-#define IS_OPTION4					(0x00000003)
-#define OPTION_MASK					(0x00000003)
-#define MAX_OPTION_ARRAY			(4)
+#define IS_OPTION1		    (0x00000000)
+#define IS_OPTION2		    (0x00000001)
+#define IS_OPTION3		    (0x00000002)
+#define IS_OPTION4		    (0x00000003)
+#define OPTION_MASK		    (0x00000003)
+#define MAX_OPTION_ARRAY	    (4)
 
 /* rxvt_vars.Options */
 /*
@@ -296,95 +296,95 @@ typedef enum {
  * is reserved for "reverse" options (which I think is obsolete), and the least
  * two significant bits are used to get the array index of r->Options.
  */
-#define	Opt_console					((1LU<<2) | IS_OPTION1)
-#define Opt_loginShell				((1LU<<3) | IS_OPTION1)
-#define Opt_iconic					((1LU<<4) | IS_OPTION1)
-#define Opt_visualBell				((1LU<<5) | IS_OPTION1)
-#define Opt_mapAlert				((1LU<<6) | IS_OPTION1)
-#define Opt_reverseVideo			((1LU<<7) | IS_OPTION1)
-#define Opt_utmpInhibit				((1LU<<8) | IS_OPTION1)
-#define Opt_scrollBar				((1LU<<9) | IS_OPTION1)
-#define Opt_scrollBar_right			((1LU<<10) | IS_OPTION1)
-#define Opt_scrollBar_floating		((1LU<<11) | IS_OPTION1)
-#define Opt_meta8					((1LU<<12) | IS_OPTION1)
-#define Opt_scrollTtyOutputInhibit	((1LU<<13) | IS_OPTION1)
-#define Opt_scrollTtyKeypress		((1LU<<14) | IS_OPTION1)
-#define Opt_transparent				((1LU<<15) | IS_OPTION1)
-#define Opt_forceTransparent		((1LU<<16) | IS_OPTION1)
-#define Opt_mc_hack					((1LU<<17) | IS_OPTION1)
-#define Opt_tripleclickwords		((1LU<<18) | IS_OPTION1)
-#define Opt_scrollWithBuffer		((1LU<<19) | IS_OPTION1)
-#define Opt_jumpScroll				((1LU<<20) | IS_OPTION1)
-#define Opt_mouseWheelScrollPage	((1LU<<21) | IS_OPTION1)
-#define Opt_pointerBlank			((1LU<<22) | IS_OPTION1)
-#define Opt_cursorBlink				((1LU<<23) | IS_OPTION1)
+#define	Opt_console		    ((1LU<<2) | IS_OPTION1)
+#define Opt_loginShell		    ((1LU<<3) | IS_OPTION1)
+#define Opt_iconic		    ((1LU<<4) | IS_OPTION1)
+#define Opt_visualBell		    ((1LU<<5) | IS_OPTION1)
+#define Opt_mapAlert		    ((1LU<<6) | IS_OPTION1)
+#define Opt_reverseVideo	    ((1LU<<7) | IS_OPTION1)
+#define Opt_utmpInhibit		    ((1LU<<8) | IS_OPTION1)
+#define Opt_scrollBar		    ((1LU<<9) | IS_OPTION1)
+#define Opt_scrollBar_right	    ((1LU<<10) | IS_OPTION1)
+#define Opt_scrollBar_floating	    ((1LU<<11) | IS_OPTION1)
+#define Opt_meta8		    ((1LU<<12) | IS_OPTION1)
+#define Opt_scrollTtyOutputInhibit  ((1LU<<13) | IS_OPTION1)
+#define Opt_scrollTtyKeypress	    ((1LU<<14) | IS_OPTION1)
+#define Opt_transparent		    ((1LU<<15) | IS_OPTION1)
+#define Opt_forceTransparent	    ((1LU<<16) | IS_OPTION1)
+#define Opt_mc_hack		    ((1LU<<17) | IS_OPTION1)
+#define Opt_tripleclickwords	    ((1LU<<18) | IS_OPTION1)
+#define Opt_scrollWithBuffer	    ((1LU<<19) | IS_OPTION1)
+#define Opt_jumpScroll		    ((1LU<<20) | IS_OPTION1)
+#define Opt_mouseWheelScrollPage    ((1LU<<21) | IS_OPTION1)
+#define Opt_pointerBlank	    ((1LU<<22) | IS_OPTION1)
+#define Opt_cursorBlink		    ((1LU<<23) | IS_OPTION1)
 #ifdef HAVE_SCROLLBARS
-# define Opt_transparent_scrollbar	((1LU<<24) | IS_OPTION1)
+# define Opt_transparent_scrollbar  ((1LU<<24) | IS_OPTION1)
 #endif
 #ifdef HAVE_MENUBAR
-# define Opt_transparent_menubar	((1LU<<25) | IS_OPTION1)
-# define Opt_showMenu				((1LU<<26) | IS_OPTION1)
+# define Opt_transparent_menubar    ((1LU<<25) | IS_OPTION1)
+# define Opt_showMenu		    ((1LU<<26) | IS_OPTION1)
 #endif
-#define Opt_transparent_tabbar		((1LU<<27) | IS_OPTION1)
-#define Opt_tabPixmap				((1LU<<28) | IS_OPTION1)
+#define Opt_transparent_tabbar	    ((1LU<<27) | IS_OPTION1)
+#define Opt_tabPixmap		    ((1LU<<28) | IS_OPTION1)
 #ifdef XFT_SUPPORT
-# define Opt_xft					((1LU<<29) | IS_OPTION1)
+# define Opt_xft		    ((1LU<<29) | IS_OPTION1)
 #endif
-#define DEFAULT_OPTIONS		\
-	(Opt_scrollBar | Opt_jumpScroll)
+#define DEFAULT_OPTIONS	    \
+    (Opt_scrollBar | Opt_jumpScroll)
 
 /* rxvt_vars.Options2 */
-#define Opt2_protectSecondary		((1LU<<2) | IS_OPTION2)
-#define Opt2_cmdAllTabs				((1LU<<3) | IS_OPTION2)
+#define Opt2_protectSecondary	    ((1LU<<2) | IS_OPTION2)
+#define Opt2_cmdAllTabs		    ((1LU<<3) | IS_OPTION2)
 #ifdef XFT_SUPPORT
 # ifdef MULTICHAR_SET
-#  define Opt2_xftNomFont			((1LU<<4) | IS_OPTION2)
-#  define Opt2_xftSlowOutput		((1LU<<5) | IS_OPTION2)
+#  define Opt2_xftNomFont	    ((1LU<<4) | IS_OPTION2)
+#  define Opt2_xftSlowOutput	    ((1LU<<5) | IS_OPTION2)
 # endif
-# define Opt2_xftAntialias			((1LU<<6) | IS_OPTION2)
-# define Opt2_xftHinting			((1LU<<7) | IS_OPTION2)
-# define Opt2_xftAutoHint			((1LU<<8) | IS_OPTION2)
-# define Opt2_xftGlobalAdvance		((1LU<<9) | IS_OPTION2)
+# define Opt2_xftAntialias	    ((1LU<<6) | IS_OPTION2)
+# define Opt2_xftHinting	    ((1LU<<7) | IS_OPTION2)
+# define Opt2_xftAutoHint	    ((1LU<<8) | IS_OPTION2)
+# define Opt2_xftGlobalAdvance	    ((1LU<<9) | IS_OPTION2)
 #endif
-#define Opt2_syncTabTitle			((1LU<<10) | IS_OPTION2)
-#define Opt2_syncTabIcon			((1LU<<11) | IS_OPTION2)
-#define Opt2_hideTabbar				((1LU<<12) | IS_OPTION2)
-#define Opt2_bottomTabbar			((1LU<<13) | IS_OPTION2)
-#define Opt2_borderLess				((1LU<<14) | IS_OPTION2)
-#define Opt2_overrideRedirect		((1LU<<15) | IS_OPTION2)
-#define Opt2_holdExit				((1LU<<16) | IS_OPTION2)
-#define Opt2_broadcast				((1LU<<17) | IS_OPTION2)
-#define Opt2_hideButtons			((1LU<<18) | IS_OPTION2)
-#define Opt2_veryBold				((1LU<<19) | IS_OPTION2)
-#define Opt2_noSysConfig			((1LU<<20) | IS_OPTION2)
-#define Opt2_disableMacros			((1LU<<21) | IS_OPTION2)
+#define Opt2_syncTabTitle	    ((1LU<<10) | IS_OPTION2)
+#define Opt2_syncTabIcon	    ((1LU<<11) | IS_OPTION2)
+#define Opt2_hideTabbar		    ((1LU<<12) | IS_OPTION2)
+#define Opt2_bottomTabbar	    ((1LU<<13) | IS_OPTION2)
+#define Opt2_borderLess		    ((1LU<<14) | IS_OPTION2)
+#define Opt2_overrideRedirect	    ((1LU<<15) | IS_OPTION2)
+#define Opt2_holdExit		    ((1LU<<16) | IS_OPTION2)
+#define Opt2_broadcast		    ((1LU<<17) | IS_OPTION2)
+#define Opt2_hideButtons	    ((1LU<<18) | IS_OPTION2)
+#define Opt2_veryBold		    ((1LU<<19) | IS_OPTION2)
+#define Opt2_noSysConfig	    ((1LU<<20) | IS_OPTION2)
+#define Opt2_disableMacros	    ((1LU<<21) | IS_OPTION2)
 #ifdef HAVE_X11_SM_SMLIB_H
-# define Opt2_enableSessionMgt		((1LU<<22) | IS_OPTION2)
+# define Opt2_enableSessionMgt	    ((1LU<<22) | IS_OPTION2)
 #endif
-#define Opt2_linuxHomeEndKey		((1LU<<23) | IS_OPTION2)
-#define Opt2_hlTabOnBell			((1LU<<24) | IS_OPTION2)
-#define Opt2_smoothResize			((1LU<<25) | IS_OPTION2)
-#define Opt2_smartResize			((1LU<<26) | IS_OPTION2)
-#define Opt2_autohideTabbar			((1LU<<27) | IS_OPTION2)
-#define Opt2_maximized				((1LU<<28) | IS_OPTION2)
-#define Opt2_fullscreen				((1LU<<29) | IS_OPTION2)
+#define Opt2_linuxHomeEndKey	    ((1LU<<23) | IS_OPTION2)
+#define Opt2_hlTabOnBell	    ((1LU<<24) | IS_OPTION2)
+#define Opt2_smoothResize	    ((1LU<<25) | IS_OPTION2)
+#define Opt2_smartResize	    ((1LU<<26) | IS_OPTION2)
+#define Opt2_autohideTabbar	    ((1LU<<27) | IS_OPTION2)
+#define Opt2_maximized		    ((1LU<<28) | IS_OPTION2)
+#define Opt2_fullscreen		    ((1LU<<29) | IS_OPTION2)
 
 
 #ifdef XFT_SUPPORT
-# define DEFAULT_OPTIONS2	\
-	(Opt2_veryBold | Opt2_smartResize | Opt2_xftAntialias)
+# define DEFAULT_OPTIONS2   \
+    (Opt2_veryBold | Opt2_smartResize | Opt2_xftAntialias)
 #else
-# define DEFAULT_OPTIONS2	\
-	(Opt2_veryBold | Opt2_smartResize)
+# define DEFAULT_OPTIONS2   \
+    (Opt2_veryBold | Opt2_smartResize)
 #endif
 
-#define DEFAULT_OPTIONS3	\
+#define DEFAULT_OPTIONS3    \
     (IS_OPTION3)
-#define DEFAULT_OPTIONS4	\
+#define DEFAULT_OPTIONS4    \
     (IS_OPTION4)
 
 /* place holder used for parsing command-line options */
-#define Opt_Reverse			(1LU<<31)
+#define Opt_Reverse	    (1LU<<31)
 
 /* Macros to test whether an option has been set.  */
 #define ISSET_OPTION(R, OPT)	\
@@ -405,18 +405,18 @@ typedef enum {
 
 
 
-#define PROPFONT_NORMAL				(1<<0)
-#define PROPFONT_BOLD				(1<<1)
-#define PROPFONT_MULTI				(1<<2)
+#define PROPFONT_NORMAL		    (1<<0)
+#define PROPFONT_BOLD		    (1<<1)
+#define PROPFONT_MULTI		    (1<<2)
 
 /*
  * Weather or not we should use xftPfont / xftpfont while drawing text. This has
  * ABSOLUTELY NOTHING to do with PROPFONT_* or the propfont junk. This is used
  * for drawing tab titles / menubar / etc.
  */
-#define NO_PFONT					(0)
-#define USE_PFONT					(1)
-#define USE_BOLD_PFONT				(2)
+#define NO_PFONT		    (0)
+#define USE_PFONT		    (1)
+#define USE_BOLD_PFONT		    (2)
 
 /* ------------------------------------------------------------------------- */
 
@@ -424,18 +424,18 @@ typedef enum {
 typedef struct {
     short           state;
     Window          win;
-	GC				gc;
+    GC		    gc;
 # ifdef BACKGROUND_IMAGE
-	Pixmap			pixmap;
+    Pixmap	    pixmap;
 # endif
-	unsigned long	fg;
-	unsigned long	bg;
-	unsigned long	topshadow;
-	unsigned long	botshadow;
+    unsigned long   fg;
+    unsigned long   bg;
+    unsigned long   topshadow;
+    unsigned long   botshadow;
 
 # ifdef XFT_SUPPORT
-	XftDraw			*xftDraw;
-	XftColor		xftFore;
+    XftDraw	    *xftDraw;
+    XftColor	    xftFore;
 # endif
 } menuBar_t;
 #endif
@@ -443,105 +443,105 @@ typedef struct {
 
 #ifdef HAVE_SCROLLBARS
 typedef struct {
-    char            state;	/* scrollbar state */
-    char            init;	/* scrollbar has been initialised */
-    short           beg;	/* slider sub-window begin height */
-    short           end;	/* slider sub-window end height */
-    short           top;	/* slider top position */
-    short           bot;	/* slider bottom position */
-    short           style;	/* style: rxvt, xterm, next */
-    short           width;	/* scrollbar width */
+    char            state;  /* scrollbar state */
+    char            init;   /* scrollbar has been initialised */
+    short           beg;    /* slider sub-window begin height */
+    short           end;    /* slider sub-window end height */
+    short           top;    /* slider top position */
+    short           bot;    /* slider bottom position */
+    short           style;  /* style: rxvt, xterm, next */
+    short           width;  /* scrollbar width */
     Window          win;
     int             (*update)(struct rxvt_vars *, int, int, int, int);
 
-	GC				gc;
+    GC		    gc;
 # ifdef BACKGROUND_IMAGE
-	Pixmap			pixmap;
+    Pixmap	    pixmap;
 # endif
 # ifdef RXVT_SCROLLBAR
-	unsigned long	rxvt_fg;
-	unsigned long	rxvt_bg;
-	unsigned long	rxvt_topshadow;
-	unsigned long	rxvt_botshadow;
+    unsigned long   rxvt_fg;
+    unsigned long   rxvt_bg;
+    unsigned long   rxvt_topshadow;
+    unsigned long   rxvt_botshadow;
 # endif
 # ifdef XTERM_SCROLLBAR
-	unsigned long	xterm_fg;
-	unsigned long	xterm_bg;
-	unsigned long	xterm_shadow;
+    unsigned long   xterm_fg;
+    unsigned long   xterm_bg;
+    unsigned long   xterm_shadow;
 # endif
 # ifdef PLAIN_SCROLLBAR
-	unsigned long	plain_fg;
-	unsigned long	plain_bg;
+    unsigned long   plain_fg;
+    unsigned long   plain_bg;
 # endif
 # ifdef NEXT_SCROLLBAR
-	unsigned long	next_fg;	/* black */
-	unsigned long	next_bg;	/* gray */
-	unsigned long	next_white;
-	unsigned long	next_dark;
-	GC				next_stippleGC;
-    Pixmap			next_dimple, 
-					next_upArrow,
-					next_upArrowHi,
-					next_downArrow,
-					next_downArrowHi;
+    unsigned long   next_fg;	/* black */
+    unsigned long   next_bg;	/* gray */
+    unsigned long   next_white;
+    unsigned long   next_dark;
+    GC		    next_stippleGC;
+    Pixmap	    next_dimple, 
+		    next_upArrow,
+		    next_upArrowHi,
+		    next_downArrow,
+		    next_downArrowHi;
 # endif
 # ifdef SGI_SCROLLBAR
-	unsigned long	sgi_fg;		/* medium */
-	unsigned long	sgi_bg;		/* light */
-	unsigned long	sgi_black;
-	unsigned long	sgi_white;
-	unsigned long	sgi_lmedium;
-	unsigned long	sgi_dark;
-	unsigned long	sgi_vdark;
-	GC				sgi_stippleGC;
-    Pixmap			sgi_dimple, 
-					sgi_upArrow,
-					sgi_upArrowHi,
-					sgi_upArrowLow,
-					sgi_downArrow,
-					sgi_downArrowHi,
-					sgi_downArrowLow;
+    unsigned long   sgi_fg;	/* medium */
+    unsigned long   sgi_bg;	/* light */
+    unsigned long   sgi_black;
+    unsigned long   sgi_white;
+    unsigned long   sgi_lmedium;
+    unsigned long   sgi_dark;
+    unsigned long   sgi_vdark;
+    GC		    sgi_stippleGC;
+    Pixmap	    sgi_dimple, 
+		    sgi_upArrow,
+		    sgi_upArrowHi,
+		    sgi_upArrowLow,
+		    sgi_downArrow,
+		    sgi_downArrowHi,
+		    sgi_downArrowLow;
 # endif
 } scrollBar_t;
 #endif	/* HAVE_SCROLLBARS */
 
 
 typedef struct {
-	char		state;	/* tabbar state */
+    char	state;	/* tabbar state */
 
-	short		ltab;	/* last tab */
-	short		atab;	/* active tab */
-	short		ptab;	/* previous active tab */
-	short		fvtab;	/* first visible tab */
-	short		lvtab;	/* last visible tab */
+    short	ltab;	/* last tab */
+    short	atab;	/* active tab */
+    short	ptab;	/* previous active tab */
+    short	fvtab;	/* first visible tab */
+    short	lvtab;	/* last visible tab */
 
-	Window		win;
+    Window	win;
 #ifdef BACKGROUND_IMAGE
-	Bool			hasPixmap;	/* has a background Pixmap */
+    Bool	    hasPixmap;	/* has a background Pixmap */
 #endif
-	GC			gc;		/* tab background/foreground, grey25/black */
-	unsigned long	fg;		/* foreground, black */
-	unsigned long	bg;		/* background, grey25 */
-	unsigned long	ifg;	/* inactive tab foreground, black */
-	unsigned long	ibg;	/* inactive tab background, grey */
-	char			rsfg;	/* fg resource has changed */
-	char			rsbg;	/* bg resource has changed */
-	char			rsifg;	/* ifg resource has changed */
-	char			rsibg;	/* ibg resource has changed */
-	unsigned long	frame;		/* tab frame, white */
-	unsigned long	delimit;	/* delimit, dark grey */
+    GC		gc;	/* tab background/foreground, grey25/black */
+    unsigned long   fg;	    /* foreground, black */
+    unsigned long   bg;	    /* background, grey25 */
+    unsigned long   ifg;    /* inactive tab foreground, black */
+    unsigned long   ibg;    /* inactive tab background, grey */
+    char	    rsfg;   /* fg resource has changed */
+    char	    rsbg;   /* bg resource has changed */
+    char	    rsifg;  /* ifg resource has changed */
+    char	    rsibg;  /* ibg resource has changed */
+    unsigned long   frame;	/* tab frame, white */
+    unsigned long   delimit;	/* delimit, dark grey */
 #ifdef XFT_SUPPORT
-	XftDraw*		xftwin;	/* XFT window */
-	XftColor		xftfg;	/* foreground */
-	XftColor		xftifg;	/* background */
+    XftDraw*	    xftwin; /* XFT window */
+    XftColor	    xftfg;  /* foreground */
+    XftColor	    xftifg; /* background */
 #endif
 } tabBar_t;
 
 
 #ifdef BACKGROUND_IMAGE
 typedef struct {
-	short           w, h, x, y;
-	Pixmap          pixmap; 
+    short           w, h, x, y;
+    Pixmap          pixmap; 
 } bgPixmap_t;
 #endif
 
@@ -549,113 +549,113 @@ typedef struct {
 /* To suppress compile warning without xpm library */
 #ifdef BACKGROUND_IMAGE
 # ifndef HAVE_LIBXPM
-#  define XpmCloseness		(0)
-#  define XpmColormap		(0)
-#  define XpmVisual			(0)
-#  define XpmDepth			(0)
-#  define XpmSize			(0)
-#  define XpmReturnPixels	(0)
+#  define XpmCloseness	    (0)
+#  define XpmColormap	    (0)
+#  define XpmVisual	    (0)
+#  define XpmDepth	    (0)
+#  define XpmSize	    (0)
+#  define XpmReturnPixels   (0)
 typedef struct {
-	unsigned long	valuemask;
-	Visual*			visual;
-	Colormap		colormap;
-	unsigned int	depth;
-	unsigned int	width;
-	unsigned int	height;
-	unsigned int	closeness;
+    unsigned long   valuemask;
+    Visual*	    visual;
+    Colormap	    colormap;
+    unsigned int    depth;
+    unsigned int    width;
+    unsigned int    height;
+    unsigned int    closeness;
 } XpmAttributes;
 # endif	/* HAVE_LIBXPM */
 #endif	/* BACKGROUND_IMAGE */
 
 
 typedef enum {
-	TERMENV_XTERM = 0,
-	TERMENV_RXVT,
-	TERMENV_VT102,
-	TERMENV_VT100,
-	TERMENV_ANSI,
-	TERMENV_DUMB,
+    TERMENV_XTERM = 0,
+    TERMENV_RXVT,
+    TERMENV_VT102,
+    TERMENV_VT100,
+    TERMENV_ANSI,
+    TERMENV_DUMB,
 } termenv_t;
 
 struct term_t;
 typedef struct {
-	/*
-	 * Index to vts. If it's -1, then this term_t structure is not used.
-	 * Otherwise, it is used by pointer vts[vts_idx]. This is to improve destroy
-	 * performance so that we only need to do (i = page..ltab) vts[i] = vts[i+1]
-	 * instead of vterm[i] = vterm[i+1].
-	 */
-	short			vts_idx;
+    /*
+     * Index to vts. If it's -1, then this term_t structure is not used.
+     * Otherwise, it is used by pointer vts[vts_idx]. This is to improve destroy
+     * performance so that we only need to do (i = page..ltab) vts[i] = vts[i+1]
+     * instead of vterm[i] = vterm[i+1].
+     */
+    short	    vts_idx;
 
-	unsigned char	profileNum;	/* Profile used to init settings */
+    unsigned char   profileNum;	/* Profile used to init settings */
 
-	/* moved from TermWin_t */
-    RUINT16T		saveLines;	/* number of lines to save */
-    RUINT16T		num_scr;	/* number of lines scrolled */
-    RUINT16T		nscrolled;	/* number of line actually scrolled */
-    RUINT16T		view_start;	/* scrollback view starts here */
-    RUINT16T		mapped;		/* window state mapped? */
+    /* moved from TermWin_t */
+    RUINT16T	    saveLines;	/* number of lines to save */
+    RUINT16T	    num_scr;	/* number of lines scrolled */
+    RUINT16T	    nscrolled;	/* number of line actually scrolled */
+    RUINT16T	    view_start;	/* scrollback view starts here */
+    RUINT16T	    mapped;	/* window state mapped? */
 
-	/* screen structure initialized? */
-	unsigned char	BOOLVAR(init_screen, 1);
+    /* screen structure initialized? */
+    unsigned char   BOOLVAR(init_screen, 1);
 
     Window          vt; /* terminal window */
 #ifdef XFT_SUPPORT
-	XftDraw*		xftvt;
+    XftDraw*	    xftvt;
 #endif
 #ifdef BACKGROUND_IMAGE
-    Pixmap			pixmap;		/* background image, NOT used by */
-	bgPixmap_t		bg;			/* transparent window!!! */
-	XpmAttributes   xpm_attr;	/* original attr of image */
+    Pixmap	    pixmap;	/* background image, NOT used by */
+    bgPixmap_t	    bg;		/* transparent window!!! */
+    XpmAttributes   xpm_attr;	/* original attr of image */
 #endif
 
-	/* Apparently, people like fg/bg colors for individual terminal */
-	unsigned long	p_fg;
-	unsigned long	p_bg;
+    /* Apparently, people like fg/bg colors for individual terminal */
+    unsigned long   p_fg;
+    unsigned long   p_bg;
 #ifdef XFT_SUPPORT
-    XftColor		p_xftfg;
-    XftColor		p_xftbg;
+    XftColor	    p_xftfg;
+    XftColor	    p_xftbg;
 #endif
 
-	/* moved from rxvt_t */
-    text_t**		drawn_text;	/* text drawn on screen (characters) */
-    rend_t**		drawn_rend;	/* text drawn on screen (rendition) */
-    text_t**		buf_text;
-    rend_t**		buf_rend;
+    /* moved from rxvt_t */
+    text_t**	    drawn_text;	/* text drawn on screen (characters) */
+    rend_t**	    drawn_rend;	/* text drawn on screen (rendition) */
+    text_t**	    buf_text;
+    rend_t**	    buf_rend;
     screen_t        screen;
 #if NSCREENS
     screen_t        swap;
 #endif
-	/* move from hidden */
-	rend_t			rstyle;
+    /* move from hidden */
+    rend_t	    rstyle;
 
-	RUINT16T		prev_ncol; /* previous columns */
-	RUINT16T		prev_nrow; /* previous rows */
-	/* moved from tab_t */
-	short				tab_width;	/* tab width */
-	char UNTAINTED *	tab_title;	/* tab title */
+    RUINT16T	    prev_ncol; /* previous columns */
+    RUINT16T	    prev_nrow; /* previous rows */
+    /* moved from tab_t */
+    short		tab_width;  /* tab width */
+    char UNTAINTED *	tab_title;  /* tab title */
 
-	/* moved from rxvt_t */
-    int             cmd_fd;	/* pty file descriptor; connected to command */
-    int             tty_fd;	/* tty file descriptor; connected to child */
-	/* moved from hidden */
-	unsigned char	BOOLVAR( current_screen, 1);	/* PRIMARY / SECONDARY */
+    /* moved from rxvt_t */
+    int             cmd_fd; /* pty file descriptor; connected to command */
+    int             tty_fd; /* tty file descriptor; connected to child */
+    /* moved from hidden */
+    unsigned char   BOOLVAR( current_screen, 1);    /* PRIMARY / SECONDARY */
 #ifdef POINTER_BLANK
-	unsigned char	BOOLVAR( hidden_pointer, 1);	/* pointer is hidden? */
+    unsigned char   BOOLVAR( hidden_pointer, 1);    /* pointer is hidden? */
 #endif
 
-	pid_t			cmd_pid;
-	char*			ttydev;
+    pid_t	    cmd_pid;
+    char*	    ttydev;
 #ifndef RESET_TTY_TO_COMMON_DEFAULTS
-	struct stat     ttyfd_stat; /* original status of our tty */
+    struct stat     ttyfd_stat; /* original status of our tty */
 #endif
 #ifndef NO_SETOWNER_TTYDEV
-	unsigned char	next_tty_action;
+    unsigned char   next_tty_action;
 #endif
 
-	/* moved from hidden */
-	unsigned long	PrivateModes;
-	unsigned long	SavedModes;
+    /* moved from hidden */
+    unsigned long   PrivateModes;
+    unsigned long   SavedModes;
 
 #ifdef UTMP_SUPPORT
 #ifndef UTEMPTER_SUPPORT
@@ -670,114 +670,114 @@ typedef struct {
 # endif
     int             utmp_pos;
 #endif	/* UTEMPTER_SUPPORT */
-	unsigned char	next_utmp_action;
+    unsigned char   next_utmp_action;
 #endif
 
 #if 0
-	char**			command_argv;
-	int				command_argc;
+    char**	    command_argv;
+    int		    command_argc;
 #endif
 
-	/* move from rxvt_hidden */
-	ttymode_t		tio;
-	unsigned int	ttymode;
-	char			rvideo;
+    /* move from rxvt_hidden */
+    ttymode_t	    tio;
+    unsigned int    ttymode;
+    char	    rvideo;
 #ifdef MULTICHAR_SET
-	char			chstat,
-	/* set ==> we only got half a glyph */
-					lost_multi,
-	/* set ==> currently using 2 bytes per glyph */
-					multi_byte;
+    char	    chstat,
+    /* set ==> we only got half a glyph */
+		    lost_multi,
+    /* set ==> currently using 2 bytes per glyph */
+		    multi_byte;
 #endif
-	char			charsets[4];
+    char	    charsets[4];
 
-	/* need to hold the terminal?
-	**   hold == 0: not hold
-	**   hold == 1: hold
-	**   hold >  1: can destroy the terminal now
-	*/
-	char			hold;
-	/* the terminal is dead or alive? */
-	char			dead;
-	/* the terminal is highlighted? */
-	char			BOOLVAR(highlight,1);
+    /* need to hold the terminal?
+    **   hold == 0: not hold
+    **   hold == 1: hold
+    **   hold >  1: can destroy the terminal now
+    */
+    char	    hold;
+    /* the terminal is dead or alive? */
+    char	    dead;
+    /* the terminal is highlighted? */
+    char	    BOOLVAR(highlight,1);
 
-	/* the terminal TERM type */
-	termenv_t		termenv;
+    /* the terminal TERM type */
+    termenv_t	    termenv;
 
-	clock_t			checksum;	/* unique id of this terminal */
+    clock_t	    checksum;	/* unique id of this terminal */
 
-	/* write out buffer */
-	unsigned char*	v_buffer;	/* pointer to physical buffer */
-	unsigned char*	v_bufstr;	/* beginning of area to write */
-	unsigned char*	v_bufptr;	/* end of area to write */
-	unsigned char*	v_bufend;	/* end of physical buffer */
+    /* write out buffer */
+    unsigned char*  v_buffer;	/* pointer to physical buffer */
+    unsigned char*  v_bufstr;	/* beginning of area to write */
+    unsigned char*  v_bufptr;	/* end of area to write */
+    unsigned char*  v_bufend;	/* end of physical buffer */
 
-	/* command input buffering */
-	unsigned char*	cmdbuf_ptr;
-	unsigned char*	cmdbuf_endp;
-	unsigned char	cmdbuf_base[BUFSIZ];
+    /* command input buffering */
+    unsigned char*  cmdbuf_ptr;
+    unsigned char*  cmdbuf_endp;
+    unsigned char   cmdbuf_base[BUFSIZ];
 } term_t;
 
 
 /* Possible values for macros.modFlags */
-#define MACRO_CTRL		(1U << 0)
-#define MACRO_META		(1U << 1)
-#define MACRO_SHIFT		(1U << 2)
+#define MACRO_CTRL	(1U << 0)
+#define MACRO_META	(1U << 1)
+#define MACRO_SHIFT	(1U << 2)
 #define MACRO_PRIMARY	(1U << 3)
 
 /* Number of bits used by modifiers in modFlags */
-#define MACRO_N_MOD_BITS	(4)
+#define MACRO_N_MOD_BITS    (4)
 #define MACRO_MODMASK	\
-	( MACRO_CTRL | MACRO_META | MACRO_SHIFT | MACRO_PRIMARY )
-#define MACRO_MAX_CHAINLEN	(0xf)
+    ( MACRO_CTRL | MACRO_META | MACRO_SHIFT | MACRO_PRIMARY )
+#define MACRO_MAX_CHAINLEN  (0xf)
 
 /* Get / set the macro number from modFlags */
-#define MACRO_GET_NUMBER(x)		\
-	( (x) & ~MACRO_MODMASK ) >> MACRO_N_MOD_BITS
+#define MACRO_GET_NUMBER(x)	\
+    ( (x) & ~MACRO_MODMASK ) >> MACRO_N_MOD_BITS
 
 
 /*
  * Action to take when a macro is called / menu item is selected.
  */
 typedef struct {
-    unsigned short	type;	/* must not be changed; first element */
-    unsigned short	len;	/* strlen (str) */
-    unsigned char	*str;	/* action to take */
+    unsigned short  type;   /* must not be changed; first element */
+    unsigned short  len;    /* strlen (str) */
+    unsigned char   *str;   /* action to take */
 } action_t;
 
 /* Values for macro_t.type. Must sync this with macroNames from xdefaults.c */
 enum {
-	MacroFnDummy=0,
-	MacroFnEsc,
-	MacroFnStr,
-	MacroFnNewTab,
-	MacroFnClose,
-	MacroFnGoto,
-	MacroFnMove,
-	MacroFnScroll,
-	MacroFnCopy,
-	MacroFnPaste,
-	MacroFnToggleSubwin,
-	MacroFnFont,
-	MacroFnToggleVeryBold,
-	MacroFnToggleTransp,
-	MacroFnToggleBcst,
-	MacroFnToggleHold,
-	MacroFnToggleFullscren,
-	MacroFnSetTitle,
-	MacroFnPrintScreen,
-	MacroFnSaveConfig,
-	MacroFnToggleMacros,
-	NMACRO_FUNCS
+    MacroFnDummy=0,
+    MacroFnEsc,
+    MacroFnStr,
+    MacroFnNewTab,
+    MacroFnClose,
+    MacroFnGoto,
+    MacroFnMove,
+    MacroFnScroll,
+    MacroFnCopy,
+    MacroFnPaste,
+    MacroFnToggleSubwin,
+    MacroFnFont,
+    MacroFnToggleVeryBold,
+    MacroFnToggleTransp,
+    MacroFnToggleBcst,
+    MacroFnToggleHold,
+    MacroFnToggleFullscren,
+    MacroFnSetTitle,
+    MacroFnPrintScreen,
+    MacroFnSaveConfig,
+    MacroFnToggleMacros,
+    NMACRO_FUNCS
 };
 
 typedef struct {
-	KeySym				keysym;
-	unsigned char		modFlags;		/* First 4 bits are the action order
-										   number. Last four bits are the
-										   modifiers */
-	action_t			action;
+    KeySym		keysym;
+    unsigned char	modFlags;	/* First 4 bits are the action order
+					   number. Last four bits are the
+					   modifiers */
+    action_t		action;
 } macros_t;
 
 /*
@@ -786,189 +786,189 @@ typedef struct {
  */
 typedef struct _profile_t
 {
-	unsigned long		fg, bg;
+    unsigned long	fg, bg;
 #ifdef XFT_SUPPORT
-	XftColor		xftfg, xftbg;
+    XftColor	    xftfg, xftbg;
 #endif
 #ifdef OFF_FOCUS_FADING
-	unsigned long		fg_fade, bg_fade;
+    unsigned long	fg_fade, bg_fade;
 #endif
 
-	int			saveLines;
+    int		saveLines;
 
-	/*
-	 * Each profile also has a tab title, and command associated to it. However
-	 * since that's already stored in our resource options, we don't need
-	 * pointers for it here.
-	 */
+    /*
+     * Each profile also has a tab title, and command associated to it. However
+     * since that's already stored in our resource options, we don't need
+     * pointers for it here.
+     */
 } profile_t;
 
 
 typedef struct rxvt_vars {
-	/*
-	 * These ``hidden'' items are not for public consumption and must not be
-	 * accessed externally
-	 *
-	 * 2006-02-19 gi1242: mrxvt was forked from rxvt. In rxvt, they compiled
-	 * common rxvt functions into a library "rxvtlib". Thus when loading
-	 * multiple versions of rxvt, this common code was linked to, saving some
-	 * memory.
-	 *
-	 * With tabs, we of course won't find this as useful. With grand dreams of
-	 * multiple windows, we'll never need it :).
-	 */
+    /*
+     * These ``hidden'' items are not for public consumption and must not be
+     * accessed externally
+     *
+     * 2006-02-19 gi1242: mrxvt was forked from rxvt. In rxvt, they compiled
+     * common rxvt functions into a library "rxvtlib". Thus when loading
+     * multiple versions of rxvt, this common code was linked to, saving some
+     * memory.
+     *
+     * With tabs, we of course won't find this as useful. With grand dreams of
+     * multiple windows, we'll never need it :).
+     */
     struct rxvt_hidden *h;
 
-	/*
-	 * Exposed items
-	 *   Changes to structure here require library version number change
-	 */
-    TermWin_t		TermWin;
+    /*
+     * Exposed items
+     *   Changes to structure here require library version number change
+     */
+    TermWin_t	    TermWin;
 #ifdef HAVE_SCROLLBARS
-    scrollBar_t		scrollBar;
+    scrollBar_t	    scrollBar;
 #endif
 #ifdef HAVE_MENUBAR
-    menuBar_t		menuBar;
+    menuBar_t	    menuBar;
 #endif
-	tabBar_t	tabBar;
-	Display*	Xdisplay;
-	RUINT32T	Options[MAX_OPTION_ARRAY];
-	XSizeHints      szHint;
+    tabBar_t	tabBar;
+    Display*	Xdisplay;
+    RUINT32T	Options[MAX_OPTION_ARRAY];
+    XSizeHints      szHint;
 
-	/* macros */
-	macros_t*	macros;	/* array of all user defind macros */
-	unsigned short	nmacros,	/* Number of macros defined */
-			maxMacros;	/* max # of macros that can be stored in memory
-								   pointed to by "macros" */
+    /* macros */
+    macros_t*	macros;	/* array of all user defind macros */
+    unsigned short  nmacros,	/* Number of macros defined */
+	    maxMacros;	/* max # of macros that can be stored in memory
+				   pointed to by "macros" */
 
-	Colormap        Xcmap;
+    Colormap        Xcmap;
 #ifdef OFF_FOCUS_FADING
-	unsigned long*	PixColorsUnfocus;		/* Array of size TOTAL_COLORS */
-	/* PixColorsUnfocus and PixColor has been switched */
-	char		color_switched;
+    unsigned long*  PixColorsUnfocus;	    /* Array of size TOTAL_COLORS */
+    /* PixColorsUnfocus and PixColor has been switched */
+    char	color_switched;
 #endif
-	/* Bg and UfBg has been switched */
-	char		ufbg_switched;
-	unsigned long*	PixColors;				/* Array of size TOTAL_COLORS */
+    /* Bg and UfBg has been switched */
+    char	ufbg_switched;
+    unsigned long*  PixColors;		    /* Array of size TOTAL_COLORS */
 #ifdef XFT_SUPPORT
-	XftColor*	XftColors;	/* number of colors + 2 * NPAGES */
+    XftColor*	XftColors;  /* number of colors + 2 * NPAGES */
 #endif
-	short		numPixColors;	/* TOTAL_COLORS */
+    short	numPixColors;	/* TOTAL_COLORS */
 
-	profile_t	profile[MAX_PROFILES];
+    profile_t	profile[MAX_PROFILES];
 
-	Cursor		term_pointer; /* cursor for vt window */
-	int		Xdepth;
-	int		sb_shadow;	/* scrollbar shadow width */
-	int		Xfd;		/* file descriptor of X connection */
+    Cursor	term_pointer; /* cursor for vt window */
+    int	    Xdepth;
+    int	    sb_shadow;	/* scrollbar shadow width */
+    int	    Xfd;	/* file descriptor of X connection */
 
-	/* term_t structures and pointers */
-	term_t		vterm[MAX_PAGES];
-	term_t*		vts[MAX_PAGES];
+    /* term_t structures and pointers */
+    term_t	vterm[MAX_PAGES];
+    term_t*	vts[MAX_PAGES];
 
-	short			tabClicked;		/* Tab clicked by user. Used for moving tabs
-									   by drag and dropping. */
+    short	    tabClicked;	    /* Tab clicked by user. Used for moving tabs
+				       by drag and dropping. */
 
-	/* number of children that have died */
-	short		vt_died;
+    /* number of children that have died */
+    short	vt_died;
 
-	int		num_fds;	/* number of fd to monitor */
-	selection_t     selection;
-	sstyle_t	selection_style;
-	int		numlock_state;
-	char*		tabstop;	/* per location: 1 == tab-stop */
-	enum enc_label  encoding_method;
+    int	    num_fds;	/* number of fd to monitor */
+    selection_t     selection;
+    sstyle_t	selection_style;
+    int	    numlock_state;
+    char*	tabstop;    /* per location: 1 == tab-stop */
+    enum enc_label  encoding_method;
 
-	char**		global_argv;
-	int		global_argc;
+    char**	global_argv;
+    int	    global_argc;
 } rxvt_t;
 
 
 typedef enum {
-	HIDE_MENUBAR = 0,
-	SHOW_MENUBAR,
-	HIDE_TABBAR,
-	SHOW_TABBAR,
-	HIDE_SCROLLBAR,
-	SHOW_SCROLLBAR,
-	RESIZE_FONT,
-	X_CONFIGURE,
+    HIDE_MENUBAR = 0,
+    SHOW_MENUBAR,
+    HIDE_TABBAR,
+    SHOW_TABBAR,
+    HIDE_SCROLLBAR,
+    SHOW_SCROLLBAR,
+    RESIZE_FONT,
+    X_CONFIGURE,
 } resize_reason_t;
 
 
 /* MACROS for colors of individual terminals */
 #if 0
-#define VTFG(R, P)		\
-	((R)->PixColors[TOTAL_COLORS + (P)])
-#define VTBG(R, P)		\
-	((R)->PixColors[TOTAL_COLORS + MAX_PAGES + (P)])
+#define VTFG(R, P)	\
+    ((R)->PixColors[TOTAL_COLORS + (P)])
+#define VTBG(R, P)	\
+    ((R)->PixColors[TOTAL_COLORS + MAX_PAGES + (P)])
 #ifdef XFT_SUPPORT
-# define VTXFTFG(R, P)		\
-	((R)->XftColors[TOTAL_COLORS + (P)])
-# define VTXFTBG(R, P)		\
-	((R)->XftColors[TOTAL_COLORS + MAX_PAGES + (P)])
+# define VTXFTFG(R, P)	    \
+    ((R)->XftColors[TOTAL_COLORS + (P)])
+# define VTXFTBG(R, P)	    \
+    ((R)->XftColors[TOTAL_COLORS + MAX_PAGES + (P)])
 #endif	/* XFT_SUPPORT */
-#define ISSET_VTFG(R, P)	\
-	(NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + (P)]))
-#define ISSET_VTBG(R, P)	\
-	(NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + MAX_PAGES + (P)]))
+#define ISSET_VTFG(R, P)    \
+    (NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + (P)]))
+#define ISSET_VTBG(R, P)    \
+    (NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + MAX_PAGES + (P)]))
 #endif
 
-#define VTFG(R, P)		\
-	((R)->profile[(P)].fg)
-#define VTBG(R, P)		\
-	((R)->profile[(P)].bg)
+#define VTFG(R, P)	\
+    ((R)->profile[(P)].fg)
+#define VTBG(R, P)	\
+    ((R)->profile[(P)].bg)
 
 #ifdef XFT_SUPPORT
-# define VTXFTFG(R, P)		\
-	((R)->profile[(P)].xftfg)
-# define VTXFTBG(R, P)		\
-	((R)->profile[(P)].xftbg)
+# define VTXFTFG(R, P)	    \
+    ((R)->profile[(P)].xftfg)
+# define VTXFTBG(R, P)	    \
+    ((R)->profile[(P)].xftbg)
 #endif	/* XFT_SUPPORT */
 
 #ifdef OFF_FOCUS_FADING
-#define VTFG_FADE(R, P)		\
-	((R)->profile[(P)].fg_fade)
-#define VTBG_FADE(R, P)		\
-	((R)->profile[(P)].bg_fade)
+#define VTFG_FADE(R, P)	    \
+    ((R)->profile[(P)].fg_fade)
+#define VTBG_FADE(R, P)	    \
+    ((R)->profile[(P)].bg_fade)
 #endif /* OFF_FOCUS_FADING */
 
-#define ISSET_VTFG(R, P)	\
-	(NULL != ((R)->h->rs[Rs_foreground + (P)] ) )
-#define ISSET_VTBG(R, P)	\
-	(NULL != ((R)->h->rs[Rs_background + (P)] ) )
+#define ISSET_VTFG(R, P)    \
+    (NULL != ((R)->h->rs[Rs_foreground + (P)] ) )
+#define ISSET_VTBG(R, P)    \
+    (NULL != ((R)->h->rs[Rs_background + (P)] ) )
 
 
 
 /* MACROS for tab/page number */
-#define ATAB(R)		((R)->tabBar.atab)
-#define LTAB(R)		((R)->tabBar.ltab)
-#define FVTAB(R)	((R)->tabBar.fvtab)
-#define LVTAB(R)	((R)->tabBar.lvtab)
-#define PTAB(R)		((R)->tabBar.ptab)
+#define ATAB(R)	    ((R)->tabBar.atab)
+#define LTAB(R)	    ((R)->tabBar.ltab)
+#define FVTAB(R)    ((R)->tabBar.fvtab)
+#define LVTAB(R)    ((R)->tabBar.lvtab)
+#define PTAB(R)	    ((R)->tabBar.ptab)
 
-#define APAGE(R)	((R)->tabBar.atab)
-#define LPAGE(R)	((R)->tabBar.ltab)
-#define FVPAGE(R)	((R)->tabBar.fvtab)
-#define LVPAGE(R)	((R)->tabBar.lvtab)
-#define PPAGE(R)	((R)->tabBar.ptab)
+#define APAGE(R)    ((R)->tabBar.atab)
+#define LPAGE(R)    ((R)->tabBar.ltab)
+#define FVPAGE(R)   ((R)->tabBar.fvtab)
+#define LVPAGE(R)   ((R)->tabBar.lvtab)
+#define PPAGE(R)    ((R)->tabBar.ptab)
 
 /* MACROS for vts structure */
-#define AVTS(R)		((R)->vts[(R)->tabBar.atab])
-#define LVTS(R)		((R)->vts[(R)->tabBar.ltab])
-#define PVTS(R, P)	((R)->vts[(P)])
+#define AVTS(R)	    ((R)->vts[(R)->tabBar.atab])
+#define LVTS(R)	    ((R)->vts[(R)->tabBar.ltab])
+#define PVTS(R, P)  ((R)->vts[(P)])
 
-#define SEL(R)		((R)->selection)
+#define SEL(R)	    ((R)->selection)
 
-#define ASCR(R)		((R)->vts[(R)->tabBar.atab]->screen)
-#define PSCR(R, P)	((R)->vts[(P)]->screen)
+#define ASCR(R)	    ((R)->vts[(R)->tabBar.atab]->screen)
+#define PSCR(R, P)  ((R)->vts[(P)]->screen)
 
 
 /*****************************************************************************
  *                                PROTOTYPES                                 *
  *****************************************************************************/
-void		rxvt_main_loop(rxvt_t *);
-rxvt_t*		rxvt_init (int, const char *const *);
+void	    rxvt_main_loop(rxvt_t *);
+rxvt_t*	    rxvt_init (int, const char *const *);
 
-#endif		/* __RXVTLIB_H__ */
+#endif	    /* __RXVTLIB_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

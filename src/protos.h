@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	protos.h
+ * File:    protos.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -70,14 +70,14 @@ int              greek_xlat                       __PROTO((char* s, int num_char
 /* End prototypes of grkelot.c */
 
 /* Begin prototypes of macros.c */
-int				 rxvt_parse_macros				  __PROTO((rxvt_t*, const char *, const char *, Bool noReplace));
-void			 rxvt_cleanup_macros			  __PROTO((rxvt_t*));
-Bool			 rxvt_set_action				  __PROTO((action_t*, char*));
-int				 rxvt_process_macros			  __PROTO((rxvt_t*, KeySym, XKeyEvent*));
-int				 rxvt_dispatch_action			  __PROTO((rxvt_t*, action_t*, XEvent *ev));
+int		 rxvt_parse_macros		  __PROTO((rxvt_t*, const char *, const char *, Bool noReplace));
+void		 rxvt_cleanup_macros		  __PROTO((rxvt_t*));
+Bool		 rxvt_set_action		  __PROTO((action_t*, char*));
+int		 rxvt_process_macros		  __PROTO((rxvt_t*, KeySym, XKeyEvent*));
+int		 rxvt_dispatch_action		  __PROTO((rxvt_t*, action_t*, XEvent *ev));
 
-void			 rxvt_toggle_verybold			  __PROTO((rxvt_t*));
-void			 rxvt_toggle_subwin				  __PROTO((rxvt_t*, const unsigned char *));
+void		 rxvt_toggle_verybold		  __PROTO((rxvt_t*));
+void		 rxvt_toggle_subwin		  __PROTO((rxvt_t*, const unsigned char *));
 /* End prototypes of macros.c */
 
 /* Begin prototypes of init.c */
@@ -99,11 +99,11 @@ CARD32           rxvt_get_desktop                 __PROTO((rxvt_t* r));
 void             rxvt_create_show_windows         __PROTO((rxvt_t* r, int argc, const char* const *argv));
 void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page));
 void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
-const char*		 getProfileOption				  __PROTO(( rxvt_t *r, int profile, int resource ));
-Status			 ewmh_message					  __PROTO(( Display *, Window, Window, Atom, long, long, long, long, long));
+const char*	 getProfileOption		  __PROTO(( rxvt_t *r, int profile, int resource ));
+Status		 ewmh_message			  __PROTO(( Display *, Window, Window, Atom, long, long, long, long, long));
 int              rxvt_run_command                 __PROTO((rxvt_t* r, int page, const char** argv));
 termenv_t        rxvt_get_termenv                 __PROTO((const char* str));
-char**			 rxvt_string_to_argv    		  __PROTO((const char*, int*));
+char**		 rxvt_string_to_argv    	  __PROTO((const char*, int*));
 /* End prototypes of init.c */
 
 
@@ -132,7 +132,7 @@ void             rxvt_free                        __PROTO((void *ptr));
 void             rxvt_privileges                  __PROTO((int mode));
 RETSIGTYPE       rxvt_Child_signal                __PROTO((int sig __attribute__((unused))));
 RETSIGTYPE       rxvt_Exit_signal                 __PROTO((int sig));
-void			 rxvt_exit_request                __PROTO((rxvt_t*));
+void		 rxvt_exit_request                __PROTO((rxvt_t*));
 void             rxvt_clean_exit                  __PROTO((rxvt_t* r));
 void             rxvt_privileged_utmp             __PROTO((rxvt_t* r, int page, char action));
 void             rxvt_privileged_ttydev           __PROTO((rxvt_t* r, int page, char action));
@@ -177,8 +177,8 @@ int              rxvt_is_menubar_win              __PROTO((rxvt_t*, Window));
 unsigned short   rxvt_menubar_height              __PROTO((rxvt_t*));
 unsigned short   rxvt_menubar_rheight             __PROTO((rxvt_t*));
 int              rxvt_menubar_visible             __PROTO((rxvt_t*));
-void			 rxvt_menu_show					  __PROTO((rxvt_t*));
-int				 rxvt_menu_select				  __PROTO((rxvt_t*, XButtonEvent*));
+void		 rxvt_menu_show			  __PROTO((rxvt_t*));
+int		 rxvt_menu_select		  __PROTO((rxvt_t*, XButtonEvent*));
 #endif
 /* End prototypes of menubar.c */
 
@@ -214,13 +214,13 @@ int              rxvt_control_tty                 __PROTO((int fd_tty, const cha
 /* Begin prototypes of screen.c */
 void
 rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
-		int x, int y, char* str, int len, int (*draw_string)());
+	int x, int y, char* str, int len, int (*draw_string)());
 #ifdef XFT_SUPPORT
 void
 rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
-		rend_t rend, int pfont,
-		XftDraw* win, XftColor* fore, int x, int y, char* str, int len,
-		void (*xftdraw_string)());
+	rend_t rend, int pfont,
+	XftDraw* win, XftColor* fore, int x, int y, char* str, int len,
+	void (*xftdraw_string)());
 #endif
 void             rxvt_init_screen                 __PROTO((rxvt_t* r));
 void             rxvt_scr_reset                   __PROTO((rxvt_t* r, int page));
@@ -336,7 +336,7 @@ int              rxvt_scrollbar_update            __PROTO((rxvt_t* r, int update
 unsigned short   rxvt_scrollbar_width             __PROTO((rxvt_t* r));
 unsigned short   rxvt_scrollbar_rwidth            __PROTO((rxvt_t* r));
 int              rxvt_is_scrollbar_win            __PROTO((rxvt_t* r, Window w));
-unsigned long	 rxvt_scrollbar_bg				  __PROTO((rxvt_t* r));
+unsigned long	 rxvt_scrollbar_bg		  __PROTO((rxvt_t* r));
 #endif
 /* End prototypes of scrollbar.c */
 
@@ -367,24 +367,24 @@ void*            ma_memcpy                        __PROTO((void *s1, const void 
 void*            ma_memmove                       __PROTO((void *d, const void *s, size_t len));
 void             ma_bzero                         __PROTO((void *b, size_t len));
 void*            ma_memset                        __PROTO((void *p, int c1, size_t len));
-char*			 ma_strcasestr					  __PROTO((const char* phaystack, const char *pneedle));
+char*		 ma_strcasestr			  __PROTO((const char* phaystack, const char *pneedle));
 
 /* End prototypes of strings.c */
 
 /* Begin prototypes of transparent.c */
-int				rxvt_set_opacity			 	 __PROTO((rxvt_t*));
-void			rxvt_process_reparentnotify   	 __PROTO((rxvt_t*, XEvent*));
+int		rxvt_set_opacity	     	 __PROTO((rxvt_t*));
+void		rxvt_process_reparentnotify   	 __PROTO((rxvt_t*, XEvent*));
 #ifdef TRANSPARENT
-void			rxvt_toggle_transparency		 __PROTO((rxvt_t*));
-void			refreshRootBGVars				 __PROTO((rxvt_t*));
+void		rxvt_toggle_transparency	 __PROTO((rxvt_t*));
+void		refreshRootBGVars		 __PROTO((rxvt_t*));
 int             rxvt_check_our_parents           __PROTO((rxvt_t*));
 #endif
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
-void			rxvt_refresh_bg_image			 __PROTO((rxvt_t*, int, Bool));
+void		rxvt_refresh_bg_image		 __PROTO((rxvt_t*, int, Bool));
 #endif
 #ifdef TINTING_SUPPORT
 # if defined(HAVE_LIBXRENDER)
-void			xrenderShadeParentPixmap	 	 __PROTO((rxvt_t*, Pixmap, int, int, unsigned, unsigned, Bool));
+void		xrenderShadeParentPixmap     	 __PROTO((rxvt_t*, Pixmap, int, int, unsigned, unsigned, Bool));
 # else
 void            rxvt_shade_pixmap                __PROTO((rxvt_t*, Drawable, int, int, unsigned, unsigned));
 # endif
@@ -428,11 +428,11 @@ void             rxvt_append_page               __PROTO((rxvt_t*, int profile, c
 void             rxvt_kill_page                 __PROTO((rxvt_t*, short));
 void             rxvt_remove_page               __PROTO((rxvt_t*, short));
 void             rxvt_activate_page             __PROTO((rxvt_t*, short));
-void			 rxvt_tabbar_set_visible_tabs   __PROTO((rxvt_t*, Bool));
+void		 rxvt_tabbar_set_visible_tabs   __PROTO((rxvt_t*, Bool));
 void             rxvt_tabbar_set_title          __PROTO((rxvt_t*, short, const unsigned char TAINTED *));
 void             rxvt_tabbar_resize             __PROTO((rxvt_t*));
 void             rxvt_tabbar_dispatcher         __PROTO((rxvt_t*, XButtonEvent*));
-void			 rxvt_tabbar_button_release     __PROTO((rxvt_t*, XButtonEvent*));
+void		 rxvt_tabbar_button_release     __PROTO((rxvt_t*, XButtonEvent*));
 int              rxvt_tabbar_visible            __PROTO((rxvt_t*));
 void             rxvt_tabbar_expose             __PROTO((rxvt_t*, XEvent*));
 int              rxvt_tabbar_hide               __PROTO((rxvt_t*));

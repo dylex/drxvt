@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	command.h
+ * File:    command.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -24,30 +24,30 @@
 #ifndef __COMMAND_H__
 #define __COMMAND_H__
 
-#define STRING_MAX	512	/* max string size for process_rxvt_xterm_seq() */
-#define ESC_ARGS	32	/* max # of args for esc sequences */
+#define STRING_MAX  512	/* max string size for process_rxvt_xterm_seq() */
+#define ESC_ARGS    32	/* max # of args for esc sequences */
 
 #ifdef OFFIX_DND
-# define DndFile	2
-# define DndDir		5
-# define DndLink	7
+# define DndFile    2
+# define DndDir	    5
+# define DndLink    7
 #endif
 
 /* a large REFRESH_PERIOD causes problems with `cat' */
-#define REFRESH_PERIOD		1
+#define REFRESH_PERIOD	    1
 
 #ifndef MULTICLICK_TIME
-# define MULTICLICK_TIME	500
+# define MULTICLICK_TIME    500
 #endif
 #ifndef SCROLLBAR_INITIAL_DELAY
 # ifdef NEXT_SCROLLER
-#  define SCROLLBAR_INITIAL_DELAY	20
+#  define SCROLLBAR_INITIAL_DELAY   20
 # else
-#  define SCROLLBAR_INITIAL_DELAY	40
+#  define SCROLLBAR_INITIAL_DELAY   40
 # endif
 #endif
 #ifndef SCROLLBAR_CONTINUOUS_DELAY
-# define SCROLLBAR_CONTINUOUS_DELAY	2
+# define SCROLLBAR_CONTINUOUS_DELAY 2
 #endif
 
 /*
@@ -56,11 +56,11 @@
  * If only these keys were standardized <sigh>
  */
 /* Linux console style */
-#define KS_HOME_LINUX	"\033[1"	/* Home == Find */
-#define KS_END_LINUX	"\033[4"	/* End == Select */
+#define KS_HOME_LINUX	"\033[1"    /* Home == Find */
+#define KS_END_LINUX	"\033[4"    /* End == Select */
 /* X Terminal style [default] */
-#define KS_HOME			"\033[7"	/* Home */
-#define KS_END			"\033[8"	/* End */
+#define KS_HOME		"\033[7"    /* Home */
+#define KS_END		"\033[8"    /* End */
 
 /*
  * ESC-Z processing:
@@ -81,9 +81,9 @@
  * two strings should be the same so that identical read(2) calls may be
  * used.
  */
-#define VT100_ANS	"\033[?1;2c"	/* vt100 answerback */
+#define VT100_ANS   "\033[?1;2c"    /* vt100 answerback */
 #ifndef ESCZ_ANSWER
-# define ESCZ_ANSWER	VT100_ANS	/* obsolete ANSI ESC[c */
+# define ESCZ_ANSWER	VT100_ANS   /* obsolete ANSI ESC[c */
 #endif
 
 #endif	/* __COMMAND_H__ */

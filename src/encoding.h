@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	encoding.h
+ * File:    encoding.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -46,8 +46,8 @@
  * These definitions should be brushed up by native speakers.
  */
 
-#define MAX_NFONTS		(6)
-#define FONT0_IDX		(0)
+#define MAX_NFONTS	(6)
+#define FONT0_IDX	(0)
 
 
 #ifdef MULTICHAR_SET
@@ -113,7 +113,7 @@
   "-baekmuk-batang-medium-r-normal--12-120-75-75-m-120-ksc5601.1987-0",\
   "-baekmuk-batang-medium-r-normal--14-140-75-75-m-140-ksc5601.1987-0"
 
-#define MFONT_LIST_NULL		NULL,NULL,NULL,NULL,NULL,NULL
+#define MFONT_LIST_NULL	    NULL,NULL,NULL,NULL,NULL,NULL
 #endif /* MULTICHAR_SET */
 
 
@@ -142,20 +142,20 @@
   "-misc-fixed-medium-r-normal--13-120-75-75-c-70-iso8859-%d",\
   "-misc-fixed-medium-r-normal--14-130-75-75-c-70-iso8859-%d"
 
-#define NFONT_LIST_NULL		NULL,NULL,NULL,NULL,NULL,NULL
+#define NFONT_LIST_NULL	    NULL,NULL,NULL,NULL,NULL,NULL
 
 
 enum enc_label {
-	ENC_NOENC,
+    ENC_NOENC,
 #ifdef MULTICHAR_SET
-	ENC_SJIS , ENC_EUCJ, ENC_GB, ENC_GBK, ENC_GB18030,
-	ENC_BIG5, ENC_EUCKR,
+    ENC_SJIS , ENC_EUCJ, ENC_GB, ENC_GBK, ENC_GB18030,
+    ENC_BIG5, ENC_EUCKR,
 #endif
-	ENC_KOI8R, ENC_KOI8U,
-	ENC_ISO8859_1, ENC_ISO8859_2, ENC_ISO8859_3, ENC_ISO8859_4,
-	ENC_ISO8859_5, ENC_ISO8859_6, ENC_ISO8859_7, ENC_ISO8859_8,
-	ENC_ISO8859_9, ENC_ISO8859_10, ENC_ISO8859_11, ENC_ISO8859_12,
-	ENC_ISO8859_13, ENC_ISO8859_14, ENC_ISO8859_15,
+    ENC_KOI8R, ENC_KOI8U,
+    ENC_ISO8859_1, ENC_ISO8859_2, ENC_ISO8859_3, ENC_ISO8859_4,
+    ENC_ISO8859_5, ENC_ISO8859_6, ENC_ISO8859_7, ENC_ISO8859_8,
+    ENC_ISO8859_9, ENC_ISO8859_10, ENC_ISO8859_11, ENC_ISO8859_12,
+    ENC_ISO8859_13, ENC_ISO8859_14, ENC_ISO8859_15,
 };
 
 

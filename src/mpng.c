@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	mpng.c
+ * File:    mpng.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -43,9 +43,9 @@
 static void
 png_cexcept_error (png_structp png_ptr, png_const_charp msg)
 {
-	if(png_ptr){
-		fprintf(stderr, "png file read error: %s\n", msg);
-	}
+    if(png_ptr){
+	fprintf(stderr, "png file read error: %s\n", msg);
+    }
 }
 
 
@@ -155,10 +155,10 @@ png_uint_32 png_row_bytes;
     rheight = png_height;
     components = png_channels;
 
-	/* possible integer overflow? */
-	assert ((int) png_row_bytes > 0);
-	assert ((int) png_height > 0);
-	assert (((int)png_row_bytes) * ((int)png_height) * sizeof(png_byte) > 0);
+    /* possible integer overflow? */
+    assert ((int) png_row_bytes > 0);
+    assert ((int) png_height > 0);
+    assert (((int)png_row_bytes) * ((int)png_height) * sizeof(png_byte) > 0);
     buf = rxvt_malloc(png_row_bytes * png_height * sizeof(png_byte));
     if (buf == NULL){
 fprintf(stderr,"png read error: out of memory..\n");
@@ -166,9 +166,9 @@ fprintf(stderr,"png read error: out of memory..\n");
       fclose(ifile);
       return -1;
     }
-	/* possible integer overflow? */
-	assert ((int) png_height > 0);
-	assert (sizeof(png_bytep) * ((int)png_height) > 0);
+    /* possible integer overflow? */
+    assert ((int) png_height > 0);
+    assert (sizeof(png_bytep) * ((int)png_height) > 0);
     png_row_ptrs = rxvt_malloc (sizeof(png_bytep)*png_height);
     if (png_row_ptrs == NULL){
 fprintf(stderr,"png read error: out of memory..\n");
@@ -258,10 +258,10 @@ fprintf(stderr,"png read error: out of memory..\n");
       }
     }
 
-	/* possible integer overflow? */
-	assert ((int) image->bytes_per_line > 0);
-	assert ((int) vheight > 0);
-	assert (((int)image->bytes_per_line) * ((int)vheight) > 0);
+    /* possible integer overflow? */
+    assert ((int) image->bytes_per_line > 0);
+    assert ((int) vheight > 0);
+    assert (((int)image->bytes_per_line) * ((int)vheight) > 0);
     data1 = rxvt_malloc(image->bytes_per_line * vheight);
     if (image->bits_per_pixel ==32){
       if (components == 3 || components == 4){
@@ -455,7 +455,7 @@ fprintf(stderr,"png read error: out of memory..\n");
         }
       }
     }else if (image->bits_per_pixel == 8){
-	/* printf("components=%d\n",components); */
+    /* printf("components=%d\n",components); */
       XColor col[5*5*5];
       Colormap cm = DefaultColormap(display,DefaultScreen(display));
       long k;

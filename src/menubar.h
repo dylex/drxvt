@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	menubar.h
+ * File:    menubar.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -25,52 +25,52 @@
 #define __MENUBAR_H__
 
 typedef struct {
-    /* short           menuType; */	/* must not be changed; first element */
-    struct menu_t  *menu;			/* sub-menu */
+    /* short           menuType; */ /* must not be changed; first element */
+    struct menu_t  *menu;	    /* sub-menu */
 } submenu_t;
 
 typedef struct menuitem_t {
     struct menuitem_t	*prev;	/* prev menu-item */
     struct menuitem_t	*next;	/* next menu-item */
-    unsigned char		*name;	/* character string displayed */
-    unsigned char		*name2;	/* character string displayed (right) */
-    unsigned short		len;	/* strlen (name) */
-    unsigned short		len2;	/* strlen (name) */
+    unsigned char	*name;	/* character string displayed */
+    unsigned char	*name2;	/* character string displayed (right) */
+    unsigned short	len;	/* strlen (name) */
+    unsigned short	len2;	/* strlen (name) */
     struct {
-		short           itemType;	/* must not be changed; first element */
-		union {
-			action_t        action;
-			submenu_t       submenu;
-		};
+	short           itemType;   /* must not be changed; first element */
+	union {
+	    action_t        action;
+	    submenu_t       submenu;
+	};
     } entry;
 } menuitem_t;
 
 enum menuitem_t_action {
     MenuLabel=0,
     MenuSubMenu,
-	MenuItem
+    MenuItem
 };
 
 typedef struct menu_t {
-    struct menu_t	*parent;/* parent menu */
-    struct menu_t	*prev;	/* prev menu */
-    struct menu_t	*next;	/* next menu */
-    menuitem_t		*head;	/* double-linked list */
-    menuitem_t		*tail;	/* double-linked list */
-    menuitem_t		*item;	/* current item */
-    unsigned char	*name;	/* menu name */
-    unsigned short	len;	/* strlen (name) */
-    Window          win;	/* window of the menu */
-    short           x;		/* x location [pixels] relative to terminal win */
-    short           y;		/* y location [pixels] relative to terminal win */
-    unsigned short	lwidth,	/* Max width of the left text items */
-					rwidth,	/* Max width of the right text items */
-					height;	/* Window height (pixels) */
+    struct menu_t   *parent;/* parent menu */
+    struct menu_t   *prev;  /* prev menu */
+    struct menu_t   *next;  /* next menu */
+    menuitem_t	    *head;  /* double-linked list */
+    menuitem_t	    *tail;  /* double-linked list */
+    menuitem_t	    *item;  /* current item */
+    unsigned char   *name;  /* menu name */
+    unsigned short  len;    /* strlen (name) */
+    Window          win;    /* window of the menu */
+    short           x;	    /* x location [pixels] relative to terminal win */
+    short           y;	    /* y location [pixels] relative to terminal win */
+    unsigned short  lwidth, /* Max width of the left text items */
+		    rwidth, /* Max width of the right text items */
+		    height; /* Window height (pixels) */
 } menu_t;
 
 typedef struct bar_t {
-    menu_t         *head, *tail;	/* double-linked list of menus */
-    unsigned char  *title;			/* title to put in the empty menuBar */
+    menu_t         *head, *tail;    /* double-linked list of menus */
+    unsigned char  *title;	    /* title to put in the empty menuBar */
 #define NARROWS	4
     action_t        arrows[NARROWS];
 } bar_t;
@@ -79,16 +79,16 @@ typedef struct bar_t {
 /* #define DEBUG_MENU_LAYOUT */
 /* #define DEBUG_MENUBAR_STACKING */
 
-#define HSPACE		1	/* one space */
-#define isSeparator(name)	((name)[0] == '\0')
-#define HEIGHT_SEPARATOR	(SHADOW + 1)
+#define HSPACE	    1	/* one space */
+#define isSeparator(name)   ((name)[0] == '\0')
+#define HEIGHT_SEPARATOR    (SHADOW + 1)
 
 #ifdef XFT_SUPPORT
-# define HSPACE_PIXEL			(r->TermWin.pwidth)
-# define HEIGHT_TEXT			(r->TermWin.pheight + 2)
+# define HSPACE_PIXEL		(r->TermWin.pwidth)
+# define HEIGHT_TEXT		(r->TermWin.pheight + 2)
 #else
-# define HSPACE_PIXEL			(r->TermWin.fwidth)
-# define HEIGHT_TEXT			(r->TermWin.fheight + 2)
+# define HSPACE_PIXEL		(r->TermWin.fwidth)
+# define HEIGHT_TEXT		(r->TermWin.fheight + 2)
 #endif
 
 #define MENUBAR_ARROW_WIDTH HSPACE_PIXEL
@@ -96,19 +96,19 @@ typedef struct bar_t {
 #define MENU_DELAY_USEC	250000	/* 1/4 sec */
 
 
-#define SEPARATOR_NAME		"-"
-#define MENUITEM_BEG		'{'
-#define MENUITEM_END		'}'
-#define COMMENT_CHAR		'#'
+#define SEPARATOR_NAME	    "-"
+#define MENUITEM_BEG	    '{'
+#define MENUITEM_END	    '}'
+#define COMMENT_CHAR	    '#'
 
-#define DOT	"."
+#define DOT "."
 #define DOTS	".."
 
 /*
  * Values for r->h->showingMenu
  */
-#define NOMENU			(0)
-#define POPUP_MENU		(1)
+#define NOMENU		(0)
+#define POPUP_MENU	(1)
 #define PULLDOWN_MENU	(1 << 1)
 
 #endif	/* __MENUBAR_H__ */

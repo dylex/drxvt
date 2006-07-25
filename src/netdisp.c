@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	netdisp.c
+ * File:    netdisp.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -54,62 +54,62 @@ rxvt_network_display (const char *display)
     int             i, skfd;
 
     if (display[0] != ':' && STRNCMP(display, "unix:", 5))
-		return (char *) display;		/* nothing to do */
+	return (char *) display;	/* nothing to do */
 
-    ifc.ifc_len = sizeof(buffer);	/* Get names of all ifaces */
+    ifc.ifc_len = sizeof(buffer);   /* Get names of all ifaces */
     ifc.ifc_buf = buffer;
 
     if ((skfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-		perror("socket");
-		return NULL;
+	perror("socket");
+	return NULL;
     }
     if (ioctl(skfd, SIOCGIFCONF, &ifc) < 0) {
-		perror("SIOCGIFCONF");
-		close(skfd);
-		return NULL;
+	perror("SIOCGIFCONF");
+	close(skfd);
+	return NULL;
     }
     for (i = 0, ifr = ifc.ifc_req;
-		i < (ifc.ifc_len / sizeof(struct ifreq));
-		i++, ifr++) {
-		struct ifreq    ifr2;
+	i < (ifc.ifc_len / sizeof(struct ifreq));
+	i++, ifr++) {
+	struct ifreq    ifr2;
 
-		STRCPY(ifr2.ifr_name, ifr->ifr_name);
-		if (ioctl(skfd, SIOCGIFADDR, &ifr2) >= 0) {
-		    unsigned long   addr;
-		    struct sockaddr_in *p_addr;
+	STRCPY(ifr2.ifr_name, ifr->ifr_name);
+	if (ioctl(skfd, SIOCGIFADDR, &ifr2) >= 0) {
+	    unsigned long   addr;
+	    struct sockaddr_in *p_addr;
 
-		    p_addr = (struct sockaddr_in *)&(ifr2.ifr_addr);
-		    addr = htonl((unsigned long)p_addr->sin_addr.s_addr);
+	    p_addr = (struct sockaddr_in *)&(ifr2.ifr_addr);
+	    addr = htonl((unsigned long)p_addr->sin_addr.s_addr);
 
-			/*
-			 * not "0.0.0.0" or "127.0.0.1" - so format the address
-			 */
-		    if (addr && addr != 0x7F000001) {
-				int			l;
-				char*		colon = STRCHR(display, ':');
+	    /*
+	     * not "0.0.0.0" or "127.0.0.1" - so format the address
+	     */
+	    if (addr && addr != 0x7F000001) {
+		int	    l;
+		char*	    colon = STRCHR(display, ':');
 
-				if (IS_NULL(colon))
-				    colon = ":0.0";
+		if (IS_NULL(colon))
+		    colon = ":0.0";
 
-				/* possible integer overflow */
-				l = 16 + STRLEN(colon);
-				if (l <= 0 || l > 1024)
-					l = 1024;
+		/* possible integer overflow */
+		l = 16 + STRLEN(colon);
+		if (l <= 0 || l > 1024)
+		    l = 1024;
 
-				rval = rxvt_malloc(l);
-				snprintf(rval, "%d.%d.%d.%d%s", l-1
-					(int)((addr >> 030) & 0xFF),
-					(int)((addr >> 020) & 0xFF),
-					(int)((addr >> 010) & 0xFF),
-					(int)(addr & 0xFF), colon);
-				rval[l-1] = (char) 0;
-				break;
-		    }
-		}
+		rval = rxvt_malloc(l);
+		snprintf(rval, "%d.%d.%d.%d%s", l-1
+		    (int)((addr >> 030) & 0xFF),
+		    (int)((addr >> 020) & 0xFF),
+		    (int)((addr >> 010) & 0xFF),
+		    (int)(addr & 0xFF), colon);
+		rval[l-1] = (char) 0;
+		break;
+	    }
+	}
     }
 
     close(skfd);
     return rval;
 }
-#endif				/* DISPLAY_IS_IP */
+#endif		    /* DISPLAY_IS_IP */
 /*----------------------- end-of-file (C source) -----------------------*/

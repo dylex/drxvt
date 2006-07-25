@@ -1,11 +1,11 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	feature.h
+ * File:    feature.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
  * Copyright (c) 1997-1998   Oezguer Kesim <kesim@math.fu-berlin.de>
  * Copyright (c) 2005        William P. Y. Hadisoeseno
- * 										<williampoetra@users.sourceforge.net>
+ * 					<williampoetra@users.sourceforge.net>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gautam@math.uchicago.edu>
  *
@@ -28,14 +28,14 @@
 #define __FEATURE_H__
 
 #ifndef X11USRLIBDIR
-# define X11USRLIBDIR		"/usr/X11R6/lib"
+# define X11USRLIBDIR	    "/usr/X11R6/lib"
 #endif
 #ifndef X11LIBDIR
-# define X11LIBDIR		X11USRLIBDIR "/X11"
+# define X11LIBDIR	X11USRLIBDIR "/X11"
 #endif
 #ifndef XAPPLOADDIR
-# define XAPPLOADDIR		X11LIBDIR "/app-defaults" 
-# define XAPPLOADDIRLOCALE	X11LIBDIR "/%-.*s/app-defaults"
+# define XAPPLOADDIR	    X11LIBDIR "/app-defaults" 
+# define XAPPLOADDIRLOCALE  X11LIBDIR "/%-.*s/app-defaults"
 #endif
 
 /* Check ~/.Xdefaults and ~/.Xresources as well */
@@ -49,7 +49,7 @@
  * Usually it should point to where you keep your background pixmaps and/or
  * your menu files
  */
-#define PATH_ENV	"RXVTPATH"
+#define PATH_ENV    "RXVTPATH"
 
 /*
  * Avoid enabling the colour cursor (-cr, cursorColor, cursorColor2)
@@ -100,34 +100,34 @@
 /*
  * Define maximum possible columns and rows
  */
-#define MAX_COLS	1000
-#define MAX_ROWS	1000
+#define MAX_COLS    1000
+#define MAX_ROWS    1000
 
 /*
  * Define default colours for certain items.  If you have a low colour
  * display, then consider using colours which are already pre-allocated:
- *   Black		(#000000)
- *   Red3		(#CD0000)	+ these
- *   Green3		(#00CD00)	+ colours
- *   Yellow3		(#CDCD00)	+ are
- *   Blue3		(#0000CD)	+ not
- *   Magenta3		(#CD00CD)	+ pre-allocated
- *   Cyan3		(#00CDCD)	+ if
- *   AntiqueWhite	(#FAEBD7)	+ NO_BRIGHTCOLOR
- *   Grey25		(#404040)	+ defined
- *   Red		(#FF0000)
- *   Green		(#00FF00)
- *   Yellow		(#FFFF00)
- *   Blue		(#0000FF)
- *   Magenta		(#FF00FF)
- *   Cyan		(#00FFFF)
- *   White		(#FFFFFF)
+ *   Black	(#000000)
+ *   Red3	(#CD0000)   + these
+ *   Green3	(#00CD00)   + colours
+ *   Yellow3	    (#CDCD00)	+ are
+ *   Blue3	(#0000CD)   + not
+ *   Magenta3	    (#CD00CD)	+ pre-allocated
+ *   Cyan3	(#00CDCD)   + if
+ *   AntiqueWhite   (#FAEBD7)	+ NO_BRIGHTCOLOR
+ *   Grey25	(#404040)   + defined
+ *   Red	(#FF0000)
+ *   Green	(#00FF00)
+ *   Yellow	(#FFFF00)
+ *   Blue	(#0000FF)
+ *   Magenta	    (#FF00FF)
+ *   Cyan	(#00FFFF)
+ *   White	(#FFFFFF)
  */
 /* These colours MUST be defined */
-#define COLOR_FOREGROUND	"Black"
-#define COLOR_BACKGROUND	"White"
-#define COLOR_SCROLLBAR		"#B2B2B2"	/* scrollColor match Netscape */
-#define COLOR_SCROLLTROUGH	"#969696"
+#define COLOR_FOREGROUND    "Black"
+#define COLOR_BACKGROUND    "White"
+#define COLOR_SCROLLBAR	    "#B2B2B2"	/* scrollColor match Netscape */
+#define COLOR_SCROLLTROUGH  "#969696"
 /*
  * The cursor colours are special.  Be very careful about setting these:
  * foreground/background colours may be modified by command line or resources
@@ -146,7 +146,7 @@
 /*
  * Printer pipe which will be used for emulation of attached vt100 printer
  */
-#define PRINTPIPE	"lpr"
+#define PRINTPIPE   "lpr"
 
 /*
  * Allow 80/132 mode switching on startup
@@ -170,9 +170,9 @@
  * Define defaults for backspace and delete keys - unless they have been
  * configured out with --disable-backspace-key / --disable-delete-key
  */
-/* #define DEFAULT_BACKSPACE	"DEC"		*/ /* SPECIAL */
-/* #define DEFAULT_BACKSPACE	"\177"		*/
-/* #define DEFAULT_DELETE	"\033[3~"	*/
+/* #define DEFAULT_BACKSPACE	"DEC"	    */ /* SPECIAL */
+/* #define DEFAULT_BACKSPACE	"\177"	    */
+/* #define DEFAULT_DELETE   "\033[3~"	*/
 
 /*
  * If defined, then escape sequences for keys with a modifier pressed will be
@@ -232,7 +232,7 @@
  * Default separating chars for multiple-click selection
  * Space and tab are separate separating characters and are not settable
  */
-#define CUTCHARS	"\"&'()*,;<=>?@[\\]^`{|}~"
+#define CUTCHARS    "\"&'()*,;<=>?@[\\]^`{|}~"
 
 /*
  * Add run-time support for changing the cutchars for double click selection
@@ -253,7 +253,7 @@
  * Time factor to slow down a `jumpy' mouse.  Motion isn't recognised until
  * this long after the last mouse click [default: 50 milliseconds]
  */
-#define MOUSE_THRESHOLD		50
+#define MOUSE_THRESHOLD	    50
 
 /*
  * If mouse wheel is defined, then scrolling is by 5 lines (or 1 line
@@ -323,7 +323,7 @@
 /*------------------------------TAB BAR---------------------------------*/
 
 /* Default title of new tabs if unspecified */
-#define DEFAULT_TAB_TITLE	"Terminal"
+#define DEFAULT_TAB_TITLE   "Terminal"
 
 /*-----------------------------SCROLL BAR-------------------------------*/
 /*
@@ -335,8 +335,8 @@
 /*
  * Minimum and maximum widths of the scrollbar (all styles)
  */
-#define SB_WIDTH_MINIMUM 	5
-#define SB_WIDTH_MAXIMUM 	100
+#define SB_WIDTH_MINIMUM    5
+#define SB_WIDTH_MAXIMUM    100
 
 /*
  * When using Rxvt scrollbar, clicking above or below the slider will move
@@ -428,57 +428,57 @@
 /* #define SCROLL_ON_NO_SECONDARY */
 
 /* Width of the term internal border */
-#define DEFAULT_INTERNALBORDERWIDTH	(0)
-#define MAX_INTERNALBORDERWIDTH		(20)
+#define DEFAULT_INTERNALBORDERWIDTH (0)
+#define MAX_INTERNALBORDERWIDTH	    (20)
 
 /* Width of the term external border */
-#define DEFAULT_EXTERNALBORDERWIDTH	(0)
-#define MAX_EXTERNALBORDERWIDTH		(20)
+#define DEFAULT_EXTERNALBORDERWIDTH (0)
+#define MAX_EXTERNALBORDERWIDTH	    (20)
 
 /* Default number of extra dots between lines */
-#define DEFAULT_LINESPACE			(0)
-#define MAX_LINESPACE				(20)
+#define DEFAULT_LINESPACE	    (0)
+#define MAX_LINESPACE		    (20)
 
 /* Default seconds of pointer blank delay */
-#define DEFAULT_BLANKDELAY			(2)
-#define MAX_BLANKDELAY				(20)
+#define DEFAULT_BLANKDELAY	    (2)
+#define MAX_BLANKDELAY		    (20)
 
 /* Default number of lines in the scrollback buffer */
-#define DEFAULT_SAVELINES			(100)
-#define MAX_SAVELINES				(0xffff)
+#define DEFAULT_SAVELINES	    (100)
+#define MAX_SAVELINES		    (0xffff)
 
 /* Default bell throttle interval */
 /*
-#define THROTTLE_BELL_MSEC			(500)
-#define THROTTLE_BELL_COUNT			(3)
+#define THROTTLE_BELL_MSEC	    (500)
+#define THROTTLE_BELL_COUNT	    (3)
 */
 
 /* Default tabstop size */
-#define TABSTOP_SIZE				(8)
+#define TABSTOP_SIZE		    (8)
 
 /* Maximal length and display length of tab title */
-#define MAX_TAB_TXT					(507)
-#define MAX_DISPLAY_TAB_TXT			(40)
-#define MAX_TAB_PIXEL_WIDTH			(200)
+#define MAX_TAB_TXT		    (507)
+#define MAX_DISPLAY_TAB_TXT	    (40)
+#define MAX_TAB_PIXEL_WIDTH	    (200)
 
-#define DEFAULT_DISPLAY_TAB_TXT		(27)
-#define DEFAULT_MIN_VISIBLE_TABS	(6)
+#define DEFAULT_DISPLAY_TAB_TXT	    (27)
+#define DEFAULT_MIN_VISIBLE_TABS    (6)
 
 /* Minimum Xft font size (pixel) */
-#define MIN_XFT_FONT_SIZE			(8)
+#define MIN_XFT_FONT_SIZE	    (8)
 
 /* Default Xft font name and size */
-#define DEFAULT_XFT_FONT_SIZE		(12)
-#define DEFAULT_XFT_FONT_NAME		"Monospace"
+#define DEFAULT_XFT_FONT_SIZE	    (12)
+#define DEFAULT_XFT_FONT_NAME	    "Monospace"
 
 /* Default Xft propotional font name and size (used for menubar / tabs) */
-#define DEFAULT_XFT_PFONT_SIZE		(10)
-#define DEFAULT_XFT_PFONT_NAME		"Sans"
+#define DEFAULT_XFT_PFONT_SIZE	    (10)
+#define DEFAULT_XFT_PFONT_NAME	    "Sans"
 
 /* Default cursor blinking time (ms) */
-#define MIN_BLINK_TIME				(100)
-#define DEFAULT_BLINK_TIME			(500)
-#define MAX_BLINK_TIME				(5000)
+#define MIN_BLINK_TIME		    (100)
+#define DEFAULT_BLINK_TIME	    (500)
+#define MAX_BLINK_TIME		    (5000)
 
 /* Make text cursor highlighting be the same as color of char
 ** that the cursor is currently on */
@@ -504,7 +504,7 @@
  * Default interval (micro secs) to wait before refreshing the background under
  * pseudo transparency.
  */
-#define DEFAULT_BG_REFRESH_INTERVAL	100000L
+#define DEFAULT_BG_REFRESH_INTERVAL 100000L
 
 /*
  * Provide termcap/terminfo bw support

@@ -1,5 +1,5 @@
 /*--------------------------------*-H-*---------------------------------*
- * File:	rxvt.h
+ * File:    rxvt.h
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -25,7 +25,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------*/
 
-#ifndef __RXVT_H__		/* include once only */
+#ifndef __RXVT_H__	/* include once only */
 #define __RXVT_H__
 
 #include "../config.h"
@@ -95,11 +95,11 @@
 # if defined(OS_OPENBSD) && (OS_OPENBSD_REL < 39)
 typedef unsigned int    _our_wint_t;
 typedef struct {
-	int __count;
-	union {
-		_our_wint_t	__wch;
-		char		__wchb[4]
-	} __value;
+    int __count;
+    union {
+	_our_wint_t __wch;
+	char	    __wchb[4]
+    } __value;
 } mbstate_t;
 # endif /* defined(OS_OPENBSD) &&... */
 # include <wchar.h>
@@ -135,12 +135,12 @@ typedef struct {
 #endif
 
 #if defined(PTYS_ARE_PTMX) && defined(HAVE_SYS_STROPTS_H)
-# include <sys/stropts.h>	/* for I_PUSH */
+# include <sys/stropts.h>   /* for I_PUSH */
 #endif
 
 #if defined(PTYS_ARE_PTMX) && !defined(OS_CYGWIN)
 # include <sys/resource.h>
-# define _NEW_TTY_CTRL		/* get proper definition in <termios.h> */
+# define _NEW_TTY_CTRL	    /* get proper definition in <termios.h> */
 #endif
 
 #ifdef HAVE_TIME_H
@@ -194,7 +194,7 @@ typedef struct {
 #ifdef OS_QNX
 # include <process.h>
 # include <sys/utsname.h>
-# define ut_name	ut_user
+# define ut_name    ut_user
 #endif
 
 #ifdef TTY_GID_SUPPORT
@@ -236,11 +236,11 @@ typedef struct {
  * thus this ugly hack.
  */
 typedef struct {
-	int	flags;
-	int	functions;
-	int	decorations;
-	int	input_mode;
-	int	status;
+    int	flags;
+    int	functions;
+    int	decorations;
+    int	input_mode;
+    int	status;
 } MWMHints;
 # ifdef HAVE_X11_SM_SMLIB_H
 #  include <X11/SM/SMlib.h>
@@ -254,76 +254,76 @@ typedef struct {
 #undef IS_WIN
 #undef NOT_WIN
 #undef UNSET_WIN
-#define IS_WIN(WINDOW_ID)	\
-	(None != (WINDOW_ID))
-#define NOT_WIN(WINDOW_ID)	\
-	(None == (WINDOW_ID))
+#define IS_WIN(WINDOW_ID)   \
+    (None != (WINDOW_ID))
+#define NOT_WIN(WINDOW_ID)  \
+    (None == (WINDOW_ID))
 #define UNSET_WIN(WINDOW_ID)	\
-	((WINDOW_ID) = None)
+    ((WINDOW_ID) = None)
 
 #undef IS_PIXMAP
 #undef NOT_PIXMAP
 #undef UNSET_PIXMAP
 #define IS_PIXMAP(PIXMAP_ID)	\
-	(None != (PIXMAP_ID))
+    (None != (PIXMAP_ID))
 #define NOT_PIXMAP(PIXMAP_ID)	\
-	(None == (PIXMAP_ID))
+    (None == (PIXMAP_ID))
 #define UNSET_PIXMAP(PIXMAP_ID)	\
-	((PIXMAP_ID) = None)
+    ((PIXMAP_ID) = None)
 
 #undef IS_ATOM
 #undef NOT_ATOM
 #undef UNSET_ATOM
-#define IS_ATOM(ATOM_ID)	\
-	(None != (ATOM_ID))
-#define NOT_ATOM(ATOM_ID)	\
-	(None == (ATOM_ID))
-#define UNSET_ATOM(ATOM_ID)	\
-	((ATOM_ID) = None)
+#define IS_ATOM(ATOM_ID)    \
+    (None != (ATOM_ID))
+#define NOT_ATOM(ATOM_ID)   \
+    (None == (ATOM_ID))
+#define UNSET_ATOM(ATOM_ID) \
+    ((ATOM_ID) = None)
 
 #undef IS_GC
 #undef NOT_GC
 #undef UNSET_GC
 #define IS_GC(GC_ID)	\
-	(None != (GC_ID))
+    (None != (GC_ID))
 #define NOT_GC(GC_ID)	\
-	(None == (GC_ID))
+    (None == (GC_ID))
 #define UNSET_GC(GC_ID)	\
-	((GC_ID) = None)
+    ((GC_ID) = None)
 
 #undef IS_CURSOR
 #undef NOT_CURSOR
 #undef UNSET_CURSOR
 #define IS_CURSOR(CURSOR_ID)	\
-	(None != (CURSOR_ID))
+    (None != (CURSOR_ID))
 #define NOT_CURSOR(CURSOR_ID)	\
-	(None == (CURSOR_ID))
+    (None == (CURSOR_ID))
 #define UNSET_CURSOR(CURSOR_ID)	\
-	((CURSOR_ID) = None)
+    ((CURSOR_ID) = None)
 
 #undef IS_REGION
 #undef NOT_REGION
 #undef UNSET_REGION
 #define IS_REGION(REGION_ID)	\
-	(None != (REGION_ID))
+    (None != (REGION_ID))
 #define NOT_REGION(REGION_ID)	\
-	(None == (REGION_ID))
+    (None == (REGION_ID))
 #define UNSET_REGION(REGION_ID)	\
-	((REGION_ID) = None)
+    ((REGION_ID) = None)
 
 #undef IS_KEYSYM
 #undef NOT_KEYSYM
 #undef UNSET_KEYSYM
 #define IS_KEYSYM(KEYSYM_ID)	\
-	(None != (KEYSYM_ID))
+    (None != (KEYSYM_ID))
 #define NOT_KEYSYM(KEYSYM_ID)	\
-	(None == (KEYSYM_ID))
+    (None == (KEYSYM_ID))
 #define UNSET_KEYSYM(KEYSYM_ID)	\
-	((KEYSYM_ID) = None)
+    ((KEYSYM_ID) = None)
 
 
 #ifndef HAVE_XPOINTER
-typedef char*		XPointer;
+typedef char*	    XPointer;
 #endif
 
 
@@ -340,7 +340,7 @@ typedef char*		XPointer;
 #   include <libpng/png.h>
 #  else
 #   include <png.h>
-#  endif	/* OS_OPENBSD */
+#  endif    /* OS_OPENBSD */
 # endif	/* USE_PNG */
 #endif
 
@@ -364,16 +364,16 @@ typedef char*		XPointer;
 */
 #ifdef XFT_SUPPORT
 # ifndef FC_WIDTH
-#  define FC_WIDTH					"width"
-#  define FC_WIDTH_ULTRACONDENSED	(50)
-#  define FC_WIDTH_EXTRACONDENSED	(63)
-#  define FC_WIDTH_CONDENSED		(75)
-#  define FC_WIDTH_SEMICONDENSED	(87)
-#  define FC_WIDTH_NORMAL			(100)
-#  define FC_WIDTH_SEMIEXPANDED		(113)
-#  define FC_WIDTH_EXPANDED			(125)
-#  define FC_WIDTH_EXTRAEXPANDED	(150)
-#  define FC_WIDTH_ULTRAEXPANDED	(200)
+#  define FC_WIDTH		    "width"
+#  define FC_WIDTH_ULTRACONDENSED   (50)
+#  define FC_WIDTH_EXTRACONDENSED   (63)
+#  define FC_WIDTH_CONDENSED	    (75)
+#  define FC_WIDTH_SEMICONDENSED    (87)
+#  define FC_WIDTH_NORMAL	    (100)
+#  define FC_WIDTH_SEMIEXPANDED	    (113)
+#  define FC_WIDTH_EXPANDED	    (125)
+#  define FC_WIDTH_EXTRAEXPANDED    (150)
+#  define FC_WIDTH_ULTRAEXPANDED    (200)
 # endif
 #endif
 
@@ -446,10 +446,10 @@ typedef char*		XPointer;
 
 #ifdef LASTLOG_SUPPORT
 # ifdef OS_SOLARIS
-#  define LASTLOG_FILE		"/var/adm/lastlog"
+#  define LASTLOG_FILE	    "/var/adm/lastlog"
 # endif
 # ifdef OS_OSF
-#  define LASTLOG_FILE		"/var/adm/lastlog"
+#  define LASTLOG_FILE	    "/var/adm/lastlog"
 # endif
 # if !defined(LASTLOG_FILE) && defined(_PATH_LASTLOG)
 #  define LASTLOG_FILE     _PATH_LASTLOG
@@ -457,16 +457,16 @@ typedef char*		XPointer;
 # if !defined(LASTLOG_FILENAME) && defined(LASTLOG_FILE)
 #  define LASTLOG_FILENAME LASTLOG_FILE
 # endif
-# define RXVT_LASTLOG_FILE	LASTLOG_FILENAME
+# define RXVT_LASTLOG_FILE  LASTLOG_FILENAME
 #endif
 
 #ifdef UTMP_SUPPORT
 # ifdef RXVT_UTMP_SYSV
 #  ifndef USER_PROCESS
-#   define USER_PROCESS		(7)
+#   define USER_PROCESS	    (7)
 #  endif
 #  ifndef DEAD_PROCESS
-#   define DEAD_PROCESS		(8)
+#   define DEAD_PROCESS	    (8)
 #  endif
 # endif
 #endif
@@ -474,9 +474,9 @@ typedef char*		XPointer;
 
 
 #ifdef NO_SECONDARY_SCREEN
-# define NSCREENS		0
+# define NSCREENS	0
 #else
-# define NSCREENS		1
+# define NSCREENS	1
 #endif
 
 
@@ -491,8 +491,8 @@ typedef char*		XPointer;
 #ifdef __GNUC__
 # define $tainted
 # define $untainted
-# define TAINTED	$tainted
-# define UNTAINTED	$untainted
+# define TAINTED    $tainted
+# define UNTAINTED  $untainted
 #else
 # define TAINTED
 # define UNTAINTED
@@ -548,7 +548,7 @@ typedef char*		XPointer;
  * STRUCTURES AND TYPEDEFS
  *****************************************************************************
  */
-struct rxvt_vars;		/* Later REDEFINED and typedef'd to rxvt_t */
+struct rxvt_vars;	/* Later REDEFINED and typedef'd to rxvt_t */
 struct rxvt_hidden;
 
 
@@ -597,25 +597,25 @@ struct rxvt_hidden;
  */
 struct mouse_event {
     int             clicks;
-    Time            time;	/* milliseconds */
-    unsigned int    state;	/* key or button mask */
-    unsigned int    button;	/* detail */
+    Time            time;   /* milliseconds */
+    unsigned int    state;  /* key or button mask */
+    unsigned int    button; /* detail */
 };
 
 #ifndef min
-# define min(a,b)	(((a) < (b)) ? (a) : (b))
-# define max(a,b)	(((a) > (b)) ? (a) : (b))
+# define min(a,b)   (((a) < (b)) ? (a) : (b))
+# define max(a,b)   (((a) > (b)) ? (a) : (b))
 #endif
 
 #define MAX_IT(current, other)	if ((other) > (current)) (current) = (other)
 #define MIN_IT(current, other)	if ((other) < (current)) (current) = (other)
-#define SWAP_IT(one, two, typeof)									\
-    {																\
-		typeof          swapittmp;									\
-		(swapittmp) = (one); (one) = (two); (two) = (swapittmp);	\
+#define SWAP_IT(one, two, typeof)				    \
+    {								    \
+	typeof          swapittmp;				    \
+	(swapittmp) = (one); (one) = (two); (two) = (swapittmp);    \
     }
 
-#define BOUND_POSITIVE_INT16(val)									\
+#define BOUND_POSITIVE_INT16(val)				    \
     (RINT16T)( (val) <= 0 ? 0 : min( (val), (((RUINT16T)-1)>>1) )  )
 
 /*
@@ -628,9 +628,9 @@ struct mouse_event {
 # error if you disable both selection styles, how can you select, silly?
 #endif
 
-#define APL_CLASS		"XTerm"		/* class name */
+#define APL_CLASS	"XTerm"	    /* class name */
 #define APL_SUBCLASS	"Mrxvt"	/* also check resources under this name */
-#define APL_NAME		"mrxvt"	/* normal name */
+#define APL_NAME	"mrxvt"	/* normal name */
 
 /* COLORTERM, TERM environment variables */
 #define COLORTERMENV	"rxvt"
@@ -640,10 +640,10 @@ struct mouse_event {
 # define COLORTERMENVFULL COLORTERMENV
 #endif
 #ifndef TERMENV
-# define TERMENV		"xterm"
+# define TERMENV	"xterm"
 #endif
 
-#define TABTITLEENV		"MRXVT_TABTITLE="
+#define TABTITLEENV	"MRXVT_TABTITLE="
 
 
 #if defined (NO_MOUSE_REPORT) && !defined (NO_MOUSE_REPORT_SCROLLBAR)
@@ -660,63 +660,63 @@ struct mouse_event {
 # define EACCESS EAGAIN
 #endif
 
-#ifndef EXIT_SUCCESS		/* missing from <stdlib.h> */
-# define EXIT_SUCCESS		0	/* exit function success */
-# define EXIT_FAILURE		1	/* exit function failure */
+#ifndef EXIT_SUCCESS	    /* missing from <stdlib.h> */
+# define EXIT_SUCCESS	    0	/* exit function success */
+# define EXIT_FAILURE	    1	/* exit function failure */
 #endif
 
-#define menuBar_esc			(10)
-#define scrollBar_esc		(30)
-#define MENUBAR_MARGIN		(2)	/* margin below text */
+#define menuBar_esc	    (10)
+#define scrollBar_esc	    (30)
+#define MENUBAR_MARGIN	    (2)	/* margin below text */
 
 /* width of scrollBar, menuBar shadow, must be 1 or 2 */
 #ifdef HALFSHADOW
-# define SHADOW				(1)
+# define SHADOW		    (1)
 #else
-# define SHADOW				(2)
+# define SHADOW		    (2)
 #endif
 
-#define R_SB_ALIGN_CENTRE	(0)
-#define R_SB_ALIGN_TOP		(1)
-#define R_SB_ALIGN_BOTTOM	(2)
+#define R_SB_ALIGN_CENTRE   (0)
+#define R_SB_ALIGN_TOP	    (1)
+#define R_SB_ALIGN_BOTTOM   (2)
 
-#define R_SB_UNKNOWN		(-1)
-#define R_SB_RXVT			(0)
-#define R_SB_NEXT			(1)
-#define R_SB_XTERM			(2)
-#define R_SB_SGI			(3)
-#define R_SB_PLAIN			(4)
+#define R_SB_UNKNOWN	    (-1)
+#define R_SB_RXVT	    (0)
+#define R_SB_NEXT	    (1)
+#define R_SB_XTERM	    (2)
+#define R_SB_SGI	    (3)
+#define R_SB_PLAIN	    (4)
 
-#define SB_WIDTH_PLAIN		(15)
-#define SB_WIDTH_XTERM		(15)
-#define SB_WIDTH_RXVT		(10)
-#define SB_WIDTH_NEXT		(17)
-#define SB_WIDTH_SGI		(16)
+#define SB_WIDTH_PLAIN	    (15)
+#define SB_WIDTH_XTERM	    (15)
+#define SB_WIDTH_RXVT	    (10)
+#define SB_WIDTH_NEXT	    (17)
+#define SB_WIDTH_SGI	    (16)
 
 
 #ifdef NEXT_SCROLLBAR
 /*
 ** NeXT scrollbar definitions
 */
-#define NEXT_SB_WIDTH			(SB_WIDTH_NEXT)
-#define NEXT_SB_PAD				(1)
-#define NEXT_SB_BD_WIDTH		(1)
+#define NEXT_SB_WIDTH		(SB_WIDTH_NEXT)
+#define NEXT_SB_PAD		(1)
+#define NEXT_SB_BD_WIDTH	(1)
 #define NEXT_BEVEL_ULEFT_WIDTH	(1)
 #define NEXT_BEVEL_LRIGHT_WIDTH	(2)
-#define NEXT_SB_LPAD			(NEXT_SB_PAD + NEXT_SB_BD_WIDTH)
-#define NEXT_SB_MARGIN			(NEXT_SB_PAD<<1)
-#define NEXT_SB_BTN_WIDTH		(NEXT_SB_WIDTH - NEXT_SB_MARGIN - NEXT_SB_BD_WIDTH)
+#define NEXT_SB_LPAD		(NEXT_SB_PAD + NEXT_SB_BD_WIDTH)
+#define NEXT_SB_MARGIN		(NEXT_SB_PAD<<1)
+#define NEXT_SB_BTN_WIDTH	(NEXT_SB_WIDTH - NEXT_SB_MARGIN - NEXT_SB_BD_WIDTH)
 /* button height */
-#define NEXT_SB_BTN_HEIGHT		(NEXT_SB_BTN_WIDTH)
+#define NEXT_SB_BTN_HEIGHT	(NEXT_SB_BTN_WIDTH)
 /* single button height */
-#define NEXT_SB_SBTN_HEIGHT		(NEXT_SB_BTN_HEIGHT + NEXT_SB_PAD)
+#define NEXT_SB_SBTN_HEIGHT	(NEXT_SB_BTN_HEIGHT + NEXT_SB_PAD)
 /* double button height */
-#define NEXT_SB_DBTN_HEIGHT		(NEXT_SB_SBTN_HEIGHT<<1)
+#define NEXT_SB_DBTN_HEIGHT	(NEXT_SB_SBTN_HEIGHT<<1)
 /* total button height */
-#define NEXT_SB_TBTN_HEIGHT		(NEXT_SB_DBTN_HEIGHT + NEXT_SB_PAD)
-#define NEXT_BEVEL_X			(NEXT_SB_LPAD)
-#define NEXT_BTN_FACE_X			(NEXT_BEVEL_X + NEXT_BEVEL_ULEFT_WIDTH)
-#define NEXT_SB_MIN_HEIGHT		(NEXT_SB_BTN_WIDTH - (NEXT_SB_PAD<<1))
+#define NEXT_SB_TBTN_HEIGHT	(NEXT_SB_DBTN_HEIGHT + NEXT_SB_PAD)
+#define NEXT_BEVEL_X		(NEXT_SB_LPAD)
+#define NEXT_BTN_FACE_X		(NEXT_BEVEL_X + NEXT_BEVEL_ULEFT_WIDTH)
+#define NEXT_SB_MIN_HEIGHT	(NEXT_SB_BTN_WIDTH - (NEXT_SB_PAD<<1))
  /*
   *    +-------------+
   *    |             | <---< NEXT_SB_PAD
@@ -771,12 +771,12 @@ struct mouse_event {
 */
 #define SGI_ARROW_SOURCE_WIDTH	(14)
 #define SGI_ARROW_SOURCE_HEIGHT	(14)
-#define SGI_BEVEL_HI_WIDTH		(1)
-#define SGI_BEVEL_LO_WIDTH		(1)
-#define SGI_BEVEL_SIZE			(SGI_BEVEL_HI_WIDTH+SGI_BEVEL_LO_WIDTH)
+#define SGI_BEVEL_HI_WIDTH	(1)
+#define SGI_BEVEL_LO_WIDTH	(1)
+#define SGI_BEVEL_SIZE		(SGI_BEVEL_HI_WIDTH+SGI_BEVEL_LO_WIDTH)
 
-#define SGI_ARROW_WIDTH			(SB_WIDTH_SGI-(SGI_BEVEL_SIZE<<1))
-#define SGI_ARROW_HEIGHT		(SGI_ARROW_SOURCE_HEIGHT)
+#define SGI_ARROW_WIDTH		(SB_WIDTH_SGI-(SGI_BEVEL_SIZE<<1))
+#define SGI_ARROW_HEIGHT	(SGI_ARROW_SOURCE_HEIGHT)
 
 #define SGI_SB_BUTTON_HEIGHT	((SGI_BEVEL_SIZE<<1)+SGI_ARROW_WIDTH)
 #define SGI_SB_BUTTONS_HEIGHT	(SGI_SB_BUTTON_HEIGHT<<1)
@@ -787,40 +787,40 @@ struct mouse_event {
 /*
  * Options for r->h->refresh_type.
  */
-#define NO_REFRESH			(0)		/* Window not visible at all! */
-#define FAST_REFRESH		(1<<0)	/* Fully exposed window */
-#define SLOW_REFRESH		(1<<1)	/* Partially exposed window */
-#define SMOOTH_REFRESH		(1<<2)	/* Do sync'ing to make it smooth */
-#define REFRESH_BOUNDS		(1<<3)	/* Refresh window borders */
-#define CLIPPED_REFRESH		(1<<4)	/* Honor clipping in GC while refreshing */
+#define NO_REFRESH	    (0)	    /* Window not visible at all! */
+#define FAST_REFRESH	    (1<<0)  /* Fully exposed window */
+#define SLOW_REFRESH	    (1<<1)  /* Partially exposed window */
+#define SMOOTH_REFRESH	    (1<<2)  /* Do sync'ing to make it smooth */
+#define REFRESH_BOUNDS	    (1<<3)  /* Refresh window borders */
+#define CLIPPED_REFRESH	    (1<<4)  /* Honor clipping in GC while refreshing */
 
 /*
  * Options for r->h->want_resize
  */
-#define FORCE_RESIZE		(1U << 0)
-#define FORCE_REFRESH		(1U << 1)
+#define FORCE_RESIZE	    (1U << 0)
+#define FORCE_REFRESH	    (1U << 1)
 
 /*
  * Continue undocumented mrxvt code
  */
-#define IGNORE			0
-#define SAVE			's'
-#define RESTORE			'r'
+#define IGNORE		0
+#define SAVE		's'
+#define RESTORE		'r'
 
 /* special (internal) prefix for font commands */
-#define FONT_CMD		'#'
-#define FONT_DN			"#-"
-#define FONT_UP			"#+"
+#define FONT_CMD	'#'
+#define FONT_DN		"#-"
+#define FONT_UP		"#+"
 
 /* flags for rxvt_scr_gotorc() */
-#define C_RELATIVE		1	/* col movement is relative */
-#define R_RELATIVE		2	/* row movement is relative */
-#define RELATIVE		(R_RELATIVE|C_RELATIVE)
+#define C_RELATIVE	1   /* col movement is relative */
+#define R_RELATIVE	2   /* row movement is relative */
+#define RELATIVE	(R_RELATIVE|C_RELATIVE)
 
 /* modes for rxvt_scr_insdel_chars(), rxvt_scr_insdel_lines() */
-#define INSERT			-1	/* don't change these values */
-#define DELETE			+1
-#define ERASE			+2
+#define INSERT		-1  /* don't change these values */
+#define DELETE		+1
+#define ERASE		+2
 
 /* modes for rxvt_scr_page() - scroll page. used by scrollbar window */
 enum page_dirn {
@@ -830,8 +830,8 @@ enum page_dirn {
 };
 
 /* arguments for rxvt_scr_change_screen() */
-#define PRIMARY		(0)
-#define SECONDARY	(1)
+#define PRIMARY	    (0)
+#define SECONDARY   (1)
 
 enum {
     SBYTE = 0,
@@ -839,43 +839,43 @@ enum {
 };
 
 
-#define RS_None			0	/* Normal */
+#define RS_None		0   /* Normal */
 
 #if defined(TTY_256COLOR)
 /* have at least 32 bits to use */
-# define RS_fgMask			0x000001FFu	/* 512 colors */
-# define RS_bgMask			0x0003FE00u	/* 512 colors */
-# define RS_Bold			0x00040000u	/* bold */
-# define RS_Blink			0x00080000u	/* blink */
-# define RS_RVid			0x00100000u	/* reverse video */
-# define RS_Uline			0x00200000u	/* underline */
-# define RS_acsFont			0x00400000u	/* ACS graphics char set */
-# define RS_ukFont			0x00800000u	/* UK character set */
+# define RS_fgMask	    0x000001FFu	/* 512 colors */
+# define RS_bgMask	    0x0003FE00u	/* 512 colors */
+# define RS_Bold	    0x00040000u	/* bold */
+# define RS_Blink	    0x00080000u	/* blink */
+# define RS_RVid	    0x00100000u	/* reverse video */
+# define RS_Uline	    0x00200000u	/* underline */
+# define RS_acsFont	    0x00400000u	/* ACS graphics char set */
+# define RS_ukFont	    0x00800000u	/* UK character set */
 #else
 /* may only have 16 bits to use so squash them in */
-# define RS_fgMask			0x0000001Fu	/* 32 colors */
-# define RS_bgMask			0x000003E0u	/* 32 colors */
-# define RS_Bold			0x00000400u	/* bold */
-# define RS_Blink			0x00000800u	/* blink */
-# define RS_RVid			0x00001000u	/* reverse video */
-# define RS_Uline			0x00002000u	/* underline */
-# define RS_acsFont			0x00004000u	/* ACS graphics char set */
-# define RS_ukFont			0x00008000u	/* UK character set */
+# define RS_fgMask	    0x0000001Fu	/* 32 colors */
+# define RS_bgMask	    0x000003E0u	/* 32 colors */
+# define RS_Bold	    0x00000400u	/* bold */
+# define RS_Blink	    0x00000800u	/* blink */
+# define RS_RVid	    0x00001000u	/* reverse video */
+# define RS_Uline	    0x00002000u	/* underline */
+# define RS_acsFont	    0x00004000u	/* ACS graphics char set */
+# define RS_ukFont	    0x00008000u	/* UK character set */
 #endif
 
 #ifdef MULTICHAR_SET
-# define RS_multi0			0x10000000u	/* only multibyte characters */
-# define RS_multi1			0x20000000u	/* multibyte 1st byte */
+# define RS_multi0	    0x10000000u	/* only multibyte characters */
+# define RS_multi1	    0x20000000u	/* multibyte 1st byte */
 /* multibyte 2nd byte */
-# define RS_multi2			(RS_multi0|RS_multi1)
+# define RS_multi2	    (RS_multi0|RS_multi1)
 /* multibyte mask */
-# define RS_multiMask		(RS_multi0|RS_multi1)
-# define IS_MULTI1(R)		(((R) & RS_multiMask) == RS_multi1)
-# define IS_MULTI2(R)		(((R) & RS_multiMask) == RS_multi2)
+# define RS_multiMask	    (RS_multi0|RS_multi1)
+# define IS_MULTI1(R)	    (((R) & RS_multiMask) == RS_multi1)
+# define IS_MULTI2(R)	    (((R) & RS_multiMask) == RS_multi2)
 #else
-# define RS_multiMask		(0)
-# define IS_MULTI1(r)		(0)
-# define IS_MULTI2(r)		(0)
+# define RS_multiMask	    (0)
+# define IS_MULTI1(r)	    (0)
+# define IS_MULTI2(r)	    (0)
 #endif
 
 
@@ -892,19 +892,19 @@ enum {
 #endif
 
 
-#define RS_fontMask			(RS_acsFont|RS_ukFont)
-#define RS_baseattrMask		(RS_Bold|RS_Blink|RS_RVid|RS_Uline)
-#define RS_attrMask			(RS_baseattrMask|RS_fontMask|RS_multiMask)
+#define RS_fontMask	    (RS_acsFont|RS_ukFont)
+#define RS_baseattrMask	    (RS_Bold|RS_Blink|RS_RVid|RS_Uline)
+#define RS_attrMask	    (RS_baseattrMask|RS_fontMask|RS_multiMask)
 
-#define Sel_none			0	/* Not waiting */
-#define Sel_normal			0x01	/* normal selection */
-#define Sel_incr			0x02	/* incremental selection */
-#define Sel_direct			0x00
-#define Sel_Primary			0x01
-#define Sel_Secondary		0x02
-#define Sel_Clipboard		0x03
-#define Sel_whereMask		0x0f
-#define Sel_CompoundText	0x10	/* last request was Compound */
+#define Sel_none	    0	/* Not waiting */
+#define Sel_normal	    0x01    /* normal selection */
+#define Sel_incr	    0x02    /* incremental selection */
+#define Sel_direct	    0x00
+#define Sel_Primary	    0x01
+#define Sel_Secondary	    0x02
+#define Sel_Clipboard	    0x03
+#define Sel_whereMask	    0x0f
+#define Sel_CompoundText    0x10    /* last request was Compound */
 
 enum {
     C0_NUL = 0x00,
@@ -913,83 +913,83 @@ enum {
     C0_DLE, C0_DC1, C0_DC2, D0_DC3, C0_DC4, C0_NAK, C0_SYN, C0_ETB,
     C0_CAN, C0_EM , C0_SUB, C0_ESC, C0_IS4, C0_IS3, C0_IS2, C0_IS1
 }; 
-#define CHAR_ST			0x9c	/* 0234 */
+#define CHAR_ST		0x9c	/* 0234 */
 
 
 /*
 ** Xwsh escape sequences: ESC P Ps .y Pt ESC
 */
-#define Xwsh_title				(1)
-#define Xwsh_iconName			(3)
-#define Xwsh_textColor			(4)
-#define Xwsh_pageColor			(5)
-#define Xwsh_selTextColor		(6)
-#define Xwsh_selPageColor		(7)
+#define Xwsh_title		(1)
+#define Xwsh_iconName		(3)
+#define Xwsh_textColor		(4)
+#define Xwsh_pageColor		(5)
+#define Xwsh_selTextColor	(6)
+#define Xwsh_selPageColor	(7)
 #define Xwsh_cursorTextColor	(8)
 #define Xwsh_cursorPageColor	(9)
-#define Xwsh_halfIntColor		(10)
-#define Xwsh_boldIntColor		(11)
-#define Xwsh_bindStrKeyVal		(101) /* not implemented */
-#define Xwsh_bindStrKeyFunc		(103) /* not implemented */
+#define Xwsh_halfIntColor	(10)
+#define Xwsh_boldIntColor	(11)
+#define Xwsh_bindStrKeyVal	(101) /* not implemented */
+#define Xwsh_bindStrKeyFunc	(103) /* not implemented */
 
 
 /*
 ** XTerm Operating System Commands: ESC ] Ps;Pt (ST|BEL)
 ** colour extensions by Christian W. Zuckschwerdt <zany@triq.net>
 */
-#define XTerm_name			(0)
-#define XTerm_iconName		(1)
-#define XTerm_title			(2)
-#define XTerm_Color			(4)  /* change colors */
-#define XTerm_Color_cursor	(12) /* change actual 'Cursor' color */
-#define XTerm_Color_pointer	(13) /* change actual 'Pointer' color */
-#define XTerm_Color_RV		(17) /* change actual 'Highlight' color */
-#define XTerm_Color_BD		(18) /* change actual 'Bold' color */
-#define XTerm_Color_UL		(19) /* change actual 'Underline' color */
-#define XTerm_logfile		(46) /* not implemented */
-#define XTerm_font			(50)
+#define XTerm_name	    (0)
+#define XTerm_iconName	    (1)
+#define XTerm_title	    (2)
+#define XTerm_Color	    (4)  /* change colors */
+#define XTerm_Color_cursor  (12) /* change actual 'Cursor' color */
+#define XTerm_Color_pointer (13) /* change actual 'Pointer' color */
+#define XTerm_Color_RV	    (17) /* change actual 'Highlight' color */
+#define XTerm_Color_BD	    (18) /* change actual 'Bold' color */
+#define XTerm_Color_UL	    (19) /* change actual 'Underline' color */
+#define XTerm_logfile	    (46) /* not implemented */
+#define XTerm_font	    (50)
 
 
 /*
 ** rxvt extensions of XTerm OSCs: ESC ] Ps;Pt (ST|BEL)
 */
-#define XTerm_Menu			(10) /* set menu item */
-#define XTerm_Pixmap		(20) /* new bg pixmap */
-#define XTerm_restoreFG		(39) /* change default fg color */
-#define XTerm_restoreBG		(49) /* change default bg color */
-#define XTerm_dumpscreen	(55) /* dump scrollback and all screen */
+#define XTerm_Menu	    (10) /* set menu item */
+#define XTerm_Pixmap	    (20) /* new bg pixmap */
+#define XTerm_restoreFG	    (39) /* change default fg color */
+#define XTerm_restoreBG	    (49) /* change default bg color */
+#define XTerm_dumpscreen    (55) /* dump scrollback and all screen */
 
 
 /*
  * mrxvt extensions of XTerm OSCs: ESC ] Ps;Pt (ST|BEL)
  * Example: echo "\e]61;newtitle\a"
  */
-#define MRxvt_term			(60) /* Change window title */
-#define MRxvt_tab			(61) /* change tab title */
-#define MRxvt_tabterm		(62) /* change tab and terminal title */
-/* #define MRxvt_newtab		(63) ** DISABLED create a new tab with title */
-/* #define MRxvt_prevtab	(64) ** DISABLED switch to previous tab */
-/* #define MRxvt_nexttab	(65) ** DISABLED switch to next tab */
-#define MRxvt_tint			(66) /* change tinting color */
-#define MRxvt_shade			(67) /* change shade level */
-#define MRxvt_encode		(68) /* change encoding */
-/* #define MRxvt_hide		(69) ** DISABLED hide/show tabbar */
-#define MRxvt_opacity		(70) /* set opacity level */
-/* #define MRxvt_tabbtn		(71) ** DISABLED hide/show tabbar buttons */
-#define MRxvt_tabfg			(72) /* change active tab fg */
-#define MRxvt_tabbg			(73) /* change tabbar/active tab bg */
-#define MRxvt_itabfg		(74) /* change inactive tab fg */
-#define MRxvt_itabbg		(75) /* change inactive tab bg */
-/* #define MRxvt_trans		(76) ** DISABLED toggle transparency */
-/* #define MRxvt_moveleft	(77) ** DISABLED move active tab to left */
-/* #define MRxvt_moveright	(78) ** DISABLED move active tab to right */
-/* #define MRxvt_verybold	(79) ** DISABLED toggle bold font for color text */
-/* #define MRxvt_hotkeys	(80) ** DISABLED toggle hotkeys */
-/* #define MRxvt_saveconfig	(81) ** DISABLED save configuration */
-#define MRxvt_bgfade		(82) /* set bgfade degree (Obsolete) */
-#define MRxvt_termenv		(83) /* set TERMENV type */
-/* #define MRxvt_closewin	(84) ** DISABLED Close all tabs and exit */
-/* #define MRxvt_switchtab	(85) ** DISABLED Switch to tab N */
+#define MRxvt_term	    (60) /* Change window title */
+#define MRxvt_tab	    (61) /* change tab title */
+#define MRxvt_tabterm	    (62) /* change tab and terminal title */
+/* #define MRxvt_newtab	    (63) ** DISABLED create a new tab with title */
+/* #define MRxvt_prevtab    (64) ** DISABLED switch to previous tab */
+/* #define MRxvt_nexttab    (65) ** DISABLED switch to next tab */
+#define MRxvt_tint	    (66) /* change tinting color */
+#define MRxvt_shade	    (67) /* change shade level */
+#define MRxvt_encode	    (68) /* change encoding */
+/* #define MRxvt_hide	    (69) ** DISABLED hide/show tabbar */
+#define MRxvt_opacity	    (70) /* set opacity level */
+/* #define MRxvt_tabbtn	    (71) ** DISABLED hide/show tabbar buttons */
+#define MRxvt_tabfg	    (72) /* change active tab fg */
+#define MRxvt_tabbg	    (73) /* change tabbar/active tab bg */
+#define MRxvt_itabfg	    (74) /* change inactive tab fg */
+#define MRxvt_itabbg	    (75) /* change inactive tab bg */
+/* #define MRxvt_trans	    (76) ** DISABLED toggle transparency */
+/* #define MRxvt_moveleft   (77) ** DISABLED move active tab to left */
+/* #define MRxvt_moveright  (78) ** DISABLED move active tab to right */
+/* #define MRxvt_verybold   (79) ** DISABLED toggle bold font for color text */
+/* #define MRxvt_hotkeys    (80) ** DISABLED toggle hotkeys */
+/* #define MRxvt_saveconfig (81) ** DISABLED save configuration */
+#define MRxvt_bgfade	    (82) /* set bgfade degree (Obsolete) */
+#define MRxvt_termenv	    (83) /* set TERMENV type */
+/* #define MRxvt_closewin   (84) ** DISABLED Close all tabs and exit */
+/* #define MRxvt_switchtab  (85) ** DISABLED Switch to tab N */
 
 
 
@@ -1006,7 +1006,7 @@ enum {
 enum colour_list {
     Color_fg = 0,
     Color_bg,
-    minCOLOR,			/* 2 */
+    minCOLOR,		/* 2 */
     Color_Black = minCOLOR,
     Color_Red3,
     Color_Green3,
@@ -1014,10 +1014,10 @@ enum colour_list {
     Color_Blue3,
     Color_Magenta3,
     Color_Cyan3,
-    maxCOLOR,			/* minCOLOR + 7 */
+    maxCOLOR,		/* minCOLOR + 7 */
 #ifndef NO_BRIGHTCOLOR
     Color_AntiqueWhite = maxCOLOR,
-    minBrightCOLOR,		/* maxCOLOR + 1 */
+    minBrightCOLOR,	/* maxCOLOR + 1 */
     Color_Grey25 = minBrightCOLOR,
     Color_Red,
     Color_Green,
@@ -1025,7 +1025,7 @@ enum colour_list {
     Color_Blue,
     Color_Magenta,
     Color_Cyan,
-    maxBrightCOLOR,		/* minBrightCOLOR + 7 */
+    maxBrightCOLOR,	/* minBrightCOLOR + 7 */
     Color_White = maxBrightCOLOR,
 #else
     Color_White = maxCOLOR,
@@ -1055,29 +1055,29 @@ enum colour_list {
 #endif
 #if defined(BACKGROUND_IMAGE) || defined(TRANSPARENT)
 # ifdef TINTING_SUPPORT
-	Color_tint,
+    Color_tint,
 # endif
 #endif	/* BACKGROUND_IMAGE || TRANSPARENT */
-    NRS_COLORS,			/* */
+    NRS_COLORS,		/* */
 #ifdef KEEP_SCROLLCOLOR
     Color_topShadow = NRS_COLORS,
     Color_bottomShadow,
-    TOTAL_COLORS		/* upto 31 */
+    TOTAL_COLORS	/* upto 31 */
 #else
     TOTAL_COLORS = NRS_COLORS	/* */
 #endif
 };
 
 #ifdef TTY_256COLOR
-# define Color_Bits	9
-# define NPIXCLR_SETS	9	/* (256 + 14) bits / 32 bits */
+# define Color_Bits 9
+# define NPIXCLR_SETS	9   /* (256 + 14) bits / 32 bits */
 #else
-# define Color_Bits	5
-# define NPIXCLR_SETS	1	/* (16 + 14) bits / 32 bits */
+# define Color_Bits 5
+# define NPIXCLR_SETS	1   /* (16 + 14) bits / 32 bits */
 #endif
 #define NPIXCLR_BITS	32
 
-#define DEFAULT_RSTYLE		(RS_None | (Color_fg) | (Color_bg<<Color_Bits))
+#define DEFAULT_RSTYLE	    (RS_None | (Color_fg) | (Color_bg<<Color_Bits))
 
 
 
@@ -1100,81 +1100,81 @@ enum {
 #endif
     Rs_name,
     Rs_title,
-	Rs_maxTabWidth,
-	Rs_minVisibleTabs,
+    Rs_maxTabWidth,
+    Rs_minVisibleTabs,
 #if defined (BACKGROUND_IMAGE) || defined(HAVE_MENUBAR)
     Rs_path,
 #endif
 
 #ifdef BACKGROUND_IMAGE
-	Rs_tabbarPixmap,	/* tabbar background pixmap */
+    Rs_tabbarPixmap,	/* tabbar background pixmap */
 # if 0 /* appicon not yet implemented */
-	Rs_appIcon,			/* use pixmap as application icon */
+    Rs_appIcon,		/* use pixmap as application icon */
 # endif
 #endif
 
 #ifdef HAVE_MENUBAR
     Rs_menu,
 # ifdef BACKGROUND_IMAGE
-	Rs_menubarPixmap,
+    Rs_menubarPixmap,
 # endif
 #endif
 
 #ifndef NO_BOLDFONT
     Rs_boldFont,
-	_Rs_boldFont = Rs_boldFont + MAX_NFONTS - 1,
+    _Rs_boldFont = Rs_boldFont + MAX_NFONTS - 1,
 #endif
 #ifdef GREEK_SUPPORT
     Rs_greek_keyboard,
     Rs_greektoggle_key,
 #endif
 #ifdef XFT_SUPPORT
-	Rs_xftfont,	/* Font name, family */
+    Rs_xftfont,	/* Font name, family */
 # ifdef MULTICHAR_SET
-	Rs_xftmfont,/* Multichar font name, family */
-	Rs_xftmsz,	/* Multichar font size */
+    Rs_xftmfont,/* Multichar font name, family */
+    Rs_xftmsz,	/* Multichar font size */
 # endif
-	Rs_xftwt,	/* Font weight */
-	Rs_xftst,	/* Font slant */
-	Rs_xftsz,	/* Font size */
-	Rs_xftwd,	/* Font width style */
-	Rs_xftrgb,	/* Font sub-pixel order */
-	Rs_xftpfn,	/* Propotionally spaced Xft font (for tabbar / menubar) */
-	Rs_xftpsz,	/* Size of propotionally spaced Xft font */
+    Rs_xftwt,	/* Font weight */
+    Rs_xftst,	/* Font slant */
+    Rs_xftsz,	/* Font size */
+    Rs_xftwd,	/* Font width style */
+    Rs_xftrgb,	/* Font sub-pixel order */
+    Rs_xftpfn,	/* Propotionally spaced Xft font (for tabbar / menubar) */
+    Rs_xftpsz,	/* Size of propotionally spaced Xft font */
 #endif
 #ifdef HAVE_SCROLLBARS
     Rs_scrollBar_align,
 # ifdef BACKGROUND_IMAGE
-	Rs_scrollbarPixmap,
+    Rs_scrollbarPixmap,
 # endif
 #endif	/* HAVE_SCROLLBARS */
     Rs_scrollBar_style,
 
-	Rs_tabfg,	/* active tab foreground */
-	Rs_tabbg,	/* active tab background */
-	Rs_itabfg,	/* inactive tab foreground */
-	Rs_itabbg,	/* inactive tab background */
+    Rs_tabfg,	/* active tab foreground */
+    Rs_tabbg,	/* active tab background */
+    Rs_itabfg,	/* inactive tab foreground */
+    Rs_itabbg,	/* inactive tab background */
 
 #ifdef OFF_FOCUS_FADING
-	Rs_fade,	/* fade percentage */
+    Rs_fade,	/* fade percentage */
 #endif
 
 #ifdef TEXT_SHADOW
-	Rs_textShadow,		/* text shadow color */
-	Rs_textShadowMode,	/* text shadow color mode */
+    Rs_textShadow,	/* text shadow color */
+    Rs_textShadowMode,	/* text shadow color mode */
 #endif
 
 #ifdef TINTING_SUPPORT
-	Rs_shade,	/* shade percentage */
-	Rs_tint,	/* tinting color */
+    Rs_shade,	/* shade percentage */
+    Rs_tint,	/* tinting color */
 #endif
 #ifdef TRANSPARENT
-	Rs_bgRefreshInterval,
+    Rs_bgRefreshInterval,
 #endif
 
-	Rs_bellCommand,
-	Rs_holdExitText,
-	Rs_desktop,
+    Rs_bellCommand,
+    Rs_holdExitText,
+    Rs_desktop,
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,
 #endif
@@ -1189,8 +1189,8 @@ enum {
     Rs_preeditType,
     Rs_inputMethod,
 #endif
-	Rs_opacity,			/* transluscent window opacity degree */
-	Rs_opacityDegree,	/* opacity change degree */
+    Rs_opacity,		/* transluscent window opacity degree */
+    Rs_opacityDegree,	/* opacity change degree */
 #ifndef NO_FRILLS
     Rs_ext_bwidth,
     Rs_int_bwidth,
@@ -1204,39 +1204,39 @@ enum {
     Rs_acs_chars,
 #endif
     Rs_modifier,
-	Rs_confFile,
+    Rs_confFile,
     Rs_answerbackstring,
     Rs_cursorBlinkInterval,
     Rs_pointerBlankDelay,
-	Rs_smClientID,
-	Rs_initProfiles,
-	Rs_init_term_num,		/* OBSOLETE */
+    Rs_smClientID,
+    Rs_initProfiles,
+    Rs_init_term_num,	    /* OBSOLETE */
 
-	/*
-	 * Options for multiple profiles.
-	 */
+    /*
+     * Options for multiple profiles.
+     */
 #ifdef BACKGROUND_IMAGE
     Rs_backgroundPixmap,/* terminal background pixmap for each tab */
     _Rs_backgroundPixmap = Rs_backgroundPixmap + MAX_PROFILES - 1,
 #endif
-    Rs_tabtitle,		_Rs_tabtitle = Rs_tabtitle + MAX_PROFILES - 1,
-	Rs_command,			_Rs_command = Rs_command + MAX_PROFILES - 1,
-    Rs_saveLines,		_Rs_saveLines = Rs_saveLines + MAX_PROFILES - 1,
+    Rs_tabtitle,	_Rs_tabtitle = Rs_tabtitle + MAX_PROFILES - 1,
+    Rs_command,		_Rs_command = Rs_command + MAX_PROFILES - 1,
+    Rs_saveLines,	_Rs_saveLines = Rs_saveLines + MAX_PROFILES - 1,
 
-	Rs_foreground,		_Rs_foreground = Rs_foreground + MAX_PROFILES - 1,
-	Rs_background,		_Rs_background = Rs_background + MAX_PROFILES - 1,
-	Rs_cwd,				_Rs_cwd = Rs_cwd + MAX_PROFILES - 1,
+    Rs_foreground,	_Rs_foreground = Rs_foreground + MAX_PROFILES - 1,
+    Rs_background,	_Rs_background = Rs_background + MAX_PROFILES - 1,
+    Rs_cwd,		_Rs_cwd = Rs_cwd + MAX_PROFILES - 1,
 
-	/*
-	 * Secondary boolean options (stored in r->Options2).
-	 *
-	 * TODO 2006-05-23 gi1242: Make r->Options an array, and define macros to
-	 * set / clear these boolean options.
-	 */
-	Rs_options2,
-	Rs2_cmdInitTabs,
+    /*
+     * Secondary boolean options (stored in r->Options2).
+     *
+     * TODO 2006-05-23 gi1242: Make r->Options an array, and define macros to
+     * set / clear these boolean options.
+     */
+    Rs_options2,
+    Rs2_cmdInitTabs,
 #ifdef XFT_SUPPORT
-	Rs2_xftwd,			/* width */
+    Rs2_xftwd,		/* width */
 #endif
     NUM_RESOURCES
 } ;
@@ -1260,29 +1260,29 @@ enum {
     XA_VT_SELECTION,
     XA_INCR,
     XA_WMDELETEWINDOW,
-	XA_NET_WM_DESKTOP,
-	XA_WIN_WORKSPACE,
-	XA_NET_WM_NAME,
-	XA_NET_WM_ICON_NAME,
-	XA_WM_CLIENT_LEADER,
-	XA_NET_WM_WINDOW_OPACITY,
+    XA_NET_WM_DESKTOP,
+    XA_WIN_WORKSPACE,
+    XA_NET_WM_NAME,
+    XA_NET_WM_ICON_NAME,
+    XA_WM_CLIENT_LEADER,
+    XA_NET_WM_WINDOW_OPACITY,
 #ifndef NO_FRILLS
-	XA_NET_WM_PID,
+    XA_NET_WM_PID,
 #endif
 #ifdef HAVE_X11_SM_SMLIB_H
-	XA_SM_CLIENT_ID,
+    XA_SM_CLIENT_ID,
 #endif
 #ifdef USE_XIM
-	XA_WM_LOCALE_NAME,
+    XA_WM_LOCALE_NAME,
 #endif
 #ifdef TRANSPARENT
     XA_XROOTPMAPID,
-	XA_XSETROOTID,
+    XA_XSETROOTID,
 #endif
-#ifdef OFFIX_DND		/* OffiX Dnd (drag 'n' drop) support */
+#ifdef OFFIX_DND	/* OffiX Dnd (drag 'n' drop) support */
     XA_DNDPROTOCOL,
     XA_DNDSELECTION,
-#endif				/* OFFIX_DND */
+#endif		    /* OFFIX_DND */
     XA_CLIPBOARD,
     NUM_XA
 } ;
@@ -1292,44 +1292,44 @@ enum {
  * divisible by 2 (num lines)
  * divisible by 4 (num rect)
  */
-#define	NGRX_PTS	1000
+#define	NGRX_PTS    1000
 
 /* DEC private modes */
-#define PrivMode_132			(1LU<<0)
-#define PrivMode_132OK			(1LU<<1)
-#define PrivMode_rVideo			(1LU<<2)
-#define PrivMode_relOrigin		(1LU<<3)
-#define PrivMode_Screen			(1LU<<4)
-#define PrivMode_Autowrap		(1LU<<5)
-#define PrivMode_aplCUR			(1LU<<6)
-#define PrivMode_aplKP			(1LU<<7)
+#define PrivMode_132		(1LU<<0)
+#define PrivMode_132OK		(1LU<<1)
+#define PrivMode_rVideo		(1LU<<2)
+#define PrivMode_relOrigin	(1LU<<3)
+#define PrivMode_Screen		(1LU<<4)
+#define PrivMode_Autowrap	(1LU<<5)
+#define PrivMode_aplCUR		(1LU<<6)
+#define PrivMode_aplKP		(1LU<<7)
 #define PrivMode_HaveBackSpace	(1LU<<8)
-#define PrivMode_BackSpace		(1LU<<9)
-#define PrivMode_ShiftKeys		(1LU<<10)
+#define PrivMode_BackSpace	(1LU<<9)
+#define PrivMode_ShiftKeys	(1LU<<10)
 #define PrivMode_VisibleCursor	(1LU<<11)
-#define PrivMode_MouseX10		(1LU<<12)
-#define PrivMode_MouseX11		(1LU<<13)
-#define PrivMode_scrollBar		(1LU<<14)
-#define PrivMode_menuBar		(1LU<<15)
+#define PrivMode_MouseX10	(1LU<<12)
+#define PrivMode_MouseX11	(1LU<<13)
+#define PrivMode_scrollBar	(1LU<<14)
+#define PrivMode_menuBar	(1LU<<15)
 #define PrivMode_TtyOutputInh	(1LU<<16)
-#define PrivMode_Keypress		(1LU<<17)
+#define PrivMode_Keypress	(1LU<<17)
 #define PrivMode_smoothScroll	(1LU<<18)
-#define PrivMode_vt52			(1LU<<19)
+#define PrivMode_vt52		(1LU<<19)
 /* too annoying to implement X11 highlight tracking */
 /* #define PrivMode_MouseX11Track       (1LU<<18) */
 
 #define PrivMode_mouse_report	(PrivMode_MouseX10|PrivMode_MouseX11)
-#define PrivMode(test,bit,page)					\
-    if (test)									\
-		r->vts[page]->PrivateModes |= (bit);	\
-    else										\
-		r->vts[page]->PrivateModes &= ~(bit)
+#define PrivMode(test,bit,page)			\
+    if (test)					\
+	r->vts[page]->PrivateModes |= (bit);	\
+    else					\
+	r->vts[page]->PrivateModes &= ~(bit)
 
 #ifdef ALLOW_132_MODE
-# define PrivMode_Default						 \
+# define PrivMode_Default			 \
 (PrivMode_Autowrap|PrivMode_aplKP|PrivMode_ShiftKeys|PrivMode_VisibleCursor|PrivMode_132OK)
 #else
-# define PrivMode_Default						 \
+# define PrivMode_Default			 \
 (PrivMode_Autowrap|PrivMode_ShiftKeys|PrivMode_VisibleCursor)
 /*
 (PrivMode_Autowrap|PrivMode_aplKP|PrivMode_ShiftKeys|PrivMode_VisibleCursor)
@@ -1337,29 +1337,29 @@ enum {
 #endif
 
 
-#define XSCREEN			DefaultScreen(r->Xdisplay)
-#define XROOT			DefaultRootWindow(r->Xdisplay)
+#define XSCREEN		DefaultScreen(r->Xdisplay)
+#define XROOT		DefaultRootWindow(r->Xdisplay)
 
 #ifdef PREFER_24BIT
-# define XDEPTH			(r->Xdepth)
-# define XCMAP			(r->Xcmap)
-# define XVISUAL		(r->h->Xvisual)
+# define XDEPTH		(r->Xdepth)
+# define XCMAP		(r->Xcmap)
+# define XVISUAL	(r->h->Xvisual)
 #else
 # ifdef DEBUG_DEPTH
-#  define XDEPTH		DEBUG_DEPTH
+#  define XDEPTH	DEBUG_DEPTH
 # else
-#  define XDEPTH		DefaultDepth(r->Xdisplay, XSCREEN)
-#  define XCMAP			DefaultColormap(r->Xdisplay, XSCREEN)
-#  define XVISUAL		DefaultVisual(r->Xdisplay, XSCREEN)
+#  define XDEPTH	DefaultDepth(r->Xdisplay, XSCREEN)
+#  define XCMAP		DefaultColormap(r->Xdisplay, XSCREEN)
+#  define XVISUAL	DefaultVisual(r->Xdisplay, XSCREEN)
 # endif
 #endif
 
 
-#define IMBUFSIZ		128	/* input modifier buffer sizes */
+#define IMBUFSIZ	128 /* input modifier buffer sizes */
 #ifndef BUFSIZ
-# define BUFSIZ			4096
+# define BUFSIZ		4096
 #endif
-#define KBUFSZ			512	/* size of keyboard mapping buffer */
+#define KBUFSZ		512 /* size of keyboard mapping buffer */
 
 /*
  *****************************************************************************
@@ -1368,14 +1368,14 @@ enum {
  */
 
 /* convert pixel dimensions to row/column values.  Everything as RINT32T */
-#define Pixel2Width(x)		((RINT32T)(x) / (RINT32T)r->TermWin.fwidth)
-#define Pixel2Height(y)		((RINT32T)(y) / (RINT32T)r->TermWin.fheight)
-#define Width2Pixel(n)		((RINT32T)(n) * (RINT32T)r->TermWin.fwidth)
-#define Height2Pixel(n)		((RINT32T)(n) * (RINT32T)r->TermWin.fheight)
-#define Pixel2Col(x)		Pixel2Width((RINT32T)(x) - (RINT32T)r->TermWin.int_bwidth)
-#define Pixel2Row(y)		Pixel2Height((RINT32T)(y) - (RINT32T)r->TermWin.int_bwidth)
-#define Col2Pixel(col)		((RINT32T)Width2Pixel(col) + (RINT32T)r->TermWin.int_bwidth)
-#define Row2Pixel(row)		((RINT32T)Height2Pixel(row) + (RINT32T)r->TermWin.int_bwidth)
+#define Pixel2Width(x)	    ((RINT32T)(x) / (RINT32T)r->TermWin.fwidth)
+#define Pixel2Height(y)	    ((RINT32T)(y) / (RINT32T)r->TermWin.fheight)
+#define Width2Pixel(n)	    ((RINT32T)(n) * (RINT32T)r->TermWin.fwidth)
+#define Height2Pixel(n)	    ((RINT32T)(n) * (RINT32T)r->TermWin.fheight)
+#define Pixel2Col(x)	    Pixel2Width((RINT32T)(x) - (RINT32T)r->TermWin.int_bwidth)
+#define Pixel2Row(y)	    Pixel2Height((RINT32T)(y) - (RINT32T)r->TermWin.int_bwidth)
+#define Col2Pixel(col)	    ((RINT32T)Width2Pixel(col) + (RINT32T)r->TermWin.int_bwidth)
+#define Row2Pixel(row)	    ((RINT32T)Height2Pixel(row) + (RINT32T)r->TermWin.int_bwidth)
 
 /*
 #define TermWin_TotalWidth()	((RINT32T)r->TermWin.width  + 2 * (RINT32T)r->TermWin.int_bwidth)
@@ -1383,97 +1383,97 @@ enum {
 */
 
 /* how to build & extract colors and attributes */
-#define GET_BASEFG(x)		(((x) & RS_fgMask))
-#define GET_BASEBG(x)		(((x) & RS_bgMask)>>Color_Bits)
+#define GET_BASEFG(x)	    (((x) & RS_fgMask))
+#define GET_BASEBG(x)	    (((x) & RS_bgMask)>>Color_Bits)
 #ifndef NO_BRIGHTCOLOR
-# define GET_FGCOLOR(x)						\
-    ((((x) & RS_Bold) == 0					\
-      || GET_BASEFG(x) < minCOLOR				\
-      || GET_BASEFG(x) >= minBrightCOLOR)			\
-     ? GET_BASEFG(x)						\
+# define GET_FGCOLOR(x)			    \
+    ((((x) & RS_Bold) == 0		    \
+      || GET_BASEFG(x) < minCOLOR		\
+      || GET_BASEFG(x) >= minBrightCOLOR)	    \
+     ? GET_BASEFG(x)			    \
      : (GET_BASEFG(x) + (minBrightCOLOR - minCOLOR)))
-# define GET_BGCOLOR(x)						\
-    ((((x) & RS_Blink) == 0					\
-      || GET_BASEBG(x) < minCOLOR				\
-      || GET_BASEBG(x) >= minBrightCOLOR)			\
-     ? GET_BASEBG(x)						\
+# define GET_BGCOLOR(x)			    \
+    ((((x) & RS_Blink) == 0		    \
+      || GET_BASEBG(x) < minCOLOR		\
+      || GET_BASEBG(x) >= minBrightCOLOR)	    \
+     ? GET_BASEBG(x)			    \
      : (GET_BASEBG(x) + (minBrightCOLOR - minCOLOR)))
 #else
-# define GET_FGCOLOR(x)		GET_BASEFG(x)
-# define GET_BGCOLOR(x)		GET_BASEBG(x)
+# define GET_FGCOLOR(x)	    GET_BASEFG(x)
+# define GET_BGCOLOR(x)	    GET_BASEBG(x)
 #endif
 
-#define GET_ATTR(x)		(((x) & RS_attrMask))
-#define GET_BGATTR(x)							\
-    (((x) & RS_RVid) ? (((x) & (RS_attrMask & ~RS_RVid))		\
-			| (((x) & RS_fgMask)<<Color_Bits))		\
-		     : ((x) & (RS_attrMask | RS_bgMask)))
-#define SET_FGCOLOR(x,fg)	(((x) & ~RS_fgMask)  | (fg))
-#define SET_BGCOLOR(x,bg)	(((x) & ~RS_bgMask)  | ((bg)<<Color_Bits))
-#define SET_ATTR(x,a)		(((x) & ~RS_attrMask)| (a))
+#define GET_ATTR(x)	(((x) & RS_attrMask))
+#define GET_BGATTR(x)				\
+    (((x) & RS_RVid) ? (((x) & (RS_attrMask & ~RS_RVid))	\
+	    | (((x) & RS_fgMask)<<Color_Bits))	    \
+	     : ((x) & (RS_attrMask | RS_bgMask)))
+#define SET_FGCOLOR(x,fg)   (((x) & ~RS_fgMask)  | (fg))
+#define SET_BGCOLOR(x,bg)   (((x) & ~RS_bgMask)  | ((bg)<<Color_Bits))
+#define SET_ATTR(x,a)	    (((x) & ~RS_attrMask)| (a))
 
-#define SET_PIXCOLOR(h, x)		((h)->pixcolor_set[(x) / NPIXCLR_BITS] |= (1 << ((x) % NPIXCLR_BITS)))
+#define SET_PIXCOLOR(h, x)	((h)->pixcolor_set[(x) / NPIXCLR_BITS] |= (1 << ((x) % NPIXCLR_BITS)))
 #define ISSET_PIXCOLOR(h, x)	((h)->pixcolor_set[(x) / NPIXCLR_BITS] & (1 << ((x) % NPIXCLR_BITS)))
 
 #define scrollbar_isMotion()	(r->scrollBar.state == 'm')
-#define scrollbar_isUp()		(r->scrollBar.state == 'U')
-#define scrollbar_isDn()		(r->scrollBar.state == 'D')
-#define scrollbar_isUpDn()		isupper ((int) r->scrollBar.state)
+#define scrollbar_isUp()	(r->scrollBar.state == 'U')
+#define scrollbar_isDn()	(r->scrollBar.state == 'D')
+#define scrollbar_isUpDn()	isupper ((int) r->scrollBar.state)
 
-#define scrollbar_setIdle()		r->scrollBar.state = (char) 1
+#define scrollbar_setIdle()	r->scrollBar.state = (char) 1
 #define scrollbar_setMotion()	r->scrollBar.state = 'm'
-#define scrollbar_setUp()		r->scrollBar.state = 'U'
-#define scrollbar_setDn()		r->scrollBar.state = 'D'
+#define scrollbar_setUp()	r->scrollBar.state = 'U'
+#define scrollbar_setDn()	r->scrollBar.state = 'D'
 
 
-#define scrollbarnext_dnval()		(r->scrollBar.end + (r->scrollBar.width + 1))
-#define scrollbarnext_upButton(y)	((y) > r->scrollBar.end \
-					 && (y) <= scrollbarnext_dnval())
-#define scrollbarnext_dnButton(y)	((y) > scrollbarnext_dnval())
+#define scrollbarnext_dnval()	    (r->scrollBar.end + (r->scrollBar.width + 1))
+#define scrollbarnext_upButton(y)   ((y) > r->scrollBar.end \
+		     && (y) <= scrollbarnext_dnval())
+#define scrollbarnext_dnButton(y)   ((y) > scrollbarnext_dnval())
 
-#define scrollbarrxvt_upButton(y)	((y) < r->scrollBar.beg)
-#define scrollbarrxvt_dnButton(y)	((y) > r->scrollBar.end)
+#define scrollbarrxvt_upButton(y)   ((y) < r->scrollBar.beg)
+#define scrollbarrxvt_dnButton(y)   ((y) > r->scrollBar.end)
 
 
-#define scrollbarsgi_dnval()		(r->scrollBar.end + 1)
-#define scrollbarsgi_upButton(y)	((y) < r->scrollBar.beg)
-#define scrollbarsgi_dnButton(y)	((y) > r->scrollBar.end)
+#define scrollbarsgi_dnval()	    (r->scrollBar.end + 1)
+#define scrollbarsgi_upButton(y)    ((y) < r->scrollBar.beg)
+#define scrollbarsgi_dnButton(y)    ((y) > r->scrollBar.end)
 
 #ifdef NEXT_SCROLLBAR
-# define SCROLLNEXT_MINHEIGHT		(NEXT_SB_MIN_HEIGHT)
+# define SCROLLNEXT_MINHEIGHT	    (NEXT_SB_MIN_HEIGHT)
 #else
-# define SCROLLNEXT_MINHEIGHT		(0)
+# define SCROLLNEXT_MINHEIGHT	    (0)
 #endif	/* NEXT_SCROLLBAR */
 #ifdef SGI_SCROLLBAR
-# define SCROLLSGI_MINHEIGHT		(10)
+# define SCROLLSGI_MINHEIGHT	    (10)
 #else
-# define SCROLLSGI_MINHEIGHT		(0)
+# define SCROLLSGI_MINHEIGHT	    (0)
 #endif	/* SGI_SCROLLBAR */
-#define SCROLL_MINHEIGHT			(10)
-#define scrollbar_minheight()	(	\
-	(r->scrollBar.style == R_SB_NEXT) ? SCROLLNEXT_MINHEIGHT :	\
-	(r->scrollBar.style == R_SB_SGI) ? SCROLLSGI_MINHEIGHT :	\
-		SCROLL_MINHEIGHT)
-#define scrollbar_above_slider(y)	((y) < r->scrollBar.top)
-#define scrollbar_below_slider(y)	((y) > r->scrollBar.bot)
-#define scrollbar_position(y)		((y) - r->scrollBar.beg)
-#define scrollbar_size()		(r->scrollBar.end - r->scrollBar.beg \
-					 - scrollbar_minheight())
+#define SCROLL_MINHEIGHT	    (10)
+#define scrollbar_minheight()	(   \
+    (r->scrollBar.style == R_SB_NEXT) ? SCROLLNEXT_MINHEIGHT :	\
+    (r->scrollBar.style == R_SB_SGI) ? SCROLLSGI_MINHEIGHT :	\
+	SCROLL_MINHEIGHT)
+#define scrollbar_above_slider(y)   ((y) < r->scrollBar.top)
+#define scrollbar_below_slider(y)   ((y) > r->scrollBar.bot)
+#define scrollbar_position(y)	    ((y) - r->scrollBar.beg)
+#define scrollbar_size()	(r->scrollBar.end - r->scrollBar.beg \
+		     - scrollbar_minheight())
 
 
 
 #ifdef BACKGROUND_IMAGE
-# define XPMClearArea(a, b, c, d, e, f, g)	XClearArea((a), (b), (c), (d), (e), (f), (g))
+# define XPMClearArea(a, b, c, d, e, f, g)  XClearArea((a), (b), (c), (d), (e), (f), (g))
 #else
 # define XPMClearArea(a, b, c, d, e, f, g)
 #endif
 
 #ifndef STRICT_FONT_CHECKING
-# define rxvt_get_fontwidest(font)	((font)->max_bounds.width)
+# define rxvt_get_fontwidest(font)  ((font)->max_bounds.width)
 #endif
 
-#define rxvt_Gr_ButtonPress(x,y)	rxvt_Gr_ButtonReport (r, 'P',(x),(y))
-#define rxvt_Gr_ButtonRelease(x,y)	rxvt_Gr_ButtonReport (r, 'R',(x),(y))
+#define rxvt_Gr_ButtonPress(x,y)    rxvt_Gr_ButtonReport (r, 'P',(x),(y))
+#define rxvt_Gr_ButtonRelease(x,y)  rxvt_Gr_ButtonReport (r, 'R',(x),(y))
 
 
 /*
@@ -1481,7 +1481,7 @@ enum {
  * e.g. calls to ewmh_message().
  */
 #define _NET_WM_STATE_REMOVE	0
-#define _NET_WM_STATE_ADD		1
+#define _NET_WM_STATE_ADD	1
 #define _NET_WM_STATE_TOGGLE	2
 
 
@@ -1491,105 +1491,105 @@ enum {
  *****************************************************************************
  */
 struct rxvt_hidden {
-	unsigned char	/* Awaiting screen refresh */
-					BOOLVAR( want_refresh, 1),
-					/* Only refresh region specified by refreshRegion */
-					BOOLVAR( want_clip_refresh, 1),
-					/* perform resize even if window size has not changed */
-					BOOLVAR( want_resize, 2),
+    unsigned char   /* Awaiting screen refresh */
+		    BOOLVAR( want_refresh, 1),
+		    /* Only refresh region specified by refreshRegion */
+		    BOOLVAR( want_clip_refresh, 1),
+		    /* perform resize even if window size has not changed */
+		    BOOLVAR( want_resize, 2),
 #ifdef TRANSPARENT
-					/* awaiting full screen refresh */
-					BOOLVAR( want_full_refresh, 1),
+		    /* awaiting full screen refresh */
+		    BOOLVAR( want_full_refresh, 1),
 #endif
 #if defined(BACKGROUND_IMAGE) || defined(TRANSPARENT)
-					/* is a transparent term */
-					BOOLVAR( am_transparent, 1),
-					/* transparency without known root pixmap */
-					BOOLVAR( am_pixmap_trans, 1),
+		    /* is a transparent term */
+		    BOOLVAR( am_transparent, 1),
+		    /* transparency without known root pixmap */
+		    BOOLVAR( am_pixmap_trans, 1),
 # endif
 #ifdef CURSOR_BLINK
-					BOOLVAR( hidden_cursor, 1),
+		    BOOLVAR( hidden_cursor, 1),
 #endif
-					/* a.k.a. keep mark position */
-					BOOLVAR( hate_those_clicks, 1),
-					BOOLVAR( num_scr_allow, 1),
-					BOOLVAR( bypass_keystate, 1);
+		    /* a.k.a. keep mark position */
+		    BOOLVAR( hate_those_clicks, 1),
+		    BOOLVAR( num_scr_allow, 1),
+		    BOOLVAR( bypass_keystate, 1);
 
-	Region			refreshRegion;	/* Region for CLIPPED_REFRESH */
+    Region	    refreshRegion;  /* Region for CLIPPED_REFRESH */
     unsigned char   BOOLVAR( refresh_type, 5),
 #ifdef META8_OPTION
-					meta_char,	/* Alt-key prefix */
+		    meta_char,	/* Alt-key prefix */
 #endif
-					scrollbar_align,
-					selection_wait,
-					selection_type;
+		    scrollbar_align,
+		    selection_wait,
+		    selection_type;
 
 #ifdef GREEK_SUPPORT
-					/* greek keyboard mode */
-	short			greek_mode;
-    KeySym			ks_greekmodeswith;
+		    /* greek keyboard mode */
+    short	    greek_mode;
+    KeySym	    ks_greekmodeswith;
 #endif
 
-	/* screen: previous number of columns and rows */
-    RUINT16T		prev_ncol,
-					prev_nrow;
-	RUINT32T		pixcolor_set[NPIXCLR_SETS];
+    /* screen: previous number of columns and rows */
+    RUINT16T	    prev_ncol,
+		    prev_nrow;
+    RUINT32T	    pixcolor_set[NPIXCLR_SETS];
 
 #ifdef SELECTION_SCROLLING
-	int				scroll_selection_delay,
-					scroll_selection_lines;
-	enum page_dirn	scroll_selection_dir;
-	int				selection_save_x,
-					selection_save_y,
-					selection_save_state,
-					pending_scroll_selection;
+    int		    scroll_selection_delay,
+		    scroll_selection_lines;
+    enum page_dirn  scroll_selection_dir;
+    int		    selection_save_x,
+		    selection_save_y,
+		    selection_save_state,
+		    pending_scroll_selection;
 #endif
 
-					/* Hops - csr offset in thumb/slider to */
-					/*   give proper Scroll behaviour */
-    int				csrO,
+		    /* Hops - csr offset in thumb/slider to */
+		    /*   give proper Scroll behaviour */
+    int		    csrO,
 #ifndef NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING
-					scroll_arrow_delay,
+		    scroll_arrow_delay,
 #endif
 #if defined(MOUSE_WHEEL) && defined(MOUSE_SLIP_WHEELING)
-					mouse_slip_wheel_delay,
-					mouse_slip_wheel_speed,
+		    mouse_slip_wheel_delay,
+		    mouse_slip_wheel_speed,
 #endif
-					refresh_count,
-					refresh_limit,
-					fnum,	/* logical font number */
-					last_bot,	/* scrollbar last bottom position */
-					last_top,	/* scrollbar last top position */
-					last_state,	/* scrollbar last state */
-					scroller_len,
-					currmaxcol,
-					window_vt_x,
-					window_vt_y,
+		    refresh_count,
+		    refresh_limit,
+		    fnum,   /* logical font number */
+		    last_bot,	/* scrollbar last bottom position */
+		    last_top,	/* scrollbar last top position */
+		    last_state,	/* scrollbar last state */
+		    scroller_len,
+		    currmaxcol,
+		    window_vt_x,
+		    window_vt_y,
 # ifdef POINTER_BLANK
-					pointerBlankDelay,
+		    pointerBlankDelay,
 # endif
-					allowedxerror, /* Be silent when reporting XErrors */
-					xerror_return; /* ErrorCode of caught XError	   */
+		    allowedxerror, /* Be silent when reporting XErrors */
+		    xerror_return; /* ErrorCode of caught XError       */
 
     unsigned int    ModMetaMask,
-					ModNumLockMask;
+		    ModNumLockMask;
 #ifndef NO_BRIGHTCOLOR
-	unsigned long	colorfgbg;
+    unsigned long   colorfgbg;
 #endif
-	unsigned long	global_fg;
-	unsigned long	global_bg;
+    unsigned long   global_fg;
+    unsigned long   global_bg;
 #ifdef XFT_SUPPORT
-	XftColor		global_xftfg;
-	XftColor		global_xftbg;
+    XftColor	    global_xftfg;
+    XftColor	    global_xftbg;
 #endif
 
-	gid_t			ttygid;
+    gid_t	    ttygid;
 
 #ifdef PREFER_24BIT
-    Visual*			Xvisual;
+    Visual*	    Xvisual;
 #endif
 
-    Atom			xa[NUM_XA];
+    Atom	    xa[NUM_XA];
 
     Time            selection_time,
                     selection_request_time;
@@ -1600,79 +1600,79 @@ struct rxvt_hidden {
 #endif
 
 #ifndef NO_BACKSPACE_KEY
-    const char*		key_backspace;
+    const char*	    key_backspace;
 #endif
 #ifndef NO_DELETE_KEY
-    const char*		key_delete;
+    const char*	    key_delete;
 #endif
 #ifdef USE_XIM
-    XIC				Input_Context;
-    XIMStyle		input_style;
-    int				event_type;
+    XIC		    Input_Context;
+    XIMStyle	    input_style;
+    int		    event_type;
 #endif
     struct mouse_event	MEvent;
-    row_col_t		oldcursor;
+    row_col_t	    oldcursor;
 #ifdef MULTICHAR_SET
-    signed int		oldcursormulti;
+    signed int	    oldcursormulti;
 #endif
-    void			(*multichar_decode)(unsigned char *str, int len);
+    void	    (*multichar_decode)(unsigned char *str, int len);
 #ifdef HAVE_MENUBAR
-    menu_t*			ActiveMenu;		/* currently active menu */
-	menu_t*			BuildMenu;		/* the menu currently being built */
-	menu_t*			popupMenu[3];	/* Menus to popup on ctrl clicks */
+    menu_t*	    ActiveMenu;	    /* currently active menu */
+    menu_t*	    BuildMenu;	    /* the menu currently being built */
+    menu_t*	    popupMenu[3];   /* Menus to popup on ctrl clicks */
 
-	unsigned char	BOOLVAR( showingMenu, 1);
-									/* The type of menu currently bieng shown */
+    unsigned char   BOOLVAR( showingMenu, 1);
+				    /* The type of menu currently bieng shown */
 
-    bar_t			MenuBar;
-	int				Arrows_x;
+    bar_t	    MenuBar;
+    int		    Arrows_x;
 #endif
 #ifdef CURSOR_BLINK
-	long			blinkInterval;
-    struct timeval	lastcursorchange;
+    long	    blinkInterval;
+    struct timeval  lastcursorchange;
 #endif
 #ifdef POINTER_BLANK
-    struct timeval	lastmotion;
+    struct timeval  lastmotion;
 #endif
 #ifdef TRANSPARENT
-	unsigned long	bgRefreshInterval;
-	struct timeval	lastCNotify;	/* Time of the last CNotify event */
+    unsigned long   bgRefreshInterval;
+    struct timeval  lastCNotify;    /* Time of the last CNotify event */
 #endif
-    struct timeval	timeout[NUM_TIMEOUTS];
+    struct timeval  timeout[NUM_TIMEOUTS];
 
-	/*
-	** these three don't need to be kept but do so to placate some
-	** mem checkers
-	*/
-	char*			env_windowid; /* environmental variable WINDOWID */
-	char*			env_display;  /* environmental variable DISPLAY */
-	char*			env_term;     /* environmental variable TERM */
-	char*			env_tabtitle; /* environmental variable MRXVT_TABTITLE*/
-	char*			env_colorfgbg;
-	char*			buffer;
-	char*			locale;
-	/*
-	unsigned char*	v_buffer;
-	unsigned char*	v_bufstr;
-	unsigned char*	v_bufptr;
-	unsigned char*	v_bufend;
-	*/
-	char*			newfont[MAX_NFONTS];
-    const char*		rs[NUM_RESOURCES];
-	/* command input buffering */
-	/*
-    unsigned char*	cmdbuf_ptr, *cmdbuf_endp;
-    unsigned char	cmdbuf_base[BUFSIZ];
-    unsigned char	kbuf[KBUFSZ];
-	*/
+    /*
+    ** these three don't need to be kept but do so to placate some
+    ** mem checkers
+    */
+    char*	    env_windowid; /* environmental variable WINDOWID */
+    char*	    env_display;  /* environmental variable DISPLAY */
+    char*	    env_term;     /* environmental variable TERM */
+    char*	    env_tabtitle; /* environmental variable MRXVT_TABTITLE*/
+    char*	    env_colorfgbg;
+    char*	    buffer;
+    char*	    locale;
+    /*
+    unsigned char*  v_buffer;
+    unsigned char*  v_bufstr;
+    unsigned char*  v_bufptr;
+    unsigned char*  v_bufend;
+    */
+    char*	    newfont[MAX_NFONTS];
+    const char*	    rs[NUM_RESOURCES];
+    /* command input buffering */
+    /*
+    unsigned char*  cmdbuf_ptr, *cmdbuf_endp;
+    unsigned char   cmdbuf_base[BUFSIZ];
+    unsigned char   kbuf[KBUFSZ];
+    */
 
 #ifdef TRANSPARENT
-	Pixmap		rootPixmap;	/* Pixmap ID of the root pixmap */
-	unsigned	rpWidth,	/* Dimensions of the root pixmap */
-				rpHeight;
-	XRectangle	prevPos;	/* Previous onscreen position */
-	Bool		bgGrabbed;	/* whether the bg was succesfully grabbed
-							   at prevPos */
+    Pixmap	rootPixmap; /* Pixmap ID of the root pixmap */
+    unsigned	rpWidth,    /* Dimensions of the root pixmap */
+		rpHeight;
+    XRectangle	prevPos;    /* Previous onscreen position */
+    Bool	bgGrabbed;  /* whether the bg was succesfully grabbed
+			       at prevPos */
 #endif
 };
 
@@ -1690,103 +1690,103 @@ struct rxvt_hidden {
  * PROTOTYPES
  *****************************************************************************
  */
-#define __PROTO(p)	p
+#define __PROTO(p)  p
 #include "protos.h"
 
 #ifdef OUR_STRINGS
-# define MEMSET(x, y, z)		ma_memset((x), (y), (size_t)(z))
-# define MEMCPY(x, y, z)		ma_memcpy((void *)(x), (const void *)(y), (z))
-# define MEMMOVE(x, y, z)		ma_memmove((void *)(x), (const void *)(y), (z))
-# define STRCASECMP(x, y)		ma_strcasecmp((x), (y))
+# define MEMSET(x, y, z)	ma_memset((x), (y), (size_t)(z))
+# define MEMCPY(x, y, z)	ma_memcpy((void *)(x), (const void *)(y), (z))
+# define MEMMOVE(x, y, z)	ma_memmove((void *)(x), (const void *)(y), (z))
+# define STRCASECMP(x, y)	ma_strcasecmp((x), (y))
 # define STRNCASECMP(x, y, z)	ma_strncasecmp((x), (y), (z))
-# define STRCPY(x, y)			ma_strcpy((char *)(x), (const char *)(y))
-# define STRNCPY(x, y, z)		ma_strncpy((char *)(x), (const char *)(y), (z))
-# define STRCMP(x, y)			ma_strcmp((const char *)(x), (const char *)(y))
-# define STRNCMP(x, y, z)		ma_strncmp((const char *)(x), (const char *)(y), (z))
-# define STRCAT(x, y)			ma_strcat((char *)(x), (const char *)(y))
-# define STRNCAT(x, y, z)		ma_strncat((char *)(x), (const char *)(y), (z))
-# define STRDUP(x)				ma_strdup((const char *)(x))
-# define STRNDUP(x, z)			ma_strndup((const char TAINTED *)(x), (size_t) (z))
-# define STRLEN(x)				ma_strlen((const char *)(x))
-# define STRCHR(x, y)			ma_strchr((const char *)(x), (int)(y))
-# define STRRCHR(x, y)			ma_strrchr((const char *)(x), (int)(y))
+# define STRCPY(x, y)		ma_strcpy((char *)(x), (const char *)(y))
+# define STRNCPY(x, y, z)	ma_strncpy((char *)(x), (const char *)(y), (z))
+# define STRCMP(x, y)		ma_strcmp((const char *)(x), (const char *)(y))
+# define STRNCMP(x, y, z)	ma_strncmp((const char *)(x), (const char *)(y), (z))
+# define STRCAT(x, y)		ma_strcat((char *)(x), (const char *)(y))
+# define STRNCAT(x, y, z)	ma_strncat((char *)(x), (const char *)(y), (z))
+# define STRDUP(x)		ma_strdup((const char *)(x))
+# define STRNDUP(x, z)		ma_strndup((const char TAINTED *)(x), (size_t) (z))
+# define STRLEN(x)		ma_strlen((const char *)(x))
+# define STRCHR(x, y)		ma_strchr((const char *)(x), (int)(y))
+# define STRRCHR(x, y)		ma_strrchr((const char *)(x), (int)(y))
 
 #else /* OUR_STRINGS */
 
-# define MEMSET(x, y, z)		memset((x), (y), (size_t)(z))
-# define MEMCPY(x, y, z)		memcpy((void *)(x), (const void *)(y), (z))
-# define MEMMOVE(x, y, z)		memmove((void *)(x), (const void *)(y), (z))
-# define STRCASECMP(x, y)		strcasecmp((x), (y))
+# define MEMSET(x, y, z)	memset((x), (y), (size_t)(z))
+# define MEMCPY(x, y, z)	memcpy((void *)(x), (const void *)(y), (z))
+# define MEMMOVE(x, y, z)	memmove((void *)(x), (const void *)(y), (z))
+# define STRCASECMP(x, y)	strcasecmp((x), (y))
 # define STRNCASECMP(x, y, z)	strncasecmp((x), (y), (z))
-# define STRCPY(x, y)			strcpy((char *)(x), (const char *)(y))
-# define STRNCPY(x, y, z)		strncpy((char *)(x), (const char *)(y), (z))
-# define STRCMP(x, y)			strcmp((const char *)(x), (const char *)(y))
-# define STRNCMP(x, y, z)		strncmp((const char *)(x), (const char *)(y), (z))
-# define STRCAT(x, y)			strcat((char *)(x), (const char *)(y))
-# define STRLEN(x)				strlen((const char *)(x))
-# define STRNCAT(x, y, z)		strncat((char *)(x), (const char *)(y), (z))
+# define STRCPY(x, y)		strcpy((char *)(x), (const char *)(y))
+# define STRNCPY(x, y, z)	strncpy((char *)(x), (const char *)(y), (z))
+# define STRCMP(x, y)		strcmp((const char *)(x), (const char *)(y))
+# define STRNCMP(x, y, z)	strncmp((const char *)(x), (const char *)(y), (z))
+# define STRCAT(x, y)		strcat((char *)(x), (const char *)(y))
+# define STRLEN(x)		strlen((const char *)(x))
+# define STRNCAT(x, y, z)	strncat((char *)(x), (const char *)(y), (z))
 
 # ifdef HAVE_STRDUP
-#  define STRDUP(x)				strdup((const char *)(x))
+#  define STRDUP(x)		strdup((const char *)(x))
 # else
-#  define STRDUP(x)				ma_strdup((const char *)(x))
+#  define STRDUP(x)		ma_strdup((const char *)(x))
 # endif
 
 # ifdef HAVE_STRNDUP
-#  define STRNDUP(x, z)			strndup((const char TAINTED *)(x), (size_t) (z))
+#  define STRNDUP(x, z)		strndup((const char TAINTED *)(x), (size_t) (z))
 # else
-#  define STRNDUP(x, z)			ma_strndup((const char TAINTED *)(x), (size_t) (z))
+#  define STRNDUP(x, z)		ma_strndup((const char TAINTED *)(x), (size_t) (z))
 # endif
 
 # ifdef HAVE_STRCHR
-#  define STRCHR(x, y)			strchr((const char *)(x), (int)(y))
+#  define STRCHR(x, y)		strchr((const char *)(x), (int)(y))
 # else
-#  define STRCHR(x, y)			ma_strchr((const char *)(x), (int)(y))
+#  define STRCHR(x, y)		ma_strchr((const char *)(x), (int)(y))
 # endif
 
 # ifdef HAVE_STRRCHR
-#  define STRRCHR(x, y)			strrchr((const char *)(x), (int)(y))
+#  define STRRCHR(x, y)		strrchr((const char *)(x), (int)(y))
 # else
-#  define STRRCHR(x, y)			ma_strrchr((const char *)(x), (int)(y))
+#  define STRRCHR(x, y)		ma_strrchr((const char *)(x), (int)(y))
 # endif
 #endif	/* OUR_STRINGS */
 
-# define STRSTR(x, y)			strstr((const char *)(x), (const char*)(y))
+# define STRSTR(x, y)		strstr((const char *)(x), (const char*)(y))
 /*
  * strcasestr is not provided by Cygwin's libraries, so we have to check for it
  * here. Thanks to Teun Burgers for pointing this out.
  */
 # ifdef HAVE_STRCASESTR
-#  define STRCASESTR( x, y)		strcasestr( (x), (y) )
+#  define STRCASESTR( x, y)	strcasestr( (x), (y) )
 # else
-#  define STRCASESTR( x, y)		ma_strcasestr( (x), (y))
+#  define STRCASESTR( x, y)	ma_strcasestr( (x), (y))
 # endif
 
 
 #define TWIN_WIDTH(R)	((R)->szHint.width)
 #define TWIN_HEIGHT(R)	((R)->szHint.height)
-#define VT_WIDTH(R)		((R)->szHint.width - \
-		(R)->szHint.base_width + 2*(R)->TermWin.int_bwidth)
+#define VT_WIDTH(R)	((R)->szHint.width - \
+	(R)->szHint.base_width + 2*(R)->TermWin.int_bwidth)
 #define VT_HEIGHT(R)	((R)->szHint.height - \
-		(R)->szHint.base_height + 2*(R)->TermWin.int_bwidth)
+	(R)->szHint.base_height + 2*(R)->TermWin.int_bwidth)
 /*
 #define TWIN_WIDTH(R)	\
-	((R)->szHint.width - 2*(R)->TermWin.int_bwidth)
+    ((R)->szHint.width - 2*(R)->TermWin.int_bwidth)
 #define TWIN_HEIGHT(R)	\
-	((R)->szHint.height - 2*(R)->TermWin.int_bwidth)
-#define VT_WIDTH(R)		\
-	((R)->szHint.width - (R)->szHint.base_width)
+    ((R)->szHint.height - 2*(R)->TermWin.int_bwidth)
+#define VT_WIDTH(R)	\
+    ((R)->szHint.width - (R)->szHint.base_width)
 #define VT_HEIGHT(R)	\
-	((R)->szHint.height - (R)->szHint.base_height)
+    ((R)->szHint.height - (R)->szHint.base_height)
 */
 
 
 #ifndef XTERM_COLOR_CHANGE
-# define rxvt_set_window_color(r, page, idx, color)	()
+# define rxvt_set_window_color(r, page, idx, color) ()
 #endif
 
 #ifdef DEBUG_malloc
-# include "dmalloc.h"		/* This comes last */
+# include "dmalloc.h"	    /* This comes last */
 #endif
 
 #ifdef DEBUG
@@ -1799,5 +1799,5 @@ struct rxvt_hidden {
  */
 #define DBG_TMSG( d, x) fprintf x
 
-#endif				/* __RXVT_H__ */
+#endif		    /* __RXVT_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

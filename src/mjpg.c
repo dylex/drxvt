@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	mjpg.c
+ * File:    mjpg.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -53,38 +53,38 @@ exhandler (j_common_ptr jinf)
 static int
 chandler (j_decompress_ptr jinf)
 {
-	return TRUE;
+    return TRUE;
 }
 
 
 long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filename, Pixmap* pixmap, long* w, long* h)
 {
 
-    int				red_mask, green_mask, blue_mask;
-    int				red_shift, green_shift, blue_shift;
-    int				start_shift, msb_flag;
-    unsigned int	start_mask, udat;
-    FILE*			ifile;
+    int		    red_mask, green_mask, blue_mask;
+    int		    red_shift, green_shift, blue_shift;
+    int		    start_shift, msb_flag;
+    unsigned int    start_mask, udat;
+    FILE*	    ifile;
     XWindowAttributes win_attr;
     struct jpeg_decompress_struct    jinf;
     struct jpeg_error_mgr            jerr;
-    long			rwidth, rheight;
-    long			vwidth = *w;
-    long			vheight = *h;
-    long			stretched =0;
-    long			components;
-    unsigned char*	buf;
-    JSAMPROW		rowptr[1];
-    long			display_depth = XDefaultDepth(display,XDefaultScreen(display));
-    XImage*			image = 0;
-    Visual*			visual;
-    char*			data1;
-    unsigned char	r, g, b;
-    long			ptr = 0;
-    long			ptr2 = 0;
-    long			i;
-    long			j;
-    Pixmap			pix;
+    long	    rwidth, rheight;
+    long	    vwidth = *w;
+    long	    vheight = *h;
+    long	    stretched =0;
+    long	    components;
+    unsigned char*  buf;
+    JSAMPROW	    rowptr[1];
+    long	    display_depth = XDefaultDepth(display,XDefaultScreen(display));
+    XImage*	    image = 0;
+    Visual*	    visual;
+    char*	    data1;
+    unsigned char   r, g, b;
+    long	    ptr = 0;
+    long	    ptr2 = 0;
+    long	    i;
+    long	    j;
+    Pixmap	    pix;
     
 
     red_mask = green_mask = blue_mask = 0;
@@ -92,7 +92,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
 
     ifile = fopen(filename,"r");
     if (ifile == NULL)	{
-		return -1;
+	return -1;
     }
 
     jinf.err = jpeg_std_error(&jerr);
@@ -111,27 +111,27 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
     rwidth = jinf.output_width;
     rheight = jinf.output_height;
     if (*w == 0 || *h == 0){
-		*w = rwidth;
-		*h = rheight;
+	*w = rwidth;
+	*h = rheight;
     }
-	else{
-		if ((long)((double)rwidth * vheight/vwidth) < rheight){
-			*w = (long)((double)vheight * rwidth/rheight);
-		}
-		else	{
-			*h = (long)((double)vwidth * rheight/rwidth);
-		}
-		stretched = 1;
+    else{
+	if ((long)((double)rwidth * vheight/vwidth) < rheight){
+	    *w = (long)((double)vheight * rwidth/rheight);
 	}
+	else	{
+	    *h = (long)((double)vwidth * rheight/rwidth);
+	}
+	stretched = 1;
+    }
     vwidth = *w;
     vheight = *h;
 /*    long bpp = jinf.data_precision; */
     components = jinf.output_components;
-	/* possible integer overflow */
-	assert ((int) components > 0);
-	assert ((int) rheight > 0);
-	assert ((int) rwidth > 0);
-	assert (components * rheight * rwidth * sizeof (JSAMPLE) > 0);
+    /* possible integer overflow */
+    assert ((int) components > 0);
+    assert ((int) rheight > 0);
+    assert ((int) rwidth > 0);
+    assert (components * rheight * rwidth * sizeof (JSAMPLE) > 0);
     buf = (unsigned char*)rxvt_malloc(components * rheight * rwidth*sizeof(JSAMPLE));
 /*printf("jpg::readjpg w,h=%d,%d  c=%d\n",width,height,components); */
 
@@ -195,10 +195,10 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
       }
     }
 
-	/* possible integer overflow? */
-	assert ((int)image->bytes_per_line > 0);
-	assert ((int)vheight > 0);
-	assert (((int)image->bytes_per_line) * ((int)vheight) > 0);
+    /* possible integer overflow? */
+    assert ((int)image->bytes_per_line > 0);
+    assert ((int)vheight > 0);
+    assert (((int)image->bytes_per_line) * ((int)vheight) > 0);
     data1 = rxvt_malloc(image->bytes_per_line * vheight);
     ptr = 0;
     ptr2 = 0;
@@ -386,7 +386,7 @@ long JpegReadFileToPixmap (Display* display, Window window, GC gc, char* filenam
         }
       }
     }else if (image->bits_per_pixel == 8){
-	/* printf("components=%d\n",components); */
+    /* printf("components=%d\n",components); */
       XColor col[5*5*5];
       Colormap cm = DefaultColormap(display,DefaultScreen(display));
       long k;

@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	rxvt.c
+ * File:    rxvt.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -44,25 +44,25 @@
 int
 main(int argc, const char *const *argv)
 {
-	rxvt_t		 *rxvt_vars;
+    rxvt_t	 *rxvt_vars;
 
-	/*
-	 * Save and then give up any super-user privileges immediately after program
-	 * starts. If we need privileges in any area then we must specifically
-	 * request it.
-	 *
-	 * We should only need to be root in these cases:
-	 *
-	 *		1.  write utmp entries on some systems
-	 *		2.  chown tty on some systems
-	 */
-	rxvt_privileges(SAVE);
-	rxvt_privileges(IGNORE);
+    /*
+     * Save and then give up any super-user privileges immediately after program
+     * starts. If we need privileges in any area then we must specifically
+     * request it.
+     *
+     * We should only need to be root in these cases:
+     *
+     *	    1.  write utmp entries on some systems
+     *	    2.  chown tty on some systems
+     */
+    rxvt_privileges(SAVE);
+    rxvt_privileges(IGNORE);
 
-	if ((rxvt_vars = rxvt_init(argc, argv)) == NULL)
-		return EXIT_FAILURE;
+    if ((rxvt_vars = rxvt_init(argc, argv)) == NULL)
+	return EXIT_FAILURE;
 
-	rxvt_main_loop(rxvt_vars);	/* main processing loop */
-		return EXIT_SUCCESS;
+    rxvt_main_loop(rxvt_vars);	/* main processing loop */
+	return EXIT_SUCCESS;
 }
 /*----------------------- end-of-file (C source) -----------------------*/
