@@ -1221,7 +1221,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	int	    len = 0;
 
 
-	getcwd (cwd, PATH_MAX),
+	getcwd (cwd, PATH_MAX);
 
 	if( !STRCMP( cwdOption, "." ) )
 	{

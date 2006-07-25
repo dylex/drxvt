@@ -363,7 +363,7 @@ rxvt_menuarrow_free(rxvt_t *r, unsigned char name)
 	{
 	    action_t	   *act = &(r->h->MenuBar.arrows[i]);
 
-	    if (action->len)
+	    if (act->len)
 	    {
 		assert (NOT_NULL(act->str));
 		rxvt_free(act->str);
