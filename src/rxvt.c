@@ -67,10 +67,12 @@ main(int argc, const char *const *argv)
     if ((rxvt_vars = rxvt_init(argc, argv)) == NULL)
 	return EXIT_FAILURE;
 
+    rxvt_main_loop(rxvt_vars);	/* main processing loop */
+
 #ifdef OUR_MALLOC
     rxvt_mem_exit ();
 #endif
-    rxvt_main_loop(rxvt_vars);	/* main processing loop */
-	return EXIT_SUCCESS;
+
+    return EXIT_SUCCESS;
 }
 /*----------------------- end-of-file (C source) -----------------------*/
