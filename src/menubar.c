@@ -896,12 +896,13 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
     {
 	/* Add menus named PopupButton%d to popupMenu[%d] */
 	if(
-	    !STRNCASECMP( "popupbutton", (char *) path, 11 )
-	    && path[11] >= '1' && path[11] <= '3'
-	    && path[12] == '\0'
+	    !STRNCASECMP("popupbutton", (char*) path, (sizeof("popupbutton")-1)) &&
+	    path[sizeof("popupbutton")-1] >= '1' &&
+	    path[sizeof("popupbutton")-1] <= '3' &&
+	    path[sizeof("popupbutton")] == '\0'
 	  )
 	{
-	    int i = path[11] - '1';
+	    int i = path[sizeof("popupbutton")-1] - '1';
 
 	    /* Free the menu */
 	    if( r->h->popupMenu[i] )
