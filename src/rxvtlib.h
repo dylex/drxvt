@@ -386,22 +386,37 @@ typedef enum {
 /* place holder used for parsing command-line options */
 #define Opt_Reverse	    (1LU<<31)
 
-/* Macros to test whether an option has been set.  */
+/* Macros to manipulate options (given an option array) */
+#define ISSET_ARRAYOPT( array, option )	    \
+    ( (array)[ (option) & OPTION_MASK ] & ( (option) & ~OPTION_MASK ) )
+
+#define NOTSET_ARRAYOPT( array, option )    \
+    !ISSET_ARRAYOPT( array, option )
+
+#define SET_ARRAYOPT( array, option )	    \
+    ( (array)[ (option) & OPTION_MASK ] |= ( (option) & ~OPTION_MASK ) )
+
+#define UNSET_ARRAYOPT( array, option )	    \
+    ( (array)[ (option) & OPTION_MASK ] &= ~( (option) & ~OPTION_MASK ) )
+
+#define TOGGLE_ARRAYOPT( array, option )	    \
+    ( (array)[ (option) & OPTION_MASK ] ^= ( (option) & ~OPTION_MASK ) )
+
+/* Macros to manipulate standard options */
 #define ISSET_OPTION(R, OPT)	\
-    ((R)->Options[OPT & OPTION_MASK] & (~OPTION_MASK & OPT))
+    ISSET_ARRAYOPT( (R)->Options, (OPT) )
 
 #define NOTSET_OPTION(R, OPT)	\
-    (!((R)->Options[OPT & OPTION_MASK] & (~OPTION_MASK & OPT)))
+    !ISSET_OPTION( (R), (OPT) )
 
-/* Macros to set and unset an option.  */
 #define SET_OPTION(R, OPT)  	\
-    ((R)->Options[OPT & OPTION_MASK] |= (OPT & ~OPTION_MASK))
+    SET_ARRAYOPT( (R)->Options, (OPT) )
 
 #define UNSET_OPTION(R, OPT)  	\
-    ((R)->Options[OPT & OPTION_MASK] &= ~(OPT & ~OPTION_MASK))
+    UNSET_ARRAYOPT( (R)->Options, (OPT) )
 
 #define TOGGLE_OPTION(R, OPT)	\
-    ((R)->Options[OPT & OPTION_MASK] ^= (OPT & ~OPTION_MASK))
+    TOGGLE_ARRAYOPT( (R)->Options, (OPT) )
 
 
 

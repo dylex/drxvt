@@ -80,15 +80,6 @@ static const char *const xnames[3] = {
 #define RSTRG(rsp, kw, arg, multiple)			\
     {0, (rsp), (kw), NULL, (arg), NULL, (multiple)}
 
-#if 0 /* Old macros for boolean options */
-/* BOOL() - regular boolean `-/+' flag */
-#define BOOL(rsp, kw, opt, flag, desc, multiple)		\
-    {(Opt_Boolean|(flag)), (rsp), (kw), (opt), NULL, (desc), (multiple)}
-
-/* SWCH() - `-' flag */
-#define SWCH(opt, flag, desc, multiple)			\
-    {(flag), -1, NULL, (opt), NULL, (desc), (multiple)}
-#else
 /* BOOL() - regular boolean `-/+' flag */
 #define BOOL(kw, opt, flag, desc)		    \
     {(flag), -1, (kw), (opt), NULL, (desc), 0}
@@ -96,7 +87,6 @@ static const char *const xnames[3] = {
 /* SWCH() - `-' flag */
 #define SWCH(kw, opt, flag, desc)		    \
     {(flag), -1, (kw), (opt), NULL, (desc), 0}
-#endif
 
 
 /* convenient macros */
@@ -558,6 +548,9 @@ static const struct {
 	"List of profiles to load on startup", 0 ),
     INFO("e", "command arg ...", "command to execute")
 };
+
+/* Previously set options */
+static RUINT32T	pSetOpts[ MAX_OPTION_ARRAY ] = { 0u, 0u, 0u, 0u };
 
 #undef INFO
 #undef STRG
@@ -1044,25 +1037,19 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	    /* boolean value */
 	    else
 	    {
-		DBG_MSG(2, (stderr, "boolean (%s,%s) = %s\n",
-		    optList[entry].opt, optList[entry].kw, flag));
-		if ((optList[entry].doff+profileNum) < Rs_options2)
-		{
-		    if (flag == On)
-			SET_OPTION(r, optList[entry].flag);
-		    else
-			UNSET_OPTION(r, optList[entry].flag);
-		}
-		else
-		{
-		    if (flag == On)
-			SET_OPTION(r, optList[entry].flag);
-		    else
-			UNSET_OPTION(r, optList[entry].flag);
-		}
+		DBG_MSG( 2, ( stderr, "boolean (%s,%s) = %s\n",
+		    optList[entry].opt, optList[entry].kw, flag ) );
 
-		if ((optList[entry].doff+profileNum) != -1)
-		    r->h->rs[optList[entry].doff+profileNum] = flag;
+		if( flag == On )
+		    SET_OPTION( r, optList[entry].flag );
+		else
+		    UNSET_OPTION( r, optList[entry].flag );
+
+		/*
+		 * Remember that we've set this option, so it does not get reset
+		 * later.
+		 */
+		SET_ARRAYOPT( pSetOpts, optList[entry].flag );
 	    }
 	}
 
@@ -1252,24 +1239,29 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 			 * Boolean options: We dont' need to duplicate the
 			 * argument of the resource string. That only wastes
 			 * memory.
-			 *
-			 * We just copy the mask into our "flag" argument,
-			 * provided we have not already set it.
 			 */
-			// XXX Don't change previously set options
-			int	s;
+			if( NOTSET_ARRAYOPT( pSetOpts, optList[entry].flag ) )
+			{
+			    /*
+			     * Only set this option if we've not already set it.
+			     */
+			    int	s;
 
-			s = STRCASECMP(str, "true") == 0 ||
-			    STRCASECMP(str, "yes") == 0 ||
-			    STRCASECMP(str, "on") == 0 ||
-			    STRCASECMP(str, "1") == 0;
-			if (optList_isReverse(entry))
-			    s = !s;
+			    s = STRCASECMP(str, "true") == 0 ||
+				STRCASECMP(str, "yes") == 0 ||
+				STRCASECMP(str, "on") == 0 ||
+				STRCASECMP(str, "1") == 0;
+			    if (optList_isReverse(entry))
+				s = !s;
 
-			if (s)
-			    SET_OPTION(r, optList[entry].flag);
-			else
-			    UNSET_OPTION(r, optList[entry].flag);
+			    if (s)
+				SET_OPTION(r, optList[entry].flag);
+			    else
+				UNSET_OPTION(r, optList[entry].flag);
+
+			    /* Remember we've already set this option */
+			    SET_ARRAYOPT( pSetOpts, optList[entry].flag );
+			}
 		    }
 
 		    else if( IS_NULL( r->h->rs[ optList[entry].doff
@@ -1283,7 +1275,9 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 			    n && !optList_isBool(entry) ?
 				STRDUP( str ) : emptyResource;
 		    }
-		    break;
+
+		    break; /* out of for( entry=0 ... ) */
+
 		}   /* if( str[n] =':' ...) */
 	    }	/* for (entry = 0...) */
 	}   /* if( !rxvt_parse_macros ... ) */

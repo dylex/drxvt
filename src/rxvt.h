@@ -1227,17 +1227,6 @@ enum {
     Rs_background,	_Rs_background = Rs_background + MAX_PROFILES - 1,
     Rs_cwd,		_Rs_cwd = Rs_cwd + MAX_PROFILES - 1,
 
-    /*
-     * Secondary boolean options (stored in r->Options2).
-     *
-     * TODO 2006-05-23 gi1242: Make r->Options an array, and define macros to
-     * set / clear these boolean options.
-     */
-    Rs_options2,
-    Rs2_cmdInitTabs,
-#ifdef XFT_SUPPORT
-    Rs2_xftwd,		/* width */
-#endif
     NUM_RESOURCES
 } ;
 
