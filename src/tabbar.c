@@ -1216,9 +1216,12 @@ rxvt_append_page( rxvt_t* r, int profile,
     if( getProfileOption( r, profile, Rs_cwd ) != NULL )
     {
 	const char  *cwdOption	= getProfileOption( r, profile, Rs_cwd );
-	char	    *cwd	= getcwd( NULL, PATH_MAX ),
-		    child_cwd[PATH_MAX];
+	char	    cwd[PATH_MAX] = "",
+		    child_cwd[PATH_MAX] = "";
 	int	    len = 0;
+
+
+	getcwd (cwd, PATH_MAX),
 
 	if( !STRCMP( cwdOption, "." ) )
 	{
@@ -1268,10 +1271,6 @@ rxvt_append_page( rxvt_t* r, int profile,
 	    LVTS(r)->cmd_fd =
 		rxvt_run_command( r, LTAB(r), (const char**) argv );
 	}
-
-	/* Glibc extension to getcwd: When passed a null pointer it allocates
-	 * memory for the path. So we need to free it now. */
-	rxvt_free( cwd );
     }
     else
 	LVTS(r)->cmd_fd = rxvt_run_command (r, LTAB(r), (const char**) argv);
