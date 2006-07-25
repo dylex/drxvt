@@ -690,6 +690,7 @@ rxvt_set_action	    (action_t *action, char *astring)
 	MEMCPY( action->str, astring, len);
     }
     else
+    if (NOT_NULL(action->str))
     {
 	rxvt_free( action->str );
 	SET_NULL(action->str);

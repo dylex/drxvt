@@ -363,9 +363,13 @@ rxvt_menuarrow_free(rxvt_t *r, unsigned char name)
 	{
 	    action_t	   *act = &(r->h->MenuBar.arrows[i]);
 
-	    rxvt_free(act->str);
-	    SET_NULL(act->str);
-	    act->len = 0;
+	    if (action->len)
+	    {
+		assert (NOT_NULL(act->str));
+		rxvt_free(act->str);
+		SET_NULL(act->str);
+		act->len = 0;
+	    }
 
 	    act->type = MenuLabel;
 	}
