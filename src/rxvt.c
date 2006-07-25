@@ -59,9 +59,17 @@ main(int argc, const char *const *argv)
     rxvt_privileges(SAVE);
     rxvt_privileges(IGNORE);
 
+#ifdef OUR_MALLOC
+    /* initialize our memory systemm */
+    rxvt_mem_init ();
+#endif
+
     if ((rxvt_vars = rxvt_init(argc, argv)) == NULL)
 	return EXIT_FAILURE;
 
+#ifdef OUR_MALLOC
+    rxvt_mem_exit ();
+#endif
     rxvt_main_loop(rxvt_vars);	/* main processing loop */
 	return EXIT_SUCCESS;
 }
