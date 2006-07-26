@@ -57,10 +57,10 @@ struct block_head_t
     size_t	bbyte;		/* allocated bytes */
 #endif
     union
-	{
-		struct block_head_t*	next;	/* next block */
-		struct trunk_head_t*	trunk;	/* address of trunk_head */
-	} u;
+    {
+        struct block_head_t*	next;	/* next block */
+	struct trunk_head_t*	trunk;	/* address of trunk_head */
+    } u;
 #ifdef DEBUG
     RUINT32T    magic_e;	/* magic number */
 #endif
@@ -76,10 +76,10 @@ struct trunk_head_t
     RUINT32T	magic;  /* magic number */
     size_t	tbyte;  /* total allocated bytes in this trunk */
 #endif
-    struct block_head_t*	begin;/* begin address of the trunk. this is
-								   * ONLY used by get_trunk, init_trunk
-								   * and free trunk, and NOTHING ELSE!!!
-								   */
+    struct block_head_t*    begin;/* begin address of the trunk. this is
+				   * ONLY used by get_trunk, init_trunk
+				   * and free trunk, and NOTHING ELSE!!!
+				   */
 
     struct trunk_head_t*    prev; /* prev trunk with the same block size */
     struct trunk_head_t*    next; /* next trunk with the same block size */
@@ -103,7 +103,7 @@ struct trunk_list_t
 	size_t	    bnum;	/* number of blocks to allocate, used
 				 * before rxvt_mem_init as hint
 				 */
-	size_t	    tsize;	/* actual trunk size (exclude head)
+	size_t	    tsize;	/* actual trunk size (exclude trunk head)
 				 * after rxvt_mem_init
 				 */
     } u;
@@ -119,8 +119,15 @@ struct trunk_list_t
 #define DEFAULT_TRUNK_SIZE	(1UL << 12)
 /* 1KB is the minimal trunk size */
 #define MINIMAL_TRUNK_SIZE	(1UL << 10)
+/* 64KB is the optimal trunk size */
+#define OPTIMAL_TRUNK_SIZE	(1UL << 16)
 /* 1MB is the maximal trunk size, are you crazy?! */
 #define MAXIMAL_TRUNK_SIZE	(1UL << 20)
+
+/* stage threshold to increase trunk size based on trunk count in a
+ * trunk list.
+ */
+#define TRUNK_INCREASE_STAGE	(3)
 
 
 #endif /* OUR_MALLOC */

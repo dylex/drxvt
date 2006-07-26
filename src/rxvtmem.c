@@ -73,6 +73,7 @@ static struct trunk_list_t	g_trunk_list[] =
     { 32,  0, {150}, (struct trunk_head_t*) NULL},
     { 48,  0, { 25}, (struct trunk_head_t*) NULL},
     { 80,  0, {  0}, (struct trunk_head_t*) NULL},
+    {128,  0, {  0}, (struct trunk_head_t*) NULL},
     {320,  0, {  0}, (struct trunk_head_t*) NULL},
     {512,  0, {  4}, (struct trunk_head_t*) NULL},
     {  0,  0, {  0}, (struct trunk_head_t*) NULL},
@@ -155,6 +156,39 @@ free_trunk(struct trunk_head_t* tk_head)
 #endif
 
     free ((void*) tk_head->begin);
+}
+
+
+/*
+ * This function increase the trunk size for a trunk list if we decide
+ * that there are many memory allocation for this trunk list. Whether
+ * it really improve the performance is a question to answer. ;-)  It
+ * just shows something that we can abuse with our own memory system.
+ */
+/* INTPROTO */
+void
+optimize_trunk_list(struct trunk_list_t* tklist)
+{
+    register size_t	tsize;
+
+    assert (NOT_NULL(tklist));
+    assert (NOT_NULL(tklist->first_trunk));
+
+    /* already optimal trunk size, nothing to do */
+    if (tklist->u.tsize >= OPTIMAL_TRUNK_SIZE ||
+	tklist->u.tsize < DEFAULT_TRUNK_SIZE)
+	return;
+
+    /* optimize trunk size by increasing it!)
+     * . obtain a trunk size based on DEFAULT_TRUNK_SIZE
+     * . decide whether we should increase trunk size
+     * . do not use the size obtained based on DEFAULT_TRUNK_SIZE
+     *   in order to avoid fragmentation.
+     */
+    tsize = DEFAULT_TRUNK_SIZE <<
+	    (tklist->trunk_count / TRUNK_INCREASE_STAGE);
+    if (tsize >= (tklist->u.tsize << 1))
+	tklist->u.tsize <<= 1;
 }
 
 
@@ -347,7 +381,8 @@ rxvt_malloc(size_t size)
 		
 		new_trunk = get_trunk (tklist->u.tsize),
 		new_trunk->list = tklist,
-		tklist->trunk_count ++;	/* increase trunk counter */
+		tklist->trunk_count ++, /* increase trunk counter */
+		optimize_trunk_list (tklist);
 
 		init_trunk (new_trunk, tklist->block_size);
 		SET_NULL(new_trunk->next);
