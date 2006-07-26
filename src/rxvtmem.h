@@ -96,17 +96,17 @@ struct trunk_head_t
  */
 struct trunk_list_t
 {
-    RUINT16T		    block_size;	/* block size for this trunk list */
-    RUINT16T		    trunk_count;/* how many trunks allocated */
-	union
-	{
-		size_t		    bnum;	/* number of blocks to allocate, used
-								 * before rxvt_mem_init
-								 */
-		size_t			tsize;	/* actual trunk size (exclude head)
-								 * after rxvt_mem_init
-								 */
-	} u;
+    RUINT16T	    block_size;	/* block size for this trunk list */
+    RUINT16T	    trunk_count;/* how many trunks allocated */
+    union
+    {
+	size_t	    bnum;	/* number of blocks to allocate, used
+				 * before rxvt_mem_init as hint
+				 */
+	size_t	    tsize;	/* actual trunk size (exclude head)
+				 * after rxvt_mem_init
+				 */
+    } u;
     struct trunk_head_t*    first_trunk;
 };
 
@@ -117,7 +117,7 @@ struct trunk_list_t
 
 /* 4KB is the default trunk size */
 #define DEFAULT_TRUNK_SIZE	(1UL << 12)
-/* 1KB is the minimal trunk size, or 1KB? */
+/* 1KB is the minimal trunk size */
 #define MINIMAL_TRUNK_SIZE	(1UL << 10)
 /* 1MB is the maximal trunk size, are you crazy?! */
 #define MAXIMAL_TRUNK_SIZE	(1UL << 20)

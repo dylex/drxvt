@@ -51,11 +51,11 @@
 #ifdef OUR_MALLOC
 
 #ifdef DEBUG
-static int   memory_initialized = 0;
+static int  memory_initialized = 0;
 #endif
 
 /* Use use our malloc function only if we bypass the memory check */
-static int   use_our_malloc = 1;
+static int  use_our_malloc = 1;
 
 
 
@@ -68,12 +68,14 @@ static int   use_our_malloc = 1;
  */
 static struct trunk_list_t	g_trunk_list[] =
 {
-    {16,   0, {0}, (struct trunk_head_t*) NULL},
-    {48,   0, {0}, (struct trunk_head_t*) NULL},
-    {80,   0, {0}, (struct trunk_head_t*) NULL},
-    {320,  0, {0}, (struct trunk_head_t*) NULL},
-    {512,  0, {0}, (struct trunk_head_t*) NULL},
-    {0,    0, {0}, (struct trunk_head_t*) NULL},
+    /* block_size, trunk_count, block_num/trunk_size, first_trunk */
+    { 16,  0, {125}, (struct trunk_head_t*) NULL},
+    { 32,  0, {150}, (struct trunk_head_t*) NULL},
+    { 48,  0, { 25}, (struct trunk_head_t*) NULL},
+    { 80,  0, {  0}, (struct trunk_head_t*) NULL},
+    {320,  0, {  0}, (struct trunk_head_t*) NULL},
+    {512,  0, {  4}, (struct trunk_head_t*) NULL},
+    {  0,  0, {  0}, (struct trunk_head_t*) NULL},
 };
 static unsigned int	g_trunk_list_num;
 
@@ -267,6 +269,9 @@ rxvt_malloc(size_t size)
 
 #ifdef DEBUG
     assert (memory_initialized);
+# ifdef DEBUG_MEMORY
+    DBG_MSG(2, (stderr, "DBGMEM: %d\n", (int) size));
+# endif
 #endif
 
     if (!use_our_malloc || /* use system malloc, or request size is big */
@@ -329,8 +334,9 @@ rxvt_malloc(size_t size)
 #ifdef DEBUG
 	    /* print out statistics for the trunk */
 	    DBG_MSG(1, (stderr, "--Trunk of block size %d: %d bytes used (%d%%)\n",
-		tklist->block_size, tklist->first_trunk->tbyte,
-		tklist->first_trunk->tbyte * 100 / tklist->u.tsize));
+		tklist->block_size, (int) tklist->first_trunk->tbyte,
+		(int) (tklist->first_trunk->tbyte * 100 /
+		      (tklist->block_size * tklist->first_trunk->bmax))));
 #endif
 
 
