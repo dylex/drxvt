@@ -95,6 +95,7 @@ get_trunk(size_t trunk_size)
 	exit(EXIT_FAILURE);
     }
 
+    DBG_MSG(1, (stderr, "--Trunk allocated %d bytes\n", (int) trunk_size));
     tk_head = (struct trunk_head_t*) ((size_t) ptr + trunk_size);
     /* set the real beginning of trunk. this should only be used by
      * init_trunk and free_trunk
@@ -155,6 +156,8 @@ free_trunk(struct trunk_head_t* tk_head)
     assert (TRUNK_MAGIC == tk_head->magic);
 #endif
 
+    DBG_MSG(1, (stderr, "--Trunk freed %d bytes\n",
+	(int) ((void*) tk_head - (void*) tk_head->begin)));
     free ((void*) tk_head->begin);
 }
 
@@ -167,7 +170,7 @@ free_trunk(struct trunk_head_t* tk_head)
  */
 /* INTPROTO */
 void
-optimize_trunk_list(struct trunk_list_t* tklist)
+optimize_trunk_size(struct trunk_list_t* tklist)
 {
     register size_t	tsize;
 
@@ -175,8 +178,7 @@ optimize_trunk_list(struct trunk_list_t* tklist)
     assert (NOT_NULL(tklist->first_trunk));
 
     /* already optimal trunk size, nothing to do */
-    if (tklist->u.tsize >= OPTIMAL_TRUNK_SIZE ||
-	tklist->u.tsize < DEFAULT_TRUNK_SIZE)
+    if (tklist->u.tsize >= OPTIMAL_TRUNK_SIZE)
 	return;
 
     /* optimize trunk size by increasing it!)
@@ -189,6 +191,34 @@ optimize_trunk_list(struct trunk_list_t* tklist)
 	    (tklist->trunk_count / TRUNK_INCREASE_STAGE);
     if (tsize >= (tklist->u.tsize << 1))
 	tklist->u.tsize <<= 1;
+}
+
+
+/*
+ * This function decrease the trunk size for a trunk list if we decide
+ * that there are less memory allocation for this trunk list.
+ */
+/* INTPROTO */
+void
+shrink_trunk_size(struct trunk_list_t* tklist)
+{
+    register size_t	tsize;
+
+    assert (NOT_NULL(tklist));
+    assert (NOT_NULL(tklist->first_trunk));
+
+    /* already optimal trunk size, nothing to do */
+    if (tklist->u.tsize <= DEFAULT_TRUNK_SIZE)
+	return;
+
+    /* shrink trunk size it!)
+     * . obtain a trunk size based on DEFAULT_TRUNK_SIZE
+     * . decide whether we should decrease trunk size
+     */
+    tsize = DEFAULT_TRUNK_SIZE <<
+	    (tklist->trunk_count / TRUNK_INCREASE_STAGE);
+    if (tsize <= (tklist->u.tsize >> 1))
+	tklist->u.tsize >>= 1;
 }
 
 
@@ -382,7 +412,7 @@ rxvt_malloc(size_t size)
 		new_trunk = get_trunk (tklist->u.tsize),
 		new_trunk->list = tklist,
 		tklist->trunk_count ++, /* increase trunk counter */
-		optimize_trunk_list (tklist);
+		optimize_trunk_size (tklist);
 
 		init_trunk (new_trunk, tklist->block_size);
 		SET_NULL(new_trunk->next);
@@ -600,7 +630,8 @@ rxvt_free(void* ptr)
 		    tklist->first_trunk->prev = NULL;
 
 		    free_trunk (tk_head),
-		    tklist->trunk_count --; /* decrease trunk counter */
+		    tklist->trunk_count --, /* decrease trunk counter */
+		    shrink_trunk_size (tklist);
 		}
 	    }
 	    else    
@@ -619,7 +650,8 @@ rxvt_free(void* ptr)
 		}
 
 		free_trunk (tk_head),
-		tklist->trunk_count --; /* decrease trunk counter */
+		tklist->trunk_count --, /* decrease trunk counter */
+		shrink_trunk_size (tklist);
 	    }
 	}
     }
