@@ -75,11 +75,11 @@ rxvt_network_display (const char *display)
 
 	STRCPY(ifr2.ifr_name, ifr->ifr_name);
 	if (ioctl(skfd, SIOCGIFADDR, &ifr2) >= 0) {
-	    unsigned long   addr;
-	    struct sockaddr_in *p_addr;
+	    uint32_t		addr;
+	    struct sockaddr_in*	p_addr;
 
 	    p_addr = (struct sockaddr_in *)&(ifr2.ifr_addr);
-	    addr = htonl((unsigned long)p_addr->sin_addr.s_addr);
+	    addr = htonl((uint32_t)p_addr->sin_addr.s_addr);
 
 	    /*
 	     * not "0.0.0.0" or "127.0.0.1" - so format the address

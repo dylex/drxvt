@@ -175,7 +175,7 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 	/* generate init profile list */
 	sprintf (initprof, "%d", PVTS(r, 0)->profileNum);
 	for (i = 1; i <= LTAB(r); i ++)	{
-	    char    tmpbuf[sizeof (long int) + 1];
+	    char    tmpbuf[64];
 	    sprintf (tmpbuf, ",%d", PVTS(r, i)->profileNum);
 	    STRCAT (initprof, tmpbuf);
 	}

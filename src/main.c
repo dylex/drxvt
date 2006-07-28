@@ -2578,7 +2578,7 @@ void
 rxvt_IM_set_fontset (rxvt_t* r, int idx)
 {
     char		*string;
-    long	    length;
+    size_t	    length;
     XFontSet	    prev_fontset;
     int		    success = 0;
 

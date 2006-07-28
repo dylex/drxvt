@@ -669,8 +669,8 @@ typedef struct {
 #endif
 
     /* moved from hidden */
-    unsigned long   PrivateModes;
-    unsigned long   SavedModes;
+    RUINT32T	    PrivateModes;
+    RUINT32T	    SavedModes;
 
 #ifdef UTMP_SUPPORT
 #ifndef UTEMPTER_SUPPORT

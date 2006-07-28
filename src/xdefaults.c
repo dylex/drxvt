@@ -102,7 +102,7 @@ static const char *const xnames[3] = {
     (sizeof(optList) / sizeof(optList[0]))
 
 static const struct {
-    const unsigned long flag;	/* Option flag */
+    const RUINT32T  flag;	/* Option flag */
     const int	    doff;	/* data offset */
     const char*	    kw;		/* keyword */
     const char*	    opt;	/* option */

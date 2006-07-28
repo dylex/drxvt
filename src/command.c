@@ -214,7 +214,7 @@ void           rxvt_process_dcs_seq          (rxvt_t*, int);
 void           rxvt_process_osc_seq          (rxvt_t*, int);
 void           rxvt_xwsh_seq                 (rxvt_t*, int, const char*);
 void           rxvt_process_xwsh_seq         (rxvt_t*, int);
-int            rxvt_privcases                (rxvt_t*, int, int, unsigned long);
+int            rxvt_privcases                (rxvt_t*, int, int, RUINT32T);
 void           rxvt_process_terminal_mode    (rxvt_t*, int, int, int, unsigned int, const int*);
 void           rxvt_process_sgr_mode         (rxvt_t*, int, unsigned int, const int*);
 void           rxvt_process_graphics         (rxvt_t*, int);
@@ -1841,7 +1841,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
     {
 	int	set_quick_timeout = 0;
-	long	csdiff, psdiff, bsdiff;
+	RINT32T	csdiff, psdiff, bsdiff;
 
 	csdiff = psdiff = bsdiff = 60000000L;   /* or, say, LONG_MAX */
 
@@ -1917,7 +1917,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	    (h->pointerBlankDelay > 0) &&
 	    (0 == AVTS(r)->hidden_pointer))
 	{
-	    long		pdelay;
+	    RINT32T	pdelay;
 
 	    DBG_MSG(3, (stderr,"** get pointer time on select\n"));
 	    (void) gettimeofday(&tp, NULL);
@@ -2990,7 +2990,7 @@ rxvt_process_clientmessage(rxvt_t* r, XClientMessageEvent* ev)
 	Atom		ActualType;
 	int		ActualFormat;
 	unsigned char*	data;
-	unsigned long	Size, RemainingBytes;
+	RUINT32T	Size, RemainingBytes;
 
 	XGetWindowProperty(r->Xdisplay, XROOT,
 	   r->h->xa[XA_DNDSELECTION], 0L, 1000000L,
@@ -5898,7 +5898,7 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
  */
 /* INTPROTO */
 int
-rxvt_privcases(rxvt_t* r, int page, int mode, unsigned long bit)
+rxvt_privcases(rxvt_t* r, int page, int mode, RUINT32T bit)
 {
     int		 state;
 
@@ -5928,8 +5928,8 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
     unsigned int    i, j;
     int		    state;
     static const struct {
-	const int      argval;
-	const unsigned long bit;
+	const int	argval;
+	const RUINT32T	bit;
     } argtopriv[] = {
 	{ 1, PrivMode_aplCUR },
 	{ 2, PrivMode_vt52 },
