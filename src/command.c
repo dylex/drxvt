@@ -336,9 +336,9 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 		    meta = 0;
 		}
 
-		if (AVTS(r)->PrivateModes & PrivMode_HaveBackSpace)
+		if (ISSET_PMODE(r, ATAB(r), PrivMode_HaveBackSpace))
 		{
-		    bsKbuf[0] = (!!(AVTS(r)->PrivateModes & PrivMode_BackSpace)
+		    bsKbuf[0] = (!!(ISSET_PMODE(r, ATAB(r),PrivMode_BackSpace))
 				    ^ !!ctrl)
 				? '\b' : '\177';
 		    bsKbuf[1] = '\0';
@@ -408,7 +408,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	     */
 	    if( r->numlock_state ) shft = 0;
 
-	    if( AVTS(r)->PrivateModes & PrivMode_aplKP )
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c",
 			"txvr"[keysym - XK_KP_Left], ctrl, meta, shft );
@@ -434,10 +434,8 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	    set_xterm_key_seq( kbuf, "\033[", "\033[1;%d%c",
 		    "DACB"[keysym - XK_Left], ctrl, meta, shft);
 
-	    if (
-		    AVTS(r)->PrivateModes & PrivMode_aplCUR
-		    && !ctrl && !meta && !shft
-	       )
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplCUR) &&
+		!ctrl && !meta && !shft)
 		/*
 		 * 2006-04-07 gi1242 XXX: Should we ignore the modifiers in
 		 * the private mode?
@@ -454,7 +452,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 		kbuf[1] = 'O';
 		kbuf[2] = ("dacb"[keysym - XK_Left]);
 	    }
-	    else if (AVTS(r)->PrivateModes & PrivMode_aplCUR)
+	    else if (ISSET_PMODE(r, ATAB(r), PrivMode_aplCUR))
 		kbuf[1] = 'O';
 #endif
 
@@ -510,7 +508,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Prior:	/* \033[Oy */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c",
 			'y', ctrl, meta, shft );
@@ -527,7 +525,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Next:	/* \033Os */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c",
 			's', ctrl, meta, shft );
@@ -543,10 +541,8 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 
 	case XK_KP_Enter:   /* \033OM */
 
-	    if (
-		    (AVTS(r)->PrivateModes & PrivMode_aplKP)
-		    && ( !r->numlock_state || ctrl || meta || shft )
-	       )
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP) &&
+		(!r->numlock_state || ctrl || meta || shft))
 	    {
 #ifdef NUMLOCK_ALWAYS_IGNORES_SHIFT
 		if( r->numlock_state ) shft = 0;
@@ -565,7 +561,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Begin:   /* \033Ou (This is keypad 5) */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c", 'u',
 			ctrl, meta, shft );
@@ -584,7 +580,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Insert:  /* \033Op */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c", 'p',
 			ctrl, meta, shft );
@@ -602,7 +598,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Delete:  /* \033On */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c", 'n',
 			ctrl, meta, shft );
@@ -659,10 +655,8 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	     *
 	     * If numlock is off, then send the DEC terminal sequence.
 	     */
-	    if (
-		    (AVTS(r)->PrivateModes & PrivMode_aplKP)
-		    && ( !r->numlock_state || ctrl || meta || shft )
-	       )
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP) &&
+		(!r->numlock_state || ctrl || meta || shft))
 	    {
 		if(
 			r->numlock_state
@@ -708,7 +702,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_End:	/* \033Oq */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c", 'q',
 			ctrl, meta, shft );
@@ -729,7 +723,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_Home: /* \033Ow */
 	    if( r->numlock_state ) shft = 0;
 
-	    if (AVTS(r)->PrivateModes & PrivMode_aplKP)
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c", 'w',
 			ctrl, meta, shft );
@@ -755,7 +749,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	case XK_KP_F4:	/* "\033OS" */
 	    /* XXX 2006-04-08 gi1242: Should we cancel shift here? */
 
-	    if ( AVTS(r)->PrivateModes & PrivMode_aplKP )
+	    if (ISSET_PMODE(r, ATAB(r), PrivMode_aplKP))
 	    {
 		set_xterm_key_seq( kbuf, "\033O", "\033O%d%c",
 			'P' + (keysym - XK_KP_F1), ctrl, meta, shft);
@@ -2328,7 +2322,7 @@ rxvt_mouse_report(rxvt_t* r, const XButtonEvent *ev)
 	    button_number += (64 - 3);
     }
 
-    if (AVTS(r)->PrivateModes & PrivMode_MouseX10)
+    if (ISSET_PMODE(r, ATAB(r), PrivMode_MouseX10))
     {
 	/*
 	 * do not report ButtonRelease
@@ -2477,7 +2471,7 @@ rxvt_scrollbar_dispatcher (rxvt_t* r, int page, XButtonEvent* ev)
 
 
     if (!h->bypass_keystate)
-	reportmode = !!(PVTS(r, page)->PrivateModes & PrivMode_mouse_report);
+	reportmode = !!ISSET_PMODE(r, page, PrivMode_mouse_report);
 
     scrollbar_setIdle();
     /*
@@ -2652,7 +2646,7 @@ rxvt_process_buttonpress(rxvt_t* r, int page, XButtonEvent *ev)
     DBG_MSG(2, (stderr, "ButtonPress event\n"));
     h->bypass_keystate = ev->state & (h->ModMetaMask | ShiftMask);
     if (!h->bypass_keystate)
-	reportmode = !!(PVTS(r, page)->PrivateModes & PrivMode_mouse_report);
+	reportmode = !!ISSET_PMODE(r, page, PrivMode_mouse_report);
 
     /*
      * VT window processing of button press
@@ -2871,7 +2865,7 @@ rxvt_process_buttonrelease(rxvt_t* r, int page, XButtonEvent *ev)
     DBG_MSG(2, (stderr, "ButtonRelease event\n"));
     r->h->csrO = 0;	/* reset csr Offset */
     if (!r->h->bypass_keystate)
-	reportmode = !!(PVTS(r, page)->PrivateModes & PrivMode_mouse_report);
+	reportmode = !!ISSET_PMODE(r, page, PrivMode_mouse_report);
 
 #ifdef HAVE_SCROLLBARS
     if (scrollbar_isUpDn())
@@ -2933,9 +2927,10 @@ rxvt_process_buttonrelease(rxvt_t* r, int page, XButtonEvent *ev)
 	     * dumb hack to compensate for the failure of click-and-drag
 	     * when overriding mouse reporting
 	     */
-	    if (PVTS(r, page)->PrivateModes & PrivMode_mouse_report
-		&& r->h->bypass_keystate
-		&& ev->button == Button1 && r->h->MEvent.clicks <= 1)
+	    if (ISSET_PMODE(r, page, PrivMode_mouse_report) &&
+		r->h->bypass_keystate &&
+		Button1 == ev->button &&
+		r->h->MEvent.clicks <= 1)
 		rxvt_selection_extend(r, page, ev->x, ev->y, 0);
 
 	    switch (ev->button)
@@ -4047,7 +4042,7 @@ rxvt_process_motionnotify (rxvt_t* r, XEvent* ev)
     }
 #endif
 
-    if ((PVTS(r, page)->PrivateModes & PrivMode_mouse_report) &&
+    if (ISSET_PMODE(r, page, PrivMode_mouse_report) &&
 	!(r->h->bypass_keystate))
 	return;
 
@@ -4637,7 +4632,7 @@ rxvt_process_escape_seq(rxvt_t* r, int page)
     assert (page == readpage);	/* in case */
     assert (checksum == PVTS(r, page)->checksum);
 
-    if (PVTS(r, page)->PrivateModes & PrivMode_vt52)
+    if (ISSET_PMODE(r, page, PrivMode_vt52))
     {
 	rxvt_process_escape_vt52(r, page, ch);
 	return;
@@ -5904,16 +5899,16 @@ rxvt_privcases(rxvt_t* r, int page, int mode, RUINT32T bit)
 
     if (mode == 's')
     {
-	PVTS(r, page)->SavedModes |= (PVTS(r, page)->PrivateModes & bit);
+	SET_PMODE (r, page, ISSET_PMODE(r, page, bit));
 	return -1;
     }
     else
     {
 	if (mode == 'r')
 	    /* no overlapping */
-	    state = (PVTS(r, page)->SavedModes & bit) ? 1 : 0;
+	    state = ISSET_SMODE(r, page, bit) ? 1 : 0;
 	else
-	    state = (mode == 't') ? !(PVTS(r, page)->PrivateModes & bit) : mode;
+	    state = (mode == 't') ? !ISSET_PMODE(r, page, bit) : mode;
 	PrivMode(state, bit, page);
     }
     return state;
@@ -6032,7 +6027,7 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 		PrivMode(1, PrivMode_vt52, page);
 		break;
 	    case 3:	    /* 80/132 */
-		if (PVTS(r, page)->PrivateModes & PrivMode_132OK)
+		if (ISSET_PMODE(r, page, PrivMode_132OK))
 		{
 		    unsigned int w = Width2Pixel((state ? 132 : 80))
 					    + r->szHint.base_width;
@@ -6059,7 +6054,7 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 	    /* case 8:	- auto repeat, can't do on a per window basis */
 	    case 9:	    /* X10 mouse reporting */
 		if (state)	/* orthogonal */
-		    PVTS(r, page)->PrivateModes &= ~(PrivMode_MouseX11);
+		    UNSET_PMODE(r, page, PrivMode_MouseX11);
 		break;
 #ifdef HAVE_MENUBAR
 # ifdef menuBar_esc
@@ -6105,7 +6100,7 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 	    /* case 67:	- backspace key */
 	    case 1000:	    /* X11 mouse reporting */
 		if (state)	/* orthogonal */
-		    PVTS(r, page)->PrivateModes &= ~(PrivMode_MouseX10);
+		    UNSET_PMODE(r, page, PrivMode_MouseX10);
 		break;
 #if 0
 	    case 1001:

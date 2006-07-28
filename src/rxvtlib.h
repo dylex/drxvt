@@ -979,6 +979,23 @@ typedef enum {
 #define PSCR(R, P)  ((R)->vts[(P)]->screen)
 
 
+
+/* macros for private/saved mode of term_t */
+#define ISSET_PMODE(R, P, V)   \
+    ((R)->vts[(P)]->PrivateModes & (V))
+#define SET_PMODE(R, P, V)  \
+    ((R)->vts[(P)]->PrivateModes |= (V))
+#define UNSET_PMODE(R, P, V)  \
+    ((R)->vts[(P)]->PrivateModes &= ~(V))
+#define ISSET_SMODE(R, P, V)   \
+    ((R)->vts[(P)]->SavedModes & (V))
+#define SET_SMODE(R, P, V)  \
+    ((R)->vts[(P)]->SavedModes |= (V))
+#define UNSET_SMODE(R, P, V)  \
+    ((R)->vts[(P)]->SavedModes &= ~(V))
+
+
+
 /*****************************************************************************
  *                                PROTOTYPES                                 *
  *****************************************************************************/

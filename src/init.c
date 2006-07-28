@@ -2513,27 +2513,27 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
 	PrivMode_Default;
     if (ISSET_OPTION(r, Opt_scrollTtyOutputInhibit))
-	PVTS(r, page)->PrivateModes |= PrivMode_TtyOutputInh;
+	SET_PMODE(r, page, PrivMode_TtyOutputInh);
     if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
-	PVTS(r, page)->PrivateModes |= PrivMode_Keypress;
+	SET_PMODE(r, page, PrivMode_Keypress);
     if (NOTSET_OPTION(r, Opt_jumpScroll))
-	PVTS(r, page)->PrivateModes |= PrivMode_smoothScroll;
+	SET_PMODE(r, page, PrivMode_smoothScroll);
 #ifndef NO_BACKSPACE_KEY
     if (STRCMP(r->h->key_backspace, "DEC") == 0)
-	PVTS(r, page)->PrivateModes |= PrivMode_HaveBackSpace;
+	SET_PMODE(r, page, PrivMode_HaveBackSpace);
 #endif
 #ifdef HAVE_SCROLLBARS
     if (rxvt_scrollbar_visible(r))
     {
-	PVTS(r, page)->PrivateModes |= PrivMode_scrollBar;
-	PVTS(r, page)->SavedModes |= PrivMode_scrollBar;
+	SET_PMODE(r, page, PrivMode_scrollBar);
+	SET_SMODE(r, page, PrivMode_scrollBar);
     }
 #endif
 #ifdef HAVE_MENUBAR
     if (rxvt_menubar_visible(r))
     {
-	PVTS(r, page)->PrivateModes |= PrivMode_menuBar;
-	PVTS(r, page)->SavedModes |= PrivMode_menuBar;
+	SET_PMODE(r, page, PrivMode_menuBar);
+	SET_SMODE(r, page, PrivMode_menuBar);
     }
 #endif
 
