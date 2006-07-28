@@ -2632,7 +2632,7 @@ rxvt_menubar_control(rxvt_t *r, XButtonEvent *ev)
 	    break;
 
 	case ButtonRelease:
-	    if (ev->button == Button1)
+	    if (ev->button == Button1 && r->h->ActiveMenu)
 		rxvt_menu_select(r, ev);
 	    break;
 
