@@ -24,10 +24,18 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	   options.
 	7. Add macros to check and unset X resources.
 	8. Add macros to check and set NULL pointers.
+		9. Fix some freeing NULL pointer issues.
+		10.Fix black and white icons. Thanks to William Poetra Yoga
+		   Hadisoeseno for the patch!
+		11.Lots of code cleanup in command.c:rxvt_cmd_getc. Previously
+		   it is lengthy and nearly unmaintenanble.
+		12.Fix round-robin algorithm of command.c:rxvt_find_cmd_child.
 
     * Enhancements:
 	1. Add --with-max-profiles to configure script as suggested
 	   by Avi Yagodnick.
+		2. Add experimental fast (hopefully) memory management code. It
+		   is disabled by default.
 
 
 0.5.0 to 0.5.1

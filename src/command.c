@@ -158,8 +158,12 @@ static DeadKeyChar  dkc_tab[] = {
  *--------------------------------------------------------------------*/
 void           rxvt_process_keypress         (rxvt_t*, XKeyEvent*);
 void           rxvt_clean_cmd_page           (rxvt_t*);
-int            rxvt_find_cmd_child           (rxvt_t*, int*);
+int            rxvt_find_cmd_child           (rxvt_t*);
 void           rxvt_check_cmdbuf             (rxvt_t*, int);
+int            rxvt_read_child_cmdfd         (rxvt_t*, int, unsigned int);
+void           rxvt_process_children_cmdfd   (rxvt_t*, fd_set*);
+int            rxvt_check_quick_timeout      (rxvt_t*);
+int            rxvt_adjust_quick_timeout     (rxvt_t*, int, struct timeval*);
 unsigned char  rxvt_cmd_getc                 (rxvt_t*, int* page);
 #ifdef POINTER_BLANK
 void           rxvt_pointer_blank            (rxvt_t*, int);
@@ -842,7 +846,8 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
     }	/* switch (keysym) */
 
 
-    DBG_MSG( 5, ( stderr, "Returning %d\n", newlen ? STRLEN(kbuf) : -1 ));
+    DBG_MSG( 5, ( stderr, "Returning %d\n",
+	newlen ? (int) STRLEN(kbuf) : -1 ));
 
     return newlen ? STRLEN(kbuf) : -1;
     /*
@@ -1392,29 +1397,26 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 /* INTPROTO */
 int
-rxvt_find_cmd_child (rxvt_t* r, int* p_page)
+rxvt_find_cmd_child (rxvt_t* r)
 {
     register int    k;
 
-    assert (NOT_NULL(p_page));
-    assert (-1 == *p_page); /* in case */
 
     if (r->vt_died > 0)
     {
+	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: some child died\n"));
 	/* If a child has died, try to find and return it */
 	for (k = 0; k <= LTAB(r); k ++)
 	{
 	    assert (PVTS(r, k)->cmdbuf_base <= PVTS(r, k)->cmdbuf_endp);
 
-	    if (
-		    PVTS(r, k)->dead && 
-		    !( ISSET_OPTION(r, Opt2_holdExit) && (PVTS(r, k)->hold > 1) )
-	       )
+	    if (PVTS(r, k)->dead && 
+		!( ISSET_OPTION(r, Opt2_holdExit) &&
+		   (PVTS(r, k)->hold > 1)))
 	    {
 
 		*PVTS(r, k)->cmdbuf_endp = (char) 0;
-		*p_page = k;
-		return 1;
+		return k;
 	    }
 
 	    /* output any pending chars of page's v_buffer */
@@ -1424,6 +1426,49 @@ rxvt_find_cmd_child (rxvt_t* r, int* p_page)
     }
     else
     {
+	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: no child died\n"));
+	/*
+	 * Use round-robin to go through all tabs without starving
+	 * someone. It is used to avoid poor performance on one side
+	 * of a particularly busy tab if there are a lot of activities
+	 * in it. This problem is noticed by Carsten Menke (sourceforge
+	 * bug id 1102791)
+	 */
+	static int	lastproctab = 0;  /* tab we processed last time */
+
+
+	/* check of lastproctab in case it points to something not exist
+	 * - then we will get into infinite loop!
+	 */
+	if (lastproctab > LTAB(r))
+	    lastproctab = LTAB(r);
+	/* start from the next tab of last processed tab */
+	k = lastproctab + 1;
+
+	do
+	{
+	    if (k > LTAB(r))	/* round-robin */
+		k = 0;
+
+	    assert (PVTS(r, k)->cmdbuf_base <=
+		PVTS(r, k)->cmdbuf_endp);
+
+	    /* already have something in some page's buffer */
+	    if (PVTS(r, k)->cmdbuf_ptr < PVTS(r, k)->cmdbuf_endp)
+	    {
+		lastproctab = k;
+		return k;
+	    }
+
+	    /* output any pending chars of page's v_buffer */
+	    if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
+		rxvt_tt_write(r, k, NULL, 0);
+
+	}
+	/* until we hit the last child again */
+	while (k++ != lastproctab);
+
+#if 0
 	/*
 	 * Reverse loop direction on each entry. It is used to avoid poor
 	 * performance on one side of a particularly busy tab if there are a lot
@@ -1479,9 +1524,10 @@ rxvt_find_cmd_child (rxvt_t* r, int* p_page)
 		    rxvt_tt_write(r, k, NULL, 0);
 	    }	/* for loop */
 	}
+#endif	/* 0 */
     }
 
-    return 0; /* not found */
+    return -1; /* not found */
 }
 
 
@@ -1492,8 +1538,8 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
     if (PVTS(r, page)->cmdbuf_ptr == PVTS(r, page)->cmdbuf_endp)
     {
 	/*
-	 * If there is no data in the buffer, reset it to the beginning of the
-	 * buffer.
+	 * If there is no data in the buffer, reset it to the beginning
+	 * of the buffer.
 	 */
 	assert (PVTS(r, page)->cmdbuf_base <=
 	    PVTS(r, page)->cmdbuf_endp);
@@ -1503,22 +1549,22 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 	assert (PVTS(r, page)->cmdbuf_base <=
 	    PVTS(r, page)->cmdbuf_endp);
     }
-    else if (
-		(BUFSIZ - 1) == (PVTS(r, page)->cmdbuf_endp -
-				 	PVTS(r, page)->cmdbuf_base)
-		&& (PVTS(r, page)->cmdbuf_ptr > PVTS(r, page)->cmdbuf_base)
-	    )
+    else
+    if ((BUFSIZ-1) == (PVTS(r, page)->cmdbuf_endp -
+		 	PVTS(r, page)->cmdbuf_base) &&
+	(PVTS(r, page)->cmdbuf_ptr > PVTS(r, page)->cmdbuf_base))
     {
 	/*
-	 * If there is space at beginning of the buffer, but not space at the
-	 * end of the buffer, move the content of buffer forward to free space
+	 * If there is space at beginning of the buffer, but not space at
+	 * the end of the buffer, move the content of buffer forward to
+	 * free space
 	 */
 	unsigned int	n =
 	    PVTS(r, page)->cmdbuf_ptr - PVTS(r, page)->cmdbuf_base;
 	unsigned int	len =
 	    PVTS(r, page)->cmdbuf_endp - PVTS(r, page)->cmdbuf_ptr;
 
-	assert (n == BUFSIZ - 1);
+	assert (n == BUFSIZ - 1 - len);
 	assert (PVTS(r, page)->cmdbuf_ptr <
 		PVTS(r, page)->cmdbuf_endp);
 	MEMMOVE(PVTS(r, page)->cmdbuf_base, PVTS(r, page)->cmdbuf_ptr,
@@ -1532,6 +1578,380 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 
 
 /*
+ * This function returns the number of bytes being read from a child
+ */
+/* INTPROTO */
+int
+rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
+{
+    int		    n = 0, bread = 0;
+    int		    select_res;
+    fd_set	    readfds;
+    struct timeval  value;
+
+
+    while (count)
+    {
+	DBG_MSG(2, (stderr, "read maximal %u bytes\n", count));
+
+	errno = 0;  /* clear errno */
+	n = read (PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp,
+		count);
+	DBG_MSG(1, (stderr, "read %d bytes\n", n));
+
+	if (n > 0)
+	{
+	    /* Update count and buffer pointer */
+	    count -= n;
+	    bread += n;
+	    PVTS(r, page)->cmdbuf_endp += n;
+
+	    /*
+	     * check the file descriptor to see if there are further
+	     * input, this is to avoid blocking on read(), which seems
+	     * to be an issue when running mc in bash. this will waste
+	     * several CPU cycles, but it's safer than blocking.
+	     */
+	    FD_ZERO(&readfds);
+	    FD_SET(PVTS(r, page)->cmd_fd, &readfds);
+	    value.tv_sec = 0;
+	    value.tv_usec = 5;	/* time out, 5us */
+	    select_res = select(r->num_fds, &readfds, NULL,
+		NULL, &value);
+	    if (0 == select_res)
+	    {
+		/* time-out, no further data to read */
+		DBG_MSG(1, (stderr, "no further data\n"));
+		break;
+	    }
+	    if (-1 == select_res)
+	    {
+		/* error, stop reading */
+		DBG_MSG(1, (stderr, "select error\n"));
+		break;
+	    }
+	    /* continue the next loop iteration */
+	    DBG_MSG(1, (stderr, "more data to read\n"));
+	}
+	else if (0 == n)
+	{
+	    DBG_MSG(1, (stderr, "Should not happen?\n"));
+	    break;
+	}
+	else if (n < 0)
+	{
+	    /*
+	     * We do not update count and buffer pointer and continue
+	     * trying read more data in the next loop iteration.
+	     */
+	    DBG_MSG(1, (stderr, "%s\n", strerror(errno)));
+
+	    if (errno == EAGAIN ||
+		errno == EIO ||	    /* cygwin */
+		errno == EINVAL)    /* solaris */
+		break;
+	}
+    }	/* while (count) */
+
+    return bread;
+}
+
+
+
+/* INTPROTO */
+void
+rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
+{
+    /*
+     * Handle the children that have generate input. Notice in this
+     * loop we only process input, but do NOT determine the child we
+     * want to return.
+     */
+    register int    i;
+
+    for (i = 0; i <= LTAB(r); i++)
+    {
+	int		n = 0;
+	unsigned int	count, bufsiz;
+
+
+	/* check next file descriptor if this one has nothing to read in. */
+	if (!FD_ISSET(PVTS(r, i)->cmd_fd, p_readfds))
+	    continue;
+
+	DBG_MSG(1, (stderr, "reading from shell %d\n", i));
+
+	/* check our command buffer before reading data */
+	rxvt_check_cmdbuf (r, i);
+
+	assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
+	/* The buffer size is the buffer length - used length */
+	count = bufsiz = (BUFSIZ - 1) -
+	    (PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base);
+	/* read data from the command fd into buffer */
+	count -= rxvt_read_child_cmdfd (r, i, count);
+
+	assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
+	/* check if a child died */
+	if (PVTS(r, i)->dead /* && errno == EIO*/)
+	    *PVTS(r, i)->cmdbuf_endp = (char) 0;
+	else if (n < 0 && errno != EAGAIN)
+	{
+	    assert (!PVTS(r, i)->dead); /* in case */
+
+	    /*
+	     * It seems there is a signal loss if more than one children die
+	     * at almost the same moment. The result is that
+	     * rxvt_clean_cmd_page does not flag the dead value for some
+	     * dead children. Thus, the call of rxvt_cmd_getc (-1) in
+	     * rxvt_mail_loop will fall into an infinite loop on the path to
+	     * check the input from dead children since their cmd_fd are not
+	     * excluded in the select system call.
+	     * 
+	     * So we introduce the following hack to fix it. If it finds
+	     * certain dead children are processed by the select system
+	     * call, it flags it as dead.
+	     */
+	    if (PVTS(r, i)->cmd_pid ==
+		    waitpid (PVTS(r, i)->cmd_pid, NULL, WNOHANG))
+	    {
+		DBG_MSG(1, (stderr,"signal lost on child %d\n",i));
+
+		PVTS(r, i)->dead = 1;
+		if (ISSET_OPTION(r, Opt2_holdExit))
+		    PVTS(r, i)->hold = 1;
+		*PVTS(r, i)->cmdbuf_endp = (char) 0;
+
+		/*
+		 * increase vt_died number, there is a possible race
+		 * condition here (a signal comes in)
+		 */
+		r->vt_died ++;
+	    }
+	}
+
+	/* highlight inactive tab if there is some input */
+	if (NOTSET_OPTION(r, Opt2_hlTabOnBell) &&
+	    bufsiz != count &&
+	    i != ATAB(r)
+	   )
+	{
+	    rxvt_tabbar_highlight_tab (r, i, False);
+	}
+    }   /* for loop */
+}
+
+
+/* Check quick_timeout before select */
+/* INTPROTO */
+int
+rxvt_check_quick_timeout (rxvt_t* r)
+{
+    struct rxvt_hidden*	h = r->h;
+    int			quick_timeout = 0;
+
+
+#if defined(MOUSE_WHEEL) && defined(MOUSE_SLIP_WHEELING)
+    if (h->mouse_slip_wheel_speed)
+    {
+	quick_timeout = 1;
+	/* Only work for current active tab */
+	if (!h->mouse_slip_wheel_delay-- &&
+	    rxvt_scr_page( r, ATAB(r),
+		h->mouse_slip_wheel_speed >0 ? UP : DN,
+		abs(h->mouse_slip_wheel_speed) ))
+	{
+	    h->mouse_slip_wheel_delay = SCROLLBAR_CONTINUOUS_DELAY;
+	    h->refresh_type |= SMOOTH_REFRESH;
+	    h->want_refresh = 1;
+	}
+    }
+#endif /* MOUSE_WHEEL && MOUSE_SLIP_WHEELING */
+
+#ifdef SELECTION_SCROLLING
+    if (h->pending_scroll_selection)
+    {
+	quick_timeout = 1;
+	/* Only work for current active tab */
+	if (!h->scroll_selection_delay-- &&
+	    rxvt_scr_page(r, ATAB(r), h->scroll_selection_dir,
+		h->scroll_selection_lines))
+	{
+	    rxvt_selection_extend(r, ATAB(r), h->selection_save_x,
+		h->selection_save_y, h->selection_save_state);
+	    h->scroll_selection_delay = SCROLLBAR_CONTINUOUS_DELAY;
+	    h->refresh_type |= SMOOTH_REFRESH;
+	    h->want_refresh = 1;
+	}
+    }
+#endif	/* SELECTION_SCROLLING */
+
+#ifdef HAVE_SCROLLBARS
+# ifndef NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING
+    if (scrollbar_isUp() || scrollbar_isDn())
+    {
+	quick_timeout = 1;
+	/* Only work for current active tab */
+	if (!h->scroll_arrow_delay-- &&
+	    rxvt_scr_page(r, ATAB(r), scrollbar_isUp()?UP:DN, 1))
+	{
+	    h->scroll_arrow_delay = SCROLLBAR_CONTINUOUS_DELAY;
+	    h->refresh_type |= SMOOTH_REFRESH;
+	    h->want_refresh = 1;
+	}
+    }
+# endif	/* NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING */
+#endif
+
+    return quick_timeout;
+}
+
+
+
+#ifndef TIMEOUT_USEC
+#define TIMEOUT_USEC	(5000)
+#endif
+
+/* Adjust quick_timeout after select */
+/* INTPROTO */
+int
+rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
+{
+    struct rxvt_hidden*	h = r->h;
+#if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
+    struct timeval	tp;
+#endif
+
+
+    assert (NOT_NULL(value));
+    value->tv_usec = TIMEOUT_USEC;
+    value->tv_sec = 0;
+
+
+    if (!r->TermWin.mapped)
+	quick_timeout = 0;
+    else
+    {
+	quick_timeout |= (h->want_refresh || h->want_clip_refresh);
+#ifdef TRANSPARENT
+	quick_timeout |= h->want_full_refresh;
+#endif	/* TRANSPARENT */
+    }
+
+#if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
+    {
+	int	set_quick_timeout = 0;
+	long	csdiff, psdiff, bsdiff;
+
+	csdiff = psdiff = bsdiff = 60000000L;   /* or, say, LONG_MAX */
+
+# ifdef TRANSPARENT
+	/* Check if we should refresh our background */
+	if( h->lastCNotify.tv_sec )
+	{
+	    gettimeofday( &tp, NULL);
+	    bsdiff = (tp.tv_sec - h->lastCNotify.tv_sec) * 1000000L
+			+ tp.tv_usec - h->lastCNotify.tv_usec;
+
+	    if( bsdiff > h->bgRefreshInterval)
+	    {
+		bsdiff = 0;
+		h->lastCNotify.tv_sec = 0;
+
+		/* Only refresh bg image if we've moved. */
+		if ((!r->h->bgGrabbed ||
+		     r->h->prevPos.x	  != r->szHint.x ||
+		     r->h->prevPos.y	  != r->szHint.y ||
+		     r->h->prevPos.width  != r->szHint.width ||
+		     r->h->prevPos.height != r->szHint.height) &&
+		    rxvt_check_our_parents( r ))
+		{
+		    h->want_full_refresh = 1;
+		}
+	    }
+	    else
+		bsdiff = h->bgRefreshInterval - bsdiff;
+
+	    DBG_MSG( 3, (stderr,
+		"Waiting %ld.%06ld seconds longer for bg refresh\n",
+		bsdiff / 1000000L, bsdiff % 1000000L));
+
+	    set_quick_timeout = 1;
+	}
+# endif /* TRANSPARENT */
+
+# if defined(CURSOR_BLINK)
+	/*
+	 * Cursor only blinks when terminal window is focused.
+	 */
+	if (ISSET_OPTION(r, Opt_cursorBlink) && r->TermWin.focus)
+	{
+	    DBG_MSG(3, (stderr,"** get cursor time on select\n"));
+	    (void)gettimeofday(&tp, NULL);
+
+	    csdiff = (tp.tv_sec - h->lastcursorchange.tv_sec) * 1000000L
+		 + tp.tv_usec - h->lastcursorchange.tv_usec;
+	    if (csdiff > h->blinkInterval)
+	    {
+		/* XXX: settable blink times */
+		h->lastcursorchange.tv_sec = tp.tv_sec;
+		h->lastcursorchange.tv_usec = tp.tv_usec;
+		h->hidden_cursor = !h->hidden_cursor;
+		DBG_MSG(3, (stderr, "%s\n", h->hidden_cursor ?
+		    "** hide cursor" : "** show cursor"));
+
+		h->want_refresh = 1;
+		csdiff = 0;
+	    }
+	    else
+		csdiff = h->blinkInterval - csdiff;
+	    set_quick_timeout = 1;
+	}
+# endif	/* CURSOR_BLINK */
+
+# if defined(POINTER_BLANK)
+	/*
+	 * If we haven't moved the pointer for a while
+	 */
+	if (ISSET_OPTION(r, Opt_pointerBlank) &&
+	    (h->pointerBlankDelay > 0) &&
+	    (0 == AVTS(r)->hidden_pointer))
+	{
+	    long		pdelay;
+
+	    DBG_MSG(3, (stderr,"** get pointer time on select\n"));
+	    (void) gettimeofday(&tp, NULL);
+	    psdiff = (tp.tv_sec - h->lastmotion.tv_sec) * 1000000L
+		 + tp.tv_usec - h->lastmotion.tv_usec;
+	    pdelay = h->pointerBlankDelay * 1000000L;
+	    /* only work for current active tab */
+	    if (psdiff >= pdelay)
+		rxvt_pointer_blank(r, ATAB(r));
+	    else
+	    {
+		set_quick_timeout = 1;
+		psdiff = pdelay - psdiff;
+	    }
+	}
+# endif	/* POINTER_BLANK */
+	if (!quick_timeout && set_quick_timeout)
+	{
+	    MIN_IT(csdiff, bsdiff);
+	    MIN_IT(csdiff, psdiff);
+	    value->tv_sec =  csdiff / 1000000L;
+	    value->tv_usec = csdiff % 1000000L;
+	    quick_timeout = 1;
+	}
+    }
+#endif	/* POINTER_BLANK || CURSOR_BLINK || TRANSPARENT */
+
+
+    return quick_timeout;
+}
+
+
+
+/*
  * rxvt_cmd_getc() - Return next input character.
  *
  * Return the next input character after first passing any keyboard input to the
@@ -1541,8 +1961,7 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 unsigned char
 rxvt_cmd_getc(rxvt_t *r, int* p_page)
 {
-    int		    page = *p_page;
-#define TIMEOUT_USEC	5000
+    int		    selpage = *p_page, retpage;
     fd_set	    readfds;
     int		    quick_timeout, select_res;
 #ifdef POINTER_BLANK
@@ -1551,50 +1970,44 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #ifdef CURSOR_BLINK
     int		    want_keypress_time = 0;
 #endif
-    struct timeval  value;
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
     struct timeval  tp;
 #endif
+    struct timeval  value;
     struct rxvt_hidden *h = r->h;
     register int    i;
 
 
+    DBG_MSG(2, (stderr, "Entering rxvt_cmd_getc on page %d\nn", *p_page));
     while (1)
     {
 	/* loop until we can return something */
 
-	if (-1 != page)
-	{
-	    assert (PVTS(r, page)->cmdbuf_base <=
-		PVTS(r, page)->cmdbuf_endp);
-	    /* already have something in the buffer */
-	    if (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
-		return *(PVTS(r, page)->cmdbuf_ptr)++;
 
-	    /* output any pending chars of page's v_buffer */
-	    if (PVTS(r, page)->v_bufstr < PVTS(r, page)->v_bufptr)
-		rxvt_tt_write(r, page, NULL, 0);
+	/*
+	 * retpage is the tab number to return. it should never be -1. if
+	 * not a tab is specified, retpage is the active tab.
+	 */
+	retpage = (-1 == selpage) ? ATAB(r) : selpage;
+	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
+
+	/* already have something in the buffer */
+	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)	{
+	    /* if -1 == selpage, we only process the active tab here */
+	    *p_page = retpage;
+	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	}
-	else
-	{
-	    assert (AVTS(r)->cmdbuf_base <= AVTS(r)->cmdbuf_endp);
-	    /* if -1 == page, we only process the active tab here */
-	    if (AVTS(r)->cmdbuf_ptr < AVTS(r)->cmdbuf_endp)
-	    {
-		*p_page = ATAB(r);
-		return *(AVTS(r)->cmdbuf_ptr)++;
-	    }
 
-	    /* output any pending chars of page's v_buffer */
-	    if (AVTS(r)->v_bufstr < AVTS(r)->v_bufptr)
-		rxvt_tt_write(r, ATAB(r), NULL, 0);
+	/* output any pending chars of page's v_buffer */
+	if (PVTS(r, retpage)->v_bufstr < PVTS(r, retpage)->v_bufptr)
+	    rxvt_tt_write(r, retpage, NULL, 0);
 
-	    /*
-	     * if there is no data in active tab, we go to process the X events
-	     * before trying to find a tab that has some input/output. this
-	     * should improve the response performance of the active tab.
-	     */
-	}
+	/*
+	 * if there is no data in the active tab, we go to process the X
+	 * events before trying to find a tab that has some input/output.
+	 * this should improve the response performance of the active tab.
+	 */
+
 
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
 	/* presume == 0 implies time not yet retrieved */
@@ -1618,7 +2031,8 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 
 #ifdef CURSOR_BLINK
-	    if ( ISSET_OPTION(r, Opt_cursorBlink) && xev.type == KeyPress )
+	    if (ISSET_OPTION(r, Opt_cursorBlink) &&
+		KeyPress == xev.type)
 	    {
 		if (h->hidden_cursor)
 		{
@@ -1631,12 +2045,12 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* CURSOR_BLINK */
 
 #ifdef POINTER_BLANK
-	    if ( ISSET_OPTION(r, Opt_pointerBlank) && (h->pointerBlankDelay > 0) )
+	    if (ISSET_OPTION(r, Opt_pointerBlank) &&
+		(h->pointerBlankDelay > 0))
 	    {
-		if (
-			xev.type == MotionNotify || xev.type == ButtonPress
-			|| xev.type == ButtonRelease
-		   )
+		if (MotionNotify == xev.type ||
+		    ButtonPress == xev.type ||
+		    ButtonRelease == xev.type )
 		{
 		    /* only work for current active tab */
 		    if (AVTS(r)->hidden_pointer)
@@ -1644,12 +2058,10 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		    want_motion_time = 1;
 		}
 		/* only work for current active tab */
-		if (xev.type == KeyPress &&
-		    !AVTS(r)->hidden_pointer)
+		if (KeyPress == xev.type && !AVTS(r)->hidden_pointer)
 		    rxvt_pointer_blank(r, ATAB(r));
 	    }
 #endif	/* POINTER_BLANK */
-
 
 #ifdef USE_XIM
 	    if (NOT_NULL(r->h->Input_Context))
@@ -1664,47 +2076,39 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 
 	    /* In case button actions pushed chars to cmdbuf. */
-	    if (-1 != page)
-	    {
-		assert (PVTS(r, page)->cmdbuf_base <=
-		    PVTS(r, page)->cmdbuf_endp);
+	    assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
 
-		if (PVTS(r, page)->cmdbuf_ptr <
-		    PVTS(r, page)->cmdbuf_endp)
-		    return *(PVTS(r, page)->cmdbuf_ptr)++;
-	    }
-	    else
+	    /*
+	     * if -1 == page, only try the active tab here. we will handle
+	     * inactive tabs after processed all X events.
+	     *
+	     * Notice that there might be something BAD here: the active
+	     * tab is changed by user interaction and data are pushed into
+	     * previous active tab (now inactive). Need to study on this
+	     * in the future. So far, it seems working fine.
+	     */
+	    if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
 	    {
-		assert (AVTS(r)->cmdbuf_base <= AVTS(r)->cmdbuf_endp);
-		/*
-		 * -1 == page, only try the active tab here. we will handle
-		 *  inactive tabs after processed all X events
-		 */
-		if (AVTS(r)->cmdbuf_ptr < AVTS(r)->cmdbuf_endp)
-		{
-		    *p_page = ATAB(r);
-		    return *(AVTS(r)->cmdbuf_ptr)++;
-		}
-		/*
-		 * Notice that there might be something BAD here: the active tab
-		 * is changed by user interaction and data are pushed into
-		 * previous active tab (now inactive). Need to study on this in
-		 * the future.
-		 */
+		*p_page = retpage;
+		return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	    }
 	}   /* while ((XPending(r->Xdisplay)) */
 
 
-	if (-1 == page)
+	if (-1 == selpage &&
+	    -1 != (retpage = rxvt_find_cmd_child (r)))
 	{
 	    /*
-	     * in case -1 == page, and there's no X events to process. we will
-	     * not go to the select call if there's already input/output in some
-	     * tabs. to reach here, we have tried active tab but with no luck.
+	     * in case -1 == page, and there's no X events to process. we
+	     * will not go to the select call if there's already input/
+	     * output in some tabs. to reach here, we have tried active
+	     * tab but with no luck.
 	     */
-	    if (rxvt_find_cmd_child (r, p_page))
-		return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
+	    DBG_MSG(2, (stderr, "rxvt_find_cmd_child: find %d\n", retpage));
+	    *p_page = retpage;
+	    return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
 	}
+	/* NOTE: retpage may be -1 below, we must reset it!!! */
 
 
 #ifdef CURSOR_BLINK
@@ -1728,67 +2132,17 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* POINTER_BLANK */
 
 	/*
-	 * The command input buffer is empty and we have no pending X events
+	 * The command input buffer is empty and we have no pending X
+	 * events
 	 */
-	quick_timeout = 0;
 
-#if defined(MOUSE_WHEEL) && defined(MOUSE_SLIP_WHEELING)
-	if (h->mouse_slip_wheel_speed)
-	{
-	    quick_timeout = 1;
-	    /* Only work for current active tab */
-	    if (
-		    !h->mouse_slip_wheel_delay--
-		    && rxvt_scr_page( r, ATAB(r),
-			    h->mouse_slip_wheel_speed >0 ? UP : DN,
-			    abs(h->mouse_slip_wheel_speed) )
-	       )
-	    {
-		h->mouse_slip_wheel_delay = SCROLLBAR_CONTINUOUS_DELAY;
-		h->refresh_type |= SMOOTH_REFRESH;
-		h->want_refresh = 1;
-	    }
-	}
-#endif /* MOUSE_WHEEL && MOUSE_SLIP_WHEELING */
 
-#ifdef SELECTION_SCROLLING
-	if (h->pending_scroll_selection)
-	{
-	    quick_timeout = 1;
-	    /* Only work for current active tab */
-	    if (
-		    !h->scroll_selection_delay--
-		    && rxvt_scr_page(r, ATAB(r), h->scroll_selection_dir,
-			    h->scroll_selection_lines)
-	       )
-	    {
-		rxvt_selection_extend(r, ATAB(r), h->selection_save_x,
-		    h->selection_save_y, h->selection_save_state);
-		h->scroll_selection_delay = SCROLLBAR_CONTINUOUS_DELAY;
-		h->refresh_type |= SMOOTH_REFRESH;
-		h->want_refresh = 1;
-	    }
-	}
-#endif	/* SELECTION_SCROLLING */
-
-#ifdef HAVE_SCROLLBARS
-# ifndef NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING
-	if (scrollbar_isUp() || scrollbar_isDn())
-	{
-	    quick_timeout = 1;
-	    /* Only work for current active tab */
-	    if (
-		    !h->scroll_arrow_delay--
-		    && rxvt_scr_page(r, ATAB(r), scrollbar_isUp()?UP:DN, 1)
-	       )
-	    {
-		h->scroll_arrow_delay = SCROLLBAR_CONTINUOUS_DELAY;
-		h->refresh_type |= SMOOTH_REFRESH;
-		h->want_refresh = 1;
-	    }
-	}
-# endif	/* NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING */
-#endif
+	quick_timeout = rxvt_check_quick_timeout (r);
+	quick_timeout = rxvt_adjust_quick_timeout (r, quick_timeout, &value);
+	/* Now begin to read in from children's file descriptors */
+	DBG_MSG(2, (stderr, "Waiting for %lumu for child\n",
+	    quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec :
+	    ULONG_MAX));
 
 
 	/* Prepare to read in from children's file descriptors */
@@ -1811,317 +2165,51 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	if (-1 != r->TermWin.ice_fd)
 	    FD_SET(r->TermWin.ice_fd, &readfds);
 #endif
-	value.tv_usec = TIMEOUT_USEC;
-	value.tv_sec = 0;
 
-
-	if (!r->TermWin.mapped)
-	    quick_timeout = 0;
-	else
-	{
-	    quick_timeout |= (h->want_refresh || h->want_clip_refresh);
-#ifdef TRANSPARENT
-	    quick_timeout |= h->want_full_refresh;
-#endif	/* TRANSPARENT */
-	}
-
-#if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
-	{
-	    int		set_quick_timeout = 0;
-	    long	csdiff, psdiff, bsdiff;
-
-	    csdiff = psdiff = bsdiff = 60000000L;   /* or, say, LONG_MAX */
-
-# ifdef TRANSPARENT
-	    /* Check if we should refresh our background */
-	    if( h->lastCNotify.tv_sec )
-	    {
-		gettimeofday( &tp, NULL);
-		bsdiff = (tp.tv_sec - h->lastCNotify.tv_sec) * 1000000L
-		    + tp.tv_usec - h->lastCNotify.tv_usec;
-
-		if( bsdiff > h->bgRefreshInterval)
-		{
-		    bsdiff = 0;
-		    h->lastCNotify.tv_sec = 0;
-
-		    /* Only refresh bg image if we've moved. */
-		    if( (   !r->h->bgGrabbed
-			    || r->h->prevPos.x	    != r->szHint.x
-			    || r->h->prevPos.y	    != r->szHint.y
-			    || r->h->prevPos.width  != r->szHint.width
-			    || r->h->prevPos.height != r->szHint.height)
-			&&
-			    rxvt_check_our_parents( r ))
-		    {
-			h->want_full_refresh = 1;
-		    }
-		}
-		else bsdiff = h->bgRefreshInterval - bsdiff;
-
-		DBG_MSG( 3, (stderr,
-			    "Waiting %ld.%06ld seconds longer for bg refresh\n",
-			    bsdiff / 1000000L, bsdiff % 1000000L));
-
-		set_quick_timeout = 1;
-	    }
-# endif /* TRANSPARENT */
-
-# if defined(CURSOR_BLINK)
-	    /*
-	     * Cursor only blinks when terminal window is focused.
-	     */
-	    if (ISSET_OPTION(r, Opt_cursorBlink) && r->TermWin.focus)
-	    {
-		DBG_MSG(3, (stderr,"** get cursor time on select\n"));
-		(void)gettimeofday(&tp, NULL);
-
-		csdiff = (tp.tv_sec - h->lastcursorchange.tv_sec) * 1000000L
-		     + tp.tv_usec - h->lastcursorchange.tv_usec;
-		if (csdiff > h->blinkInterval)
-		{
-		    /* XXX: settable blink times */
-		    h->lastcursorchange.tv_sec = tp.tv_sec;
-		    h->lastcursorchange.tv_usec = tp.tv_usec;
-		    h->hidden_cursor = !h->hidden_cursor;
-		    DBG_MSG(3, (stderr, "%s\n", h->hidden_cursor ?
-			"** hide cursor" : "** show cursor"));
-
-		    h->want_refresh = 1;
-		    csdiff = 0;
-		}
-		else
-		    csdiff = h->blinkInterval - csdiff;
-		set_quick_timeout = 1;
-	    }
-# endif	/* CURSOR_BLINK */
-
-# if defined(POINTER_BLANK)
-	    /*
-	     * If we haven't moved the pointer for a while
-	     */
-	    if (
-		    ISSET_OPTION(r, Opt_pointerBlank)
-		    && (h->pointerBlankDelay > 0)
-		    && (AVTS(r)->hidden_pointer == 0)
-	       )
-	    {
-		long		pdelay;
-
-		DBG_MSG(3, (stderr,"** get pointer time on select\n"));
-		(void) gettimeofday(&tp, NULL);
-		psdiff = (tp.tv_sec - h->lastmotion.tv_sec) * 1000000L
-		     + tp.tv_usec - h->lastmotion.tv_usec;
-		pdelay = h->pointerBlankDelay * 1000000L;
-		/* only work for current active tab */
-		if (psdiff >= pdelay)
-		    rxvt_pointer_blank(r, ATAB(r));
-		else
-		{
-		    set_quick_timeout = 1;
-		    psdiff = pdelay - psdiff;
-		}
-	    }
-# endif	/* POINTER_BLANK */
-	    if (!quick_timeout && set_quick_timeout)
-	    {
-		MIN_IT(csdiff, bsdiff);
-		MIN_IT(csdiff, psdiff);
-		value.tv_sec =  csdiff / 1000000L;
-		value.tv_usec = csdiff % 1000000L;
-		quick_timeout = 1;
-	    }
-	}
-#endif	/* POINTER_BLANK || CURSOR_BLINK || TRANSPARENT */
-
-
-	/* Now begin to read in from children's file descriptors */
-	DBG_MSG( 4, (stderr, "Waiting for %lumu for child\n",
-		    quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec :
-			ULONG_MAX));
-	if (
-		(select_res = select(r->num_fds, &readfds, NULL, NULL,
-					(quick_timeout ? &value : NULL))) == 0
-	   )
+	if (0 == (select_res = select(r->num_fds, &readfds, NULL, NULL,
+		(quick_timeout ? &value : NULL))))
 	{
 	    /*
-	     * select statement timed out - we're not hard and fast scrolling
+	     * select statement timed out - we're not hard and fast
+	     * scrolling
 	     */
 	    h->refresh_limit = 1;
 	}
-#ifdef CURSOR_BLINK
-	/*
-	 * 2006-02-16 gi1242: Unnecessary. We should only refresh when the
-	 * cursor changes state. (I.e on one of the timeouts). Refreshing always
-	 * wastes CPU.
+
+	rxvt_process_children_cmdfd (r, &readfds);
+
+
+	/* reset retpage because it is possibly altered above by
+	 * call to rxvt_find_cmd_child!!! retpage is the tab number
+	 * to return. it should never be -1. if not a tab is selected,
+	 * retpage is the active tab.
 	 */
-#if 0
-	if (ISSET_OPTION(r, Opt_cursorBlink))
-	    h->want_refresh = 1;
-#endif
-#endif	/* CURSOR_BLINK */
-
-
-	/*
-	 * Handle the children that have generate input. Notice in this loop we
-	 * only process input, but do NOT determine the child we want to return.
-	 */
-	for (i = 0; i <= LTAB(r); i++)
+	retpage = (-1 == selpage) ? ATAB(r) : selpage;
+	DBG_MSG(2, (stderr, "  selpage = %d, retpage = %d\n",
+	    selpage, retpage));
+	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
+	/* Handle the cases that the specified child has died */
+	if (r->vt_died > 0 && PVTS(r, retpage)->dead)  
 	{
-	    int		    n = 0;
-	    unsigned int    count, bufsiz;
-
-
-	    /* check next file descriptor if this one has nothing to read in. */
-	    if (!FD_ISSET(PVTS(r, i)->cmd_fd, &readfds))
-		continue;
-
-	    DBG_MSG(1, (stderr, "reading from shell %d\n", i));
-
-	    /* check our command buffer before reading data */
-	    rxvt_check_cmdbuf (r, i);
-
-	    assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
-	    /* The buffer size is the buffer length - used length */
-	    count = bufsiz = (BUFSIZ - 1) -
-		(PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base);
-
-	    while (count)
-	    {
-		DBG_MSG(1, (stderr, "read maximal %u bytes\n", count));
-		errno = 0;  /* clear errno */
-		n = read (PVTS(r, i)->cmd_fd, PVTS(r, i)->cmdbuf_endp,
-			count);
-		DBG_MSG(1, (stderr, "read %d bytes\n", n));
-
-		if (n > 0)
-		{
-		    /* Update count and buffer pointer */
-		    count -= n;
-		    PVTS(r, i)->cmdbuf_endp += n;
-
-		    /*
-		     * check the file descriptor to see if there are further
-		     * input, this is to avoid blocking on read(), which seems
-		     * to be an issue when running mc in bash. this will waste
-		     * several CPU cycles, but it's safer than blocking.
-		     */
-		    FD_ZERO(&readfds);
-		    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
-		    value.tv_sec = 0;
-		    value.tv_usec = 5;	/* time out, 5us */
-		    select_res = select(r->num_fds, &readfds, NULL,
-			NULL, &value);
-		    if (0 == select_res)
-		    {
-			/* time-out, no further data to read */
-			DBG_MSG(1, (stderr, "no further data\n"));
-			break;
-		    }
-		    if (-1 == select_res)
-		    {
-			/* error, stop reading */
-			DBG_MSG(1, (stderr, "select error\n"));
-			break;
-		    }
-		    /* continue the next loop iteration */
-		    DBG_MSG(1, (stderr, "more data to read\n"));
-		}
-		else if (0 == n)
-		{
-		    DBG_MSG(1, (stderr, "Should not happen?\n"));
-		    break;
-		}
-		else if (n < 0)
-		{
-		    /*
-		     * We do not update count and buffer pointer and continue
-		     * trying read more data in the next loop iteration.
-		     */
-		    DBG_MSG(1, (stderr, "%s\n", strerror(errno)));
-
-		    if (    errno == EAGAIN ||
-			    errno == EIO ||	/* cygwin */
-			    errno == EINVAL)	/* solaris */
-			break;
-		}
-	    }	/* while (count) */
-
-	    assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
-	    /* check if a child died */
-	    if (PVTS(r, i)->dead /* && errno == EIO*/)
-		*PVTS(r, i)->cmdbuf_endp = (char) 0;
-	    else if (n < 0 && errno != EAGAIN)
-	    {
-		assert (!PVTS(r, i)->dead); /* in case */
-
-		/*
-		 * It seems there is a signal loss if more than one children die
-		 * at almost the same moment. The result is that
-		 * rxvt_clean_cmd_page does not flag the dead value for some
-		 * dead children. Thus, the call of rxvt_cmd_getc (-1) in
-		 * rxvt_mail_loop will fall into an infinite loop on the path to
-		 * check the input from dead children since their cmd_fd are not
-		 * excluded in the select system call.
-		 * 
-		 * So we introduce the following hack to fix it. If it finds
-		 * certain dead children are processed by the select system
-		 * call, it flags it as dead.
-		 */
-		if (PVTS(r, i)->cmd_pid ==
-			waitpid (PVTS(r, i)->cmd_pid, NULL, WNOHANG))
-		{
-		    DBG_MSG(1, (stderr,"signal lost on child %d\n",i));
-
-		    PVTS(r, i)->dead = 1;
-		    if (ISSET_OPTION(r, Opt2_holdExit))
-			PVTS(r, i)->hold = 1;
-		    *PVTS(r, i)->cmdbuf_endp = (char) 0;
-
-		    /*
-		     * increase vt_died number, there is a possible race
-		     * condition here (a signal comes in)
-		     */
-		    r->vt_died ++;
-		}
-	    }
-
-	    /* highlight inactive tab if there is some input */
-	    if (
-		    NOTSET_OPTION(r, Opt2_hlTabOnBell)
-		    && bufsiz != count
-		    && i != ATAB(r)
-	       )
-	    {
-		rxvt_tabbar_highlight_tab (r, i, False);
-	    }
-	}   /* for loop */
-
-
-	if (-1 != page)
-	{
-	    assert (PVTS(r, page)->cmdbuf_base <=
-		PVTS(r, page)->cmdbuf_endp);
-	    /* Handle the cases that the child has died */
-	    if (r->vt_died > 0 && PVTS(r, page)->dead)
-		return *(PVTS(r, page)->cmdbuf_ptr)++;
-
-	    /* Handle the cases that the child has some input */
-	    if (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
-		return *(PVTS(r, page)->cmdbuf_ptr)++;
+	    *p_page = retpage;
+	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	}
-	else
-	{
-	    assert (AVTS(r)->cmdbuf_base <= AVTS(r)->cmdbuf_endp);
-	    /* -1 == page, try the active tab first */
-	    if (AVTS(r)->cmdbuf_ptr < AVTS(r)->cmdbuf_endp)
-	    {
-		*p_page = ATAB(r);
-		return *(AVTS(r)->cmdbuf_ptr)++;
-	    }
 
-	    if (rxvt_find_cmd_child (r, p_page))
-		return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
+	/* Handle the cases that the specified child has some input */
+	DBG_MSG(2, (stderr, "  cmdbuf_ptr = %p, cmdbuf_endp = %p\n",
+	    PVTS(r, retpage)->cmdbuf_ptr, PVTS(r, retpage)->cmdbuf_endp));
+	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
+	{
+	    *p_page = retpage;
+	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
+	}
+
+	/* Handle the case that the specified child has no input */
+	if (-1 == selpage &&
+	    -1 != (retpage = rxvt_find_cmd_child (r)))
+	{
+	    *p_page = retpage;
+	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	}
 
 
@@ -2132,17 +2220,20 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	 * IceProcessMessages may hang and make the entire terminal
 	 * unresponsive.
 	 */
-	if (-1 != r->TermWin.ice_fd && FD_ISSET (r->TermWin.ice_fd, &readfds))
+	if (-1 != r->TermWin.ice_fd &&
+	    FD_ISSET (r->TermWin.ice_fd, &readfds))
 	{
 	    rxvt_process_ice_msgs (r);
 	}
 #endif
 
 
+	DBG_MSG(2, (stderr, "  Continue on rxvt_cmd_getc while loop\n"));
+
 #ifdef TRANSPARENT
 	if (h->want_full_refresh)
 	{
-	    DBG_MSG( 1, (stderr, "full refresh\n"));
+	    DBG_MSG(1, (stderr, "full refresh\n"));
 	    h->want_full_refresh = 0;
 	    /* only work for active tab */
 	    rxvt_scr_clear(r, ATAB(r));
@@ -2155,7 +2246,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    h->refresh_type &= ~CLIPPED_REFRESH;
 	if (h->want_refresh || h->want_clip_refresh)
 	{
-	    DBG_MSG( 3, ( stderr, "Refreshing screen ..."));
+	    DBG_MSG(3, ( stderr, "Refreshing screen ..."));
 	    rxvt_scr_refresh(r, ATAB(r), h->refresh_type);
 #ifdef HAVE_SCROLLBARS
 	    rxvt_scrollbar_update(r, 1);
@@ -2170,11 +2261,12 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 /*}}} */
 
 
+
 /* EXTPROTO */
 void
 rxvt_pointer_unblank(rxvt_t* r, int page)
 {
-    DBG_MSG( 1, ( stderr, "Unblanking pointer\n"));
+    DBG_MSG(1, ( stderr, "Unblanking pointer\n"));
     XDefineCursor(r->Xdisplay, PVTS(r, page)->vt, r->term_pointer);
     rxvt_recolour_cursor(r);
 #ifdef POINTER_BLANK
