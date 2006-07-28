@@ -96,7 +96,7 @@ get_trunk(size_t trunk_size)
     }
 
     DBG_MSG(1, (stderr, "--Trunk allocated %d bytes\n", (int) trunk_size));
-    tk_head = (struct trunk_head_t*) ((size_t) ptr + trunk_size);
+    tk_head = (struct trunk_head_t*) ((char*) ptr + trunk_size);
     /* set the real beginning of trunk. this should only be used by
      * init_trunk and free_trunk
      */
@@ -122,7 +122,7 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
     tk_head->magic = TRUNK_MAGIC;
     tk_head->tbyte = 0;
 #endif
-    bmax = ((size_t) tk_head - (size_t) tk_head->begin) /
+    bmax = ((char*) tk_head - (char*) tk_head->begin) /
 	    ((size_t) block_size + BHEAD_OFFSET);
     assert (bmax <= 0x0000ffff); /* in case of overflow */
     tk_head->bmax = (RUINT16T) bmax;
@@ -141,7 +141,7 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
 	MEMSET(block + 1, MEMORY_MAGIC, block_size);
 # endif
 #endif
-	block->u.next = (struct block_head_t*) ((size_t) block + block_size + BHEAD_OFFSET);
+	block->u.next = (struct block_head_t*) ((char*) block + block_size + BHEAD_OFFSET);
 	block = block->u.next;
     }
 }
@@ -157,7 +157,7 @@ free_trunk(struct trunk_head_t* tk_head)
 #endif
 
     DBG_MSG(1, (stderr, "--Trunk freed %d bytes\n",
-	(int) ((void*) tk_head - (void*) tk_head->begin)));
+	(int) ((char*) tk_head - (char*) tk_head->begin)));
     free ((void*) tk_head->begin);
 }
 
