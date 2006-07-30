@@ -646,6 +646,9 @@ static const char optionsstring[] = "Options: "
 #ifdef OUR_STRINGS
     "strings,"
 #endif
+#ifdef OUR_MALLOC
+    "fast memory,"
+#endif
 #if !defined(NO_FRILLS)
     "frills,"
 #endif
