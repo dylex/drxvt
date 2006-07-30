@@ -3466,9 +3466,14 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #else
 		ccol1 = Color_fg;
 #endif
-	    if (XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_cursor))
+	    if(
+		 XDEPTH > 2
+		 && ISSET_PIXCOLOR( h, Color_cursor )
+		 && ISSET_PIXCOLOR( h, Color_cursor2 )
+	      )
 		ccol2 = Color_cursor2;
 	    else
+	    {
 #ifdef CURSOR_COLOR_IS_RENDITION_COLOR
 # ifdef SIMULATE_LINUX_CONSOLE_CURSOR_COLOR
 		ccol2 = GET_FGCOLOR(PVTS(r, page)->drawn_rend[CURROW][CURCOL]);
@@ -3481,6 +3486,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #else
 		ccol2 = Color_bg;
 #endif
+	    }
+
 	    *srp = SET_FGCOLOR(*srp, ccol1);
 	    *srp = SET_BGCOLOR(*srp, ccol2);
 #endif
