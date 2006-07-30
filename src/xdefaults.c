@@ -866,10 +866,11 @@ rxvt_save_options (rxvt_t* r, const char* filename)
 void
 rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 {
-    DBG_MSG( 2, (stderr, "rxvt_get_options()\n") );
-
     int		 i, bad_option = 0;
     static const char On[3] = "ON", Off[4] = "OFF";
+
+
+    DBG_MSG( 2, (stderr, "rxvt_get_options()\n") );
 
     for (i = 1; i < argc; i++)
     {
@@ -1116,8 +1117,6 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 void
 rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 {
-    DBG_MSG( 2, ( stderr, "rxvt_get_xdefaults()\n" ) );
-
     unsigned int    len;
     char TAINTED *  str;
     char	    buffer[256];

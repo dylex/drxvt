@@ -2416,15 +2416,16 @@ void
 rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
 	const char *pipeName )
 {
-    DBG_MSG( 1, ( stderr, "rxvt_scr_printscreen( r, %d, %d, %d, %s )\n",
-		page, fullhist, pretty, pipeName ) );
-
 #ifdef PRINTPIPE
     int		row, col, nrows, row_offset;
     text_t	*txt;
     rend_t	*rnd;
 
     FILE*	fd;
+
+
+    DBG_MSG( 1, ( stderr, "rxvt_scr_printscreen( r, %d, %d, %d, %s )\n",
+		page, fullhist, pretty, pipeName ) );
 
     if ( ( fd = rxvt_popen_printer( r, pipeName ) ) == NULL )
 	return;

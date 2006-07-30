@@ -32,6 +32,9 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	12.Fix round-robin algorithm of command.c:rxvt_find_cmd_child.
 	13.Fix crash if click on empty space of menubar. Thanks to Zhu
 	   Qunying for the patch.
+	14.Fix severl compile error - we must call DBG_MSG after variable
+	   declaration in functions as we are using C, not C++. Thanks to
+	   lzl@mitbbs.com for bringing this issue to me and provide patch.
 
     * Enhancements:
 	1. Add --with-max-profiles to configure script as suggested

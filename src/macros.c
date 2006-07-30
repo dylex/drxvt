@@ -369,9 +369,6 @@ int
 rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	Bool addmacro, Bool noReplace)
 {
-    DBG_MSG( 2, ( stderr, "rxvt_add_macro(%08lx, %2hhx, %s)\n",
-		keysym, modFlags, astring));
-
     const unsigned nmacros_increment = 64;  /* # extra macros to alloc space for
 					       when we need to enlarge our list
 					       of macros. A large number here is
@@ -383,6 +380,10 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 
     unsigned char   macroNum = 0;
     action_t	    action;
+
+
+    DBG_MSG( 2, ( stderr, "rxvt_add_macro(%08lx, %2hhx, %s)\n",
+		keysym, modFlags, astring));
 
     /*
      * Check to see if macro already exists.

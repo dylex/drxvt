@@ -1131,15 +1131,14 @@ void
 rxvt_append_page( rxvt_t* r, int profile,
 	const char TAINTED *title, const char *command )
 {
-    DBG_MSG( 2, ( stderr, "rxvt_append_page( r, %d, %s, %s )\n",
-		profile, title ? title : "(nil)",
-		command ? command : "(nil)" ) );
-
-
     int	    num_fds,
 	    num_cmd_args = 0; /* Number of args we got from parsing command */
     char**  argv;
 
+
+    DBG_MSG( 2, ( stderr, "rxvt_append_page( r, %d, %s, %s )\n",
+		profile, title ? title : "(nil)",
+		command ? command : "(nil)" ) );
 
     /* Sanitization */
     assert( LTAB(r) < MAX_PAGES );
