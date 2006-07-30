@@ -4359,10 +4359,10 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 FILE*
 rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 {
+    FILE*   stream = popen( pipeName ?: r->h->rs[Rs_print_pipe], "w" );
+
+
     assert( pipeName || r->h->rs[Rs_print_pipe] );
-
-    FILE	   *stream = popen( pipeName ?: r->h->rs[Rs_print_pipe], "w" );
-
     if (IS_NULL(stream))
 	rxvt_print_error("Can't open printer pipe %s",
 		r->h->rs[Rs_print_pipe] ?: pipeName );
@@ -4376,14 +4376,10 @@ int
 rxvt_pclose_printer(FILE *stream)
 {
     fflush(stream);
-    /* pclose() reported not to work on SunOS 4.1.3 */
-    /* # if defined (__sun__) */
-# ifdef OS_SUNOS
-    /* pclose works provided SIGCHLD handler uses waitpid */
-    return pclose(stream);  /* return fclose (stream); */
-# else
+    /* pclose() reported not to work on SunOS 4.1.3.
+     * pclose works provided SIGCHLD handler uses waitpid
+     */
     return pclose(stream);
-# endif
 }
 
 
