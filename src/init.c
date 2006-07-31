@@ -3318,34 +3318,14 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 #if 0
 	    sleep(10);
 #endif
-	    /*
-	     * Close all file descriptors except PVTS(r, page)->tty_fd and
-	     * STDERR
-	     */
-	    for (i = STDERR_FILENO + 1; i < r->num_fds; i ++)
-		if (i != PVTS(r, page)->tty_fd)
-		    close (i);
-	    close (cfd);
-
-	    if( rxvt_control_tty( PVTS(r, page)->tty_fd,
-			PVTS(r, page)->ttydev) < 0)
-		rxvt_print_error("could not obtain control of tty");
-	    else
+	    if (rxvt_clean_before_exec (r, page))
 	    {
-		/*
-		 * Reopen stdin, stdout and stderr over the tty file descriptor
-		 */
-		dup2(PVTS(r, page)->tty_fd, STDIN_FILENO);
-		dup2(PVTS(r, page)->tty_fd, STDOUT_FILENO);
-		dup2(PVTS(r, page)->tty_fd, STDERR_FILENO);
-		if (PVTS(r, page)->tty_fd > 2)
-		    close(PVTS(r, page)->tty_fd);
 		rxvt_run_child(r, page, argv);
 	    }
 
 	    /*
-	     * If we got here, then we failed to exec the child process. We must
-	     * kill the child's thread, and NOT return.
+	     * If we got here, then we failed to exec the child process.
+	     * We must kill the child's thread, and NOT return.
 	     */
 	    fprintf( stderr, "Error executing %s. Exiting.\n",
 		    (argv && argv[0]) ? argv[0] : "shell");
@@ -3402,44 +3382,42 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 /* ------------------------------------------------------------------------- *
  *			    CHILD PROCESS OPERATIONS			     *
  * ------------------------------------------------------------------------- */
-/*
- * The only open file descriptor is the slave tty - so no error messages.
- * returns are fatal
- */
-/* INTPROTO */
+/* EXTPROTO */
 int
-rxvt_run_child(rxvt_t* r, int page, const char **argv)
+rxvt_clean_before_exec (rxvt_t* r, int page)
 {
 #ifdef SIGTSTP
     struct sigaction	ignore;
 #endif
     struct sigaction	deflt;
-    char*		login;
+    register int	i, ret = 0;
 
+    /*
+     * Close all file descriptors except PVTS(r, page)->tty_fd and
+     * STDERR
+     */
+    for (i = STDERR_FILENO + 1; i < r->num_fds; i ++)
+	if (i != PVTS(r, page)->tty_fd)
+	    close (i);
 
-    /* DBG_MSG(1,(stderr, "argv = %x\n", argv)); */
-
-    /* init terminal attributes */
-    SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
-
-    if (ISSET_OPTION(r, Opt_console))		    /* be virtual console, fail
-						       silently */
+    if( rxvt_control_tty(PVTS(r, page)->tty_fd, PVTS(r, page)->ttydev) < 0)
     {
-#ifdef TIOCCONS
-	unsigned int	on = 1;
-	ioctl(STDIN_FILENO, TIOCCONS, &on);
-#elif defined (SRIOCSREDIR)
-	int	    fd;
-	fd = open( CONSOLE, O_WRONLY, 0 );
-	if (fd >= 0)
-	{
-	    if( ioctl( fd, SRIOCSREDIR, NULL ) < 0 )
-	    close( fd );
-	}
-#endif	/* SRIOCSREDIR */
+	rxvt_print_error("could not obtain control of tty");
+    }
+    else
+    {
+	/*
+	 * Reopen stdin, stdout and stderr over the tty file descriptor
+	 */
+	dup2(PVTS(r, page)->tty_fd, STDIN_FILENO);
+	dup2(PVTS(r, page)->tty_fd, STDOUT_FILENO);
+	dup2(PVTS(r, page)->tty_fd, STDERR_FILENO);
+	if (PVTS(r, page)->tty_fd > 2)
+	    close(PVTS(r, page)->tty_fd);
+	ret = 1;
     }
 
-    /* reset signals and spin off the command interpreter */
+    /* reset signal handlers */
     deflt.sa_handler = SIG_DFL;
     deflt.sa_flags = 0;
     sigemptyset( &deflt.sa_mask );
@@ -3463,12 +3441,44 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
     sigaction( SIGTSTP, &ignore, NULL );
     sigaction( SIGTTIN, &ignore, NULL );
     sigaction( SIGTTOU, &ignore, NULL );
-# if 0
-    signal(SIGTSTP, SIG_IGN);
-    signal(SIGTTIN, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
-# endif
 #endif	/* SIGTSTP */
+
+    return (ret);
+}
+
+
+/*
+ * The only open file descriptor is the slave tty - so no error messages.
+ * returns are fatal
+ */
+/* INTPROTO */
+int
+rxvt_run_child(rxvt_t* r, int page, const char **argv)
+{
+    char*		login;
+
+
+    /* DBG_MSG(1,(stderr, "argv = %x\n", argv)); */
+
+    /* init terminal attributes */
+    SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
+
+    if (ISSET_OPTION(r, Opt_console))	/* be virtual console, fail
+					 * silently */
+    {
+#ifdef TIOCCONS
+	unsigned int	on = 1;
+	ioctl(STDIN_FILENO, TIOCCONS, &on);
+#elif defined (SRIOCSREDIR)
+	int	    fd;
+	fd = open( CONSOLE, O_WRONLY, 0 );
+	if (fd >= 0)
+	{
+	    if( ioctl( fd, SRIOCSREDIR, NULL ) < 0 )
+	    close( fd );
+	}
+#endif	/* SRIOCSREDIR */
+    }
 
     /* set window size */
     rxvt_tt_winsize( STDIN_FILENO, r->TermWin.ncol, r->TermWin.nrow, 0 );

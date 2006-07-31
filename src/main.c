@@ -275,11 +275,10 @@ rxvt_Child_signal(int sig __attribute__((unused)))
 	     * PID of child process was not on any tab. We should never get
 	     * here.
 	     *
-	     * 2006-04-28 gi1242: Maybe we can get here if a printPipe dies?
+	     * 2006-07-31 jimmy:: we can get here if a printPipe dies, or
+	     * it is executed by macro.
 	     */
-#if 0
-	    assert(0);
-#endif
+	    DBG_MSG(1,(stderr, "Dead child %d is not a tab\n", (int)pid));
 	}
     }
     else

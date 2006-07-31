@@ -860,12 +860,12 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
     {
 	case MacroFnEsc:
 	    /* Send action to rxvt */
-	    rxvt_cmd_write( r, ATAB(r), astr, alen);
+	    rxvt_cmd_write( r, ATAB(r), (unsigned char*) astr, alen);
 	    break;
 
 	case MacroFnStr:
 	    /* Send action to child process */
-	    rxvt_tt_write( r, ATAB(r), astr, alen);
+	    rxvt_tt_write( r, ATAB(r), (unsigned char*) astr, alen);
 	    break;
 
 	case MacroFnNewTab:
@@ -947,6 +947,11 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			 * XXX 2006-07-30 gi1242: Should we close all fd's and
 			 * reset all signals to their default masks?
 			 */
+			/*
+			 * Close all file descriptors
+			 */
+			rxvt_clean_before_exec (r, ATAB(r));
+
 			argv = rxvt_string_to_argv( astr, &argc );
 
 			execvp( argv[0], argv );
@@ -1073,7 +1078,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnToggleSubwin:
-	    rxvt_toggle_subwin( r, astr);
+	    rxvt_toggle_subwin( r, (unsigned char*) astr);
 	    break;
 
 	case MacroFnFont:
