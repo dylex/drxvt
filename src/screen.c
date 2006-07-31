@@ -4806,14 +4806,17 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
 void
 rxvt_selection_request(rxvt_t* r, int page, Time tm, int x, int y)
 {
-    DBG_MSG(2,(stderr, "rxvt_selection_request %d (%lu, %d, %d)\n", page, tm, x, y));
+    DBG_MSG( 2, ( stderr, "rxvt_selection_request %d (%lu, %d, %d)\n",
+		page, tm, x, y ) );
+
     if (x < 0 || x >= VT_WIDTH(r) || y < 0 || y >= VT_HEIGHT(r))
 	return;		/* outside window */
 
-    if (SEL(r).text != NULL)	    /* internal selection */
+    if( SEL(r).text != NULL )	    /* internal selection */
     {
-	DBG_MSG(2,(stderr, "rxvt_selection_request %d: pasting internal\n", page));
-	rxvt_PasteIt(r, page, SEL(r).text, SEL(r).len);
+	DBG_MSG( 2, ( stderr, "rxvt_selection_request %d: pasting internal\n",
+		    page ) );
+	rxvt_PasteIt( r, page, SEL(r).text, SEL(r).len );
 	return;
     }
     else
@@ -4843,8 +4846,8 @@ rxvt_selection_request(rxvt_t* r, int page, Time tm, int x, int y)
 
     /* don't loop in rxvt_selection_paste() */
     r->h->selection_wait = Sel_none;
-    DBG_MSG( 2, (stderr, "rxvt_selection_request %d: pasting CUT_BUFFER0\n",
-		page));
+    DBG_MSG( 2, ( stderr, "rxvt_selection_request %d: pasting CUT_BUFFER0\n",
+		page ));
     rxvt_selection_paste(r, XROOT, XA_CUT_BUFFER0, False);
 }
 

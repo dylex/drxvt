@@ -780,20 +780,96 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 int
 rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 {
+    const int	maxLen = 1024;
+    char	expstr[ maxLen ];
+    char	*astr;
+    int		alen;
+
+    if( IS_NULL( action->str ) )
+    {
+	SET_NULL( astr );
+	alen = 0;
+    }
+    else
+    {
+	/* {{{ % expand action->str, and copy into expstr */
+	int	i=0,	/* Unexpanded string index */
+		j=0;	/* Expanded string index */
+
+	while( i < action->len-1 && j < maxLen-1 )
+	{
+	    if( action->str[i] == '%' )
+	    {
+		switch( action->str[++i] )
+		{
+		    case '%':
+			/* Copy % over */
+			expstr[j++] = action->str[i++];
+			break;
+
+		    case 'n':
+			/* Active tab number */
+			j += snprintf( expstr + j, maxLen - j, "%d", ATAB(r) );
+			i ++;
+			break;
+
+		    case 't':
+			/* Active tab title */
+			j += snprintf( expstr + j, maxLen -j,
+					    "%s", AVTS(r)->tab_title );
+			i ++;
+			break;
+
+		    case 's':
+			/*
+			 * Selection. TODO Also paste selection if it is not
+			 * owned by mrxvt.
+			 */
+			if( NOT_NULL( r->selection.text ) )
+			    j += snprintf( expstr + j, maxLen -j,
+						"%s", r->selection.text );
+			i++;
+			break;
+
+		    default:
+			rxvt_print_error( "Unrecognized switch %%%c in '%s'",
+				action->str[i++], action->str );
+			break;
+		}
+	    }
+	    else
+		expstr[j++] = action->str[i++];
+	}
+
+	/* Copy last char over */
+	if( i == action->len-1 && j < maxLen-1 )
+	    expstr[j++] = action->str[i++];
+
+	/* NULL terminate expstr */
+	if( j > maxLen - 1 )	j = maxLen - 1;
+	if( expstr[j] )		expstr[j++] = 0;
+
+	/* % expansion done. Copy the string and length over */
+	alen = j;
+	astr = expstr;
+	/* }}} */
+    }
+
+
     switch( action->type )
     {
 	case MacroFnEsc:
 	    /* Send action to rxvt */
-	    rxvt_cmd_write( r, ATAB(r), action->str, action->len);
+	    rxvt_cmd_write( r, ATAB(r), astr, alen);
 	    break;
 
 	case MacroFnStr:
 	    /* Send action to child process */
-	    rxvt_tt_write( r, ATAB(r), action->str, action->len);
+	    rxvt_tt_write( r, ATAB(r), astr, alen);
 	    break;
 
 	case MacroFnNewTab:
-	    if (NOT_NULL(action->str))
+	    if (NOT_NULL(astr))
 	    {
 		/*
 		 * If the first word is quoted, use that as the title. Don't be
@@ -807,7 +883,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 		const int   MaxMacroTitle = 80;	/* Longest title we will have */
 		char	    titlestring[MaxMacroTitle];
-		char	    *command = (char *) action->str;
+		char	    *command = (char *) astr;
 		char	    *title = NULL;
 
 		int	    profile = 0;
@@ -855,7 +931,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnExec:
-	    if( NOT_NULL( action->str ) )
+	    if( NOT_NULL( astr ) )
 	    {
 		int	argc;
 		char	**argv;
@@ -871,7 +947,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			 * XXX 2006-07-30 gi1242: Should we close all fd's and
 			 * reset all signals to their default masks?
 			 */
-			argv = rxvt_string_to_argv( action->str, &argc );
+			argv = rxvt_string_to_argv( astr, &argc );
 
 			execvp( argv[0], argv );
 
@@ -881,7 +957,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 		    default:
 			/* Nothing to be done */
-			DBG_MSG( 5, ( stderr, "Forked %s", action->str ) );
+			DBG_MSG( 5, ( stderr, "Forked %s", astr ) );
 		}
 	    }
 	    else
@@ -889,10 +965,10 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnClose:
-	    if( action->len > 0 && *(action->str) )
+	    if( alen > 0 && *(astr) )
 	    {
 		/* Close tab specified by str */
-		int tabno = atoi( (char*) action->str) - 1;
+		int tabno = atoi( (char*) astr) - 1;
 
 		if( tabno == -1 ) tabno = ATAB(r);
 
@@ -914,14 +990,14 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 	case MacroFnGoto:
 	{
-	    /* Goto tab in position action->str */
+	    /* Goto tab in position astr */
 	    int tabno;
 	    
-	    if (NOT_NULL(action->str) && *(action->str) )
+	    if (NOT_NULL(astr) && *(astr) )
 	    {
-		tabno = atoi( (char*) action->str );
+		tabno = atoi( (char*) astr );
 
-		if( *(action->str)  == '+' || *(action->str) == '-' )
+		if( *(astr)  == '+' || *(astr) == '-' )
 		{
 		    /*
 		     * Relative movement of tabs
@@ -955,12 +1031,12 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	}
 
 	case MacroFnMove:
-	    /* Move active tab to position in action->str */
-	    if( action->len > 0 && *(action->str) )
+	    /* Move active tab to position in astr */
+	    if( alen > 0 && *(astr) )
 	    {
-		short tabno = atoi( (char*) action->str );
+		short tabno = atoi( (char*) astr );
 
-		if( *(action->str) == '+' || *(action->str) == '-' )
+		if( *(astr) == '+' || *(astr) == '-' )
 		    rxvt_tabbar_move_tab( r, tabno + ATAB(r));
 		else
 		    rxvt_tabbar_move_tab( r, tabno-1 );
@@ -968,13 +1044,13 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnScroll:
-	    /* Scroll by an amount specified in action->str */
-	    if( action->len > 1 )
+	    /* Scroll by an amount specified in astr */
+	    if( alen > 1 )
 	    {
-		int		amount	    = abs( atoi( (char*) action->str ));
-		enum page_dirn	direction   = (*(action->str) == '-' ? UP : DN);
+		int		amount	    = abs( atoi( (char*) astr ));
+		enum page_dirn	direction   = (*(astr) == '-' ? UP : DN);
 
-		if( tolower( action->str[ action->len - 2] ) == 'p' )
+		if( tolower( astr[ alen - 2] ) == 'p' )
 		    /* scroll pages */
 		    amount *=
 #ifdef PAGING_CONTEXT_LINES
@@ -997,7 +1073,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnToggleSubwin:
-	    rxvt_toggle_subwin( r, action->str);
+	    rxvt_toggle_subwin( r, astr);
 	    break;
 
 	case MacroFnFont:
@@ -1005,13 +1081,13 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    const int MaxFontLen = 8;	/* Only need space for "#+xx" */
 
 	    char fontname[MaxFontLen];
-	    if( action->len >= MaxFontLen - 1 ) break;	/* Remember that
-							   action->len includes
-							   the trailing null
-							   char */
+	    if( alen >= MaxFontLen - 1 ) break;	/* Remember that
+						   alen includes
+						   the trailing null
+						   char */
 
-	    fontname[0] = FONT_CMD;			/* Internal prefix */
-	    STRNCPY( fontname + 1, action->str, MaxFontLen - 1);
+	    fontname[0] = FONT_CMD;		/* Internal prefix */
+	    STRNCPY( fontname + 1, astr, MaxFontLen - 1);
 	    fontname[MaxFontLen - 1] = '\0';	/* Null terminate */
 
 	    rxvt_resize_on_font( r, fontname );
@@ -1054,9 +1130,9 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnSetTitle:
-	    if (NOT_NULL(action->str))
+	    if (NOT_NULL(astr))
 		rxvt_tabbar_set_title( r, ATAB(r),
-			(unsigned char*) action->str);
+			(unsigned char*) astr);
 	    else if (NOT_NULL(r->selection.text))
 		rxvt_tabbar_set_title( r, ATAB(r),
 			(const unsigned char TAINTED*) r->selection.text);
@@ -1070,7 +1146,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	     * the printer pipe.
 	     */
 
-	    char    *s		= (char*) action->str;
+	    char    *s		= (char*) astr;
 	    int	    pretty	= 0,
 		    scrollback	= 0;
 
@@ -1097,8 +1173,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	{
 	    char    cfile[PATH_MAX] = "";
 
-	    if (NOT_NULL(action->str))
-		STRNCPY( cfile, action->str, PATH_MAX-1 );
+	    if (NOT_NULL(astr))
+		STRNCPY( cfile, astr, PATH_MAX-1 );
 	    else
 	    {
 		char*	home = getenv ("HOME");

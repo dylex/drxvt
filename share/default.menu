@@ -39,6 +39,8 @@
 {Toggle Fullscreen}					ToggleFullscreen
 {Toggle Macros}						ToggleMacros
 {-}
+{Paste selection}					Paste
+{Open in firefox}					Exec firefox %s
 [read:submenus;tabsmenu]
 [read:submenus;transparent]
 
