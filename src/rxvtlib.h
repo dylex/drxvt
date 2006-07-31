@@ -761,12 +761,13 @@ typedef struct {
     unsigned char   *str;   /* action to take */
 } action_t;
 
-/* Values for macro_t.type. Must sync this with macroNames from xdefaults.c */
+/* Values for macro_t.type. Must sync this with macroNames from macros.c */
 enum {
     MacroFnDummy=0,
     MacroFnEsc,
     MacroFnStr,
     MacroFnNewTab,
+    MacroFnExec,
     MacroFnClose,
     MacroFnGoto,
     MacroFnMove,
@@ -785,7 +786,7 @@ enum {
     MacroFnSaveConfig,
     MacroFnToggleMacros,
     NMACRO_FUNCS
-};
+} macroFnNames;
 
 typedef struct {
     KeySym		keysym;

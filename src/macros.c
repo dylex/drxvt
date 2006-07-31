@@ -39,7 +39,7 @@
 
 
 /*
- * Must sync these to values for macro_t.type in rxvtlib.h.
+ * Must sync these to macroFnNames in rxvtlib.h.
  */
 static const char *const macroNames[] =
 {
@@ -47,6 +47,7 @@ static const char *const macroNames[] =
     "Esc",		    /* Escape sequence to send to mrxvt */
     "Str",		    /* String to send to child process */
     "NewTab",		    /* Open a new tab, and exec a program in it. */
+    "Exec",		    /* Exec a program asynchronusly */
     "Close",		    /* Close tab(s) */
     "GotoTab",		    /* Switch to tab */
     "MoveTab",		    /* Move tab */
@@ -849,9 +850,42 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 				    *command ? command : NULL );
 	    }
 	    else
-		rxvt_append_page( r, 0, NULL, NULL);
+		rxvt_append_page( r, 0, NULL, NULL );
 
+	    break;
 
+	case MacroFnExec:
+	    if( NOT_NULL( action->str ) )
+	    {
+		int	argc;
+		char	**argv;
+
+		switch( fork() )
+		{
+		    case -1:
+			rxvt_print_error( "Unable to fork" );
+			break;
+
+		    case 0:
+			/*
+			 * XXX 2006-07-30 gi1242: Should we close all fd's and
+			 * reset all signals to their default masks?
+			 */
+			argv = rxvt_string_to_argv( action->str, &argc );
+
+			execvp( argv[0], argv );
+
+			rxvt_print_error( "Failed to exec %s", argv[0] );
+			exit(1);
+			/* NOT REACHED */
+
+		    default:
+			/* Nothing to be done */
+			DBG_MSG( 5, ( stderr, "Forked %s", action->str ) );
+		}
+	    }
+	    else
+		rxvt_print_error( "Macro Exec requires an argument." );
 	    break;
 
 	case MacroFnClose:
