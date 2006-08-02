@@ -3318,8 +3318,32 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 #if 0
 	    sleep(10);
 #endif
-	    if (rxvt_clean_before_exec (r, page))
+
+	    clean_sigmasks_and_fds( r, page );
+
+	    if(
+		 rxvt_control_tty( PVTS(r, page)->tty_fd,
+				   PVTS(r, page)->ttydev ) < 0
+	      )
 	    {
+		rxvt_print_error("Could not obtain control of tty");
+	    }
+
+	    else
+	    {
+		/*
+		 * Reopen stdin, stdout and stderr over the tty file descriptor
+		 */
+		dup2( PVTS(r, page)->tty_fd, STDIN_FILENO  );
+		dup2( PVTS(r, page)->tty_fd, STDOUT_FILENO );
+		dup2( PVTS(r, page)->tty_fd, STDERR_FILENO );
+
+		if( PVTS(r, page)->tty_fd > 2 )
+		    close(PVTS(r, page)->tty_fd);
+
+		/*
+		 * Spin off command interpreter.
+		 */
 		rxvt_run_child(r, page, argv);
 	    }
 
@@ -3331,7 +3355,8 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 		    (argv && argv[0]) ? argv[0] : "shell");
 	    sleep(5);
 
-	    exit(EXIT_FAILURE);	/* Don't return */
+	    exit(EXIT_FAILURE);
+	    /* NOT REACHED */
 
 	default:
 	    {
@@ -3382,15 +3407,20 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 /* ------------------------------------------------------------------------- *
  *			    CHILD PROCESS OPERATIONS			     *
  * ------------------------------------------------------------------------- */
+
+/*
+ * Reset signal masks to their default values, and close all open file
+ * descriptors.
+ */
 /* EXTPROTO */
-int
-rxvt_clean_before_exec (rxvt_t* r, int page)
+void
+clean_sigmasks_and_fds( rxvt_t* r, int page )
 {
 #ifdef SIGTSTP
     struct sigaction	ignore;
 #endif
     struct sigaction	deflt;
-    register int	i, ret = 0;
+    register int	i;
 
     /*
      * Close all file descriptors except PVTS(r, page)->tty_fd and
@@ -3399,23 +3429,6 @@ rxvt_clean_before_exec (rxvt_t* r, int page)
     for (i = STDERR_FILENO + 1; i < r->num_fds; i ++)
 	if (i != PVTS(r, page)->tty_fd)
 	    close (i);
-
-    if( rxvt_control_tty(PVTS(r, page)->tty_fd, PVTS(r, page)->ttydev) < 0)
-    {
-	rxvt_print_error("could not obtain control of tty");
-    }
-    else
-    {
-	/*
-	 * Reopen stdin, stdout and stderr over the tty file descriptor
-	 */
-	dup2(PVTS(r, page)->tty_fd, STDIN_FILENO);
-	dup2(PVTS(r, page)->tty_fd, STDOUT_FILENO);
-	dup2(PVTS(r, page)->tty_fd, STDERR_FILENO);
-	if (PVTS(r, page)->tty_fd > 2)
-	    close(PVTS(r, page)->tty_fd);
-	ret = 1;
-    }
 
     /* reset signal handlers */
     deflt.sa_handler = SIG_DFL;
@@ -3442,8 +3455,6 @@ rxvt_clean_before_exec (rxvt_t* r, int page)
     sigaction( SIGTTIN, &ignore, NULL );
     sigaction( SIGTTOU, &ignore, NULL );
 #endif	/* SIGTSTP */
-
-    return (ret);
 }
 
 

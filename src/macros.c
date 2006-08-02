@@ -944,13 +944,11 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 		    case 0:
 			/*
-			 * XXX 2006-07-30 gi1242: Should we close all fd's and
-			 * reset all signals to their default masks?
+			 * Close all file descriptors, and reset signal masks to
+			 * their default values before exec'ing the child
+			 * process.
 			 */
-			/*
-			 * Close all file descriptors
-			 */
-			rxvt_clean_before_exec (r, ATAB(r));
+			clean_sigmasks_and_fds( r, ATAB(r) );
 
 			argv = rxvt_string_to_argv( astr, &argc );
 
