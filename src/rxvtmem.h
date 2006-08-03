@@ -73,7 +73,7 @@ struct block_head_t
 struct trunk_head_t
 {
 #ifdef DEBUG
-    RUINT32T	magic;  /* magic number */
+    RUINT32T	magic_f;  /* magic number */
     size_t	tbyte;  /* total allocated bytes in this trunk */
 #endif
     struct block_head_t*    begin;/* begin address of the trunk. this is
@@ -88,6 +88,9 @@ struct trunk_head_t
     RUINT16T	bmax;   /* max # of free blocks in this trunk */
     RUINT16T	fcount; /* # of free blocks in this trunk */
     RUINT16T	bsize;  /* block size to allocate (exclude head) */
+#ifdef DEBUG
+    RUINT32T	magic_e;  /* magic number */
+#endif
 };
 
 

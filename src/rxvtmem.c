@@ -119,7 +119,7 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
 
 
 #ifdef DEBUG
-    tk_head->magic = TRUNK_MAGIC;
+    tk_head->magic_f = tk_head->magic_e = TRUNK_MAGIC;
     tk_head->tbyte = 0;
 #endif
     bmax = ((char*) tk_head - (char*) tk_head->begin) /
@@ -153,7 +153,8 @@ free_trunk(struct trunk_head_t* tk_head)
 {
     assert (NOT_NULL(tk_head));
 #ifdef DEBUG
-    assert (TRUNK_MAGIC == tk_head->magic);
+    assert (TRUNK_MAGIC == tk_head->magic_f);
+    assert (TRUNK_MAGIC == tk_head->magic_e);
 #endif
 
     DBG_MSG(1, (stderr, "--Trunk freed %d bytes\n",
@@ -312,7 +313,8 @@ rxvt_mem_exit (void)
 	    while (NOT_NULL(tk_head = tklist->first_trunk))  
 	    {
 #ifdef DEBUG
-		assert (TRUNK_MAGIC == tk_head->magic);
+		assert (TRUNK_MAGIC == tk_head->magic_f);
+		assert (TRUNK_MAGIC == tk_head->magic_e);
 #endif
 		tklist->first_trunk = tk_head->next; /* new first trunk */
 
@@ -371,7 +373,8 @@ rxvt_malloc(size_t size)
 	tklist = &g_trunk_list[idx];
 	assert (tklist->first_trunk);
 #ifdef DEBUG
-	assert (TRUNK_MAGIC == tklist->first_trunk->magic);
+	assert (TRUNK_MAGIC == tklist->first_trunk->magic_f);
+	assert (TRUNK_MAGIC == tklist->first_trunk->magic_e);
 #endif
 
 	/* find the free block */
@@ -433,7 +436,8 @@ rxvt_malloc(size_t size)
 		struct trunk_head_t*	remove = tklist->first_trunk;
 		tklist->first_trunk = remove->next;
 #ifdef DEBUG
-		assert (TRUNK_MAGIC == tklist->first_trunk->magic);
+		assert (TRUNK_MAGIC == tklist->first_trunk->magic_f);
+		assert (TRUNK_MAGIC == tklist->first_trunk->magic_e);
 #endif
 		SET_NULL(tklist->first_trunk->prev);
 
@@ -523,7 +527,8 @@ rxvt_realloc(void* ptr, size_t size)
     {
 	/* now do some serious business about reallocating this ptr */
 #ifdef DEBUG
-	assert (TRUNK_MAGIC == tk_head->magic);
+	assert (TRUNK_MAGIC == tk_head->magic_f);
+	assert (TRUNK_MAGIC == tk_head->magic_e);
 #endif
 	/* nothing to do if this block is actually big enough */
 	if (size <= (size_t) tk_head->bsize)
@@ -572,7 +577,8 @@ rxvt_free(void* ptr)
     else
     {
 #ifdef DEBUG
-	assert (TRUNK_MAGIC == tk_head->magic);
+	assert (TRUNK_MAGIC == tk_head->magic_f);
+	assert (TRUNK_MAGIC == tk_head->magic_e);
 	tk_head->tbyte -= block->bbyte;
 # ifdef DEBUG_MEMORY
 	MEMSET (ptr, MEMORY_MAGIC, tk_head->list->block_size);
@@ -601,7 +607,8 @@ rxvt_free(void* ptr)
 
 	    assert (NOT_NULL(tklist->first_trunk));
 #ifdef DEBUG
-	    assert (TRUNK_MAGIC == tklist->first_trunk->magic);
+	    assert (TRUNK_MAGIC == tklist->first_trunk->magic_f);
+	    assert (TRUNK_MAGIC == tklist->first_trunk->magic_e);
 #endif
 	    tk_head->next = tklist->first_trunk;
 	    tklist->first_trunk->prev = tk_head;
@@ -624,7 +631,8 @@ rxvt_free(void* ptr)
 		/* this trunk is the first in trunk list */
 		if (NOT_NULL(tk_head->next))    {
 #ifdef DEBUG
-		    assert (TRUNK_MAGIC == tk_head->next->magic);
+		    assert (TRUNK_MAGIC == tk_head->next->magic_f);
+		    assert (TRUNK_MAGIC == tk_head->next->magic_e);
 #endif
 		    tklist->first_trunk = tk_head->next;
 		    tklist->first_trunk->prev = NULL;
@@ -638,13 +646,15 @@ rxvt_free(void* ptr)
 	    {
 		/* this trunk is not the first in trunk list */
 #ifdef DEBUG
-		assert (TRUNK_MAGIC == tk_head->prev->magic);
+		assert (TRUNK_MAGIC == tk_head->prev->magic_f);
+		assert (TRUNK_MAGIC == tk_head->prev->magic_e);
 #endif
 		tk_head->prev->next = tk_head->next;
 		if (NOT_NULL(tk_head->next))	
 		{
 #ifdef DEBUG
-		    assert (TRUNK_MAGIC == tk_head->next->magic);
+		    assert (TRUNK_MAGIC == tk_head->next->magic_f);
+		    assert (TRUNK_MAGIC == tk_head->next->magic_e);
 #endif
 		    tk_head->next->prev = tk_head->prev;
 		}
