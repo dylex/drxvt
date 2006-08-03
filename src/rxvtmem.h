@@ -112,7 +112,7 @@ struct trunk_list_t
 
 
 /* size of trunk_head_t and block_head_t */
-#define THEAD_OFFSET	(sizeof (struct block_head_t))
+#define THEAD_OFFSET	(sizeof (struct trunk_head_t))
 #define BHEAD_OFFSET	(sizeof (struct block_head_t))
 
 /* 4KB is the default trunk size */
