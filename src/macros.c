@@ -949,7 +949,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			 * process.
 			 */
 			clean_sigmasks_and_fds( r, ATAB(r) );
-			close (AVTS(r)->tty_fd);
+			if (-1 != AVTS(r)->tty_fd)
+			    close (AVTS(r)->tty_fd);
 
 			argv = rxvt_string_to_argv( astr, &argc );
 
