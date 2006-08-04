@@ -148,6 +148,7 @@ static const struct {
 	    "showing color text with bold font" ),
 
 
+    STRG(Rs_container_window, NULL, "into", "WinID", "Parent window id", 0),
     STRG(Rs_display_name, NULL, "d", NULL, NULL, 0),
     STRG(Rs_display_name, NULL, "display", "string", "X server to contact", 0),
     STRG(Rs_term_name, "termName", "tn", "string", "the TERM environment variable", 0),

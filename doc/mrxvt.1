@@ -133,6 +133,14 @@ manpages.
 .It Fl display Ns | Ns Fl d Ar displayname
 X display name, the X server to contact
 .
+.It Fl into Ar WinID
+If given an X window identifier,
+.Nm
+will reparent its top-level shell widget to that window.
+This is used to embed
+.Nm
+within other applications.
+.
 .It Fl geometry Ns | Ns Fl g Ar geometry
 geometry at startup
 .Op Cm geometry

@@ -924,7 +924,7 @@ rxvt_xerror_handler(const Display *display __attribute__((unused)), const XError
     XGetErrorText (r->Xdisplay, event->error_code, error_msg, 1023);
     r->h->xerror_return = event->error_code;
 
-    if ( ! r->h->allowedxerror)
+    if( !r->h->allowedxerror )
 	rxvt_print_error("%s", error_msg);
 
     return 0;	    /* ignored anyway */
@@ -1111,6 +1111,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	    ISSET_OPTION(r, Opt_xft) ? MAX_DISPLAY_TAB_TXT :
 #endif
 	    DEFAULT_DISPLAY_TAB_TXT;
+
 
     if( rs[Rs_minVisibleTabs] )
     {
@@ -2887,6 +2888,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     static const XColor	    blackcolour = { 0, 0, 0, 0, 0, 0 };
 #endif
 
+    Window		    parent;	/* WinID to use for parent window */
+
 #ifdef PREFER_24BIT
     XSetWindowAttributes    attributes;
     XWindowAttributes	    gattr;
@@ -2905,8 +2908,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     {
 	XDEPTH = DefaultDepth(r->Xdisplay, XSCREEN);
 	/*
-	** If depth is not 24, look for a 24bit visual.
-	*/
+	 * If depth is not 24, look for a 24bit visual.
+	 */
 	if (XDEPTH != 24)
 	{
 	    XVisualInfo	 vinfo;
@@ -2948,34 +2951,58 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	    UNSET_OPTION(r, Opt_xft);
 	}
 	else
-	{
 	    xftInitACS (r->Xdisplay, XROOT, XDEPTH);
-	}
     }
 #endif
     /* init fallback X11 font */
-    rxvt_init_font_x11 (r);
+    rxvt_init_font_x11( r );
 
 
     /*
-    ** must initialize scrollbar before initialize window size and
-    ** create windows.
-    */
+     * must initialize scrollbar before initialize window size and
+     * create windows.
+     */
 #ifdef HAVE_SCROLLBARS
     rxvt_scrollbar_init (r);
 #endif
     rxvt_init_win_size (r);
 
     /*
-    ** parent window - reverse video so we can see placement errors
-    ** sub-window placement & size in rxvt_resize_subwindows()
-    */
+     * Use window specified by -into option as the parent window.
+     */
+    if( r->h->rs[Rs_container_window] )
+    {
+	XWindowAttributes   attrs;
+
+	r->h->allowedxerror = 1;    /* Enable Xerror reporting */
+	r->h->xerror_return = Success;
+
+        parent = strtoul( r->h->rs[Rs_container_window], NULL, 0 );
+
+	XGetWindowAttributes( r->Xdisplay, parent, &attrs );
+
+	/* Check if we have valid attributes */
+	if( r->h->xerror_return != Success || attrs.class == InputOnly )
+	{
+	    rxvt_print_error( "Unable to embed into Win 0x%lx", parent );
+	    parent = XROOT;
+	}
+
+	r->h->allowedxerror = 0;    /* Disable Xerror reporting */
+    }
+    else
+        parent = XROOT;
+    
+    /*
+     * parent window - reverse video so we can see placement errors sub-window
+     * placement & size in rxvt_resize_subwindows()
+     */
 
 #ifdef PREFER_24BIT
     attributes.background_pixel = r->PixColors[Color_bg];
     attributes.border_pixel = r->PixColors[Color_border];
     attributes.colormap = XCMAP;
-    r->TermWin.parent = XCreateWindow(r->Xdisplay, XROOT,
+    r->TermWin.parent = XCreateWindow(r->Xdisplay, parent,
 		    r->szHint.x, r->szHint.y,
 		    r->szHint.width, r->szHint.height,
 		    r->TermWin.ext_bwidth,
@@ -2984,7 +3011,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 		    CWBackPixel | CWBorderPixel
 		    | CWColormap, &attributes);
 #else
-    r->TermWin.parent = XCreateSimpleWindow(r->Xdisplay, XROOT,
+    r->TermWin.parent = XCreateSimpleWindow(r->Xdisplay, parent,
 			r->szHint.x, r->szHint.y,
 			r->szHint.width,
 			r->szHint.height,
@@ -2992,15 +3019,14 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			r->PixColors[Color_border],
 			r->PixColors[Color_bg]);
 #endif
-    assert (IS_WIN(r->TermWin.parent));
-
 
 #ifdef XFT_SUPPORT
     if (ISSET_OPTION(r, Opt_xft))
     {
 	/* create XFT draw, test only */
-	XftDraw*	xftdraw = XftDrawCreate (r->Xdisplay,
-	    r->TermWin.parent, XVISUAL, XCMAP);
+	XftDraw*	xftdraw = XftDrawCreate( r->Xdisplay,
+						 r->TermWin.parent, XVISUAL,
+						 XCMAP);
 	if (xftdraw)
 	{
 	    XftDrawDestroy (xftdraw);
@@ -3027,8 +3053,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
 
     /*
-    ** Now set window properties, like title, icon name and hints
-    */
+     * Now set window properties, like title, icon name and hints
+     */
     /* window title name */
     win_prop.value = (unsigned char*) r->h->rs[Rs_title];
     win_prop.nitems = STRLEN (win_prop.value);
@@ -3085,13 +3111,13 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     }
 
     /*
-    ** set WM_CLIENT_LEADER property so that session management proxy
-    ** can handle us even session management is not enabled.
-    */
+     * set WM_CLIENT_LEADER property so that session management proxy can handle
+     * us even session management is not enabled.
+     */
     if (IS_ATOM(r->h->xa[XA_WM_CLIENT_LEADER]))
-	XChangeProperty(r->Xdisplay, r->TermWin.parent,
+	XChangeProperty( r->Xdisplay, r->TermWin.parent,
 	    r->h->xa[XA_WM_CLIENT_LEADER], XA_WINDOW, 32,
-	    PropModeReplace, (unsigned char*) &(r->TermWin.parent), 1L);
+	    PropModeReplace, (unsigned char*) &(r->TermWin.parent), 1L );
 
 # ifdef HAVE_X11_SM_SMLIB_H
     if (NOT_NULL(r->TermWin.sm_conn) &&
@@ -3248,7 +3274,6 @@ int
 rxvt_run_command(rxvt_t *r, int page, const char **argv)
 {
     int		cfd, er;
-    int		i;
 
     /* get master (pty) */
     if ((cfd = rxvt_get_pty(&(PVTS(r, page)->tty_fd),

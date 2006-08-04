@@ -1086,6 +1086,7 @@ enum colour_list {
  */
 enum {
     Rs_display_name = 0,
+    Rs_container_window,
     Rs_term_name,
     Rs_iconName,
     Rs_geometry,
