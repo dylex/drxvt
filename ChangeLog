@@ -4,6 +4,15 @@ Gautam Iyer <gi1242@users.sourceforge.net>
     * Bug Fixes:
 	1. Fixed detecting xft support if xft-config is missing.
 	2. Fixed segfault obtained when the last macro in r->macros is executed
+	4. Convert sources from ts=8 to ts=4. Yes ts=8 was a bug :). Added a
+	   script ts4to8.pl to do this.
+	3. Make text under cursor visible if cursorcolor2 is not defined.
+	5. Added "Exec" macro to execute external programs
+	6. Added % expansion to macros. %s=selection, %t=tab title, %n=tab#.
+	7. Added a menu option to open the selection in a new tab in mutt /
+	   w3m, or in firefox.
+	8. Implemented a "-into" option to embed mrxvt into. Thanks to Bruno
+	   Deferrari <utizoc@gmail.com> for the patch.
 
     * Enhancements:
 	1. Reduced memory footprint by roughly 0.5kb.
