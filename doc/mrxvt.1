@@ -133,14 +133,6 @@ manpages.
 .It Fl display Ns | Ns Fl d Ar displayname
 X display name, the X server to contact
 .
-.It Fl into Ar WinID
-If given an X window identifier,
-.Nm
-will reparent its top-level shell widget to that window.
-This is used to embed
-.Nm
-within other applications.
-.
 .It Fl geometry Ns | Ns Fl g Ar geometry
 geometry at startup
 .Op Cm geometry
@@ -156,6 +148,14 @@ start iconic
 .It Fl in Ar name
 Icon name for window
 .Op Cm iconName
+.
+.It Fl into Ar WinID
+If given an X window identifier,
+.Nm
+will reparent its top-level shell widget to that window.
+This is used to embed
+.Nm
+within other applications.
 .
 .It Fl name Ar name
 Client instance, icon, and title strings
@@ -1422,33 +1422,18 @@ Send the escape sequence
 .Ar str
 to
 .Nm .
-The following escape sequences are interpolated into the argument string:
-.Bl -tag -compact -offset 4n -width 8n
-.It \ea
-Bell
-.It \eb
-Backspace
-.It \eE, \ee
-Escape
-.It \en
-Newline
-.It \er
-Carriage return
-.It \et
-Tab
-.It \e Ns Ar ddd
-Char with octal ASCII code
-.Ar ddd .
-.It  ^@, ^A .. ^Z .. ^_, ^?
-Control-@, Control-A ...
-.El
 .\" ------------------------------------------------------------
 .It Ic Str Ar str
 Send the string
 .Ar str
-to the child process. The string
-.Ar str
-is backslash escaped as above.
+to the child process.
+.\" ------------------------------------------------------------
+.It Ic Exec Ar command
+Executes
+.Ar command
+asynchronously. The command run without any controlling shell or TTY. This is generally used to launch X11 programs (e.g. open the selected text in firefox). If you want a command run in a new tab, see the
+.Ic NewTab
+macro).
 .\" ------------------------------------------------------------
 .It Ic NewTab Oo Ar -N Oc Oo Ar \*qtitle\*q Oc Op Oo ! Oc Ns Ar command
 Open a new tab.
@@ -1574,6 +1559,41 @@ Toggle the use of keyboard shortcuts. When macros are disabled (either by using 
 .Fl dm
 option), then this is the only keyboard shortcut that will work. Thus you can re-enable your keyboard shortcuts via the keyboard using this function.
 .\" ------------------------------------------------------------
+.El
+.Pp
+Additionally, the argument to any of the above macros are
+.Sq Sy \e
+and
+.Sq Sy %
+interpolated as follows:
+.Pp
+.Bl -tag -compact -offset 4n -width 8n
+.It Sy \ea
+Bell
+.It Sy \eb
+Backspace
+.It Sy \eE , \ee
+Escape
+.It Sy \en
+Newline
+.It Sy \er
+Carriage return
+.It Sy \et
+Tab
+.It Sy \e Ns Ar ddd
+Char with octal ASCII code
+.Ar ddd .
+.It Sy ^@ , ^A .. ^Z .. ^_ , ^?
+Control-@, Control-A ...
+.Pp
+.It Sy %s
+Text selected in the
+.Nm
+window.
+.It Sy %n
+Number of the active tab.
+.It Sy %t
+Title of the active tab.
 .El
 .Ed
 .Ss Mouse shortcuts \"{{{2
