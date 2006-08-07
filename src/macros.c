@@ -583,8 +583,11 @@ rxvt_cleanup_macros( rxvt_t *r )
 	    r->macros[i].keysym	    = 0;
 	    r->macros[i].modFlags   = 0;
 
-	    rxvt_free( r->macros[i].action.str );
-	    SET_NULL(r->macros[i].action.str); /* Probably unnecessary */
+		if (NOT_NULL(r->macros[i].action.str))
+		{
+			rxvt_free( r->macros[i].action.str );
+			SET_NULL(r->macros[i].action.str); /* Probably unnecessary */
+		}
 
 	    nDummyMacros++;
 	}
