@@ -1123,6 +1123,41 @@ rxvt_kill_page (rxvt_t* r, short page)
 
 
 /*
+ * Reduce r->num_fds so that select() is more efficient
+ */
+/* INTPROTO */
+void
+rxvt_adjust_fd_number (rxvt_t* r)
+{
+    int	    num_fds;
+
+
+    num_fds = max( STDERR_FILENO, LVTS(r)->cmd_fd );
+
+    /* adjust num_fds based on X connection. notice that we do not
+     * need to check if Xfd is a valid file descriptor here because
+     * -1 is always smaller than positive number :-)
+     */
+    MAX_IT( num_fds, r->Xfd );
+#ifdef HAVE_X11_SM_SMLIB_H
+    /* adjust num_fds based on ICE connection. notice that we do not
+     * need to check if ice_fd is a valid file descriptor here because
+     * -1 is always smaller than positive number :-)
+     */
+    MAX_IT( num_fds, r->TermWin.ice_fd );
+#endif
+
+    MAX_IT( num_fds, r->num_fds-1 );
+#ifdef OS_IRIX
+    /* Alex Coventry says we need 4 & 7 too */
+    MAX_IT( num_fds, 7 );
+#endif
+    r->num_fds = num_fds + 1;	/* counts from 0 */
+    DBG_MSG(1, (stderr, "Adjust num_fds to %d\n", r->num_fds));
+}
+
+
+/*
  * Append a new tab after the last tab. If command is not NULL, run that
  * command in the tab. If command begins with '!', then run the shell first.
  */
@@ -1131,8 +1166,7 @@ void
 rxvt_append_page( rxvt_t* r, int profile,
 	const char TAINTED *title, const char *command )
 {
-    int	    num_fds,
-	    num_cmd_args = 0; /* Number of args we got from parsing command */
+    int	    num_cmd_args = 0; /* Number of args we got from parsing command */
     char**  argv;
 
 
@@ -1299,19 +1333,9 @@ rxvt_append_page( rxvt_t* r, int profile,
     }
     DBG_MSG(2,(stderr,"page %d's cmd_fd is %d\n", LTAB(r), LVTS(r)->cmd_fd));
 
-    /*
-     * Reduce r->num_fds so that select() is more efficient
-     */
-    num_fds = max( STDERR_FILENO, LVTS(r)->cmd_fd );
-    MAX_IT( num_fds, r->Xfd );
-    MAX_IT( num_fds, r->num_fds-1 );
-/* #ifdef __sgi */
-#ifdef OS_IRIX
-    /* Alex Coventry says we need 4 & 7 too */
-    MAX_IT( num_fds, 7 );
-#endif
-    r->num_fds = num_fds + 1;	/* counts from 0 */
-    DBG_MSG(1, (stderr, "Adjust num_fds to %d\n", r->num_fds));
+
+    /* adjust number of file descriptors to listen */
+    rxvt_adjust_fd_number (r);
 
     /*
      * Initialize the screen data structures

@@ -44,6 +44,10 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	14.Fix severl compile error - we must call DBG_MSG after variable
 	   declaration in functions as we are using C, not C++. Thanks to
 	   lzl@mitbbs.com for bringing this issue to me and provide patch.
+	15.Fix unclosed file descriptors in child process.
+	16.Fix session support. We actually did not listen on it because
+	   the number of open file descriptor is small - we did not count
+	   it!
 
     * Enhancements:
 	1. Add --with-max-profiles to configure script as suggested

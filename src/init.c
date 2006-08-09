@@ -3344,27 +3344,25 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 	    sleep(10);
 #endif
 
-	    clean_sigmasks_and_fds( r, page );
 
-	    if(
-		 rxvt_control_tty( PVTS(r, page)->tty_fd,
-				   PVTS(r, page)->ttydev ) < 0
+	    if (rxvt_control_tty( PVTS(r, page)->tty_fd,
+				  PVTS(r, page)->ttydev ) < 0
 	      )
 	    {
 		rxvt_print_error("Could not obtain control of tty");
+		clean_sigmasks_and_fds( r, page );
 	    }
-
 	    else
 	    {
 		/*
-		 * Reopen stdin, stdout and stderr over the tty file descriptor
+		 * Reopen stdin, stdout and stderr over the tty file
+		 * descriptor
 		 */
 		dup2( PVTS(r, page)->tty_fd, STDIN_FILENO  );
 		dup2( PVTS(r, page)->tty_fd, STDOUT_FILENO );
 		dup2( PVTS(r, page)->tty_fd, STDERR_FILENO );
 
-		if( PVTS(r, page)->tty_fd > 2 )
-		    close(PVTS(r, page)->tty_fd);
+		clean_sigmasks_and_fds( r, page );
 
 		/*
 		 * Spin off command interpreter.
@@ -3419,6 +3417,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
     fchmod(PVTS(r, page)->tty_fd, 0622);
     fcntl(PVTS(r, page)->tty_fd, F_SETFD, FD_CLOEXEC);
     fcntl(cfd, F_SETFD, FD_CLOEXEC);
+    PVTS(r, page)->cmd_fd = cfd;
 
     if (rxvt_run_child(r, page, argv) == -1)
 	/*exit(EXIT_FAILURE);*/
@@ -3447,13 +3446,14 @@ clean_sigmasks_and_fds( rxvt_t* r, int page )
     struct sigaction	deflt;
     register int	i;
 
-    /*
-     * Close all file descriptors except PVTS(r, page)->tty_fd and
-     * STDERR
-     */
+    /* Close all file descriptors except STDXXX */
     for (i = STDERR_FILENO + 1; i < r->num_fds; i ++)
-	if (i != PVTS(r, page)->tty_fd)
-	    close (i);
+	close (i);
+    if (PVTS(r, page)->tty_fd > 2)
+    {
+	close (PVTS(r, page)->tty_fd);
+	PVTS(r, page)->tty_fd = -1;
+    }
 
     /* reset signal handlers */
     deflt.sa_handler = SIG_DFL;
@@ -3615,6 +3615,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
 	if (login)
 	    rxvt_free(login);
 	close(PVTS(r, page)->tty_fd);
+	PVTS(r, page)->tty_fd = -1;
 	return PVTS(r, page)->cmd_fd;
     }
 #endif

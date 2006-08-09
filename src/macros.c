@@ -947,13 +947,11 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 		    case 0:
 			/*
-			 * Close all file descriptors, and reset signal masks to
-			 * their default values before exec'ing the child
-			 * process.
+			 * Close all file descriptors, and reset signal
+			 * masks to their default values before exec'ing
+			 * the child process.
 			 */
 			clean_sigmasks_and_fds( r, ATAB(r) );
-			if (-1 != AVTS(r)->tty_fd)
-			    close (AVTS(r)->tty_fd);
 
 			argv = rxvt_string_to_argv( astr, &argc );
 
