@@ -3314,7 +3314,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     int		i,	    /* tmp */
 		row_offset; /* basic offset in screen structure */
 #ifndef NO_CURSORCOLOR
-    rend_t	cc1;	    /* store colours at cursor position(s) */
+    rend_t	cc1 = 0;    /* store colours at cursor position(s) */
 # ifdef MULTICHAR_SET
     rend_t	cc2;	    /* store colours at cursor position(s) */
 # endif

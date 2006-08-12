@@ -1121,12 +1121,14 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 void
 rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 {
-    unsigned int    len;
+    unsigned int    len, lenstr;
     char TAINTED *  str;
     char	    buffer[256];
 
-    /* Macros defined with APL_CLASS or APL_SUBCLASS will not replace previous
-     * user defined macros */
+    /*
+     * Macros defined with APL_CLASS or APL_SUBCLASS will not replace previous
+     * user defined macros
+     */
     Bool    noReplace = !STRCMP( name, APL_CLASS )
 			    || !STRCMP( name, APL_SUBCLASS);
 
@@ -1149,10 +1151,13 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 	  )
 	    continue;
 	str += (len + 1);   /* skip `name*' or `name.' */
+	lenstr = STRLEN( str );
 
 	{
-	    /* replace '*' with '.', but stop at ':'! bug reported
-	    ** by afo@zlug.org */
+	    /*
+	     * replace '*' with '.', but stop at ':'! bug reported by
+	     * afo@zlug.org
+	     */
 	    char*   ptr = str;
 	    while (*ptr && *ptr != ':')
 	    {
@@ -1223,7 +1228,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 		}
 
 		n = STRLEN(kw);
-		if (str[n] == ':' && rxvt_str_match(str, kw))
+		if( n < lenstr && str[n] == ':' && rxvt_str_match(str, kw) )
 		{
 		    /* skip `keyword:' */
 		    str += (n + 1);
