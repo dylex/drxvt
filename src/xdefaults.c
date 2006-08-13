@@ -1308,6 +1308,9 @@ rxvt_extract_resources (
 	const char  *name )
 {
 #ifndef NO_RESOURCES
+    /* get resources the hard way, but save lots of memory */
+    FILE	   *fd = NULL;
+    char	   *home;
 
 # if defined XAPPLOADDIR
 #  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
@@ -1324,28 +1327,24 @@ rxvt_extract_resources (
 	    r->h->locale);  /* 258 = 255 + 4 (-.*s) - 1 (/) */
     }
 #  endif
-# endif
-
-    /* get resources the hard way, but save lots of memory */
-    FILE	   *fd = NULL;
-    char	   *home;
+# endif /* XAPPLOADDIR */
 
 
     /* open user supplied config file first */
-    if (r->h->rs[Rs_confFile])
+    if (NOT_NULL(r->h->rs[Rs_confFile]))
 	fd = fopen( r->h->rs[Rs_confFile], "r" );
 
     if (IS_NULL(fd) && NOT_NULL(home = getenv("HOME")))
     {
-	unsigned int	i, len = STRLEN(home) + 2;
-	char*		f = NULL;
+	int	i, len = STRLEN(home) + 2;
+	char*	f = NULL;
 
 	/* possible integer overflow? */
 	assert (len > 0);
 	for( i = 0; i < (sizeof(xnames) / sizeof(xnames[0])); i++ )
 	{
 	    /* possible integer overflow? */
-	    assert( len + STRLEN(xnames[i]) > 0 );
+	    assert (len + STRLEN(xnames[i]) >= len);
 	    f = rxvt_realloc( f, ( len + STRLEN(xnames[i]) ) * sizeof(char) );
 
 	    sprintf( f, "%s/%s", home, xnames[i] );
