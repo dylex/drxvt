@@ -15,9 +15,10 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   Deferrari <utizoc@gmail.com> for the patch.
 	9. Fix buffer overflow. Thanks to Frederik Deweerdt <deweerdt@free.fr>
 	   for the patch.
+       10. Made -ufbg and -fade options work under Xft ;).
 
     * Enhancements:
-	1. Reduced memory footprint by roughly 0.5kb.
+	1. Reduced memory footprint by roughly 5kb.
 	2. Converted all source files to use the standard ts=8 for easier
 	   diffing / online viewing.
 

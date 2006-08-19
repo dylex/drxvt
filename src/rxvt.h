@@ -1481,48 +1481,51 @@ enum {
  *****************************************************************************
  */
 struct rxvt_hidden {
-    unsigned char   /* Awaiting screen refresh */
-		    BOOLVAR( want_refresh, 1),
-		    /* Only refresh region specified by refreshRegion */
-		    BOOLVAR( want_clip_refresh, 1),
-		    /* perform resize even if window size has not changed */
-		    BOOLVAR( want_resize, 2),
+    unsigned char   BOOLVAR( want_refresh, 1),		/* Awaiting screen
+							   refresh */
+		    BOOLVAR( want_clip_refresh, 1),	/* Only refresh region
+							   specified by
+							   refreshRegion */
+		    BOOLVAR( want_resize, 2),		/* perform resize even
+							   if window size has
+							   not changed */
 #ifdef TRANSPARENT
-		    /* awaiting full screen refresh */
-		    BOOLVAR( want_full_refresh, 1),
+		    BOOLVAR( want_full_refresh, 1),	/* awaiting full screen
+							   refresh */
 #endif
 #if defined(BACKGROUND_IMAGE) || defined(TRANSPARENT)
-		    /* is a transparent term */
-		    BOOLVAR( am_transparent, 1),
-		    /* transparency without known root pixmap */
-		    BOOLVAR( am_pixmap_trans, 1),
+		    BOOLVAR( am_transparent, 1),	/* is transparent */
+		    BOOLVAR( am_pixmap_trans, 1),	/* transparency without
+							   known root pixmap */
 # endif
 #ifdef CURSOR_BLINK
 		    BOOLVAR( hidden_cursor, 1),
 #endif
-		    /* a.k.a. keep mark position */
-		    BOOLVAR( hate_those_clicks, 1),
+		    BOOLVAR( hate_those_clicks, 1),	/* a.k.a. keep mark
+							   position */
 		    BOOLVAR( num_scr_allow, 1),
 		    BOOLVAR( bypass_keystate, 1);
 
-    Region	    refreshRegion;  /* Region for CLIPPED_REFRESH */
+    Region	    refreshRegion;			/* Region for
+							   CLIPPED_REFRESH */
     unsigned char   BOOLVAR( refresh_type, 5),
 #ifdef META8_OPTION
-		    meta_char,	/* Alt-key prefix */
+		    meta_char,				/* Alt-key prefix */
 #endif
 		    scrollbar_align,
 		    selection_wait,
 		    selection_type;
 
 #ifdef GREEK_SUPPORT
-		    /* greek keyboard mode */
-    short	    greek_mode;
+    short	    greek_mode;				/* Greek keyboard
+							   mode */
     KeySym	    ks_greekmodeswith;
 #endif
 
-    /* screen: previous number of columns and rows */
     RUINT16T	    prev_ncol,
-		    prev_nrow;
+		    prev_nrow;				/* screen: previous
+							   number of columns and
+							   rows */
     RUINT32T	    pixcolor_set[NPIXCLR_SETS];
 
 #ifdef SELECTION_SCROLLING
@@ -1535,9 +1538,10 @@ struct rxvt_hidden {
 		    pending_scroll_selection;
 #endif
 
-		    /* Hops - csr offset in thumb/slider to */
-		    /*   give proper Scroll behaviour */
-    int		    csrO,
+    int		    csrO,				/* Hops - csr offset in
+							   thumb/slider to give
+							   proper Scroll
+							   behaviour */
 #ifndef NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING
 		    scroll_arrow_delay,
 #endif
@@ -1547,19 +1551,26 @@ struct rxvt_hidden {
 #endif
 		    refresh_count,
 		    refresh_limit,
-		    fnum,   /* logical font number */
-		    last_bot,	/* scrollbar last bottom position */
-		    last_top,	/* scrollbar last top position */
-		    last_state,	/* scrollbar last state */
+		    fnum,				/* logical font
+							   number */
+		    last_bot,				/* scrollbar last bottom
+							   position */
+		    last_top,				/* scrollbar last top
+							   position */
+		    last_state,				/* scrollbar last
+							   state */
 		    scroller_len,
 		    currmaxcol,
 		    window_vt_x,
-		    window_vt_y,
+		    window_vt_y;
 # ifdef POINTER_BLANK
-		    pointerBlankDelay,
+    int		    pointerBlankDelay;
 # endif
-		    allowedxerror, /* Be silent when reporting XErrors */
-		    xerror_return; /* ErrorCode of caught XError       */
+
+    unsigned char   BOOLVAR( allowedxerror, 1);		/* Be silent when
+							   reporting XErrors */
+    int		    xerror_return;			/* ErrorCode of caught
+							   XError */
 
     unsigned int    ModMetaMask,
 		    ModNumLockMask;
@@ -1607,12 +1618,16 @@ struct rxvt_hidden {
 #endif
     void	    (*multichar_decode)(unsigned char *str, int len);
 #ifdef HAVE_MENUBAR
-    menu_t*	    ActiveMenu;	    /* currently active menu */
-    menu_t*	    BuildMenu;	    /* the menu currently being built */
-    menu_t*	    popupMenu[3];   /* Menus to popup on ctrl clicks */
+    menu_t*	    ActiveMenu;				/* currently active
+							   menu */
+    menu_t*	    BuildMenu;				/* the menu currently
+							   being built */
+    menu_t*	    popupMenu[3];			/* Menus to popup on
+							   ctrl clicks */
 
-    unsigned char   BOOLVAR( showingMenu, 1);
-				    /* The type of menu currently bieng shown */
+    unsigned char   BOOLVAR( showingMenu, 1);		/* The type of menu
+							   currently being
+							   shown */
 
     bar_t	    MenuBar;
     int		    Arrows_x;
@@ -1626,7 +1641,8 @@ struct rxvt_hidden {
 #endif
 #ifdef TRANSPARENT
     unsigned long   bgRefreshInterval;
-    struct timeval  lastCNotify;    /* Time of the last CNotify event */
+    struct timeval  lastCNotify;			/* Time of the last
+							   CNotify event */
 #endif
     struct timeval  timeout[NUM_TIMEOUTS];
 
@@ -1634,35 +1650,46 @@ struct rxvt_hidden {
     ** these three don't need to be kept but do so to placate some
     ** mem checkers
     */
-    char*	    env_windowid; /* environmental variable WINDOWID */
-    char*	    env_display;  /* environmental variable DISPLAY */
-    char*	    env_term;     /* environmental variable TERM */
-    char*	    env_tabtitle; /* environmental variable MRXVT_TABTITLE*/
+    char*	    env_windowid;			/* environmental
+							   variable WINDOWID */
+    char*	    env_display;			/* environmental
+							   variable DISPLAY */
+    char*	    env_term;				/* environmental
+							   variable TERM */
+    char*	    env_tabtitle;			/* environmental
+							   variable
+							   MRXVT_TABTITLE*/
     char*	    env_colorfgbg;
     char*	    buffer;
     char*	    locale;
-    /*
+
+#if 0
     unsigned char*  v_buffer;
     unsigned char*  v_bufstr;
     unsigned char*  v_bufptr;
     unsigned char*  v_bufend;
-    */
+#endif
+
     char*	    newfont[MAX_NFONTS];
     const char*	    rs[NUM_RESOURCES];
-    /* command input buffering */
-    /*
+
+#if 0    /* command input buffering */
     unsigned char*  cmdbuf_ptr, *cmdbuf_endp;
     unsigned char   cmdbuf_base[BUFSIZ];
     unsigned char   kbuf[KBUFSZ];
-    */
+#endif
 
 #ifdef TRANSPARENT
-    Pixmap	rootPixmap; /* Pixmap ID of the root pixmap */
-    unsigned	rpWidth,    /* Dimensions of the root pixmap */
+    Pixmap	rootPixmap;				/* Pixmap ID of the root
+							   pixmap */
+    unsigned	rpWidth,				/* Dimensions of the
+							   root pixmap */
 		rpHeight;
-    XRectangle	prevPos;    /* Previous onscreen position */
-    Bool	bgGrabbed;  /* whether the bg was succesfully grabbed
-			       at prevPos */
+    XRectangle	prevPos;				/* Previous onscreen
+							   position */
+    Bool	bgGrabbed;				/* whether the bg was
+							   succesfully grabbed
+							   at prevPos */
 #endif
 };
 

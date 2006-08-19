@@ -2664,17 +2664,8 @@ rxvt_free_clipping (rxvt_t* r, void* xftdraw, GC gc, Region refreshRegion)
 void inline
 rxvt_clear_area (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int h)
 {
-    /*
-#ifdef XFT_SUPPORT
-    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
-    {
-	XftDrawRect (PVTS(r, page)->xftvt, &(r->XftColors[Color_bg]),
-	    x, y, w, h);
-    }
-    else
-#endif
-    */
     DBG_MSG(9, (stderr, "clear area (%d, %d, %d, %d)\n", x,y,w,h));
+
     XClearArea (r->Xdisplay, drawBuffer, x, y, w, h, False);
 }
 
@@ -2682,16 +2673,6 @@ rxvt_clear_area (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int
 void inline
 rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int h)
 {
-    /*
-#ifdef XFT_SUPPORT
-    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)
-    {
-	XftDrawRect (PVTS(r, page)->xftvt, &(r->XftColors[Color_bg]),
-	    x, y, w, h);
-    }
-    else
-#endif
-    */
     DBG_MSG(9, (stderr, "fill rectangle (%d, %d, %d, %d)\n", x,y,w,h));
     XFillRectangle (r->Xdisplay, drawBuffer, r->TermWin.gc, x, y, w, h);
 }

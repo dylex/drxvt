@@ -802,15 +802,20 @@ typedef struct {
  */
 typedef struct _profile_t
 {
-    unsigned long	fg, bg;
+    unsigned long	fg,
+			bg;
 #ifdef XFT_SUPPORT
-    XftColor	    xftfg, xftbg;
+    XftColor		xftfg,
+			xftbg;
 #endif
 #ifdef OFF_FOCUS_FADING
-    unsigned long	fg_fade, bg_fade;
+    unsigned long	fg_fade,
+			bg_fade;
+    XftColor		xftfg_fade,
+			xftbg_fade;
 #endif
 
-    int		saveLines;
+    int			saveLines;
 
     /*
      * Each profile also has a tab title, and command associated to it. However
@@ -846,57 +851,70 @@ typedef struct rxvt_vars {
 #ifdef HAVE_MENUBAR
     menuBar_t	    menuBar;
 #endif
-    tabBar_t	tabBar;
-    Display*	Xdisplay;
-    RUINT32T	Options[MAX_OPTION_ARRAY];
+    tabBar_t	    tabBar;
+    Display*	    Xdisplay;
+    RUINT32T	    Options[MAX_OPTION_ARRAY];
     XSizeHints      szHint;
 
     /* macros */
-    macros_t*	macros;	/* array of all user defind macros */
-    unsigned short  nmacros,	/* Number of macros defined */
-	    maxMacros;	/* max # of macros that can be stored in memory
-				   pointed to by "macros" */
+    macros_t*	    macros;		    /* array of user defind macros */
+    unsigned short  nmacros,		    /* Number of macros defined */
+		    maxMacros;		    /* max # of macros that can be
+					       stored in memory pointed to by
+					       "macros" */
 
     Colormap        Xcmap;
 #ifdef OFF_FOCUS_FADING
+    char	    color_switched;	    /* PixColorsUnfocus and PixColor has
+					       been switched */
+
     unsigned long*  PixColorsUnfocus;	    /* Array of size TOTAL_COLORS */
-    /* PixColorsUnfocus and PixColor has been switched */
-    char	color_switched;
-#endif
-    /* Bg and UfBg has been switched */
-    char	ufbg_switched;
+# ifdef XFT_SUPPORT
+    XftColor*	    XftColorsUnfocus;	    /* Array of size TOTAL_COLORS */
+# endif
+#endif /* OFF_FOCUS_FADING */
+
+    char	    ufbg_switched;	    /* Bg and UfBg has been switched */
     unsigned long*  PixColors;		    /* Array of size TOTAL_COLORS */
 #ifdef XFT_SUPPORT
-    XftColor*	XftColors;  /* number of colors + 2 * NPAGES */
+    XftColor*	    XftColors;		    /* Array of size TOTAL_COLORS */
 #endif
-    short	numPixColors;	/* TOTAL_COLORS */
 
-    profile_t	profile[MAX_PROFILES];
+    profile_t	    profile[MAX_PROFILES];
 
-    Cursor	term_pointer; /* cursor for vt window */
-    int	    Xdepth;
-    int	    sb_shadow;	/* scrollbar shadow width */
-    int	    Xfd;	/* file descriptor of X connection */
+    Cursor	    term_pointer;	    /* cursor for vt window */
+    int		    Xdepth;
+    int		    sb_shadow;		    /* scrollbar shadow width */
+    int		    Xfd;		    /* file descriptor of the X
+					       connection */
 
-    /* term_t structures and pointers */
-    term_t	vterm[MAX_PAGES];
-    term_t*	vts[MAX_PAGES];
+    /*
+     * term_t structures and pointers.
+     *
+     * 2006-08-18 gi1242 TODO: This should be an array that grows dynamically in
+     * size. Plus we should only reserve enough memory for a our currently
+     * displayed term structures.
+     */
+    term_t	    vterm[MAX_PAGES];
+    term_t*	    vts[MAX_PAGES];
 
-    short	    tabClicked;	    /* Tab clicked by user. Used for moving tabs
-				       by drag and dropping. */
+    short	    tabClicked;		    /* Tab clicked by user. Used for
+					       moving tabs by drag and drop. */
 
-    /* number of children that have died */
-    short	vt_died;
+    short	    vt_died;		    /* number of children that have
+					       died */
 
-    int	    num_fds;	/* number of fd to monitor */
+    int		    num_fds;		    /* number of fd to monitor */
+
     selection_t     selection;
-    sstyle_t	selection_style;
-    int	    numlock_state;
-    char*	tabstop;    /* per location: 1 == tab-stop */
+    sstyle_t	    selection_style;
+
+    int		    numlock_state;
+    char*	    tabstop;		    /* per location: 1 == tab-stop */
     enum enc_label  encoding_method;
 
-    char**	global_argv;
-    int	    global_argc;
+    char**	    global_argv;
+    int		    global_argc;
 } rxvt_t;
 
 
@@ -943,10 +961,17 @@ typedef enum {
 #endif	/* XFT_SUPPORT */
 
 #ifdef OFF_FOCUS_FADING
-#define VTFG_FADE(R, P)	    \
+# define VTFG_FADE(R, P)	    \
     ((R)->profile[(P)].fg_fade)
-#define VTBG_FADE(R, P)	    \
+# define VTBG_FADE(R, P)	    \
     ((R)->profile[(P)].bg_fade)
+
+# ifdef XFT_SUPPORT
+#  define VTXFTFG_FADE(R, P)	    \
+    ((R)->profile[(P)].xftfg_fade)
+#  define VTXFTBG_FADE(R, P)	    \
+    ((R)->profile[(P)].xftbg_fade)
+# endif /* XFT_SUPPORT */
 #endif /* OFF_FOCUS_FADING */
 
 #define ISSET_VTFG(R, P)    \

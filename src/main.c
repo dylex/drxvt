@@ -56,6 +56,7 @@
 /*--------------------------------------------------------------------*
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
+void rxvt_pre_show_init	       (rxvt_t* r);
 void rxvt_clean_commands       (rxvt_t* r, int command_number);
 void rxvt_free_hidden          (rxvt_t*);
 void rxvt_font_up_down         (rxvt_t*, int, int);
@@ -96,6 +97,50 @@ int  isDoubleWidthFont         (Display *dpy, XftFont *font);
 const char**	cmd_argv;
 /*----------------------------------------------------------------------*/
 
+/*
+ * Initialization done after reading command line options, and before calling
+ * rxvt_create_show_windows().
+ */
+/* INTPROTO */
+void
+rxvt_pre_show_init( rxvt_t *r )
+{
+#ifdef XFT_SUPPORT
+    if( ISSET_OPTION( r, Opt_xft ) )
+    {
+	r->XftColors = (XftColor*) rxvt_malloc (
+	    sizeof (XftColor) * (TOTAL_COLORS));
+    }
+    else
+	SET_NULL( r->XftColors );
+#endif
+
+#ifdef OFF_FOCUS_FADING
+    if( r->TermWin.fade )
+    {
+	DBG_MSG( 5, ( stderr, "Allocating space for fade colors\n" ) );
+	r->PixColorsUnfocus = (unsigned long*)
+	    rxvt_malloc( sizeof(unsigned long) * (TOTAL_COLORS) );
+
+# ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    r->XftColorsUnfocus = (XftColor*)
+		rxvt_malloc( sizeof(XftColor) * TOTAL_COLORS );
+	else
+	    SET_NULL( r->XftColorsUnfocus );
+# endif /* XFT_SUPPORT */
+    }
+
+    else
+    {
+	SET_NULL( r->PixColorsUnfocus );
+# ifdef XFT_SUPPORT
+	SET_NULL( r->XftColorsUnfocus );
+# endif
+    }
+#endif /* OFF_FOCUS_FADING */
+}
+
 /* rxvt_init() */
 /* LIBPROTO */
 rxvt_t		*
@@ -114,6 +159,7 @@ rxvt_init(int argc, const char *const *argv)
     /* Initialize vars in "r" */
     if (rxvt_init_vars(r) < 0)
     {
+	rxvt_print_error( "Could not initialize." );
 	rxvt_free(r);
 	return NULL;
     }
@@ -124,6 +170,8 @@ rxvt_init(int argc, const char *const *argv)
 
     rxvt_init_secondary(r);
     cmd_argv = rxvt_init_resources(r, argc, argv);
+
+    rxvt_pre_show_init( r );
 
     rxvt_create_show_windows(r, argc, argv);
 
@@ -526,10 +574,27 @@ rxvt_clean_exit (rxvt_t* r)
     rxvt_free (r->tabstop);	    SET_NULL(r->tabstop);
     rxvt_free (r->PixColors);	    SET_NULL(r->PixColors);
 # ifdef OFF_FOCUS_FADING
-    rxvt_free (r->PixColorsUnfocus);	SET_NULL(r->PixColorsUnfocus);
-# endif
+    if( NOT_NULL( r->PixColorsUnfocus ) )
+    {
+	rxvt_free (r->PixColorsUnfocus);
+	SET_NULL(r->PixColorsUnfocus);
+    }
+
+#  ifdef XFT_SUPPORT
+    if( NOT_NULL( r->XftColorsUnfocus ) )
+    {
+	rxvt_free( r->XftColorsUnfocus );
+	SET_NULL( r->XftColorsUnfocus );
+    }
+#  endif /* XFT_SUPPORT */
+# endif /* OFF_FOCUS_FADING */
+
 # ifdef XFT_SUPPORT
-    rxvt_free (r->XftColors);	    SET_NULL(r->XftColors);
+    if( NOT_NULL( r->XftColors ) )
+    {
+	rxvt_free (r->XftColors);
+	SET_NULL(r->XftColors);
+    }
 # endif
     rxvt_free (r->h);		    SET_NULL(r->h);
     rxvt_free (r);		    SET_NULL(r);
@@ -2143,9 +2208,8 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
 
     color_set = ISSET_PIXCOLOR(r->h, idx);
     /*
-    ** Restore colors now. Remember to restore ufbg color before
-    ** PixColors
-    */
+     * Restore colors now. Remember to restore ufbg color before PixColors
+     */
     ufbg_switched = rxvt_restore_ufbg_color (r);
 #ifdef OFF_FOCUS_FADING
     color_switched = rxvt_restore_pix_color (r);
@@ -2206,15 +2270,27 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
     r->PixColors[idx] = xcol.pixel;
 
 #ifdef OFF_FOCUS_FADING
-    if (r->h->rs[Rs_fade])
-	r->PixColorsUnfocus[idx] = rxvt_fade_color (r, xcol.pixel);
-#endif
-#ifdef XFT_SUPPORT
-    if (color_set)
+    if( r->TermWin.fade )
     {
-	XftColorFree (r->Xdisplay, XVISUAL, XCMAP, &(r->XftColors[idx]));
+	rxvt_fade_color( r, xcol.pixel, &r->PixColorsUnfocus[idx],
+# ifdef XFT_SUPPORT
+		ISSET_OPTION( r, Opt_xft ) ? &r->XftColorsUnfocus[idx] : NULL
+# else
+		NULL
+# endif
+	    );
     }
-    rxvt_alloc_xft_color (r, r->PixColors[idx], &(r->XftColors[idx]));
+#endif /* OFF_FOCUS_FADING */
+
+#ifdef XFT_SUPPORT
+    if( ISSET_OPTION( r, Opt_xft ) )
+    {
+	if (color_set)
+	{
+	    XftColorFree (r->Xdisplay, XVISUAL, XCMAP, &(r->XftColors[idx]));
+	}
+	rxvt_alloc_xft_color (r, r->PixColors[idx], &(r->XftColors[idx]));
+    }
 #endif
     SET_PIXCOLOR(r->h, idx);
 
@@ -2235,14 +2311,16 @@ Done:
     {
 	PVTS( r, page )->p_bg	= r->PixColors[idx];
 #ifdef XFT_SUPPORT
-	PVTS( r, page )->p_xftbg = r->XftColors[idx];
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    PVTS( r, page )->p_xftbg = r->XftColors[idx];
 #endif
     }
     else if ( idx == Color_fg )
     {
 	PVTS( r, page )->p_fg	= r->PixColors[idx];
 #ifdef XFT_SUPPORT
-	PVTS( r, page )->p_xftfg = r->XftColors[idx];
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    PVTS( r, page )->p_xftfg = r->XftColors[idx];
 #endif
     }
 
@@ -2269,9 +2347,6 @@ Done:
     }
 
     /* handle Color_BD, scrollbar background, etc. */
-    /*
-     * XXX gi1242: Still needs work. Won't handle different tab bg's properly.
-     */
     rxvt_set_colorfgbg(r);
     rxvt_recolour_cursor(r);
 

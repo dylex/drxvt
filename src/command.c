@@ -1986,7 +1986,8 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
 
 	/* already have something in the buffer */
-	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)	{
+	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
+	{
 	    /* if -1 == selpage, we only process the active tab here */
 	    *p_page = retpage;
 	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
@@ -2089,8 +2090,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	}   /* while ((XPending(r->Xdisplay)) */
 
 
-	if (-1 == selpage &&
-	    -1 != (retpage = rxvt_find_cmd_child (r)))
+	if( -1 == selpage && -1 != (retpage = rxvt_find_cmd_child (r)) )
 	{
 	    /*
 	     * in case -1 == page, and there's no X events to process. we
@@ -2100,6 +2100,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	     */
 	    DBG_MSG(2, (stderr, "rxvt_find_cmd_child: find %d\n", retpage));
 	    *p_page = retpage;
+
 	    return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
 	}
 	/* NOTE: retpage may be -1 below, we must reset it!!! */
@@ -2250,7 +2251,8 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* USE_XIM */
 	}   /* if (h->want_refresh) */
     }	/* while (1)	*/
-    /* NOTREACHED */
+
+    /* NOT REACHED */
 }
 /*}}} */
 
@@ -3077,12 +3079,14 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 	if (
 		ISSET_PIXCOLOR(r->h, Color_ufbg)
 #ifdef OFF_FOCUS_FADING
-		|| (r->h->rs[Rs_fade] && changed)
+		|| ( r->TermWin.fade && changed)
 #endif
 	   )
 	{
-	    /* before calling rxvt_set_bg_focused, bg and ufbg are
-	    ** already restored to correct state */
+	    /*
+	     * Before calling rxvt_set_bg_focused, bg and ufbg are already
+	     * restored to correct state
+	     */
 	    rxvt_set_bg_focused(r, ATAB(r), True);
 	}
     }
@@ -3124,7 +3128,7 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 	if (
 		ISSET_PIXCOLOR(r->h, Color_ufbg)
 #ifdef OFF_FOCUS_FADING
-		|| (r->h->rs[Rs_fade] && changed)
+		|| ( r->TermWin.fade && changed)
 #endif
 	   )
 	{
