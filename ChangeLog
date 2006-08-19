@@ -21,6 +21,9 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	1. Reduced memory footprint by roughly 5kb.
 	2. Converted all source files to use the standard ts=8 for easier
 	   diffing / online viewing.
+	3. Added a --focusDelay option to collect focus changes events over an
+	   interval. This is mainly to work around a bug in some window
+	   managers.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Bug Fixes:

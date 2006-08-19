@@ -1005,6 +1005,15 @@ The string to send when the delete key (not the keypad delete key) is pressed. I
 .Sy Execute
 key.
 .
+.It Cm focusDelay Ar msec
+The time interval (in mili-seconds) to wait after getting / losing focus, before fading the colors and changing the background color as specified by the
+.Fl fade
+and
+.Fl ufbg
+options. Set it to 0 if you want your colors faded immediately on focus change events.
+.Pp
+This option is there mainly to work around a bug in some window managers which send focus in immediately followed by focus out events when moving windows, or pressing Alt+Tab (e.g. fvwm-2.5.16).
+.
 .It Cm font Ns Ar N Ar font
 Specify the alternative font
 .Ar n . n No can be 1, 2, 3, 4 or 5.

@@ -185,6 +185,7 @@ void           rxvt_process_visibilitynotify (rxvt_t*, XVisibilityEvent*);
 void           rxvt_process_enter            (rxvt_t*, XCrossingEvent*);
 void           rxvt_process_leave            (rxvt_t*, XCrossingEvent*);
 #endif
+void	       rxvt_focus_colorchange	     (rxvt_t*);
 void           rxvt_process_focusin          (rxvt_t*, XFocusChangeEvent*);
 void           rxvt_process_focusout         (rxvt_t*, XFocusChangeEvent*);
 int            rxvt_calc_colrow              (rxvt_t* r, unsigned int width, unsigned int height);
@@ -1812,9 +1813,9 @@ int
 rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 {
     struct rxvt_hidden*	h = r->h;
-#if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
     struct timeval	tp;
-#endif
+    int			set_quick_timeout = 0;
+    RINT32T		fsdiff = 60000000l;	/* or say LONG_MAX */
 
 
     assert (NOT_NULL(value));
@@ -1832,9 +1833,30 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 #endif	/* TRANSPARENT */
     }
 
+    if( h->focusDelay && r->h->lastFocusChange.tv_sec )
+    {
+	/*
+	 * Focus change time out.
+	 */
+	gettimeofday( &tp, NULL );
+	fsdiff = (tp.tv_sec - h->lastFocusChange.tv_sec) * 1000000L
+		    + tp.tv_usec - h->lastFocusChange.tv_usec;
+
+	if( fsdiff > h->focusDelay )
+	{
+	    fsdiff = 0;
+	    h->lastFocusChange.tv_sec = 0;
+
+	    rxvt_focus_colorchange(r);
+	}
+	else
+	    fsdiff = h->focusDelay - fsdiff;
+
+	set_quick_timeout = 1;
+    }
+
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
     {
-	int	set_quick_timeout = 0;
 	RINT32T	csdiff, psdiff, bsdiff;
 
 	csdiff = psdiff = bsdiff = 60000000L;   /* or, say, LONG_MAX */
@@ -1930,6 +1952,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 # endif	/* POINTER_BLANK */
 	if (!quick_timeout && set_quick_timeout)
 	{
+	    MIN_IT(csdiff, fsdiff);
 	    MIN_IT(csdiff, bsdiff);
 	    MIN_IT(csdiff, psdiff);
 	    value->tv_sec =  csdiff / 1000000L;
@@ -3050,27 +3073,22 @@ rxvt_process_leave (rxvt_t* r, XCrossingEvent* ev)
 #endif	/* MONITOR_ENTER_LEAVE */
 
 
+/*
+ * Change the bg / faded colors because of a focus change
+ */
 /* INTPROTO */
 void
-rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
+rxvt_focus_colorchange( rxvt_t *r )
 {
-    if (ev->window == r->TermWin.parent)
-    {
 #ifdef OFF_FOCUS_FADING
-	register int	changed = 0;
+    int	    changed = 0;
 #endif
 
-	DBG_MSG(2, (stderr, "FocusIn event\n"));
-	r->TermWin.focus = 1;
-	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
+    /* If we have switched bg/ufbg color, restore it */
+    rxvt_restore_ufbg_color (r);
 
-#ifdef USE_XIM
-	if (NOT_NULL(r->h->Input_Context))
-	    XSetICFocus(r->h->Input_Context);
-#endif
-
-	/* if we have switched bg/ufbg color, restore it */
-	rxvt_restore_ufbg_color (r);
+    if( r->TermWin.focus )
+    {
 #ifdef OFF_FOCUS_FADING
 	/* if we have switched to off-focus color, restore it */
 	changed = rxvt_restore_pix_color (r);
@@ -3091,35 +3109,8 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 	}
     }
 
-}
-
-
-
-/* INTPROTO */
-void
-rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
-{
-    if (ev->window == r->TermWin.parent)
+    else
     {
-#ifdef OFF_FOCUS_FADING
-	register int	changed = 0;
-#endif
-
-	DBG_MSG(2, (stderr, "FocusOut event\n"));
-	r->TermWin.focus = 0;
-	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
-
-#ifdef CURSOR_BLINK
-	r->h->hidden_cursor = 0;
-#endif
-
-#ifdef USE_XIM
-	if (NOT_NULL(r->h->Input_Context))
-	    XUnsetICFocus(r->h->Input_Context);
-#endif
-
-	/* if we have switched bg/ufbg color, restore it */
-	rxvt_restore_ufbg_color (r);
 #ifdef OFF_FOCUS_FADING
 	/* if we are using on-focus color, switch it */
 	changed = rxvt_switch_pix_color (r);
@@ -3132,88 +3123,64 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 #endif
 	   )
 	{
-	    /* before calling rxvt_set_bg_focused, bg and ufbg are
-	    ** already restored to correct state */
+	    /*
+	     * Before calling rxvt_set_bg_focused, bg and ufbg are already
+	     * restored to correct state
+	     */
 	    rxvt_set_bg_focused(r, ATAB(r), False);
 	}
     }
 }
 
 
-
-#if 0
-/* 2006-01-07 gi1242: Old "smart" resize code which we no longer need */
-/* Resize windows on showing/hiding sub windows */
-/* EXTPROTO */
+/* INTPROTO */
 void
-rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
+rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 {
-    unsigned int    w = r->szHint.width, h = r->szHint.height;
-    unsigned int    old_width = r->szHint.width,
-		    old_height = r->szHint.height;
-
-    DBG_MSG(1, (stderr, "rxvt_resize_on_subwin\n"));
-    rxvt_recalc_szhint (r, reason, &w, &h);
-
-    /*
-     * Move the window so hiding / showing the tabbar doesn't take you off
-     * screen. We should not move the window here, but only on ConfigureNotify
-     * events
-     */
-    if(ISSET_OPTION(r, Opt2_smartResize))
+    if (ev->window == r->TermWin.parent)
     {
-	/*
-	** resize by Marius Gedminas <marius.gedminas@uosis.mif.vu.lt>
-	** reposition window on resize depending on placement on screen
-	*/
-	int		x, y, x1, y1;
-	int		dx, dy;
-	unsigned int	unused_w1, unused_h1, unused_b1, unused_d1;
-	Window		unused_cr;
+	DBG_MSG(2, (stderr, "FocusIn event\n"));
+	r->TermWin.focus = 1;
+	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
 
-	XTranslateCoordinates(r->Xdisplay, r->TermWin.parent, XROOT,
-	    0, 0, &x, &y, &unused_cr);
-	XGetGeometry(r->Xdisplay, r->TermWin.parent, &unused_cr,
-	    &x1, &y1, &unused_w1, &unused_h1, &unused_b1, &unused_d1);
-	/*
-	** if XROOT isn't the parent window, a WM will probably have
-	** offset our position for handles and decorations. Counter
-	** it.
-	*/
-	if (x1 != x || y1 != y)
-	{
-	    x -= x1;
-	    y -= y1;
-	}
-
-	x1 = (DisplayWidth(r->Xdisplay, XSCREEN) - old_width) / 2;
-	y1 = (DisplayHeight(r->Xdisplay, XSCREEN) - old_height) / 2;
-	dx = old_width - w;
-	dy = old_height - h;
-
-	/* Check position of the center of the window */
-	if (x < x1)	/* left half */
-	    dx = 0;
-	else if (x == x1)   /* exact center */
-	    dx /= 2;
-	if (y < y1)	/* top half */
-	    dy = 0;
-	else if (y == y1)   /* exact center */
-	    dy /= 2;
-
-	/* Only move the window if we stay completely onscreen */
-	x1 = x + dx;
-	y1 = y + dy;
-
-	fprintf( stderr, "smart moving to (%d, %d, %u, %u)\n", x1, y1, w, h);
-	if( x1 >= 0 && x1 + w <= DisplayWidth( r->Xdisplay, XSCREEN)
-		&& y1 >= 0 && y1 + h <= DisplayHeight( r->Xdisplay, XSCREEN))
-	{
-	    XMoveWindow(r->Xdisplay, r->TermWin.parent, x1, y1);
-	}
-    }
-}
+#ifdef USE_XIM
+	if (NOT_NULL(r->h->Input_Context))
+	    XSetICFocus(r->h->Input_Context);
 #endif
+    }
+
+    if (r->h->focusDelay)
+	gettimeofday( &r->h->lastFocusChange, NULL);
+    else
+	rxvt_focus_colorchange (r);
+}
+
+
+/* INTPROTO */
+void
+rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
+{
+    if (ev->window == r->TermWin.parent)
+    {
+	DBG_MSG(2, (stderr, "FocusOut event\n"));
+	r->TermWin.focus = 0;
+	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
+
+#ifdef CURSOR_BLINK
+	r->h->hidden_cursor = 0;
+#endif
+
+#ifdef USE_XIM
+	if (NOT_NULL(r->h->Input_Context))
+	    XUnsetICFocus(r->h->Input_Context);
+#endif
+    }
+
+    if (r->h->focusDelay)
+	gettimeofday( &r->h->lastFocusChange, NULL);
+    else
+	rxvt_focus_colorchange (r);
+}
 
 
 /*
@@ -4230,17 +4197,23 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
     {
 	for (i = NUM_TIMEOUTS; i--; )
 	{
-	    if (h->timeout[i].tv_sec == 0)
+	    if (
+		    h->timeout[i].tv_sec == 0		||
+		    tp.tv_sec < h->timeout[i].tv_sec	||
+		    (
+		      tp.tv_sec == h->timeout[i].tv_sec	    &&
+		      tp.tv_usec < h->timeout[i].tv_usec
+		    )
+	       )
 		continue;
-	    if ((tp.tv_sec < h->timeout[i].tv_sec) ||
-		(tp.tv_sec == h->timeout[i].tv_sec &&
-		 tp.tv_usec < h->timeout[i].tv_usec))
-		continue;
+
+	    /* We timed out on the "i"th timeout */
 	    h->timeout[i].tv_sec = 0;
 	    switch(i)
 	    {
 		case TIMEOUT_INCR:
-		    rxvt_print_error("data loss: timeout on INCR selection paste");
+		    rxvt_print_error
+			("data loss: timeout on INCR selection paste");
 		    h->selection_wait = Sel_none;
 		    break;
 

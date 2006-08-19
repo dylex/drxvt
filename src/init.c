@@ -750,6 +750,11 @@ rxvt_init_vars(rxvt_t *r)
     for( i=NUM_TIMEOUTS; i--;)
         h->timeout[i].tv_sec = 0;
 
+    /* Initialize focus delay interval */
+    h->focusDelay		= DEFAULT_FOCUS_DELAY_INTERVAL;
+    h->lastFocusChange.tv_sec	= 0;
+
+
     /* Back to undocumented code :) */
     h->MEvent.time = CurrentTime;
     h->MEvent.button = AnyButton;
@@ -1183,6 +1188,14 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->h->bgRefreshInterval = interval * 1000L; /* convert to micro-sec */
     }
 #endif
+
+    if( rs[Rs_focusDelay] )
+    {
+	register unsigned long interval = atol( rs[Rs_focusDelay] );
+
+	if( interval > 1000 ) interval = 1000;
+	r->h->focusDelay = interval * 1000L; /* convert to micro-sec */
+    }
 
 #ifdef OFF_FOCUS_FADING
     if (rs[Rs_fade])

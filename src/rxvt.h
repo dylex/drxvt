@@ -1173,6 +1173,8 @@ enum {
     Rs_bgRefreshInterval,
 #endif
 
+    Rs_focusDelay,
+
     Rs_bellCommand,
     Rs_holdExitText,
     Rs_desktop,
@@ -1646,10 +1648,14 @@ struct rxvt_hidden {
 #endif
     struct timeval  timeout[NUM_TIMEOUTS];
 
+    unsigned long   focusDelay;
+    struct timeval  lastFocusChange;			/* Time of the last
+							   FocusChange XEvent */
+
     /*
-    ** these three don't need to be kept but do so to placate some
-    ** mem checkers
-    */
+     * These three don't need to be kept but do so to placate some memory
+     * checkers
+     */
     char*	    env_windowid;			/* environmental
 							   variable WINDOWID */
     char*	    env_display;			/* environmental
