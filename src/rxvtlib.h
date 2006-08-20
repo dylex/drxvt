@@ -150,9 +150,7 @@ typedef struct {
 #  endif
 # endif
 # ifndef NO_BOLDFONT
-    XftPattern*	    xftbpattern;
     XftFont*	    xftbfont;
-    char	    bf_switched;/* bold and normal font switched? */
 # endif
     char	    xftfnmono;	/* font is mono? */
     char	    xftmono;	/* font and mfont are mono? */

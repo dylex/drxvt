@@ -212,10 +212,6 @@ void rxvt_free_clipping		  (rxvt_t*, __attribute__((unused)) void*, GC, Region);
 # endif
 #endif
 #ifdef XFT_SUPPORT
-# ifndef NO_BOLDFONT
-int  rxvt_switch_bold_font        (rxvt_t* r);
-int  rxvt_restore_bold_font       (rxvt_t* r);
-# endif
 #endif	/* XFT_SUPPORT */
 /*--------------------------------------------------------------------*
  *         END   `INTERNAL' ROUTINE PROTOTYPES                        *
@@ -2741,6 +2737,9 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 #endif
     else font = r->TermWin.xftfont;
 
+    DBG_MSG( 9, ( stderr, "Draw: 0x%8x %p: '%.40s'\n",
+		rend, font, str ) );
+
 #ifdef MULTICHAR_SET
     if( xftdraw_string == XftDrawStringUtf8 )
 	len = STRLEN( str);
@@ -2964,32 +2963,11 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	 * background of text by ourselves.
 	 */
 	if (fillback)
-	{
-#if 0
-	    XGCValues	gcvalue;
-
-	    /* save current foreground color */
-	    XGetGCValues (r->Xdisplay, r->TermWin.gc, GCForeground, 
-		&gcvalue);
-	    /* fill background rectangle using background color */
-	    XSetForeground (r->Xdisplay, r->TermWin.gc,
-		r->PixColors[back]);
-	    rxvt_fill_rectangle (r, page, x, y,
-		Width2Pixel(len * (1 + adjust)), Height2Pixel(1));
-	    /* restore current foreground color */
-	    XSetForeground (r->Xdisplay, r->TermWin.gc,
-		gcvalue.foreground);
-#endif
-	    /*
-	     * Xft provides these "convinience routiens". Why go through the
-	     * above contortions?
-	     */
 	    XftDrawRect( PVTS(r, page)->xftvt, &(r->XftColors[back]),
 		    x, y, Width2Pixel(len * (1 + adjust)), Height2Pixel(1));
-	}
+
 	/* We use TermWin.xftfont->ascent here */
 	y += r->TermWin.xftfont->ascent;
-
 
 	/*
 	 * Xft does not support XftDrawString16, so we need to convert the
@@ -3195,58 +3173,22 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 }
 
 
-
-#ifdef XFT_SUPPORT
-# ifndef NO_BOLDFONT
-/* INTPROTO */
-int
-rxvt_switch_bold_font (rxvt_t* r)
-{
-    /* bold font is not loaded */
-    if (NULL == r->TermWin.xftbfont)
-	return 0;
-    /* bold font is already switched */
-    if (r->TermWin.bf_switched)
-	return 0;
-    /* now switch the bold font */
-    SWAP_IT (r->TermWin.xftfont, r->TermWin.xftbfont, XftFont*);
-    r->TermWin.bf_switched = 1;
-    return 1;
-}
-
-/* INTPROTO */
-int
-rxvt_restore_bold_font (rxvt_t* r)
-{
-    /* bold font is not loaded */
-    if (NULL == r->TermWin.xftbfont)
-	return 0;
-    /* bold font is not switched */
-    if (!r->TermWin.bf_switched)
-	return 0;
-    /* now restore the bold font */
-    SWAP_IT (r->TermWin.xftfont, r->TermWin.xftbfont, XftFont*);
-    r->TermWin.bf_switched = 0;
-    return 1;
-}
-# endif	/* NO_BOLDFONT */
-#endif	/* XFT_SUPPORT */
-
-#ifdef NO_BRIGHTCOLOR
-# define MONO_BOLD(x)	    ((x) & (RS_Bold|RS_Blink))
-# define MONO_BOLD_FG(x, fg)	MONO_BOLD(x)
-#else	/* NO_BRIGHTCOLOR */
-# define MONO_BOLD(x)							    \
+/*
+ * 2006-08-19 gi1242: Don't display blinking text with the bold attribute. This
+ * causes problems all over the code: When we unset the bold attribute, thinking
+ * "we've taken care of it", the blink attribute might cause us to do over
+ * striking. Plus it causes trouble in the pixel dropping avoidance stuff.
+ */
+#define MONO_BOLD(x)							    \
     (ISSET_OPTION(r, Opt2_veryBold) ?					    \
-     ((x) & (RS_Bold|RS_Blink)) :					    \
+     ((x) & RS_Bold) :							    \
      (((x) & (RS_Bold | RS_fgMask)) == (RS_Bold | Color_fg))		    \
     )
-# define MONO_BOLD_FG(x, fg)						    \
+#define MONO_BOLD_FG(x, fg)						    \
     (ISSET_OPTION(r, Opt2_veryBold) ?					    \
-     MONO_BOLD(x) :							    \
+     ((x) & RS_Bold) :							    \
      (((x) & RS_Bold) && (fg) == Color_fg)				    \
     )
-#endif	/* NO_BRIGHTCOLOR */
 
 
 #define FONT_WIDTH(X, Y)						    \
@@ -3275,7 +3217,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		must_clear, /* use drawfunc not image_drawfunc */
 		already_cleared=0, /* Use XClearArea or no-op */
 #ifndef NO_BOLDFONT
-		bfont,	    /* we've changed font to bold font */
+		usingBoldFt, /* we've changed font to bold font */
+		loadedBoldFt,	/* If a bold font is loaded */
 #endif
 		rvid,	    /* reverse video this position */
 		wbyte,	    /* we're in multibyte */
@@ -3342,8 +3285,22 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
     clearfirst = clearlast = must_clear = wbyte = 0;
 #ifndef NO_BOLDFONT
-    bfont = 0;
-#endif
+    usingBoldFt = 0;
+
+    /* Determine if we have a bold font loaded or not */
+    if(
+# ifdef XFT_SUPPORT
+        ISSET_OPTION( r, Opt_xft )		    ?
+	    NOT_NULL( r->TermWin.xftbfont )	    :
+	    NOT_NULL( r->TermWin.bfont )
+# else
+        NOT_NULL( r->TermWin.bfont )
+# endif
+      )
+	loadedBoldFt = 1;
+    else
+	loadedBoldFt = 0;
+#endif /* NO_BOLDFONT */
 
     if (h->currmaxcol < r->TermWin.ncol)
     {
@@ -3675,9 +3632,12 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    if( ISSET_OPTION(r, Opt_xft) )
 	    {
 		/*
+		 * Only text drawn by over striking needs to be watched for
+		 * "dropped pixels".
+		 * 
 		 * XXX This does not take into account Color_BD
 		 */
-		if( drp[col] & RS_Bold )
+		if( !loadedBoldFt && ( drp[col] & RS_Bold ) )
 		{
 		    if( col == r->TermWin.ncol - 1 ) clearlast = 1;
 		    else clear_next = 1;
@@ -3917,7 +3877,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		    }
 		}   /* if (wbyte) */
 #else
-	    { /* } for correct % bouncing */
+	    { /* add } for correct % bouncing */
 #endif
 		if (!fprop)
 		{
@@ -3979,8 +3939,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    buffer[len] = '\0';
 
 	    /*
-	    ** Determine the attributes for the string
-	    */
+	     * Determine the attributes for the string
+	     */
 	    fore = GET_FGCOLOR(rend);
 	    back = GET_BGCOLOR(rend);
 	    rend = GET_ATTR(rend);
@@ -4171,40 +4131,71 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #ifndef NO_BOLDFONT
 	    /*
 	     * Switch to the bold font if we are rendering bold text.
+	     *
+	     * NOTE: We only deal with bold fonts for non-multichar text.
+	     * Multichar bold text will have to be done by over striking (or
+	     * some other shmuck must code it) -- gi1242 2006-08-19.
 	     */
-	    if (    !wbyte && MONO_BOLD_FG(rend, fore)
-		    && r->TermWin.bfont != NULL
-		    && !bfont	/* Only switch to bold font if we're not already
-				   using a bold font */
-	       )
+	    if ( MONO_BOLD_FG(rend, fore) && !wbyte )
 	    {
-		bfont = 1;
+		if( usingBoldFt )
+		    rend &= ~RS_Bold;	/* We've taken care of it */
+
+		else if( loadedBoldFt )
+		{
+		    usingBoldFt = 1;
+
 # ifdef XFT_SUPPORT
-		if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
-		    rxvt_switch_bold_font (r);
-		else
+		    if( ISSET_OPTION(r, Opt_xft) )
+		    {
+			SWAP_IT( r->TermWin.xftfont, r->TermWin.xftbfont,
+				XftFont*);
+		    }
+		    else
 # endif
-		XSetFont(r->Xdisplay, r->TermWin.gc,
-		    r->TermWin.bfont->fid);
-		fontdiff = (r->TermWin.propfont & PROPFONT_BOLD);
-		rend &= ~RS_Bold;   /* we've taken care of it */
+		    {
+			XSetFont(r->Xdisplay, r->TermWin.gc,
+				r->TermWin.bfont->fid);
+		    }
+
+		    fontdiff = (r->TermWin.propfont & PROPFONT_BOLD);
+		    rend &= ~RS_Bold;   /* we've taken care of it */
+		}
 	    }
-	    else if (bfont)
+
+	    /*
+	     * If we are using the bold font, but don't want to render bold
+	     * text, then we should restore the original font.
+	     */
+	    else if( usingBoldFt && !MONO_BOLD_FG( rend, fore ) )
 	    {
-		bfont = 0;
+		usingBoldFt = 0;
+
+		/*
+		 * If we're not showing a multi byte char, then we reset
+		 * fontdiff to 0. If we're showing a multi byte char, then font
+		 * diff will have been set elsewhere, and we should not reset
+		 * it.
+		 */
+		if( !wbyte )
+		    fontdiff    = 0;
+
 # ifdef XFT_SUPPORT
-		if (ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont)
-		    rxvt_restore_bold_font (r);
+		if( ISSET_OPTION(r, Opt_xft) )
+		{
+		    SWAP_IT( r->TermWin.xftfont, r->TermWin.xftbfont, XftFont*);
+		}
 		else
 # endif
-		XSetFont(r->Xdisplay, r->TermWin.gc,
-		    r->TermWin.font->fid);
+		{
+		    XSetFont(r->Xdisplay, r->TermWin.gc, r->TermWin.font->fid);
+		}
 	    }
 #endif
 
 	    /*
-	    ** Actually do the drawing of the string here
-	    */
+	     * Actually do the drawing of the string here
+	     */
 	    if (back == Color_bg && must_clear)
 	    {
 		CLEAR_CHARS( r, page, already_cleared,
@@ -4264,6 +4255,11 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 # endif
 	    if (MONO_BOLD_FG(rend, fore))
 	    {
+		/*
+		 * If we still need to draw a bold chars, then all else has
+		 * failed. Fall back to overstriking.
+		 */
+		DBG_MSG( 3, ( stderr, "Overstriking %s\n", buffer ) );
 		rxvt_scr_draw_string (r, page,
 			xpixel + 1, ypixelc, buffer, wlen, drawfunc,
 			fore, back, rend,
@@ -4301,8 +4297,29 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		XChangeGC(r->Xdisplay, r->TermWin.gc, gcmask, &gcvalue);
 	    }
 	} /* for (col....) */
+
 	/* End of E2 */
     } /* for (row....) */
+
+    /*
+     * If we've completed our refresh, and are using the bold font, we need to
+     * reset it. Only needed when using XFT.
+     */
+    if( usingBoldFt )
+    {
+	usingBoldFt = 0;
+
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION(r, Opt_xft) )
+	{
+	    SWAP_IT( r->TermWin.xftfont, r->TermWin.xftbfont, XftFont*);
+	}
+	else
+# endif
+	{
+	    XSetFont(r->Xdisplay, r->TermWin.gc, r->TermWin.font->fid);
+	}
+    }
     /* End of E */
 
 

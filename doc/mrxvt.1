@@ -579,6 +579,14 @@ Freetype font size in pixel. The
 option must be enabled
 .Op Cm xftSize
 .
+.It Fl xftBwd Ar style
+Freetype bold font weight:
+.Ar light | medium | demibold | bold | black .
+The
+.Fl xft
+option must be enabled.
+.Op Cm xftBoldWeight
+.
 .It Fl xftwd Ar style
 Freetype font width:
 .Ar ultracondensed | condensed | normal | expanded | ultraexpanded .
@@ -589,7 +597,7 @@ option must be enabled.
 .
 .It Fl xftwt Ar style
 Freetype font weight:
-.Ar light | medium | bold .
+.Ar light | medium | demibold | bold | black .
 The
 .Fl xft
 option must be enabled.
@@ -1746,8 +1754,6 @@ Be sure you give us enough details to reproduce the bug ourselves, and check to 
 Tabs don't work properly when running under Xnest.
 .It
 Transparency and tinting are global, not specific to a terminal.
-.It
-Off-focus fading does not work under freetype font.
 .It
 The transparentForce option does not work well with all window managers (e.g. OpenBox).
 .El

@@ -1136,6 +1136,7 @@ enum {
     Rs_xftmsz,	/* Multichar font size */
 # endif
     Rs_xftwt,	/* Font weight */
+    Rs_xftBwt,	/* Bold font weight */
     Rs_xftst,	/* Font slant */
     Rs_xftsz,	/* Font size */
     Rs_xftwd,	/* Font width style */

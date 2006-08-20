@@ -77,7 +77,8 @@ void rxvt_IM_set_status_pos    (rxvt_t*);
 #endif
 void rxvt_set_r                (rxvt_t*);
 #ifdef XFT_SUPPORT
-void xftFreeUnusedFont		   (rxvt_t*, XftFont*);
+void xftFreeUnusedFont	       (rxvt_t*, XftFont*);
+void setXftWeight	       (XftPattern *, const char *, int);
 void rxvt_init_font_fixed      (rxvt_t*);
 # ifndef NO_BOLDFONT
 void rxvt_init_bfont_xft       (rxvt_t*, XftPattern*);
@@ -546,11 +547,6 @@ rxvt_clean_exit (rxvt_t* r)
     if( r->TermWin.xftpattern )
 	XftPatternDestroy( r->TermWin.xftpattern);
 
-#  ifndef NO_BOLDFONT
-    if( r->TermWin.xftbpattern )
-	XftPatternDestroy( r->TermWin.xftbpattern );
-#  endif
-
 #  ifdef MULTICHAR_SET
     if( r->TermWin.xftmpattern )
 	XftPatternDestroy( r->TermWin.xftmpattern );
@@ -792,14 +788,13 @@ void
 rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 {
     XftResult	    fr;
-    XftPattern*	    xp;
+    XftPattern*	    xp, *xftbpattern;
 # ifdef DEBUG
     FT_Face	    face;
 # endif
 
 
-    if (r->h->rs[Rs_xftwt] && !STRCASECMP(r->h->rs[Rs_xftwt], "bold"))
-	return ;
+    DBG_MSG( 2, ( stderr, "rxvt_init_bfont_xft()" ) );
 
     xp = XftPatternDuplicate (xpold);
     if (IS_NULL(xp))
@@ -807,21 +802,56 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 
     /* set font weight */
     XftPatternDel (xp, XFT_WEIGHT);
-    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_BOLD);
+    setXftWeight( xp, r->h->rs[Rs_xftBwt], XFT_WEIGHT_BOLD );
 
-    r->TermWin.xftbpattern = XftFontMatch (r->Xdisplay, XSCREEN, xp, &fr);
+    xftbpattern = XftFontMatch (r->Xdisplay, XSCREEN, xp, &fr);
 
-    if (NOT_NULL(r->TermWin.xftbpattern))
+    if (NOT_NULL(xftbpattern))
     {
 	r->TermWin.xftbfont =
-	    XftFontOpenPattern (r->Xdisplay, r->TermWin.xftbpattern);
+	    XftFontOpenPattern (r->Xdisplay, xftbpattern);
 
 	if (IS_NULL(r->TermWin.xftbfont))
 	{
 	    /* fall back to normal font */
-	    XftPatternDestroy (r->TermWin.xftbpattern);
-	    SET_NULL(r->TermWin.xftbpattern);
+	    XftPatternDestroy (xftbpattern);
+	    SET_NULL(xftbpattern);
 	}
+
+	else
+	{
+	    DBG_MSG( 3, ( stderr, "Opened bold font: h=%d(%d), w=%d(%d)",
+			r->TermWin.xftbfont->height,
+			r->TermWin.xftfont->height,
+			r->TermWin.xftbfont->max_advance_width,
+			r->TermWin.xftfont->max_advance_width) );
+#ifdef DEBUG_VERBOSE
+	    FcPatternPrint( xftbpattern );
+#endif
+	    /*
+	     * If the bold font is of different dimensions from the regular
+	     * font, we should draw it like a proportionally spaced font.
+	     */
+	    if (r->TermWin.xftbfont->max_advance_width < r->TermWin.fwidth)
+		r->TermWin.propfont |= PROPFONT_BOLD;
+
+	    else
+	    {
+		if (r->TermWin.xftbfont->max_advance_width > r->TermWin.fwidth)
+		{
+		    rxvt_print_error( "Bold font too wide. Using overstrike" );
+		    XftFontClose( r->Xdisplay, r->TermWin.xftbfont );
+		    SET_NULL( r->TermWin.xftbfont );
+		}
+
+		/*
+		 * Now we're either overstriking, or using a correctly sized
+		 * bold font, so clear PROPFONT_BOLD.
+		 */
+		r->TermWin.propfont &= ~PROPFONT_BOLD;
+	    }
+	}
+
 # ifdef DEBUG
 	else
 	{
@@ -1008,6 +1038,41 @@ Failure:
 # endif	/* MULTICHAR_SET */
 
 
+/*
+ * Set the weight of an Xft font from the weight description.
+ */
+/* INTPROTO */
+void
+setXftWeight( XftPattern *xp, const char *weightString, int defaultWeight )
+{
+    assert(xp);
+
+    /* font weight */
+    if ( NOT_NULL(weightString) )
+    {
+	if (0 == STRCASECMP (weightString, "light"))
+	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_LIGHT);
+
+	else if (0 == STRCASECMP (weightString, "medium"))
+	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_MEDIUM);
+
+	else if (0 == STRCASECMP (weightString, "demibold"))
+	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_DEMIBOLD);
+
+	else if (0 == STRCASECMP (weightString, "bold"))
+	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_BOLD);
+
+	else if (0 == STRCASECMP (weightString, "black"))
+	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_BLACK);
+
+	else
+	    XftPatternAddInteger (xp, XFT_WEIGHT, defaultWeight);
+    }
+
+    else
+	XftPatternAddInteger( xp, XFT_WEIGHT, defaultWeight );
+}
+
 
 /* EXTPROTO */
 int
@@ -1087,27 +1152,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	    XftPatternAddInteger (xp, FC_WIDTH, FC_WIDTH_NORMAL);
     }
 
-    /* font weight */
-    if (r->h->rs[Rs_xftwt])
-    {
-	if (0 == STRCASECMP (r->h->rs[Rs_xftwt], "light"))
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_LIGHT);
-
-	else if (0 == STRCASECMP (r->h->rs[Rs_xftwt], "medium"))
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_MEDIUM);
-
-	else if (0 == STRCASECMP (r->h->rs[Rs_xftwt], "demibold"))
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_DEMIBOLD);
-
-	else if (0 == STRCASECMP (r->h->rs[Rs_xftwt], "bold"))
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_BOLD);
-
-	else if (0 == STRCASECMP (r->h->rs[Rs_xftwt], "black"))
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_BLACK);
-
-	else	/* default is medium */
-	    XftPatternAddInteger (xp, XFT_WEIGHT, XFT_WEIGHT_MEDIUM);
-    }
+    setXftWeight( xp, r->h->rs[Rs_xftwt], XFT_WEIGHT_MEDIUM );
 
     /* font slant */
     if (r->h->rs[Rs_xftst])
@@ -1348,9 +1393,7 @@ rxvt_init_font_xft (rxvt_t* r)
 
 
 # ifndef NO_BOLDFONT
-    /*
-    rxvt_init_bfont_xft (r, xp);
-    */
+    rxvt_init_bfont_xft( r, xp );
 # endif
 
 # ifdef MULTICHAR_SET
@@ -1516,9 +1559,9 @@ rxvt_init_font_x11 (rxvt_t *r)
 	    {
 		r->TermWin.bfont = bfont;
 		if (fw == r->TermWin.fwidth)
-		    r->TermWin.propfont &= ~PROPFONT_NORMAL;
+		    r->TermWin.propfont &= ~PROPFONT_BOLD;
 		else
-		    r->TermWin.propfont |= PROPFONT_NORMAL;
+		    r->TermWin.propfont |= PROPFONT_BOLD;
 	    }
 	    else
 	    {

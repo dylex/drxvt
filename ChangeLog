@@ -16,6 +16,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	9. Fix buffer overflow. Thanks to Frederik Deweerdt <deweerdt@free.fr>
 	   for the patch.
        10. Made -ufbg and -fade options work under Xft ;).
+       11. Font specified with --boldFont is correctly handled (even if it's
+	   of a different dimension).
 
     * Enhancements:
 	1. Reduced memory footprint by roughly 5kb.
@@ -24,6 +26,10 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	3. Added a --focusDelay option to collect focus changes events over an
 	   interval. This is mainly to work around a bug in some window
 	   managers.
+	4. Xft bold fonts now actually use the bold font, instead of over
+	   striking.
+	5. Added a --xftBoldWeight option to control the weight of the Xft
+	   bold font.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Bug Fixes:
