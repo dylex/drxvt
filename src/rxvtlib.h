@@ -809,9 +809,11 @@ typedef struct _profile_t
 #ifdef OFF_FOCUS_FADING
     unsigned long	fg_fade,
 			bg_fade;
+# ifdef XFT_SUPPORT
     XftColor		xftfg_fade,
 			xftbg_fade;
-#endif
+# endif
+#endif /* OFF_FOCUS_FADING */
 
     int			saveLines;
 
