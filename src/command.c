@@ -219,6 +219,7 @@ int            rxvt_privcases                (rxvt_t*, int, int, RUINT32T);
 void           rxvt_process_terminal_mode    (rxvt_t*, int, int, int, unsigned int, const int*);
 void           rxvt_process_sgr_mode         (rxvt_t*, int, unsigned int, const int*);
 void           rxvt_process_graphics         (rxvt_t*, int);
+void	       rxvt_process_getc	     (rxvt_t*, int, unsigned char);
 /*--------------------------------------------------------------------*
  *         END   `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
@@ -1463,13 +1464,23 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		DBG_MSG(1, (stderr, "hold child %d after it died\n", i));
 
 		/*
-		 * XXX Check if there is any pending input / output on this
-		 * page.
+		 * print the holding exit text on screen
 		 */
-		if (PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp)
-		    rxvt_print_error( "%d bytes pending on exited tab %d",
-			     PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_ptr,
-			     i );
+		if(
+		     NOT_NULL( r->h->rs[Rs_holdExitText] ) &&
+		     STRLEN( r->h->rs[Rs_holdExitText] )
+		  )
+		{
+		    rxvt_cmd_write(r, i,
+			(const unsigned char*) r->h->rs[Rs_holdExitText],
+			STRLEN(r->h->rs[Rs_holdExitText]));
+		}
+
+		/*
+		 * Process any pending input.
+		 */
+		while (PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp)
+		    rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
 
 		if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
 		    rxvt_tt_write(r, i, NULL, 0);
@@ -1481,17 +1492,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 			tabTitle, maxLen );
 		rxvt_tabbar_set_title( r, i, tabTitle );
 
-		if(
-		     NOT_NULL( r->h->rs[Rs_holdExitText] ) &&
-		     STRLEN( r->h->rs[Rs_holdExitText] )
-		  )
-		{
-		    /* print the holding exit text on screen */
-		    rxvt_scr_add_lines(r, i,
-			(const unsigned char*) r->h->rs[Rs_holdExitText],
-			1, STRLEN(r->h->rs[Rs_holdExitText]));
-		    rxvt_scr_refresh (r, i, SMOOTH_REFRESH);
-		}
+		rxvt_scr_refresh (r, i, SMOOTH_REFRESH);
 
 		/* increase hold number, so next iteration will skip it */
 		PVTS(r, i)->hold++;
@@ -6459,18 +6460,120 @@ rxvt_process_graphics(rxvt_t* r, int page)
 
 /* ------------------------------------------------------------------------- */
 
+/*
+ * Process the value returned by rxvt_cmd_getc() here. This processes escape
+ * sequences, and adds text to the tabs output buffer.
+ */
+/* INTPROTO */
+void
+rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
+{
+    unsigned char   *str;
+    static int	    refreshnow = 0;
+
+    /* handle the case where we have input */
+    if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+    {
+	/* Read a text string from the input buffer */
+	int	    nlines = 0;
+
+	/*
+	 * point `str' to the start of the string, decrement first since
+	 * it was post incremented in rxvt_cmd_getc()
+	 */
+	str = --(PVTS(r, page)->cmdbuf_ptr);
+	while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
+	{
+	    assert (PVTS(r, page)->cmdbuf_base <=
+		PVTS(r, page)->cmdbuf_endp);
+
+	    ch = *(PVTS(r, page)->cmdbuf_ptr)++;
+	    if (ch == '\n')
+	    {
+		register int    limit;
+
+		limit = r->h->refresh_limit * (r->TermWin.nrow - 1);
+		nlines++;
+		r->h->refresh_count++;
+		if(
+		     NOTSET_OPTION(r, Opt_jumpScroll)	||
+		     (r->h->refresh_count >= limit)
+		  )
+		{
+		    refreshnow = 1;
+		    break;
+		}
+	    }
+	    else if (ch < ' ' && ch != '\t' && ch != '\r')
+	    {
+		/* Unprintable. Reduce cmdbuf_ptr so it is processed later */
+		PVTS(r, page)->cmdbuf_ptr--;
+		break;
+	    }
+	}
+
+	DBG_MSG(2, (stderr, "adding '%s' in %d\n", str, page));
+	rxvt_scr_add_lines(r, page, str, nlines,
+	    (PVTS(r, page)->cmdbuf_ptr - str));
+
+	/*
+	 * If there have been a lot of new lines, then update the
+	 * screen. I'll cheat and only refresh less than every
+	 * page-full. The number of pages between refreshes is
+	 * h->refresh_limit, which is incremented here because we must
+	 * be doing flat-out scrolling.
+	 *
+	 * Refreshing should be correct for small scrolls, because of
+	 * the time-out
+	 */
+	if (refreshnow)
+	{
+	    refreshnow = 0;
+	    if (ISSET_OPTION(r, Opt_jumpScroll) &&
+		    r->h->refresh_limit < REFRESH_PERIOD)
+		r->h->refresh_limit++;
+# ifdef XFT_SUPPORT
+	    /*
+	     * disable screen refresh if XFT antialias is used to
+	     * improve performance
+	     */
+	    if (!(ISSET_OPTION(r, Opt_xft) &&
+		    ISSET_OPTION(r, Opt2_xftAntialias)))
+# endif
+		rxvt_scr_refresh(r, page,
+			(r->h->refresh_type & ~CLIPPED_REFRESH));
+	}
+    }
+    else
+    {
+	switch (ch)
+	{
+	    case C0_ESC:	/* escape char */
+		rxvt_process_escape_seq(r, page);
+		break;
+
+	    default:
+		rxvt_process_nonprinting(r, page, ch);
+		break;
+	    /* case 0x9b: */    /* CSI */
+	    /*  rxvt_process_csi_seq(r, ATAB(r)); */
+	}
+    }
+}
+
+
 /*{{{ Read and process output from the application */
 /* LIBPROTO */
 void
 rxvt_main_loop(rxvt_t *r)
 {
     register int	i;
-    unsigned char	ch, *str;
-    int			page, nlines, refreshnow;
-    struct rxvt_hidden*	h = r->h;
+    unsigned char	ch;
+    int			page, refreshnow;
 
 
     DBG_MSG( 2, ( stderr, "Entering rxvt_main_loop()\n" ) );
+
     /* Send the screen size. */
     for (i = 0; i <= LTAB(r); i ++)
     {
@@ -6484,6 +6587,8 @@ rxvt_main_loop(rxvt_t *r)
 	/* wait for something */
 	page = -1;
 
+	ch = 0;
+
 	while(
 	       r->vt_died == 0		&&	/* Nothing dead */
 	       r->cleanDeadChilds == 0	&&	/* Nothing to be cleaned up */
@@ -6491,100 +6596,22 @@ rxvt_main_loop(rxvt_t *r)
 	     )
 	    ;
 
-	DBG_MSG( 9, ( stderr, "rxvt_cmd_getc() returned 0x%hx (%c)\n",
-		    ch, ch ) );
+	/*
+	 * 2006-08-23 gi1242: If rxvt_cmd_getc is called, and then r->vt_died
+	 * gets set during this call, then we should not discard the return
+	 * value of rxvt_cmd_getc.
+	 */
 
-	/* handle the case that some children have died */
+	if( ch != 0 )
+	    /* rxvt_cmd_getc() returned something */
+	    rxvt_process_getc( r, page, ch );
+
+	/*
+	 * handle the case that some children have died (regardless of what
+	 * rxvt_cmd_getc returned
+	 */
 	if (r->vt_died > 0 || r->cleanDeadChilds )
 	    rxvt_clean_cmd_page (r);
-
-	/* handle the case where we have input */
-	else if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
-	{
-	    /* Read a text string from the input buffer */
-
-	    /*
-	     * point `str' to the start of the string, decrement first since
-	     * it was post incremented in rxvt_cmd_getc()
-	     */
-	    str = --(PVTS(r, page)->cmdbuf_ptr);
-	    nlines = 0;
-	    while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
-	    {
-		assert (PVTS(r, page)->cmdbuf_base <=
-		    PVTS(r, page)->cmdbuf_endp);
-
-		ch = *(PVTS(r, page)->cmdbuf_ptr)++;
-		if (ch == '\n')
-		{
-		    register int    limit;
-
-		    limit = h->refresh_limit * (r->TermWin.nrow - 1);
-		    nlines++;
-		    h->refresh_count++;
-		    if(
-			 NOTSET_OPTION(r, Opt_jumpScroll)	||
-			 (h->refresh_count >= limit)
-		      )
-		    {
-			refreshnow = 1;
-			break;
-		    }
-		}
-		else if (ch < ' ' && ch != '\t' && ch != '\r')
-		{
-		    /* unprintable */
-		    PVTS(r, page)->cmdbuf_ptr--;
-		    break;
-		}
-	    }
-
-	    DBG_MSG(2, (stderr, "adding '%s' in %d\n", str, page));
-	    rxvt_scr_add_lines(r, page, str, nlines,
-		(PVTS(r, page)->cmdbuf_ptr - str));
-
-	    /*
-	     * If there have been a lot of new lines, then update the
-	     * screen. I'll cheat and only refresh less than every
-	     * page-full. The number of pages between refreshes is
-	     * h->refresh_limit, which is incremented here because we must
-	     * be doing flat-out scrolling.
-	     *
-	     * Refreshing should be correct for small scrolls, because of
-	     * the time-out
-	     */
-	    if (refreshnow)
-	    {
-		refreshnow = 0;
-		if (ISSET_OPTION(r, Opt_jumpScroll) &&
-			h->refresh_limit < REFRESH_PERIOD)
-		    h->refresh_limit++;
-# ifdef XFT_SUPPORT
-		/*
-		 * disable screen refresh if XFT antialias is used to
-		 * improve performance
-		 */
-		if (!(ISSET_OPTION(r, Opt_xft) &&
-			ISSET_OPTION(r, Opt2_xftAntialias)))
-# endif
-		    rxvt_scr_refresh(r, page,
-			    (h->refresh_type & ~CLIPPED_REFRESH));
-	    }
-	}
-	else
-	{
-	    switch (ch)
-	    {
-		default:
-		    rxvt_process_nonprinting(r, page, ch);
-		    break;
-		case C0_ESC:	/* escape char */
-		    rxvt_process_escape_seq(r, page);
-		    break;
-		/* case 0x9b: */    /* CSI */
-		/*  rxvt_process_csi_seq(r, ATAB(r)); */
-	    }
-	}
 
     } /* while(1) */
     /* NOT REACHED */
