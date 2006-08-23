@@ -705,15 +705,15 @@ typedef struct {
     char	    charsets[4];
 
     /* need to hold the terminal?
-    **   hold == 0: not hold
-    **   hold == 1: hold
-    **   hold >  1: can destroy the terminal now
-    */
-    char	    hold;
-    /* the terminal is dead or alive? */
-    char	    dead;
-    /* the terminal is highlighted? */
-    char	    BOOLVAR(highlight,1);
+     *   hold == 0: not hold
+     *   hold == 1: hold
+     *   hold >  1: can destroy the terminal now
+     */
+    unsigned char   BOOLVAR(hold,2),
+		    BOOLVAR(dead,1),	    /* the terminal is dead or alive? */
+		    BOOLVAR(highlight,1);   /* the terminal is highlighted? */
+    int		    status;		    /* Status of child process after it
+					       exits */
 
     /* the terminal TERM type */
     termenv_t	    termenv;
@@ -901,6 +901,11 @@ typedef struct rxvt_vars {
     short	    tabClicked;		    /* Tab clicked by user. Used for
 					       moving tabs by drag and drop. */
 
+      /*
+       * True if we have marked some children as dead, but not called
+       * rxvt_clean_cmd_page() to clean them out
+       */
+    unsigned char   BOOLVAR( cleanDeadChilds, 1 );
     short	    vt_died;		    /* number of children that have
 					       died */
 

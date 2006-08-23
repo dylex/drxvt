@@ -3390,6 +3390,8 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 {
     int		cfd, er;
 
+    DBG_MSG( 1, ( stderr, "rxvt_run_command(r, %d, argv)", page ) );
+
     /* get master (pty) */
     if ((cfd = rxvt_get_pty(&(PVTS(r, page)->tty_fd),
 	(char**) &(PVTS(r, page)->ttydev))) < 0)

@@ -468,6 +468,8 @@ static const struct {
 	    "hold after terminal exits" ),
     STRG(Rs_holdExitText, "holdExitText", "het",
 	"string", "text to show while holding the terminal", 0),
+    STRG(Rs_holdExitTitle, "holdExitTitle", "heT",
+	"string", "Tab title of exited tabs", 0),
     STRG(Rs_desktop, "desktop", "desktop",
 	"number", "desktop to place the program", 0),
     BOOL( "broadcast", "bcst", Opt2_broadcast,

@@ -1285,7 +1285,8 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 /* attempt to `write' count to the input buffer */
 /* EXTPROTO */
 unsigned int
-rxvt_cmd_write(rxvt_t* r, int page, const unsigned char *str, unsigned int count)
+rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
+	unsigned int count)
 {
     unsigned int    n, s;
     unsigned char*  cmdbuf_base = PVTS(r, page)->cmdbuf_base;
@@ -1316,77 +1317,191 @@ rxvt_cmd_write(rxvt_t* r, int page, const unsigned char *str, unsigned int count
 }
 
 
+/*
+ * Does a waitpid() on each child, and marks it as dead if it's dead. This
+ * function is safe to call from anywhere.
+ */
+void
+rxvt_mark_dead_childs( rxvt_t *r )
+{
+    int	    status, i;
+    short   vt_died = r->vt_died;
+
+    DBG_MSG(1, (stderr, "rxvt_mark_dead_childs(): %d children are dead\n",
+		r->vt_died) );
+
+
+    for (i = LTAB(r); i >= 0 ; i--)
+    {
+	int pid;
+
+	errno = 0;  /* Clear errno */
+	if(
+	     !PVTS(r, i)->dead	    &&
+	     (pid = waitpid( PVTS(r, i)->cmd_pid, &status, WNOHANG)) != 0
+	  )
+	{
+	    if( pid == -1 && errno == ECHILD )
+	    {
+		/*
+		 * Command in ith tab is not our child. The only way this can
+		 * happen is if we lost an SIGCHLD signal.
+		 */
+		DBG_MSG( 2, ( stderr, "ECHILD error on waitpid(%d)\n", i ) );
+
+		/* We have no way of getting the child's exit status now */
+		PVTS( r, i )->status = 0;
+	    }
+	    else
+	    {
+		/* Process in tab i is dead. */
+		r->vt_died--;				/* Reduce number of
+							   unprocessed dead vt's
+							   by one */
+		vt_died--;				/* This variable is safe
+							   from being modified
+							   in a signal */
+		PVTS( r, i )->status = status;		/* Save exit status */
+	    }
+
+	    /*
+	     * Regardless of losing SIGCHLD, we mark this tab as dead.
+	     */
+	    PVTS( r, i )->dead	    = 1;	/* Mark it as dead */
+	    PVTS( r, i )->hold	    = 1;	/* Hold it until it is cleaned
+						   up */
+	    r->cleanDeadChilds	    = 1;	/* Child has been marked as
+						   dead, but not cleaned out. */
+	}
+    }
+
+    if( r->vt_died < 0 )
+    {
+	/*
+	 * Oops. Some child died, but we never got a dead child signal on it. As
+	 * long as we got here, we're fine.
+	 *
+	 * NOTE: It is OK for vt_died < 0. r->vt_died is updated for processes
+	 * that die when we are in this function. vt_died is not.
+	 */
+	DBG_MSG( 1, ( stderr,  "Lost child signal." ) );
+	r->vt_died = 0;
+    }
+
+    else if ( vt_died > 0 )
+    {
+	/*
+	 * This is problematic. The number of processes that were promised as
+	 * "dead" on entry to this function is not actually the number of
+	 * processes that are dead!
+	 *
+	 * NOTE: It is OK for r->vt_died > 0, as r->vt_died could be externally
+	 * modified while we are in this function.
+	 *
+	 * If we get here, we're in trouble. For now just complain and continue.
+	 */
+	rxvt_print_error( "Spurious dead child signal received" );
+
+	/* Maybe assert(0) would be better */
+
+	r->vt_died -= vt_died;	/* Don't set it to 0. Just reduce it by the
+				   number of processes we failed to catch as
+				   dead. */
+    }
+
+    DBG_MSG(1, (stderr, "Exit rxvt_mark_dead_childs(): %d children are dead\n",
+		r->vt_died) );
+}
+
 
 /*
- * Be careful the time to call this function. Do NOT call it in rxvt_cmd_getc
- * because this can redirect command buffer input of one terminal to the other
- * terminals!!!
+ * Cleans out tabs which have died but have not been cleaned up. (i.e. dead &&
+ * hold == 1)
+ *
+ * NOTE: This function MUST NOT be called from rxvt_cmd_getc(), because it could
+ * redirect command buffer input of the tabs.
  */
 /* INTPROTO */
 void
 rxvt_clean_cmd_page (rxvt_t* r)
 {
-    int		hold_msg = 0;	/* whether title has been changed */
-    char*	msg;		/* hold message */
+    const char*	msg;		/* hold message */
+    int		i;
 
+    if( r->vt_died )
+	rxvt_mark_dead_childs( r );
 
-    msg = (char*) r->h->rs[Rs_holdExitText];
-    if (IS_NULL(msg))
-	msg = " -- Terminal finished, ESC to exit";
+   /*
+    * We had better not get here unless we need to clean up dead children.
+    * (Taken out of context "cleaning up dead children" sounds pretty heinous.)
+    */
+    assert( r->cleanDeadChilds );
 
+    msg = NOT_NULL( r->h->rs[Rs_holdExitTitle] ) ?
+		r->h->rs[Rs_holdExitTitle] : "(Finished) %t";
 
-    DBG_MSG(1, (stderr, "%d children have died, clean cmd fd\n", r->vt_died));
-    while (r->vt_died > 0)
+    /*
+     * We start from the last child because we need to move ahead after
+     * removing dead child. This makes it much safer.
+     *
+     * Why do we need to restart dead value from LTAB(r) again? Because a
+     * child may have died when we do something following and changed the
+     * value of r->vt_died! This child may be later than any dead children
+     * we have examined.
+     */
+    for (i = LTAB(r); i >= 0; i--)
     {
-	int	    dead;   /* child that has died */
-	/*
-	 * We start from the last child because we need to move ahead after
-	 * removing dead child. This makes it much safer.
-	 *
-	 * Why do we need to restart dead value from LTAB(r) again? Because a
-	 * child may have died when we do something following and changed the
-	 * value of r->vt_died! This child may be later than any dead children
-	 * we have examined.
-	 */
-	for (dead = LTAB(r); dead >= 0; dead--)
-	    /* only dead children that are not held */
-	    if (PVTS(r, dead)->dead &&
-		( NOTSET_OPTION(r, Opt2_holdExit) ||
-		 (ISSET_OPTION(r, Opt2_holdExit) && 1 == PVTS(r, dead)->hold)
-		))
-		break;
-	assert (dead <= LTAB(r));   /* in case */
-
-
-	if (1 == PVTS(r, dead)->hold)
+	if( PVTS(r, i)->dead && PVTS(r, i)->hold == 1 )
 	{
-	    DBG_MSG(1, (stderr, "hold child %d after it died\n", dead));
+	    /* Process in tab i has died, and needs to be cleaned up. */
 
-	    if (!hold_msg)
+	    if( ISSET_OPTION( r, Opt2_holdExit ) )
 	    {
-		rxvt_set_term_title (r, (const unsigned char*) msg);
-		rxvt_set_icon_name (r, (const unsigned char*) msg);
-		hold_msg = 1;	/* do not change title anymore */
-	    }
+		const int	maxLen = 1024;
+		char		tabTitle[maxLen];
 
-	    if (r->h->rs[Rs_holdExitText])
-	    {
-		/* print the holding exit text on screen */
-		rxvt_scr_add_lines(r, dead,
-		    (const unsigned char*) r->h->rs[Rs_holdExitText],
-		    1, STRLEN(r->h->rs[Rs_holdExitText]));
-		rxvt_scr_refresh (r, dead, SMOOTH_REFRESH);
-	    }
+		DBG_MSG(1, (stderr, "hold child %d after it died\n", i));
 
-	    /* increase hold number, so next iteration will skip it */
-	    PVTS(r, dead)->hold ++;
+		/*
+		 * XXX Check if there is any pending input / output on this
+		 * page.
+		 */
+		if (PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp)
+		    rxvt_print_error( "%d bytes pending on exited tab %d",
+			     PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_ptr,
+			     i );
+
+		if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
+		    rxvt_tt_write(r, i, NULL, 0);
+
+		/*
+		 * Update title to show tab has finished.
+		 */
+		rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
+			tabTitle, maxLen );
+		rxvt_tabbar_set_title( r, i, tabTitle );
+
+		if(
+		     NOT_NULL( r->h->rs[Rs_holdExitText] ) &&
+		     STRLEN( r->h->rs[Rs_holdExitText] )
+		  )
+		{
+		    /* print the holding exit text on screen */
+		    rxvt_scr_add_lines(r, i,
+			(const unsigned char*) r->h->rs[Rs_holdExitText],
+			1, STRLEN(r->h->rs[Rs_holdExitText]));
+		    rxvt_scr_refresh (r, i, SMOOTH_REFRESH);
+		}
+
+		/* increase hold number, so next iteration will skip it */
+		PVTS(r, i)->hold++;
+	    }
+	    else
+		rxvt_remove_page( r, i );
 	}
-	else
-	    rxvt_remove_page (r, dead);
+    } /* for(i) */
 
-	/* reduce number of dead children by -1 */
-	r->vt_died --;
-    }	/* while loop */
+    r->cleanDeadChilds = 0; /* Dead child cleanup complete. */
 }
 
 
@@ -1397,6 +1512,7 @@ rxvt_find_cmd_child (rxvt_t* r)
     register int    k;
 
 
+#if 0 /* {{{ Old code when children are dead */
     if (r->vt_died > 0)
     {
 	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: some child died\n"));
@@ -1420,6 +1536,7 @@ rxvt_find_cmd_child (rxvt_t* r)
 	}   /* for loop */
     }
     else
+#endif /* }}} */
     {
 	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: no child died\n"));
 	/*
@@ -1432,7 +1549,8 @@ rxvt_find_cmd_child (rxvt_t* r)
 	static int	lastproctab = 0;  /* tab we processed last time */
 
 
-	/* check of lastproctab in case it points to something not exist
+	/*
+	 * check of lastproctab in case it points to something not exist
 	 * - then we will get into infinite loop!
 	 */
 	if (lastproctab > LTAB(r))
@@ -1441,7 +1559,7 @@ rxvt_find_cmd_child (rxvt_t* r)
 	k = lastproctab + 1;
 
 	do
-	{
+	  {
 	    if (k > LTAB(r))	/* round-robin */
 		k = 0;
 
@@ -1459,11 +1577,10 @@ rxvt_find_cmd_child (rxvt_t* r)
 	    if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
 		rxvt_tt_write(r, k, NULL, 0);
 
-	}
-	/* until we hit the last child again */
-	while (k++ != lastproctab);
+	  }
+	while (k++ != lastproctab);	/* until we hit the last child again */
 
-#if 0
+#if 0 /* {{{ */
 	/*
 	 * Reverse loop direction on each entry. It is used to avoid poor
 	 * performance on one side of a particularly busy tab if there are a lot
@@ -1519,7 +1636,7 @@ rxvt_find_cmd_child (rxvt_t* r)
 		    rxvt_tt_write(r, k, NULL, 0);
 	    }	/* for loop */
 	}
-#endif	/* 0 */
+#endif	/* 0 }}}*/
     }
 
     return -1; /* not found */
@@ -1641,9 +1758,18 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	     */
 	    DBG_MSG(1, (stderr, "%s\n", strerror(errno)));
 
-	    if (errno == EAGAIN ||
-		errno == EIO ||	    /* cygwin */
-		errno == EINVAL)    /* solaris */
+	    if( errno == EIO )
+	    {
+		/* See if this process is dead */
+		rxvt_mark_dead_childs(r);
+
+		break;
+	    }
+
+	    else if (
+		      errno == EAGAIN ||
+		      errno == EINVAL	    /* Solaris */
+		    )
 		break;
 	}
     }	/* while (count) */
@@ -1666,7 +1792,6 @@ rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
 
     for (i = 0; i <= LTAB(r); i++)
     {
-	int		n = 0;
 	unsigned int	count, bufsiz;
 
 
@@ -1688,8 +1813,14 @@ rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
 
 	assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
 	/* check if a child died */
-	if (PVTS(r, i)->dead /* && errno == EIO*/)
+	if (PVTS(r, i)->dead && errno == EIO )
 	    *PVTS(r, i)->cmdbuf_endp = (char) 0;
+
+	/*
+	 * 2006-08-22 gi1242: Our SIGCHLD handler now only counts the number
+	 * of calls it gets, so we will not miss any dead child signals.
+	 */
+#if 0 /* {{{ Old dead child signal loss hack */
 	else if (n < 0 && errno != EAGAIN)
 	{
 	    assert (!PVTS(r, i)->dead); /* in case */
@@ -1710,7 +1841,7 @@ rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
 	    if (PVTS(r, i)->cmd_pid ==
 		    waitpid (PVTS(r, i)->cmd_pid, NULL, WNOHANG))
 	    {
-		DBG_MSG(1, (stderr,"signal lost on child %d\n",i));
+		rxvt_print_error( "Warning: signal lost on child %d", i );
 
 		PVTS(r, i)->dead = 1;
 		if (ISSET_OPTION(r, Opt2_holdExit))
@@ -1718,12 +1849,13 @@ rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
 		*PVTS(r, i)->cmdbuf_endp = (char) 0;
 
 		/*
-		 * increase vt_died number, there is a possible race
-		 * condition here (a signal comes in)
+		 * increase vt_died number, there is a possible race condition
+		 * here (a signal comes in)
 		 */
 		r->vt_died ++;
 	    }
 	}
+#endif /*}}}*/
 
 	/* highlight inactive tab if there is some input */
 	if (NOTSET_OPTION(r, Opt2_hlTabOnBell) &&
@@ -1995,7 +2127,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
     register int    i;
 
 
-    DBG_MSG(2, (stderr, "Entering rxvt_cmd_getc on page %d\nn", *p_page));
+    DBG_MSG(2, (stderr, "Entering rxvt_cmd_getc on page %d\n", *p_page));
     while (1)
     {
 	/* loop until we can return something */
@@ -2118,7 +2250,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    /*
 	     * in case -1 == page, and there's no X events to process. we
 	     * will not go to the select call if there's already input/
-	     * output in some tabs. to reach here, we have tried active
+	     * output in some tabs. To reach here, we have tried active
 	     * tab but with no luck.
 	     */
 	    DBG_MSG(2, (stderr, "rxvt_find_cmd_child: find %d\n", retpage));
@@ -2168,7 +2300,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	for (i = 0; i <= LTAB(r); i ++)
 	{
 	    /* remember to skip held childrens */
-	    if (ISSET_OPTION(r, Opt2_holdExit) && (PVTS(r, i)->hold > 1))
+	    if ( (PVTS(r, i)->hold > 1) )
 	    {
 		DBG_MSG(2,(stderr," not listen on vt[%d].cmd_fd\n",i));
 		continue;
@@ -2197,38 +2329,85 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	rxvt_process_children_cmdfd (r, &readfds);
 
 
-	/* reset retpage because it is possibly altered above by
-	 * call to rxvt_find_cmd_child!!! retpage is the tab number
-	 * to return. it should never be -1. if not a tab is selected,
-	 * retpage is the active tab.
+	/*
+	 * reset retpage because it is possibly altered above by call to
+	 * rxvt_find_cmd_child! retpage is the tab number to return. It should
+	 * never be -1. If not a tab is selected, retpage is the active tab.
 	 */
 	retpage = (-1 == selpage) ? ATAB(r) : selpage;
 	DBG_MSG(2, (stderr, "  selpage = %d, retpage = %d\n",
 	    selpage, retpage));
 	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
-	/* Handle the cases that the specified child has died */
-	if (r->vt_died > 0 && PVTS(r, retpage)->dead)  
-	{
-	    *p_page = retpage;
-	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	}
 
-	/* Handle the cases that the specified child has some input */
+
 	DBG_MSG(2, (stderr, "  cmdbuf_ptr = %p, cmdbuf_endp = %p\n",
 	    PVTS(r, retpage)->cmdbuf_ptr, PVTS(r, retpage)->cmdbuf_endp));
+
+	/*
+	 * Now figure out if we have something to return.
+	 */
 	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
 	{
+	    /* Specified child has input to return */
 	    *p_page = retpage;
 	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	}
 
-	/* Handle the case that the specified child has no input */
-	if (-1 == selpage &&
-	    -1 != (retpage = rxvt_find_cmd_child (r)))
+	/* No input from specified child */
+	else if (
+		  selpage == -1  &&
+		  (retpage = rxvt_find_cmd_child (r)) != -1
+		)
 	{
+	    /* No child specified, and we have input from some child */
 	    *p_page = retpage;
 	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 	}
+
+	else
+	{
+	    /* Last resort: Hope something died */
+	    if( r->vt_died )
+		rxvt_mark_dead_childs( r );
+
+	    if( r->cleanDeadChilds )
+	    {
+		/* Ok. Something died. Let's see if we can return something */
+		if( selpage != -1 && PVTS( r, selpage )->dead )
+		{
+		    /*
+		     * Specified child died (with no input). Let's fake some
+		     * input, and return it ;)
+		     */
+		    assert( PVTS( r, selpage )->hold == 1 );
+
+		    rxvt_cmd_write( r, selpage, "\0", 1 );
+		    *p_page = selpage;
+		    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+		}
+
+		else if( selpage == -1 )
+		{
+		    /*
+		     * No child specified, and something died. Find the child
+		     * that died.
+		     */
+		    for( retpage = 0; retpage <= LTAB(r); retpage++ )
+		    {
+			if(
+			    PVTS( r, retpage )->dead &&
+			    PVTS(r,retpage)->hold == 1
+			  )
+			{
+			    /* Fake some input and return this child */
+			    rxvt_cmd_write( r, retpage, "\0", 1 );
+			    *p_page = retpage;
+			    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
+			}
+		    } /* for() */
+		} /* else if( selpage == -1 ) */
+	    } /* if( r->cleanDeadChilds ) */
+	} /* else */
 
 
 #ifdef HAVE_X11_SM_SMLIB_H
@@ -5303,6 +5482,8 @@ rxvt_process_osc_seq (rxvt_t* r, int page)
     {
 	assert (page == readpage);
 	assert (checksum == PVTS(r, page)->checksum);
+	if( page != readpage )
+	    printf( "Oops. Want char from page %d, but got %d\n", page, readpage );
 	arg = arg * 10 + (ch - '0');
     }
 
@@ -6289,6 +6470,7 @@ rxvt_main_loop(rxvt_t *r)
     struct rxvt_hidden*	h = r->h;
 
 
+    DBG_MSG( 2, ( stderr, "Entering rxvt_main_loop()\n" ) );
     /* Send the screen size. */
     for (i = 0; i <= LTAB(r); i ++)
     {
@@ -6301,25 +6483,30 @@ rxvt_main_loop(rxvt_t *r)
     {
 	/* wait for something */
 	page = -1;
-	while (r->vt_died <= 0 &&
-	    (0 == (ch = rxvt_cmd_getc(r, &page))))
+
+	while(
+	       r->vt_died == 0		&&	/* Nothing dead */
+	       r->cleanDeadChilds == 0	&&	/* Nothing to be cleaned up */
+	       ( (ch = rxvt_cmd_getc(r, &page)) == 0 )	/* No input */
+	     )
 	    ;
 
-	/* handle the case that some children have died */
-	if (r->vt_died > 0)
-	{
-	    rxvt_clean_cmd_page (r);
-	    continue;
-	}
+	DBG_MSG( 9, ( stderr, "rxvt_cmd_getc() returned 0x%hx (%c)\n",
+		    ch, ch ) );
 
-	if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+	/* handle the case that some children have died */
+	if (r->vt_died > 0 || r->cleanDeadChilds )
+	    rxvt_clean_cmd_page (r);
+
+	/* handle the case where we have input */
+	else if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
 	{
 	    /* Read a text string from the input buffer */
+
 	    /*
-	    ** point `str' to the start of the string,
-	    ** decrement first since it was post incremented in
-	    ** rxvt_cmd_getc()
-	    */
+	     * point `str' to the start of the string, decrement first since
+	     * it was post incremented in rxvt_cmd_getc()
+	     */
 	    str = --(PVTS(r, page)->cmdbuf_ptr);
 	    nlines = 0;
 	    while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
@@ -6335,7 +6522,10 @@ rxvt_main_loop(rxvt_t *r)
 		    limit = h->refresh_limit * (r->TermWin.nrow - 1);
 		    nlines++;
 		    h->refresh_count++;
-		    if (NOTSET_OPTION(r, Opt_jumpScroll) || (h->refresh_count >= limit))
+		    if(
+			 NOTSET_OPTION(r, Opt_jumpScroll)	||
+			 (h->refresh_count >= limit)
+		      )
 		    {
 			refreshnow = 1;
 			break;
@@ -6354,13 +6544,14 @@ rxvt_main_loop(rxvt_t *r)
 		(PVTS(r, page)->cmdbuf_ptr - str));
 
 	    /*
-	     * If there have been a lot of new lines, then update the screen.
-	     * I'll cheat and only refresh less than every page-full. The number
-	     * of pages between refreshes is h->refresh_limit, which is
-	     * incremented here because we must be doing flat-out scrolling.
+	     * If there have been a lot of new lines, then update the
+	     * screen. I'll cheat and only refresh less than every
+	     * page-full. The number of pages between refreshes is
+	     * h->refresh_limit, which is incremented here because we must
+	     * be doing flat-out scrolling.
 	     *
-	     * Refreshing should be correct for small scrolls, because of the
-	     * time-out
+	     * Refreshing should be correct for small scrolls, because of
+	     * the time-out
 	     */
 	    if (refreshnow)
 	    {
@@ -6369,8 +6560,10 @@ rxvt_main_loop(rxvt_t *r)
 			h->refresh_limit < REFRESH_PERIOD)
 		    h->refresh_limit++;
 # ifdef XFT_SUPPORT
-		/* disable screen refresh if XFT antialias is used to improve
-		 * performance */
+		/*
+		 * disable screen refresh if XFT antialias is used to
+		 * improve performance
+		 */
 		if (!(ISSET_OPTION(r, Opt_xft) &&
 			ISSET_OPTION(r, Opt2_xftAntialias)))
 # endif
@@ -6392,8 +6585,9 @@ rxvt_main_loop(rxvt_t *r)
 		/*  rxvt_process_csi_seq(r, ATAB(r)); */
 	    }
 	}
-    }
-    /* NOTREACHED */
+
+    } /* while(1) */
+    /* NOT REACHED */
     assert (0);
 }
 

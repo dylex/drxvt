@@ -1561,12 +1561,14 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
     /* synchronize terminal title with active tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle) &&
 	(page == ATAB(r)))
-	rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	rxvt_set_term_title (r,
+		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon) &&
 	(page == ATAB(r)))
-	rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	rxvt_set_icon_name(r,
+		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
 

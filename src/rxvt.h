@@ -1178,6 +1178,7 @@ enum {
 
     Rs_bellCommand,
     Rs_holdExitText,
+    Rs_holdExitTitle,
     Rs_desktop,
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,

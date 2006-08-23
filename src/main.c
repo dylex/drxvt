@@ -255,6 +255,25 @@ rxvt_init(int argc, const char *const *argv)
 RETSIGTYPE
 rxvt_Child_signal(int sig __attribute__((unused)))
 {
+    /*
+     * Sometimes the child process could exit before we have a chance to
+     * initialize the term structure. So we just count the number of calls to
+     * this function here. We will wait for our dead children later.
+     */
+    rxvt_t  *r;
+
+    DBG_MSG( 1, ( stderr, "\e[31mrxvt_Child_signal()\e[0m\n"));
+
+    r = rxvt_get_r();
+    r->vt_died++;
+
+    DBG_MSG( 1, ( stderr, "done rxvt_Child_signal()\n"));
+}
+
+#if 0 /* Old child signal handler */
+RETSIGTYPE
+rxvt_Child_signal(int sig __attribute__((unused)))
+{
     int			pid, page,
 			save_errno = errno;
     rxvt_t*		r;
@@ -262,7 +281,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
     /* enable signal reentry, it's ok here */
     signal(SIGCHLD, rxvt_Child_signal);
 
-    DBG_MSG( 1, ( stderr, "rxvt_Child_signal()\n"));
+    DBG_TMSG( 1, ( stderr, "rxvt_Child_signal()\n"));
     r = rxvt_get_r();
 
     /*
@@ -273,7 +292,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
     for( page=0; page <= LTAB(r); page++)
 	if( PVTS( r, page)->cmd_pid <=0 )
 	{
-	    DBG_MSG( 1, ( stderr,
+	    DBG_TMSG( 1, ( stderr,
 			"Tab %d not initialized. Dropping signal\n", page));
 	    return;
 	}
@@ -339,6 +358,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
 	errno = save_errno;
     }
 }
+#endif
 
 
 /*
@@ -2826,7 +2846,7 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
     rxvt_t	    *r = rxvt_get_r();
     char	    buf[IMBUFSIZ];
 
-    DBG_MSG(1,(stderr, "rxvt_IMInstantiateCallback()\n"));
+    DBG_MSG(1,(stderr, "rxvt_IM_init_callback()\n"));
     if (r->h->Input_Context)
 	return;
 

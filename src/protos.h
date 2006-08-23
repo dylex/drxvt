@@ -194,6 +194,7 @@ int              rxvt_str_match                   __PROTO((const char* s1, const
 const char*      rxvt_str_skip_space              __PROTO((const char* str));
 char*            rxvt_str_trim                    __PROTO((char* str));
 int              rxvt_str_escaped                 __PROTO((char* str));
+int		 rxvt_percent_interpolate         __PROTO((rxvt_t*, int, const char *, int, char *, int));
 char**           rxvt_splitcommastring            __PROTO((const char* cs));
 char*            rxvt_File_find                   __PROTO((const char* file, const char* ext, const char* path));
 void             rxvt_draw_shadow                 __PROTO((Display *Xdisplay, Window win, GC gc, unsigned long topShadow, unsigned long botShadow, int x, int y, int w, int h));

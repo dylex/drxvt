@@ -795,67 +795,10 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
     }
     else
     {
-	/* {{{ % expand action->str, and copy into expstr */
-	int	i=0,	/* Unexpanded string index */
-		j=0;	/* Expanded string index */
-
-	while( i < action->len-1 && j < maxLen-1 )
-	{
-	    if( action->str[i] == '%' )
-	    {
-		switch( action->str[++i] )
-		{
-		    case '%':
-			/* Copy % over */
-			expstr[j++] = action->str[i++];
-			break;
-
-		    case 'n':
-			/* Active tab number */
-			j += snprintf( expstr + j, maxLen - j, "%d", ATAB(r) );
-			i ++;
-			break;
-
-		    case 't':
-			/* Active tab title */
-			j += snprintf( expstr + j, maxLen -j,
-					    "%s", AVTS(r)->tab_title );
-			i ++;
-			break;
-
-		    case 's':
-			/*
-			 * Selection. TODO Also paste selection if it is not
-			 * owned by mrxvt.
-			 */
-			if( NOT_NULL( r->selection.text ) )
-			    j += snprintf( expstr + j, maxLen -j,
-						"%s", r->selection.text );
-			i++;
-			break;
-
-		    default:
-			rxvt_print_error( "Unrecognized switch %%%c in '%s'",
-				action->str[i++], action->str );
-			break;
-		}
-	    }
-	    else
-		expstr[j++] = action->str[i++];
-	}
-
-	/* Copy last char over */
-	if( i == action->len-1 && j < maxLen-1 )
-	    expstr[j++] = action->str[i++];
-
-	/* NULL terminate expstr */
-	if( j > maxLen - 1 )	j = maxLen - 1;
-	if( expstr[j] )		expstr[j++] = 0;
-
-	/* % expansion done. Copy the string and length over */
-	alen = j;
+	/* % interpolate the action string */
 	astr = expstr;
-	/* }}} */
+	alen = rxvt_percent_interpolate( r, ATAB(r), action->str, action->len,
+		astr, maxLen );
     }
 
 

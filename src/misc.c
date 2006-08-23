@@ -242,6 +242,71 @@ rxvt_str_escaped(char *str)
     return (d - str);
 }
 
+/* % interpolate expand src, and copy into dst */
+/* EXTPROTO */
+int
+rxvt_percent_interpolate( rxvt_t *r, int page,
+	const char *src, int len, char *dst, int maxLen )
+{
+    int	i=0,	/* Unexpanded string index */
+	j=0;	/* Expanded string index */
+
+    while( i < len-1 && j < maxLen-1 )
+    {
+	if( src[i] == '%' )
+	{
+	    switch( src[++i] )
+	    {
+		case '%':
+		    /* Copy % over */
+		    dst[j++] = src[i++];
+		    break;
+
+		case 'n':
+		    /* Active tab number */
+		    j += snprintf( dst + j, maxLen - j, "%d", ATAB(r) );
+		    i ++;
+		    break;
+
+		case 't':
+		    /* Active tab title */
+		    j += snprintf( dst + j, maxLen -j,
+					"%s", AVTS(r)->tab_title );
+		    i ++;
+		    break;
+
+		case 's':
+		    /*
+		     * Selection. TODO Also paste selection if it is not
+		     * owned by mrxvt.
+		     */
+		    if( NOT_NULL( r->selection.text ) )
+			j += snprintf( dst + j, maxLen -j,
+					    "%s", r->selection.text );
+		    i++;
+		    break;
+
+		default:
+		    rxvt_print_error( "Unrecognized switch %%%c in '%s'",
+			    src[i++], src );
+		    break;
+	    }
+	}
+	else
+	    dst[j++] = src[i++];
+    }
+
+    /* Copy last char over */
+    if( i == len-1 && j < maxLen-1 )
+	dst[j++] = src[i++];
+
+    /* NULL terminate dst */
+    if( j > maxLen - 1 )	j = maxLen - 1;
+    if( dst[j] )		dst[j++] = 0;
+
+    /* % expansion done. Copy the string and length over */
+    return j;
+}
 
 /*
  * Split a comma-separated string into an array, stripping leading and
