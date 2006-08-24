@@ -992,6 +992,10 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		case XK_dead_tilde:	    /* ~ */
 		    dk = XK_asciitilde;
 		    break;
+
+		default:
+		    assert(0);
+		    dk = 0;
 	    }	/* switch(accent) */
 
 	    for (idx = 0; idx < DEADKEY_CHAR_NUMBER; idx++)
@@ -1346,7 +1350,8 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	    {
 		/*
 		 * Command in ith tab is not our child. The only way this can
-		 * happen is if we lost an SIGCHLD signal.
+		 * happen is if we lost an SIGCHLD signal (e.g. if we receive a
+		 * SIGCHLD when it is blocked, say by our own SIGCHLD handler).
 		 */
 		DBG_MSG( 2, ( stderr, "ECHILD error on waitpid(%d)\n", i ) );
 
@@ -1399,15 +1404,23 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	 * NOTE: It is OK for r->vt_died > 0, as r->vt_died could be externally
 	 * modified while we are in this function.
 	 *
-	 * If we get here, we're in trouble. For now just complain and continue.
+	 * We should only get here when one of our child processes that is NOT
+	 * running in a tab dies. For instance, when we print something with our
+	 * "PrintPipe" macro. If we get here for any other reason, we're in deep
+	 * trouble.
 	 */
-	rxvt_print_error( "Spurious dead child signal received" );
+	DBG_MSG( 3, ( stderr, "Spurious dead child signal received\n") );
 
-	/* Maybe assert(0) would be better */
-
-	r->vt_died -= vt_died;	/* Don't set it to 0. Just reduce it by the
-				   number of processes we failed to catch as
-				   dead. */
+	/*
+	 * We should reset r->vt_died to 0. But there is a possible race
+	 * condition with doing that. Suppose we received a dead child signal
+	 * *after* looping over all childs, but just before getting here!
+	 *
+	 * To avoid this we only reduce r->vt_died by the number of processes we
+	 * failed to catch as dead. Further, when we get EIO errors reading from
+	 * a child, we call this function to see if the child is dead or not.
+	 */
+	r->vt_died -= vt_died;
     }
 
     DBG_MSG(1, (stderr, "Exit rxvt_mark_dead_childs(): %d children are dead\n",
@@ -1448,10 +1461,12 @@ rxvt_clean_cmd_page (rxvt_t* r)
 	rxvt_mark_dead_childs( r );
 
    /*
-    * We had better not get here unless we need to clean up dead children.
-    * (Taken out of context "cleaning up dead children" sounds pretty heinous.)
+    * We had better not get here unless we need to clean up dead children. Make
+    * sure we don't proceed when we receive spurious dead child messages (e.g.
+    * from when the print pipe dies).
     */
-    assert( r->cleanDeadChilds );
+    if( !r->cleanDeadChilds )
+	return;
 
     /*
      * We start from the last child because we need to move ahead after
@@ -1501,13 +1516,13 @@ rxvt_clean_cmd_page (rxvt_t* r)
 				Rs_holdExitTxt );
 		if( NOT_NULL( msg ) && *msg )
 		{
-		    char    buffer[maxLen];
-		    int	    len;
+		    unsigned char   buffer[maxLen];
+		    int		    len;
 
 		    rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
-			    buffer, maxLen );
+			    (char*) buffer, maxLen );
 
-		    len = rxvt_str_escaped( buffer );
+		    len = rxvt_str_escaped( (char*) buffer );
 
 		    rxvt_cmd_write(r, i, buffer, len );
 		}
@@ -1528,11 +1543,11 @@ rxvt_clean_cmd_page (rxvt_t* r)
 				Rs_holdExitTtl );
 		if( NOT_NULL( msg ) && *msg )
 		{
-		    char    tabTitle[maxLen];
+		    unsigned char    tabTitle[maxLen];
 
 		    rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
-			    tabTitle, maxLen );
-		    rxvt_str_escaped( tabTitle );
+			    (char*) tabTitle, maxLen );
+		    rxvt_str_escaped( (char*) tabTitle );
 
 		    rxvt_tabbar_set_title( r, i, tabTitle );
 		}
@@ -2436,7 +2451,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		     */
 		    assert( PVTS( r, selpage )->hold == 1 );
 
-		    rxvt_cmd_write( r, selpage, "\0", 1 );
+		    rxvt_cmd_write( r, selpage, (unsigned char*) "\0", 1 );
 		    *p_page = selpage;
 		    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
 		}
@@ -2455,7 +2470,8 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 			  )
 			{
 			    /* Fake some input and return this child */
-			    rxvt_cmd_write( r, retpage, "\0", 1 );
+			    rxvt_cmd_write( r, retpage,
+				    (unsigned char*) "\0", 1 );
 			    *p_page = retpage;
 			    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
 			}
