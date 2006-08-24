@@ -1177,8 +1177,6 @@ enum {
     Rs_focusDelay,
 
     Rs_bellCommand,
-    Rs_holdExitText,
-    Rs_holdExitTitle,
     Rs_desktop,
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,
@@ -1224,13 +1222,15 @@ enum {
     Rs_backgroundPixmap,/* terminal background pixmap for each tab */
     _Rs_backgroundPixmap = Rs_backgroundPixmap + MAX_PROFILES - 1,
 #endif
-    Rs_tabtitle,	_Rs_tabtitle = Rs_tabtitle + MAX_PROFILES - 1,
-    Rs_command,		_Rs_command = Rs_command + MAX_PROFILES - 1,
-    Rs_saveLines,	_Rs_saveLines = Rs_saveLines + MAX_PROFILES - 1,
-
-    Rs_foreground,	_Rs_foreground = Rs_foreground + MAX_PROFILES - 1,
-    Rs_background,	_Rs_background = Rs_background + MAX_PROFILES - 1,
-    Rs_cwd,		_Rs_cwd = Rs_cwd + MAX_PROFILES - 1,
+    Rs_tabtitle,	_Rs_tabtitle	= MAX_PROFILES - 1 + Rs_tabtitle,
+    Rs_command,		_Rs_command	= MAX_PROFILES - 1 + Rs_command,
+    Rs_saveLines,	_Rs_saveLines	= MAX_PROFILES - 1 + Rs_saveLines,
+    Rs_foreground,	_Rs_foreground	= MAX_PROFILES - 1 + Rs_foreground,
+    Rs_background,	_Rs_background	= MAX_PROFILES - 1 + Rs_background,
+    Rs_cwd,		_Rs_cwd		= MAX_PROFILES - 1 + Rs_cwd,
+    Rs_holdExit,	_Rs_holdExit	= MAX_PROFILES - 1 + Rs_holdExit,
+    Rs_holdExitTxt,	_Rs_holdExitTxt = MAX_PROFILES - 1 + Rs_holdExitTxt,
+    Rs_holdExitTtl,	_Rs_holdExitTtl = MAX_PROFILES - 1 + Rs_holdExitTtl,
 
     NUM_RESOURCES
 } ;
@@ -1478,6 +1478,14 @@ enum {
 #define _NET_WM_STATE_ADD	1
 #define _NET_WM_STATE_TOGGLE	2
 
+/* Values for holdOption */
+#define HOLD_CLEANBIT		(1u)
+#define HOLD_DIRTYBIT		(2u)
+
+#define HOLD_NEVER		0
+#define HOLD_CLEAN		HOLD_CLEANBIT
+#define HOLD_NOTCLEAN		HOLD_DIRTYBIT
+#define HOLD_ALWAYS		(HOLD_CLEANBIT | HOLD_DIRTYBIT)
 
 /*
  *****************************************************************************

@@ -1415,6 +1415,24 @@ rxvt_mark_dead_childs( rxvt_t *r )
 }
 
 
+/* Macro to determine weather we should the i-th tab or not */
+#define SHOULD_HOLD( r, i )						       \
+    (									       \
+      (									       \
+	( HOLD_CLEANBIT & PVTS((r),(i))->holdOption )			       \
+	&& WIFEXITED( PVTS((r),(i))->status )				       \
+	&& WEXITSTATUS( PVTS((r),(i))->status ) == 0			       \
+      )									       \
+      ||								       \
+      (									       \
+	( HOLD_DIRTYBIT & PVTS((r),(i))->holdOption )			       \
+	&& (								       \
+	     !WIFEXITED( PVTS((r),(i))->status )	||		       \
+	     WEXITSTATUS( PVTS((r),(i))->status ) != 0			       \
+	   )								       \
+      )									       \
+    )
+
 /*
  * Cleans out tabs which have died but have not been cleaned up. (i.e. dead &&
  * hold == 1)
@@ -1426,7 +1444,6 @@ rxvt_mark_dead_childs( rxvt_t *r )
 void
 rxvt_clean_cmd_page (rxvt_t* r)
 {
-    const char*	msg;		/* hold message */
     int		i;
 
     if( r->vt_died )
@@ -1437,9 +1454,6 @@ rxvt_clean_cmd_page (rxvt_t* r)
     * (Taken out of context "cleaning up dead children" sounds pretty heinous.)
     */
     assert( r->cleanDeadChilds );
-
-    msg = NOT_NULL( r->h->rs[Rs_holdExitTitle] ) ?
-		r->h->rs[Rs_holdExitTitle] : "(Finished) %t";
 
     /*
      * We start from the last child because we need to move ahead after
@@ -1454,26 +1468,50 @@ rxvt_clean_cmd_page (rxvt_t* r)
     {
 	if( PVTS(r, i)->dead && PVTS(r, i)->hold == 1 )
 	{
+	    DBG_MSG( 3, ( stderr,
+			"Tab %d exit %s (status %d). holdOption: %d\n",
+			i, WIFEXITED(PVTS(r,i)->status) ? "success" : "failure",
+			PVTS(r,i)->status,
+			PVTS(r,i)->holdOption ) );
 	    /* Process in tab i has died, and needs to be cleaned up. */
-
-	    if( ISSET_OPTION( r, Opt2_holdExit ) )
+	    if( SHOULD_HOLD( r, i ) )
 	    {
 		const int	maxLen = 1024;
-		char		tabTitle[maxLen];
+		const char	*msg;
 
-		DBG_MSG(1, (stderr, "hold child %d after it died\n", i));
+		DBG_MSG(1, (stderr, "Hold child %d after it died\n", i));
+
+		/* increase hold number, so next iteration will skip it */
+		PVTS(r, i)->hold++;
+
+		/*
+		 * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry
+		 * about calls to read() blocking.
+		 */
+		DBG_MSG( 9, ( stderr, "Reading from tab %d. (O_NDELAY %d)\n",
+			i, O_NDELAY & fcntl( PVTS(r,i)->cmd_fd, F_GETFL ) ) );
+
+		/* See if there is any pending data in the child's fd */
+		rxvt_read_child_cmdfd( r, i,
+		    BUFSIZ - 1 -
+			(PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base) );
 
 		/*
 		 * print the holding exit text on screen
 		 */
-		if(
-		     NOT_NULL( r->h->rs[Rs_holdExitText] ) &&
-		     STRLEN( r->h->rs[Rs_holdExitText] )
-		  )
+		msg = getProfileOption( r, PVTS(r,i)->profileNum,
+				Rs_holdExitTxt );
+		if( NOT_NULL( msg ) && *msg )
 		{
-		    rxvt_cmd_write(r, i,
-			(const unsigned char*) r->h->rs[Rs_holdExitText],
-			STRLEN(r->h->rs[Rs_holdExitText]));
+		    char    buffer[maxLen];
+		    int	    len;
+
+		    rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
+			    buffer, maxLen );
+
+		    len = rxvt_str_escaped( buffer );
+
+		    rxvt_cmd_write(r, i, buffer, len );
 		}
 
 		/*
@@ -1488,14 +1526,20 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		/*
 		 * Update title to show tab has finished.
 		 */
-		rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
-			tabTitle, maxLen );
-		rxvt_tabbar_set_title( r, i, tabTitle );
+		msg = getProfileOption( r, PVTS(r,i)->profileNum,
+				Rs_holdExitTtl );
+		if( NOT_NULL( msg ) && *msg )
+		{
+		    char    tabTitle[maxLen];
+
+		    rxvt_percent_interpolate( r, i, msg, STRLEN(msg),
+			    tabTitle, maxLen );
+		    rxvt_str_escaped( tabTitle );
+
+		    rxvt_tabbar_set_title( r, i, tabTitle );
+		}
 
 		rxvt_scr_refresh (r, i, SMOOTH_REFRESH);
-
-		/* increase hold number, so next iteration will skip it */
-		PVTS(r, i)->hold++;
 	    }
 	    else
 		rxvt_remove_page( r, i );
@@ -1698,9 +1742,12 @@ int
 rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 {
     int		    n = 0, bread = 0;
+
+#if 0
     int		    select_res;
     fd_set	    readfds;
     struct timeval  value;
+#endif
 
 
     while (count)
@@ -1708,6 +1755,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	DBG_MSG(2, (stderr, "read maximal %u bytes\n", count));
 
 	errno = 0;  /* clear errno */
+
 	n = read (PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp,
 		count);
 	DBG_MSG(1, (stderr, "read %d bytes\n", n));
@@ -1720,15 +1768,20 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	    PVTS(r, page)->cmdbuf_endp += n;
 
 	    /*
+	     * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry
+	     * about calls to read() blocking.
+	     */
+#if 0 /*{{{ Old code to select(fd) to check if read would block */
+	    /*
 	     * check the file descriptor to see if there are further
 	     * input, this is to avoid blocking on read(), which seems
-	     * to be an issue when running mc in bash. this will waste
+	     * to be an issue when running mc in bash. This will waste
 	     * several CPU cycles, but it's safer than blocking.
 	     */
 	    FD_ZERO(&readfds);
 	    FD_SET(PVTS(r, page)->cmd_fd, &readfds);
 	    value.tv_sec = 0;
-	    value.tv_usec = 5;	/* time out, 5us */
+	    value.tv_usec = 0;	/* Was time out, 5us */
 	    select_res = select(r->num_fds, &readfds, NULL,
 		NULL, &value);
 	    if (0 == select_res)
@@ -1745,10 +1798,12 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	    }
 	    /* continue the next loop iteration */
 	    DBG_MSG(1, (stderr, "more data to read\n"));
+#endif /*}}}*/
 	}
 	else if (0 == n)
 	{
-	    DBG_MSG(1, (stderr, "Should not happen?\n"));
+	    /* DBG_MSG(1, (stderr, "Should not happen?\n")); */
+	    /* 2006-08-23 gi1242: Could happen if we have no more data. */
 	    break;
 	}
 	else if (n < 0)
@@ -1757,7 +1812,8 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	     * We do not update count and buffer pointer and continue
 	     * trying read more data in the next loop iteration.
 	     */
-	    DBG_MSG(1, (stderr, "%s\n", strerror(errno)));
+	    DBG_MSG(1, (stderr, "%s\n", strerror(errno))); /* NOTE this might
+							      reset errno */
 
 	    if( errno == EIO )
 	    {

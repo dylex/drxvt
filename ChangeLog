@@ -18,6 +18,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
        10. Made -ufbg and -fade options work under Xft ;).
        11. Font specified with --boldFont is correctly handled (even if it's
 	   of a different dimension).
+       12. Exited tabs are now correctly held. Output from them is not lost
+	   even if they exit very quickly.
 
     * Enhancements:
 	1. Reduced memory footprint by roughly 5kb.
@@ -30,6 +32,11 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   striking.
 	5. Added a --xftBoldWeight option to control the weight of the Xft
 	   bold font.
+	6. Made --holdExit a string option, so that tabs can be held based on
+	   the exit status of the child.
+	7. Added --holdExitTitle and --holdExitText options to specify the
+	   title of an exited tab, and the text printed in the tab of an
+	   exited child process.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Bug Fixes:

@@ -1058,17 +1058,18 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnToggleHold:
-	    if (ISSET_OPTION (r, Opt2_holdExit))
-	    {
-		int k;
-		for (k = LTAB(r); k>= 0; k --)
-		    if (PVTS(r, k)->dead && PVTS(r, k)->hold > 1)
-			rxvt_remove_page (r, k);
-		UNSET_OPTION (r, Opt2_holdExit);
-	    }
-	    else
-		SET_OPTION(r, Opt2_holdExit);
+	{
+	    /*
+	     * 2006-08-23 gi1242: mrxvt-0.5.2 holding works differently (based
+	     * on the childs exit status. This macro just clears all held tabs.
+	     */
+	    int k;
+	    for (k = LTAB(r); k>= 0; k --)
+		if (PVTS(r, k)->dead && PVTS(r, k)->hold > 1)
+		    rxvt_remove_page (r, k);
+
 	    break;
+	}
 
 	case MacroFnToggleFullscren:
 	    ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,

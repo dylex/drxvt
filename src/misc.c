@@ -251,6 +251,9 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
     int	i=0,	/* Unexpanded string index */
 	j=0;	/* Expanded string index */
 
+    DBG_MSG( 2, (stderr, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n",
+	    page, src, len, "dst", maxLen ));
+
     while( i < len-1 && j < maxLen-1 )
     {
 	if( src[i] == '%' )
@@ -264,14 +267,37 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 
 		case 'n':
 		    /* Active tab number */
-		    j += snprintf( dst + j, maxLen - j, "%d", ATAB(r) );
+		    j += snprintf( dst + j, maxLen - j, "%d", page );
 		    i ++;
 		    break;
 
 		case 't':
 		    /* Active tab title */
 		    j += snprintf( dst + j, maxLen -j,
-					"%s", AVTS(r)->tab_title );
+					"%s", PVTS(r, page)->tab_title );
+		    i ++;
+		    break;
+
+		case 'S':
+		    /* Exit status of dead processes */
+		    if( PVTS( r, page )->dead )
+			j += snprintf( dst + j, maxLen - j, "%d",
+				WEXITSTATUS( PVTS( r, page )->status ) );
+		    else
+			dst[ j++ ] = src[ i ];
+
+		    i++;
+		    break;
+
+		case 'N':
+		    /* Normal / abnormal exit status of dead processes */
+		    if( PVTS( r, page )->dead )
+			j += snprintf( dst + j, maxLen - j, "%s",
+				WIFEXITED( PVTS( r, page )->status )
+				    ? "normally" : "abnormally" );
+		    else
+			dst[ j++ ] = src[ i ];
+
 		    i ++;
 		    break;
 

@@ -1429,7 +1429,36 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	else
 	    r->profile[i].saveLines = ( i > 0 ) ? r->profile[0].saveLines :
 							    DEFAULT_SAVELINES;
+
+	/* Set holdOption */
+	if( r->h->rs[Rs_holdExit + i] )
+	{
+	    if( !STRCASECMP( r->h->rs[Rs_holdExit + i], "clean" ) )
+		r->profile[i].holdOption = HOLD_CLEAN;
+	    else if( !STRCASECMP( r->h->rs[Rs_holdExit + i], "notclean" ) )
+		r->profile[i].holdOption = HOLD_NOTCLEAN;
+	    else if(
+		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "always" )	    ||
+		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "true" )	    ||
+		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "yes" )	    ||
+		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "on" )	    ||
+		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "1" )
+		   )
+		r->profile[i].holdOption = HOLD_ALWAYS;
+	    else
+		r->profile[i].holdOption = HOLD_NEVER;
+	}
+	else
+	    r->profile[i].holdOption = HOLD_NOTCLEAN;
     }
+
+    if( !r->h->rs[Rs_holdExitTtl] )
+	r->h->rs[Rs_holdExitTtl] = "(Done) %t";
+
+    if( !r->h->rs[Rs_holdExitTxt] )
+	r->h->rs[Rs_holdExitTxt] = "\n\n\r\e[31m"
+				   "Process exited %N with status %S. "
+				   "Press any key to close tab.\e[0m";
 
 #ifdef OS_LINUX
     if( !r->h->rs[Rs_cwd] )
@@ -1584,6 +1613,8 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
      * server connection is established.
      */
     struct sigaction	act;
+
+    DBG_MSG( 1, ( stderr, "rxvt_init_command()\n" ) );
 
 
     /*
@@ -2617,6 +2648,9 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     PVTS(r, page)->next_tty_action = SAVE;
 #endif
 
+    PVTS(r, page)->holdOption = r->profile[profile].holdOption;
+
+    PVTS(r, page)->status = 0;
     PVTS(r, page)->hold = 0;	    /* clear hold flag */
     PVTS(r, page)->dead = 0;	    /* clear dead flag */
     PVTS(r, page)->highlight = 0;   /* clear highlight flag */
@@ -3491,9 +3525,8 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 	     * If we got here, then we failed to exec the child process.
 	     * We must kill the child's thread, and NOT return.
 	     */
-	    fprintf( stderr, "Error executing %s. Exiting.\n",
+	    fprintf( stderr, "Could not execute %s.\n",
 		    (argv && argv[0]) ? argv[0] : "shell");
-	    sleep(5);
 
 	    exit(EXIT_FAILURE);
 	    /* NOT REACHED */

@@ -11,12 +11,12 @@
 - Extensible timer support
 
 - Reduce X resource usage, like Window, Pixmap, etc.
-	2006-01-29 gi1242: Xresource usage (with or without transparency) is now
-	down to some 20kb. I'm not sure how much more can be shaved of this ...
+    2006-01-29 gi1242: Xresource usage (with or without transparency) is now
+    down to some 20kb. I'm not sure how much more can be shaved of this ...
 
-	2006-02-23 gi1242: Jimmy pointed out that we currently use one window for
-	each VT. This is very wasteful, especially since we only display one window
-	each time.
+    2006-02-23 gi1242: Jimmy pointed out that we currently use one window for
+    each VT. This is very wasteful, especially since we only display one window
+    each time.
 
 - Xterm style mouse support, e.g., joe 3.2
 
@@ -32,6 +32,37 @@
   	2006-02-23 gi1242: Possibly fixed. See comments in rxvt_Child_signal in
 	main.c.
 
+	2006-08-23 gi1242: Fixed! Our child handler now only sets a global
+	variable. Further, we know we might miss a few SIGCHLD's, so when we
+	get EIO errors after read(), we check to see if something died without
+	telling us. We also flush the input buffer of dead childs, so the
+	output is perfect ;)
+
 - Show icon in tabs
 
 - Add separate colors for tabbar background, menubar fg/bg
+
+
+BUGS:
+
+    1. mrxvt lockup! While waiting for an escape sequence to complete, mrxvt
+       can not read any input from other tabs. This could lead to lockups:
+
+	    mrxvt -ip 0,0 -e bash -c 'echo -ne "\e["; sleep 10
+
+       Will make you wait 10 seconds before you can do anything on other tabs.
+
+       WORK AROUND: Just type some text (or kill) the process in the first tab.
+       If that doesn't work, press the ToggleHold macro after killing the
+       process in the offending tab.
+
+    2. Some functions are called from within rxvt_cmd_getc which should not be!
+       For instance we can switch tabs inside rxvt_cmd_getc. This is not a good
+       idea. For instance, if mrxvt is waiting for an escape sequence to
+       complete (as above), then it will lead to incorrect output.
+
+       NOTE: The above two bugs have been around since the first release of
+       mrxvt. However have not been spotted until now! This is mainly because it
+       is very unlikely you're going to stop half way through an escape
+       sequence. Thus for normal use, these two bugs should not affect anyone.
+       However we will try and fix it in the near future.

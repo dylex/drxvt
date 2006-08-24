@@ -374,7 +374,6 @@ rxvt_Exit_signal(int sig)
     rxvt_t*	    r;
 
     DBG_MSG( 1, ( stderr, "Received signal %d\n", (int) sig));
-    signal( sig, SIG_DFL );
 
     r = rxvt_get_r();
 
@@ -479,8 +478,10 @@ rxvt_clean_exit (rxvt_t* r)
 	rxvt_session_exit (r);
 #endif
 
-    /* now kill all child processes, zsh puts them into background
-    ** if we do not do so */
+    /*
+     * Now kill all child processes, zsh puts them into background if we do not
+     * do so.
+     */
     for (i = 0; i <= LTAB(r); i ++)
 	kill (PVTS(r, i)->cmd_pid, SIGHUP);
 

@@ -350,7 +350,7 @@ typedef enum {
 #define Opt2_bottomTabbar	    ((1LU<<13) | IS_OPTION2)
 #define Opt2_borderLess		    ((1LU<<14) | IS_OPTION2)
 #define Opt2_overrideRedirect	    ((1LU<<15) | IS_OPTION2)
-#define Opt2_holdExit		    ((1LU<<16) | IS_OPTION2)
+/* #define Opt2_holdExit		    ((1LU<<16) | IS_OPTION2) */
 #define Opt2_broadcast		    ((1LU<<17) | IS_OPTION2)
 #define Opt2_hideButtons	    ((1LU<<18) | IS_OPTION2)
 #define Opt2_veryBold		    ((1LU<<19) | IS_OPTION2)
@@ -710,6 +710,8 @@ typedef struct {
      *   hold >  1: can destroy the terminal now
      */
     unsigned char   BOOLVAR(hold,2),
+		    BOOLVAR(holdOption,2),  /* Copy of the profile option for
+					       this tab.*/
 		    BOOLVAR(dead,1),	    /* the terminal is dead or alive? */
 		    BOOLVAR(highlight,1);   /* the terminal is highlighted? */
     int		    status;		    /* Status of child process after it
@@ -816,6 +818,8 @@ typedef struct _profile_t
 #endif /* OFF_FOCUS_FADING */
 
     int			saveLines;
+
+    unsigned char	BOOLVAR( holdOption, 2 );
 
     /*
      * Each profile also has a tab title, and command associated to it. However
