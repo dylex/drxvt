@@ -652,23 +652,24 @@ Set the title of tabs to
 after the process in the tab exits. (This string is escape and percent interpolated).
 .Op Cm holdExitTitle
 .
-.It Fl hold Ar status
+.It Fl hold Ar mask
 Hold the tab open after the child process in it exits.
-.Ar status
-can be
-.Ar Always , Clean , NotClean , Never
-to hold the tab open based on the exit status of the child program.
+.Ar mask
+is the mask of flags which control weather the tab will be held open based on the exit status of the child process. If the lowest bit (0x01) of
+.Ar mask
+is set, then the tab will always be held open after the child exits. If the next bit (0x02) is set, then the tab will only be held open if the child exits abnormally (e.g. via
+.Xr abort 1 ) .
+If the third bit (0x04) is set, then the tab will be held open if the child exits with non-zero status.
 .Pp
 NOTE: In previous versions of
 .Nm
 this was a boolean option. For backward compatibility, the value of
-.Ar True , 1 , On
+.Ar True , On, Yes
 will be treated as
-.Ar Always
+.Ar 1
 and anything illegal will be treated as
-.Ar Never .
-The default is
-.Ar Clean .
+.Ar 0 .
+The default is 0x06.
 .Op Cm holdExit
 .
 .BO ht

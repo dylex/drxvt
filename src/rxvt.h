@@ -1479,13 +1479,9 @@ enum {
 #define _NET_WM_STATE_TOGGLE	2
 
 /* Values for holdOption */
-#define HOLD_CLEANBIT		(1u)
-#define HOLD_DIRTYBIT		(2u)
-
-#define HOLD_NEVER		0
-#define HOLD_CLEAN		HOLD_CLEANBIT
-#define HOLD_NOTCLEAN		HOLD_DIRTYBIT
-#define HOLD_ALWAYS		(HOLD_CLEANBIT | HOLD_DIRTYBIT)
+#define HOLD_ALWAYSBIT		(1u << 0)
+#define HOLD_NORMALBIT		(1u << 1)
+#define HOLD_STATUSBIT		(1u << 2)
 
 /*
  *****************************************************************************

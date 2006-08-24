@@ -710,7 +710,7 @@ typedef struct {
      *   hold >  1: can destroy the terminal now
      */
     unsigned char   BOOLVAR(hold,2),
-		    BOOLVAR(holdOption,2),  /* Copy of the profile option for
+		    BOOLVAR(holdOption,3),  /* Copy of the profile option for
 					       this tab.*/
 		    BOOLVAR(dead,1),	    /* the terminal is dead or alive? */
 		    BOOLVAR(highlight,1);   /* the terminal is highlighted? */
@@ -819,7 +819,7 @@ typedef struct _profile_t
 
     int			saveLines;
 
-    unsigned char	BOOLVAR( holdOption, 2 );
+    unsigned char	BOOLVAR( holdOption, 3 );
 
     /*
      * Each profile also has a tab title, and command associated to it. However

@@ -1433,24 +1433,22 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	/* Set holdOption */
 	if( r->h->rs[Rs_holdExit + i] )
 	{
-	    if( !STRCASECMP( r->h->rs[Rs_holdExit + i], "clean" ) )
-		r->profile[i].holdOption = HOLD_CLEAN;
-	    else if( !STRCASECMP( r->h->rs[Rs_holdExit + i], "notclean" ) )
-		r->profile[i].holdOption = HOLD_NOTCLEAN;
-	    else if(
-		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "always" )	    ||
-		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "true" )	    ||
-		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "yes" )	    ||
-		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "on" )	    ||
-		     !STRCASECMP( r->h->rs[Rs_holdExit + i], "1" )
-		   )
-		r->profile[i].holdOption = HOLD_ALWAYS;
+	    const char *s = r->h->rs[Rs_holdExit + i];
+
+	    /* Backward compatibility hack */
+	    if(
+		 !STRCASECMP( s, "true" )	    ||
+		 !STRCASECMP( s, "yes" )	    ||
+		 !STRCASECMP( s, "on" )
+	      )
+		r->profile[i].holdOption = HOLD_ALWAYSBIT;
 	    else
-		r->profile[i].holdOption = HOLD_NEVER;
+		r->profile[i].holdOption = strtoul( s, NULL, 0 );
 	}
 	else
-	    r->profile[i].holdOption = HOLD_NOTCLEAN;
-    }
+	    r->profile[i].holdOption = (i > 0) ? r->profile[0].holdOption :
+					    (HOLD_STATUSBIT|HOLD_NORMALBIT);
+    } /* for(i) */
 
     if( !r->h->rs[Rs_holdExitTtl] )
 	r->h->rs[Rs_holdExitTtl] = "(Done) %t";
