@@ -481,8 +481,6 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 	Region region)
 {
     Region	clipRegion;
-
-    UNSET_REGION(clipRegion);
     char	str[MAX_DISPLAY_TAB_TXT + 1];
 
 #ifdef MULTICHAR_SET
@@ -492,6 +490,8 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
     int		multichar;
     int		len;
 #endif
+
+    UNSET_REGION( clipRegion );
 
     /*
      * Adjust y offset, and make sure output is restricted to the current tab

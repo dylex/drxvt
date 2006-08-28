@@ -1596,7 +1596,6 @@ rxvt_find_cmd_child (rxvt_t* r)
     else
 #endif /* }}} */
     {
-	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: no child died\n"));
 	/*
 	 * Use round-robin to go through all tabs without starving
 	 * someone. It is used to avoid poor performance on one side
@@ -1605,6 +1604,8 @@ rxvt_find_cmd_child (rxvt_t* r)
 	 * bug id 1102791)
 	 */
 	static int	lastproctab = 0;  /* tab we processed last time */
+
+	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: no child died\n"));
 
 
 	/*
