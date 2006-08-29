@@ -1,11 +1,21 @@
 # 2006-02-24 Gautam Iyer <gi1242@users.sourceforge.net>
-# This is basically the same as the rxvt terminfo file, except by default has
-# 256 colors. Install this using "tic mrxvt.terminfo".
 #
-#	Reconstructed via infocmp from file: /home/gautam/.terminfo/r/rxvt
-rxvt|rxvt terminal emulator (X Window System), 
+# This file has been modified from the rxvt.terminfo file for mrxvt.
+#
+# NOTE: This file defines capabilities for a terminal named "rxvt" (not mrxvt).
+# The differences from the original rxvt's terminal capabilities are listed
+# below:
+#
+#   1. Modified function and cursor keys produce xterm like sequences, and not
+#      rxvt like sequences.
+#   2. The terminal has 256 colors by default (The original rxvt terminal
+#      emulator has a compile time option to support 256 colors).
+#
+# Install this file using "tic mrxvt.terminfo".
+#
+rxvt|mrxvt terminal emulator (X Window System), 
 	am, bce, eo, km, mir, msgr, xenl, xon, 
-	colors#256, cols#80, it#8, lines#24, ncv@, pairs#256, 
+	colors#256, cols#80, it#8, lines#24, ncv@, pairs#32717, 
 	acsc=``aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~, 
 	bel=^G, blink=\E[5m, bold=\E[1m, civis=\E[?25l, 
 	clear=\E[H\E[2J, cnorm=\E[?25h, cr=^M, 
@@ -37,3 +47,5 @@ rxvt|rxvt terminal emulator (X Window System),
 	setaf=\E[38;5;%p1%dm, sgr0=\E[m\017, smacs=^N, 
 	smcup=\E7\E[?47h, smir=\E[4h, smkx=\E=, smso=\E[7m, 
 	smul=\E[4m, tbc=\E[3g, vpa=\E[%i%p1%dd, 
+
+# vim: set ft=terminfo :

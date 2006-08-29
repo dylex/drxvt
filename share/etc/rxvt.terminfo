@@ -53,3 +53,5 @@ rxvt|rxvt terminal emulator (X Window System),
         op=\E[39;49m, setab=\E[%p1%{40}%+%dm, 
         setaf=\E[%p1%{30}%+%dm,
         use=rxvt-basic, 
+
+# vim: set ft=terminfo :
