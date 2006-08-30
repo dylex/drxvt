@@ -29,6 +29,9 @@ NEW FEATURES
 
 	8. Better performance with vttest.
 
+	9. When using -cf /dev/null, the cursor sometimes disappears. We should
+	   draw the cursor with reverse video if the colors are not specified.
+
 
     MEDIUM PRIORITY
 
@@ -203,4 +206,4 @@ CODING GUIDELINES
 --------------------------------------------------------------------------------
 
  Authors	: Jimmy Zhou, Gautam Iyer
- Last Changed	: Tue 29 Aug 2006 05:24:39 PM PDT
+ Last Changed	: Wed 30 Aug 2006 10:53:36 AM PDT
