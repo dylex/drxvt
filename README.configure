@@ -1,52 +1,40 @@
-***********************************************************************
-*   Please set tab stop to 4 for a best display of this file
-***********************************************************************
-
-
-To disable a configure option, e.g., the debug option, run the
-configure script as:
-    $ ./configure --disable-debug
-or
-    $ ./configure --enable-debug=no
-
-
-Here is the complete list of all available options of the configure
-script:
+Here is a list of a few important configure options specific to mrxvt. For a complete list, run "configure --help".
 
 --enable-everything
-    add support for all enable options marked with an asterisk listed
-    in "./configure --help".  Note that unlike other enable options
-    this is order dependant.  You can specify this and then disable
-    options which this enables by _following_ this with the appropriate
-    commands.
+    Attempt to enable everything (including debugging information) EXCEPT a few
+    development / experimental features (e.g. ourstrings). You can see what
+    features are NOT enabled by running "configure --enable-everything" and
+    looking at the status report it prints after it finishes.
 
 --enable-minimal
-	disable support for almost all enable options marked with an
-	asterisk listed in "./configure --help". Note that unlike other
-	enable options, this is order dependant. You can specify this
-	and then enable options which this disables by _following_ this
-	with the appropriate commands.
+    Disable support for almost everything that is not essential for mrxvt to
+    compile. You can see a list of features that are enabled / disabled by this
+    option by running "configure --enable-minimal" and looking at the status
+    report it prints after it finishes.
+    
+    NOTE: Unlike other enable options, this is order dependant. You can specify
+    this and then enable options which this disables by _following_ this with
+    the appropriate commands.
 
 --enable-debug
-    enable debug build of the program, which will build the program
-    with debug symbols and slow down the performance.
+    Enable debug build of the program, which will build the program with debug
+    symbols and slow down the performance. This will also print verbose
+    debugging messages to stderr.
 
 --enable-ourstrings
-    add support for our possibly faster memset() function and other
-    various routines, overriding your system's versions which may
-    have been hand-crafted in assembly or may require extra libraries
-    to link in.  (This has header problems on some Linux systems).
+    Add support for our own string functions, rather than those from the
+    standard library. Generally say no here, unless you have problems with the
+    standard library string functions.
 
 --enable-frills
-    add support for some lesser used features.
-    
+    Add support for internal borders, smooth resizing, smart resize.
+
 --enable-keepscrolling
-    add support for continual scrolling of the display when you hold
-    the mouse button down on a scrollbar arrow.
+    Add support for continual scrolling of the display when you hold the mouse
+    button down on a scrollbar arrow.
 
 --enable-selectionscrolling
-    add support to enable scrolling of the display when you select
-    the text.
+    add support to enable scrolling of the display when you select the text.
 
 --enable-mousewheel
     add support for scrolling via mouse wheel or buttons 4 & 5.
@@ -70,31 +58,30 @@ script:
     add support for a SGI IRIX-like scrollbar.
 
 --enable-half-shadow
-    make shadows on the scrollbar only half the normal width & height.
-    only applicable to rxvt scrollbars.
+    make shadows on the scrollbar only half the normal width & height. Only
+    applicable to rxvt scrollbars.
 
 --enable-utmp
-    write user and tty to utmp file (used by programs like ``w'') at
-    start of rxvt execution and delete information when rxvt exits.
+    write user and tty to utmp file (used by programs like ``w'') at start of
+    rxvt execution and delete information when rxvt exits.
 
 --enable-wtmp
-    write user and tty to wtmp file (used by programs like ``last'') at
-    start of rxvt execution and write logout when rxvt exits.  This
-    option requires --enable-utmp to also be specified.
-
---enable-lastlog
-    write user and tty to lastlog file (used by programs like
-    ``lastlogin'') at start of rxvt execution.  This option requires
+    write user and tty to wtmp file (used by programs like ``last'') at start
+    of rxvt execution and write logout when rxvt exits.  This option requires
     --enable-utmp to also be specified.
 
+--enable-lastlog
+    write user and tty to lastlog file (used by programs like ``lastlogin'') at
+    start of rxvt execution.	This option requires --enable-utmp to also be
+    specified.
+
 --enable-utempter
-	use utempter library to log the utmp and wtmp entries instead of
-	our own version. Thus, the setuid root or setgid permission can
-	be removed from mrxvt binary.
+    use utempter library to log the utmp and wtmp entries instead of our own
+    version. Thus, the setuid root or setgid permission can be removed from
+    mrxvt binary.
 
 --enable-linespace
-    add support to provide user specified line spacing between text
-    rows.
+    add support to provide user specified line spacing between text rows.
 
 --enable-24bits
     add support to 24 bits colors.
@@ -112,9 +99,9 @@ script:
     add support to have the shadow of text.
 
 --enable-smart-resize
-    add smart growth/shrink behaviour when changing font size
-    via from hot keys.  This should keep in a fixed position the
-    rxvt corner which is closest to a corner of the screen.
+    add smart growth/shrink behaviour when changing font size via from hot
+    keys. This should keep in a fixed position the rxvt corner which is
+    closest to a corner of the screen.
 
 --enable-menubar
     add support for our menu bar system.
@@ -125,15 +112,15 @@ script:
 
 --enable-xpm
      add support for XPM background pixmaps. This requires libxpm to be
-	 installed.
+     installed.
 
 --enable-jpeg
-     add support for JPEG background pixmaps. This requires libjpeg6 
-	 to be installed.
+     add support for JPEG background pixmaps. This requires libjpeg6 to be
+     installed.
 
 --enable-png
      add support for PNG background pixmaps. This requires libpng to be
-	 installed.
+     installed.
 
 --enable-fading
      add support for off focus fading of the window.
@@ -142,16 +129,16 @@ script:
      add support for color background tinting of the window.
 
 --enable-xrender
-     add support for tinting background with XRender. It is slower than
-	 default tinting behavior, but looks nicer.
+     add support for tinting background with XRender. It is slower than default
+     tinting behavior, but looks nicer.
 
 --enable-xft
      add support of freetype font. This option is not completed yet.
 
 --enable-xim
     add support for XIM (X Input Method) protocol.  This allows using
-    alternative input methods (e.g. kinput2) and will also correctly
-    set up the input for people using dead keys.
+    alternative input methods (e.g. kinput2) and will also correctly set up the
+    input for people using dead keys.
 
 --enable-greek
     add support for the greek keyboard.
@@ -160,50 +147,47 @@ script:
     add support for the Chinese/Japanese/Korean multichar languages.
 
 --enable-ttygid
-    change tty device setting to group "tty" - only use this if
-    your system uses this type of security.
+    change tty device setting to group "tty" - only use this if your system
+    uses this type of security.
 
 --enable-backspace-key
-    enable any handling of the backspace key by us - let the X server
-    do it.
+    enable any handling of the backspace key by us - let the X server do it.
 
 --enable-delete-key
-    enable any handling of the delete key by us - let the X server
-    do it.
+    enable any handling of the delete key by us - let the X server do it.
 
 --enable-resources
     add support to all resources checking.
 
 --enable-swapscreen
-    add support for swap screen, which will use more memory but make
-    the display much better.
+    add support for swap screen, which will use more memory but make the
+    display much better.
 
 --enable-old-selection
-    add support for reverting the mouse selection style to that
-    of v2.20 (and prior), which removes support for mouse selection
-    style like that of xterm.
+    add support for reverting the mouse selection style to that of v2.20 (and
+    prior), which removes support for mouse selection style like that of xterm.
 
 --with-encoding=NAME
-    set the default encoding for multi-char glyph languages to NAME.
-    Options are: "eucj" EUC Japanese encoding; "sjis" Shift JIS
-    encoding; "big5" BIG5 encoding; "gb" GB encoding; "kr" EUC Korean
-    encoding; "gbk" GBK encoding; "noenc" no encoding. This option
-	requires --enable-cjk to also be specified.
+    set the default encoding for multi-char glyph languages to NAME. Options
+    are: "eucj" EUC Japanese encoding; "sjis" Shift JIS encoding; "big5" BIG5
+    encoding; "gb" GB encoding; "kr" EUC Korean encoding; "gbk" GBK encoding;
+    "noenc" no encoding. This option requires --enable-cjk to also be
+    specified.
 
 --with-term=NAME
-    change the environmental variable for the terminal to NAME
-    (default "rxvt").
+    change the environmental variable for the terminal to NAME (default
+    "rxvt").
 
 --with-line-space=NUM
     change the default space pixels between rows.
 
 --with-int-border=NUM
-    change the default width of internal border. The --enable-frills
-	options must be enabled.
+    change the default width of internal border. The --enable-frills options
+    must be enabled.
 
 --with-ext-border=NUM
-    change the default width of external border. The --enable-frills
-	options must be enabled.
+    change the default width of external border. The --enable-frills options
+    must be enabled.
 
 --with-save-lines=NUM
     change the default lines to save in scroll buffer.
@@ -212,8 +196,8 @@ script:
     change the maximal number of tabs in a terminal (default 10).
 
 --with-terminfo=PATH
-    change the environmental variable for the path to the terminfo
-    tree to PATH.
+    change the environmental variable for the path to the terminfo tree to
+    PATH.
 
 --with-x
     use the X Window System (pretty much default, eh?).

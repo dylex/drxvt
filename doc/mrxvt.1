@@ -276,10 +276,6 @@ Tabbar background image. Pseudo transparency must be turned off.
 Apply tabbar background image to tabs.
 .Op Cm tabUsePixmap
 .
-.It pixmap Ar file Ns Op Ns ; Ns Ar geometry
-Background image for the terminal window. Pseudo-transparency must be turned off.
-.Op Cm Pixmap
-.
 .El
 .Ed
 .\" {{{2 scrolling
@@ -348,10 +344,6 @@ does not keep the screen completely up to date while scrolling. This allows
 .Nm
 to run faster when network latencies are very high and is typically useful when running across a very large internet or many gateways.
 .Op Cm scrollWithBuffer
-.
-.It sl Ar n
-Number of lines to save in the scroll back buffer. Max 65535.
-.Op saveLines
 .
 .El
 .Ed
@@ -1143,25 +1135,25 @@ option at startup. You can consult the
 .Pa doc/mrxvtrc.sample
 in the directory for more details.
 .Vb
-Mrxvt.vt0.tabTitle:         term1
-Mrxvt.vt1.tabTitle:         term2
-Mrxvt.vt2.tabTitle:         term3
-Mrxvt.vt0.saveLines:        600
-Mrxvt.vt1.saveLines:        600
-Mrxvt.vt2.saveLines:        600
-# Mrxvt.vt0.Pixmap:         /home/images/vt0bg.xpm
-# Mrxvt.vt1.Pixmap:         /home/images/vt1bg.xpm
-# Mrxvt.vt2.Pixmap:         /home/images/vt2bg.xpm
-Mrxvt.scrollbarStyle:       next
-Mrxvt.initTermNumber:       3
-Mrxvt.transparent:          True
-Mrxvt.transparentScrollbar: True
-Mrxvt.transparentTabbar:    False
-Mrxvt.transparentMenubar:   False
-Mrxvt.tintColor:	    #ffffff
-Mrxvt.shading:		    85
-Mrxvt.foreground:           white
-Mrxvt.background:           black
+Mrxvt.profile0.tabTitle:        term1
+Mrxvt.profile1.tabTitle:        term2
+Mrxvt.profile2.tabTitle:        term3
+Mrxvt.profile0.saveLines:       600
+Mrxvt.profile1.saveLines:       600
+Mrxvt.profile2.saveLines:       600
+# Mrxvt.profile0.Pixmap:        /home/images/vt0bg.xpm
+# Mrxvt.profile1.Pixmap:        /home/images/vt1bg.xpm
+# Mrxvt.profile2.Pixmap:        /home/images/vt2bg.xpm
+Mrxvt.scrollbarStyle:           next
+Mrxvt.initTermNumber:           3
+Mrxvt.transparent:              True
+Mrxvt.transparentScrollbar:     True
+Mrxvt.transparentTabbar:        False
+Mrxvt.transparentMenubar:       False
+Mrxvt.tintColor:                #ffffff
+Mrxvt.shading:                  85
+Mrxvt.foreground:               white
+Mrxvt.background:               black
 .Ve
 .Ed
 .\"}}}

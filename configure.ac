@@ -704,7 +704,7 @@ fi
 
 AC_ARG_WITH(
     term,
-    AC_HELP_STRING([--with-termname=NAME],[set the terminal to NAME [[rxvt]]]),
+    AC_HELP_STRING([--with-term=NAME],[set the terminal to NAME [[rxvt]]]),
     [term_name_option=$withval],
     [term_name_option=rxvt]
 )
