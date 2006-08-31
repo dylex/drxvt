@@ -1,4 +1,10 @@
-Here is a list of a few important configure options specific to mrxvt. For a complete list, run "configure --help".
+Here is a list of a important configure options specific to mrxvt. For a
+complete list, and for other options (e.g. PREFIX etc) run "configure --help",
+or read the help on the GNU autoconf tools.
+
+--enable-maintainer-mode
+    Enable make rules and dependencies not useful (and sometimes confusing) to
+    the casual installer.
 
 --enable-everything
     Attempt to enable everything (including debugging information) EXCEPT a few
@@ -75,6 +81,9 @@ Here is a list of a few important configure options specific to mrxvt. For a com
     start of rxvt execution.	This option requires --enable-utmp to also be
     specified.
 
+--enable-sessionmgr
+    enable X session manager
+
 --enable-utempter
     use utempter library to log the utmp and wtmp entries instead of our own
     version. Thus, the setuid root or setgid permission can be removed from
@@ -98,17 +107,22 @@ Here is a list of a few important configure options specific to mrxvt. For a com
 --enable-text-shadow
     add support to have the shadow of text.
 
---enable-smart-resize
-    add smart growth/shrink behaviour when changing font size via from hot
-    keys. This should keep in a fixed position the rxvt corner which is
-    closest to a corner of the screen.
-
 --enable-menubar
-    add support for our menu bar system.
+    Enable popup menus and menu bar.
 
 --enable-transparency
     add support for inheriting parent backgrounds thus giving a fake
     transparency to the term.
+
+--enable-fading
+     add support for off focus fading of the window.
+
+--enable-tinting
+     add support for color background tinting of the window.
+
+--enable-xrender
+     add support for tinting background with XRender. It is slower than default
+     tinting behavior, but looks nicer.
 
 --enable-xpm
      add support for XPM background pixmaps. This requires libxpm to be
@@ -121,16 +135,6 @@ Here is a list of a few important configure options specific to mrxvt. For a com
 --enable-png
      add support for PNG background pixmaps. This requires libpng to be
      installed.
-
---enable-fading
-     add support for off focus fading of the window.
-
---enable-tinting
-     add support for color background tinting of the window.
-
---enable-xrender
-     add support for tinting background with XRender. It is slower than default
-     tinting behavior, but looks nicer.
 
 --enable-xft
      add support of freetype font. This option is not completed yet.
@@ -167,13 +171,6 @@ Here is a list of a few important configure options specific to mrxvt. For a com
     add support for reverting the mouse selection style to that of v2.20 (and
     prior), which removes support for mouse selection style like that of xterm.
 
---with-encoding=NAME
-    set the default encoding for multi-char glyph languages to NAME. Options
-    are: "eucj" EUC Japanese encoding; "sjis" Shift JIS encoding; "big5" BIG5
-    encoding; "gb" GB encoding; "kr" EUC Korean encoding; "gbk" GBK encoding;
-    "noenc" no encoding. This option requires --enable-cjk to also be
-    specified.
-
 --with-term=NAME
     change the environmental variable for the terminal to NAME (default
     "rxvt").
@@ -193,11 +190,24 @@ Here is a list of a few important configure options specific to mrxvt. For a com
     change the default lines to save in scroll buffer.
 
 --with-max-term=NUM
-    change the maximal number of tabs in a terminal (default 10).
+    change the maximal number of tabs in a terminal (default 15).
+
+--with-atab-extra=%
+    The extra height (as a % of the font height) active tabs should have
+
+--with-tab-radius=%
+    The radius (as a % of the font X offset) of tab corners
 
 --with-terminfo=PATH
     change the environmental variable for the path to the terminfo tree to
     PATH.
+
+--with-encoding=NAME
+    set the default encoding for multi-char glyph languages to NAME. Options
+    are: "eucj" EUC Japanese encoding; "sjis" Shift JIS encoding; "big5" BIG5
+    encoding; "gb" GB encoding; "kr" EUC Korean encoding; "gbk" GBK encoding;
+    "noenc" no encoding. This option requires --enable-cjk to also be
+    specified.
 
 --with-x
     use the X Window System (pretty much default, eh?).
