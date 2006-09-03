@@ -999,6 +999,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		int		amount	    = abs( atoi( (char*) astr ));
 		enum page_dirn	direction   = (*(astr) == '-' ? UP : DN);
 
+		DBG_MSG( 2, ( stderr, "astr: '%s', alen: %d\n", astr, alen ) );
+
 		if( tolower( astr[ alen - 2] ) == 'p' )
 		    /* scroll pages */
 		    amount *=
@@ -1010,6 +1012,9 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		    ;
 
 		rxvt_scr_page( r, ATAB(r), direction, amount);
+#  ifdef HAVE_SCROLLBARS
+		rxvt_scrollbar_update(r, 1);
+#  endif    /* HAVE_SCROLLBARS */
 	    }
 	    break;
 

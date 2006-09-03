@@ -530,8 +530,11 @@ rxvt_is_scrollbar_win(rxvt_t *r, Window w)
  * Return the scrollbar background color.
  */
 /* EXTPROTO */
-unsigned long rxvt_scrollbar_bg( rxvt_t *r ) {
-    switch (r->scrollBar.style)	{
+unsigned long
+rxvt_scrollbar_bg( rxvt_t *r )
+{
+    switch (r->scrollBar.style)
+    {
 #  ifdef PLAIN_SCROLLBAR
 	case R_SB_PLAIN: return r->scrollBar.plain_bg;
 #  endif

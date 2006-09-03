@@ -1,209 +1,144 @@
 			      TODO list for mrxvt.
 
-If you do something on this list, be sure to send us a patch. See the section on
-"CODING GUIDELINES" at the end of this file.
+If you do something on this list, be sure to send us a patch. See the section
+on "CODING GUIDELINES" at the end of this file.
+
+Priority classification:    9 -- Important, 0 -- Useless.
 
 --------------------------------------------------------------------------------
 
-NEW FEATURES
+				  NEW FEATURES
 
-    HIGH PRIORITY
+Menus:
+8   Sticky menus, that can be accessed via the keyboard.
+7   Add -pfn option (analogous to -xftpfn) for a proportional font to display
+    tab titles / menus with an X11 font.
+7   Multichar Xft support in menus.
+7   Extend menu language / facility.
 
-	1. Multichar Xft support in menus.
+Windows and tabs:
+7   Split window support (e.g. like screen / vim).
+7   Have mrxvt be able to manage multiple windows. (Advantage is low memory
+    usage, and the ability to detach tabs / move them between windows).
+7   Rewrite background support using imlib2
+7   Show icons in tabs (after imlib2 support is added)
+7   Regexp based icon selection for tabs (and EWMH mini icon)
+5   Add separate colors for tabbar background, menubar fg/bg
+5   Searching scroll buffer support: We should pipe the scroll-back to less
+    directly, and open it in the *same* tab. (Ugly hack possible using macros)
 
-	2. Add -pfn option (analogus to -xftpfn) for a proportional font to
-	   display tab titles / menus with an X11 font.
+Core:
+9   UTF-8 support.
+9   Monitor tabs for output / silence (very easy as of 2006-09-02).
+8   Better performance with vttest.
+7   Draw the cursor with reverse video if the colors are not specified.
+7   I18N support
+7   regexp based selection, and URL highlighting
+7   Smart insertion of newlines in the selection
+5   Xterm style mouse support, e.g., joe 3.2
+4   Extensible timer support
 
-	3. UTF-8 support.
-
-	4. Split window support (e.g. like screen / vim).
-
-	5. Have mrxvt be able to manage multiple windows. (Advantage is low
-	   memory usage, and the ability to detach tabs / move them between
-	   windows).
-
-	6. Remove the uglyness that is pixmap.c, and link to imlib2 instead.
-	   Use imlib2 to show icons in tabs, tabbar buttons, backgrounds etc.
-
-	7. Add separate colors for tabbar background, menubar fg/bg
-
-	8. Better performance with vttest.
-
-	9. When using -cf /dev/null, the cursor sometimes disappears. We should
-	   draw the cursor with reverse video if the colors are not specified.
-
-
-    MEDIUM PRIORITY
-
-	1. Extend menu language / facility.
-
-	2. Sticky menus, that can be accessed via the keyboard.
-
-	3. Searching scroll buffer support. Currently implemented via a hack
-	   that saves the scrollback to a file, and opens it (in a new tab) in
-	   less. We should pipe the scroll-back to less directly, and open it
-	   in the *same* tab.
-
-	4. I18N support
-
-	5. Extensible timer support
-
-	6. Xterm style mouse support, e.g., joe 3.2
-
-
-    LOW PRIORITY
-
-	1. Reduce X resource usage. We currently use one window for each VT.
-	   This is very wasteful, especially since we only display one window
-	   each time.
-
-	2. PNG and JPEG background support on Solaris looks broken
-
-	3. The original rxvt (which mrxvt was fork'ed from) came with a library
-	   "librxvt". mrxvt does not have that, however a lot of mrxvt's code is
-	   structured for it. For instance, half our definitions are in
-	   rxvtlib.h (which should be moved to rxvt.h). All our function names
-	   start with "rxvt_". These can be safely renamed: e.g. rxvt_cmd_getc
-	   can be called getcFromTabs() or getc_from_tabs. [The shmuck who does
-	   this cleanup will get to use his convention in naming. The rest of us
-	   will have to follow it.]
-
-	4. Some variables are named very badly. Our names should either be mixed
-	   case without underscores, or lower case with underscores. Not mixed
-	   case with underscores. This convention should be followed
-	   consistently for all global structure members, and function names.
-
-	5. Legacy rxvt code cleanup: There's tonnes and tonnes of rxvt code that
-	   has not been read by anyone for YEARS. It can probably be cleaned up
-	   a lot.
-
+Code Cleanup:
+5   The original rxvt installed a core functionality in a library (librxvt).
+    mrxvt does not do this, however a lot of mrxvt's code is structured for it.
+    For instance, half our definitions are in rxvtlib.h (which should be moved
+    to rxvt.h). All our function names start with "rxvt_". These can be safely
+    renamed: e.g. rxvt_cmd_getc can be called getcFromTabs() or getc_from_tabs.
+    [The shmuck who does this cleanup will get to use his convention in naming.
+    The rest of us will have to follow it.]
+5   Some variables are named very badly. Our names should either be mixed case
+    without underscores, or lower case with underscores. Not mixed case with
+    underscores. This convention should be followed consistently for all global
+    structure members, and function names.
+5   Legacy rxvt code cleanup: There's tonnes and tonnes of rxvt code that has
+    not been read by anyone for YEARS. It can probably be cleaned up a lot.
+3   Reduce X resource usage: We currently use one window for each VT. This is
+    very wasteful, especially since we only display one window each time.
 
 --------------------------------------------------------------------------------
 
-BUGS
+				      BUGS
 
-    1. mrxvt lockup! While waiting for an escape sequence to complete, mrxvt
-       can not read any input from other tabs. This could lead to lockups:
-
-	    mrxvt -ip 0,0 -e bash -c 'echo -ne "\e["; sleep 10'
-
-       Will make you wait 10 seconds before you can do anything on other tabs.
-
-       WORK AROUND: Just type some text (or kill) the process in the first tab.
-       If that doesn't work, press the ToggleHold macro after killing the
-       process in the offending tab.
-
-    2. Some functions are called from within rxvt_cmd_getc which should not be!
-       For instance we can switch tabs inside rxvt_cmd_getc. This is not a good
-       idea. For instance, if mrxvt is waiting for an escape sequence to
-       complete (as above), then it will lead to incorrect output.
-
-       NOTE: The above two bugs have been around since the first release of
-       mrxvt. However have not been spotted until now! This is mainly because it
-       is very unlikely you're going to stop half way through an escape
-       sequence. Thus for normal use, these two bugs should not affect anyone.
-       However we will try and fix it in the near future.
+9   vt100 printer support is now broken. Fix it.
+8   rxvt_cmd_write should be replaced with rxvt_tt_write in rxvt_clean_cmd_page
+8   When sending escape sequences to mrxvt via macros, make sure we are not
+    disrupting processing of another escape sequence.
+1   PNG and JPEG background support on Solaris looks broken
 
 --------------------------------------------------------------------------------
 
-CODING GUIDELINES
+			       CODING GUIDELINES
 
-    If you want to contribute code to mrxvt, PLEASE PLEASE follow these
-    guidelines.
-    
-    Right now we only have two regular developers, who are extremely busy. We
-    could use your help. If you want to help, do anything on the above list and
-    send us a patch. Or do something useful (and not contradictory to mrxvt's
-    design goals), and send us a patch.
-    
-    If you send us patches regularly, then we will probably give you subversion
-    access.
+If you want to contribute code to mrxvt, PLEASE PLEASE follow these guidelines.
 
-    SUBMITTING A PATCH
+Right now we only have two regular developers, who are extremely busy. We could
+use your help. If you want to help, do anything on the above list and send us a
+patch. Or do something useful (and not contradictory to mrxvt's design goals),
+and send us a patch.
 
-	Use the following guidelines when submitting a patch for mrxvt:
+If you send us patches regularly, then we will probably give you subversion
+access.
 
-	1. Please please submit a patch against the LATEST version from the
-	   subversion repository (NOT THE LATEST RELEASE). Look on the download
-	   section for how to checkout mrxvt from subversion.
+SUBMITTING A PATCH
 
-	2. Include the date, and revision number of the version from the
-	   subversion repository your patch is against.
+    Use the following guidelines when submitting a patch for mrxvt:
+    1. Please please submit a patch against the LATEST version from the
+       subversion repository (NOT THE LATEST RELEASE). Look on the download
+       section for how to checkout mrxvt from subversion.
+    2. Include the date, and revision number of the version from the subversion
+       repository your patch is against.
+    3. Follow the guidelines under "WRITING CODE FOR MRXVT" at the end of this
+       section.
 
-	3. Follow the guidelines under "WRITING CODE FOR MRXVT" at the end of
-	   this section.
+COMMITTING TO SUBVERSION
 
+    Use the following guidelines when committing your work to the subversion
+    repository.
+    1. DO NOT COMMIT YOUR WORK UNLESS IT COMPILES CLEANLY (with
+       --enable-everything)
+    2. DO NOT COMMIT YOUR WORK IF IT SEGFAULTS.
+    3. Be sure you leave helpful messages in the subversion logs.
+    4. If you plan on implementing something small (e.g. new option that takes
+       all of 10 lines of code, and is useful) just go ahead and do it. No need
+       to announce it on the devel list / etc.
+    5. If you plan on major code changes, or a "big" feature (e.g. imlib2
+       support), then it would be a good idea to discuss this on the devel list
+       first.
+    6. Follow the guidelines under "WRITING CODE FOR MRXVT" at the end of this
+       section
 
-    COMMITTING TO SUBVERSION
+WRITING CODE FOR MRXVT
 
-	Use the following guidelines when committing your work to the subversion
-	repository.
+    PLEASE PLEASE follow these guidelines when contributing code to mrxvt.
+    1. The "one true brace style" sucks. Use the style we have in our code. It
+       looks best with Vim7 and syntax folding.
+    2. You're probably aware of our design goals: Small, light, and CPU
+       friendly. Don't bend this one too much, otherwise you will get flamed
+    3. Don't add dependencies unless you ABSOLUTELY have to. Even then, discuss
+       it first on the devel list. Regardless, any dependency you add MUST be
+       optional, and mrxvt should be able compile and run without it.
+    4. If you are adding a new experimental feature (e.g. Jimmy's memory code),
+       then make sure you #ifdef it out. Thus you can use the feature by
+       compiling with env CFLAGS="-DFANTASTIC_FEATURE" configure
+       --enable-everything Once your feature has become stable, either add a
+       macro in src/feature.h, or a --enable configure option.
+    5. Comment your code! Either me or Jimmy might remove / rewrite it
+       otherwise. (Jimmy's removed some under commented code of mine before,
+       and he's sure to do it again should the need arise.)
+    6. If you've added a new feature, PLEASE DOCUMENT IT.
+    7. If you've done something on this TODO list, please update this list.
+    8. We're flexible! If for some reason you don't want to follow the above
+       coding guidelines, then LET US KNOW. We're open to discussion on coding
+       styles / etc. If we agree to your proposed change, then it is your
+       responsibility to change the style of the current mrxvt codebase to the
+       agreed new style. Just sending us a patch with only your code in your
+       style will get you flamed.
+    9. Mrxvt is GPL. Don't write code for us unless you are willing to release
+       it under GPL.
 
-	1. DO NOT COMMIT YOUR WORK UNLESS IT COMPILES CLEANLY (with
-	   --enable-everything)
-
-	2. DO NOT COMMIT YOUR WORK IF IT SEGFAULTS.
-
-	3. Be sure you leave helpful messages in the subversion logs.
-
-	4. If you plan on implementing something small (e.g. new option that
-	   takes all of 10 lines of code, and is useful) just go ahead and
-	   do it. No need to announce it on the devel list / etc.
-	   
-	5. If you plan on major code changes, or a "big" feature (e.g.
-	   imlib2 support), then it would be a good idea to discuss this
-	   on the devel list first.
-
-	6. Follow the guidelines under "WRITING CODE FOR MRXVT" at the end of
-	   this section
-
-
-    WRITING CODE FOR MRXVT
-
-	PLEASE PLEASE follow these guidelines when contributing code to mrxvt.
-
-	1. The "one true brace style" sucks. Use the style we have in our code.
-	   It looks best with Vim7 and syntax folding.
-
-	2. You're probably aware of our design goals: Small, light, and CPU
-	   friendly. Don't bend this one too much, otherwise you will get flamed
-
-	3. Don't add dependencies unless you ABSOLUTELY have to. Even then,
-	   discuss it first on the devel list. Regardless, any dependency you
-	   add MUST be optional, and mrxvt should be able compile and run
-	   without it.
-
-	4. If you are adding a new experimental feature (e.g. Jimmy's memory
-	   code), then make sure you #ifdef it out. Thus you can use the
-	   feature by compiling with
-
-	    env CFLAGS="-DFANTASTIC_FEATURE" configure --enable-everything
-
-	   Once your feature has become stable, either add a macro in
-	   src/feature.h, or a --enable configure option.
-
-	5. Comment your code! Either me or Jimmy might remove / rewrite it
-	   otherwise. (Jimmy's removed some under commented code of mine
-	   before, and he's sure to do it again should the need arise.)
-
-	6. If you've added a new feature, PLEASE DOCUMENT IT.
-
-	7. If you've done something on this TODO list, please update this list.
-
-	8. We're flexible! If for some reason you don't want to follow the above
-	   coding guidelines, then LET US KNOW. We're open to discussion on
-	   coding styles / etc. If we agree to your proposed change, then it is
-	   your responsibility to change the style of the current mrxvt codebase
-	   to the agreed new style. Just sending us a patch with only your code
-	   in your style will get you flamed.
-
-	9. Mrxvt is GPL. Don't write code for us unless you are willing to
-	   release it under GPL.
-
-
-    That's it. Happy hacking
+That's it. Happy hacking
 
 --------------------------------------------------------------------------------
 
  Authors	: Jimmy Zhou, Gautam Iyer
- Last Changed	: Wed 30 Aug 2006 10:53:36 AM PDT
+ Last Changed	: Sun 03 Sep 2006 09:11:19 AM PDT

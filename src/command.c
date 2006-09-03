@@ -158,12 +158,14 @@ static DeadKeyChar  dkc_tab[] = {
  *--------------------------------------------------------------------*/
 void           rxvt_process_keypress         (rxvt_t*, XKeyEvent*);
 void           rxvt_clean_cmd_page           (rxvt_t*);
+inline int     rxvt_cmdbuf_has_input	     ( rxvt_t *r, int page );
 int            rxvt_find_cmd_child           (rxvt_t*);
 void           rxvt_check_cmdbuf             (rxvt_t*, int);
 int            rxvt_read_child_cmdfd         (rxvt_t*, int, unsigned int);
 void           rxvt_process_children_cmdfd   (rxvt_t*, fd_set*);
 int            rxvt_check_quick_timeout      (rxvt_t*);
 int            rxvt_adjust_quick_timeout     (rxvt_t*, int, struct timeval*);
+void	       rxvt_refresh_vtscr_if_needed  (rxvt_t*);
 unsigned char  rxvt_cmd_getc                 (rxvt_t*, int* page);
 #ifdef POINTER_BLANK
 void           rxvt_pointer_blank            (rxvt_t*, int);
@@ -1261,7 +1263,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	if (AVTS(r)->view_start)
 	{
 	    AVTS(r)->view_start = 0;
-	    r->h->want_refresh = 1;
+	    AVTS(r)->want_refresh = 1;
 	}
     }
 
@@ -1289,36 +1291,53 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 /*{{{ rxvt_cmd_write(), rxvt_cmd_getc() */
 /* attempt to `write' count to the input buffer */
 /* EXTPROTO */
-unsigned int
+void
 rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
 	unsigned int count)
 {
     unsigned int    n, s;
-    unsigned char*  cmdbuf_base = PVTS(r, page)->cmdbuf_base;
-    unsigned char*  cmdbuf_endp = PVTS(r, page)->cmdbuf_endp;
-    unsigned char*  cmdbuf_ptr = PVTS(r, page)->cmdbuf_ptr;
+    unsigned char   *cmdbuf_base = PVTS(r, page)->cmdbuf_base,
+                    *cmdbuf_endp = PVTS(r, page)->cmdbuf_endp,
+                    *cmdbuf_ptr	= PVTS(r, page)->cmdbuf_escstart ? 
+			    PVTS(r, page)->cmdbuf_escstart :
+			    PVTS(r, page)->cmdbuf_ptr;
 
     n = cmdbuf_ptr - cmdbuf_base;
     s = cmdbuf_base + (BUFSIZ - 1) - cmdbuf_endp;
+
+    /*
+     * If there is not enough space to write our data, try using the unused
+     * space in the beginning.
+     */
     if (n > 0 && s < count)
     {
 	MEMMOVE(cmdbuf_base, cmdbuf_ptr,
 	    (unsigned int)(cmdbuf_endp - cmdbuf_ptr));
-	cmdbuf_ptr = cmdbuf_base;
+
+	cmdbuf_ptr  -= n;
 	cmdbuf_endp -= n;
 	s += n;
+
+	if( PVTS(r, page)->cmdbuf_escstart )
+	    PVTS(r, page)->cmdbuf_escstart -= n;
+	if( PVTS(r, page)->cmdbuf_escfail )
+	    PVTS(r, page)->cmdbuf_escfail -= n;
+
+	PVTS(r, page)->cmdbuf_ptr = cmdbuf_ptr;
     }
+
     if (count > s)
     {
 	rxvt_print_error("data loss: cmd_write too large");
 	count = s;
     }
+
     for (; count--;)
 	*cmdbuf_endp++ = *str++;
-    PVTS(r, page)->cmdbuf_ptr = cmdbuf_ptr;
+
     PVTS(r, page)->cmdbuf_endp = cmdbuf_endp;
+
     assert (PVTS(r, page)->cmdbuf_base <= PVTS(r, page)->cmdbuf_endp);
-    return 0;
 }
 
 
@@ -1457,6 +1476,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 {
     int		i;
 
+    DBG_MSG( 1, ( stderr, "rxvt_clean_cmd_page()\n" ) );
     if( r->vt_died )
 	rxvt_mark_dead_childs( r );
 
@@ -1486,7 +1506,9 @@ rxvt_clean_cmd_page (rxvt_t* r)
 			i, WIFEXITED(PVTS(r,i)->status) ? "success" : "failure",
 			PVTS(r,i)->status,
 			PVTS(r,i)->holdOption ) );
-	    /* Process in tab i has died, and needs to be cleaned up. */
+	    /*
+	     * Process in tab i has died, and needs to be cleaned up.
+	     */
 	    if( SHOULD_HOLD( r, i ) )
 	    {
 		const int	maxLen = 1024;
@@ -1504,13 +1526,56 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		DBG_MSG( 9, ( stderr, "Reading from tab %d. (O_NDELAY %d)\n",
 			i, O_NDELAY & fcntl( PVTS(r,i)->cmd_fd, F_GETFL ) ) );
 
-		/* See if there is any pending data in the child's fd */
-		rxvt_read_child_cmdfd( r, i,
-		    BUFSIZ - 1 -
-			(PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base) );
+		/*
+		 * Process any pending data from the child.
+		 */
+		do
+		  {
+		    /*
+		     * Write out pending data in the child's input buffer. NOTE:
+		     * Since the child is dead, rxvt_cmd_write is OK here.
+		     */
+		    if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
+			rxvt_cmd_write(r, i, NULL, 0);
+
+		    /*
+		     * Process information in the child's output buffer.
+		     */
+		    while( PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp )
+		    {
+			rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
+
+			/* Incomplete escape sequence, ignore it. */
+			if( PVTS(r, i)->cmdbuf_escfail )
+			{
+			    DBG_TMSG( 3, ( stderr,
+				    "Incomplete escape sequence '%.*s'\n",
+				    PVTS(r, i)->cmdbuf_escfail - 
+					PVTS(r, i)->cmdbuf_escstart + 1,
+				    PVTS(r, i)->cmdbuf_escstart+1
+				    ) );
+
+			    SET_NULL( PVTS(r, i)->cmdbuf_escstart );
+			    SET_NULL( PVTS(r, i)->cmdbuf_escfail );
+
+			    /* Skip the escape char */
+			    PVTS(r, i)->cmdbuf_ptr++;
+			}
+		    }
+
+		    /* Make place for new data */
+		    rxvt_check_cmdbuf( r, i );
+
+		    /* Read any remaining data from childs fd */
+		    rxvt_read_child_cmdfd( r, i,
+			    BUFSIZ - 1 -
+				(PVTS(r, i)->cmdbuf_endp
+					- PVTS(r, i)->cmdbuf_base) );
+		  }
+		while( rxvt_cmdbuf_has_input( r, i) );
 
 		/*
-		 * print the holding exit text on screen
+		 * print holdExitText on screen if defined.
 		 */
 		msg = getProfileOption( r, PVTS(r,i)->profileNum,
 				Rs_holdExitTxt );
@@ -1525,16 +1590,10 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		    len = rxvt_str_escaped( (char*) buffer );
 
 		    rxvt_cmd_write(r, i, buffer, len );
+
+		    if( PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp )
+			rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
 		}
-
-		/*
-		 * Process any pending input.
-		 */
-		while (PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp)
-		    rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
-
-		if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
-		    rxvt_tt_write(r, i, NULL, 0);
 
 		/*
 		 * Update title to show tab has finished.
@@ -1563,140 +1622,73 @@ rxvt_clean_cmd_page (rxvt_t* r)
 }
 
 
+/* Returns true if there is input pending in PVTS(r, page)->cmdbuf */
+/* INTPROTO */
+inline int
+rxvt_cmdbuf_has_input( rxvt_t *r, int page )
+{
+    return PVTS(r, page)->cmdbuf_escfail ?
+	PVTS(r, page)->cmdbuf_escfail < PVTS(r, page)->cmdbuf_endp	    :
+	PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp;
+}
+
+/*
+ * Find a tab with some output, and return it.
+ *
+ * Bug #1102791 (Carsten Menke): A really busy tab could starve all others. So
+ * use a round robin to go through all tabs.
+ */
 /* INTPROTO */
 int
 rxvt_find_cmd_child (rxvt_t* r)
 {
     register int    k;
+    static int	    lastProcessed = 0;  /* tab we processed last time */
 
+    DBG_MSG( 1, ( stderr, "rxvt_find_cmd_child()\n" ) );
 
-#if 0 /* {{{ Old code when children are dead */
-    if (r->vt_died > 0)
-    {
-	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: some child died\n"));
-	/* If a child has died, try to find and return it */
-	for (k = 0; k <= LTAB(r); k ++)
+    /*
+     * See if the active tab has input before anything else.
+     */
+    if( rxvt_cmdbuf_has_input( r, ATAB(r) ) )
+	return ATAB(r);
+
+    /*
+     * Now look for data from other tabs. Remember the tab we found data from so
+     * that we can start from the next tab on the next call to this function.
+     */
+    if( lastProcessed > LTAB(r) )   /* Sanity check */
+	lastProcessed = LTAB(r);
+
+    /* start from the next tab of last processed tab */
+    k = lastProcessed + 1;
+
+    do
+      {
+	if( k > LTAB(r) )	/* round-robin */
+	    k = 0;
+
+	assert( PVTS(r, k)->cmdbuf_base <= PVTS(r, k)->cmdbuf_endp );
+
+	/* already have something in some page's buffer */
+	if( rxvt_cmdbuf_has_input(r, k) )
 	{
-	    assert (PVTS(r, k)->cmdbuf_base <= PVTS(r, k)->cmdbuf_endp);
-
-	    if (PVTS(r, k)->dead && 
-		!( ISSET_OPTION(r, Opt2_holdExit) &&
-		   (PVTS(r, k)->hold > 1)))
-	    {
-
-		*PVTS(r, k)->cmdbuf_endp = (char) 0;
-		return k;
-	    }
-
-	    /* output any pending chars of page's v_buffer */
-	    if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
-		rxvt_tt_write(r, k, NULL, 0);
-	}   /* for loop */
-    }
-    else
-#endif /* }}} */
-    {
-	/*
-	 * Use round-robin to go through all tabs without starving
-	 * someone. It is used to avoid poor performance on one side
-	 * of a particularly busy tab if there are a lot of activities
-	 * in it. This problem is noticed by Carsten Menke (sourceforge
-	 * bug id 1102791)
-	 */
-	static int	lastproctab = 0;  /* tab we processed last time */
-
-	DBG_MSG(2, (stderr, "rxvt_find_cmd_child: no child died\n"));
-
-
-	/*
-	 * check of lastproctab in case it points to something not exist
-	 * - then we will get into infinite loop!
-	 */
-	if (lastproctab > LTAB(r))
-	    lastproctab = LTAB(r);
-	/* start from the next tab of last processed tab */
-	k = lastproctab + 1;
-
-	do
-	  {
-	    if (k > LTAB(r))	/* round-robin */
-		k = 0;
-
-	    assert (PVTS(r, k)->cmdbuf_base <=
-		PVTS(r, k)->cmdbuf_endp);
-
-	    /* already have something in some page's buffer */
-	    if (PVTS(r, k)->cmdbuf_ptr < PVTS(r, k)->cmdbuf_endp)
-	    {
-		lastproctab = k;
-		return k;
-	    }
-
-	    /* output any pending chars of page's v_buffer */
-	    if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
-		rxvt_tt_write(r, k, NULL, 0);
-
-	  }
-	while (k++ != lastproctab);	/* until we hit the last child again */
-
-#if 0 /* {{{ */
-	/*
-	 * Reverse loop direction on each entry. It is used to avoid poor
-	 * performance on one side of a particularly busy tab if there are a lot
-	 * of activities in it. This problem is noticed by Carsten Menke
-	 * (sourceforge bug id 1102791)
-	 */
-	static int  direction = 1;
-
-	/* reverse the loop direction */
-	direction = !direction;
-
-	if (0 == direction)
-	{
-	    /*
-	     * try to find a child with input, from the left to the right
-	     */
-	    for (k = 0; k <= LTAB(r); k ++)
-	    {
-		assert (PVTS(r, k)->cmdbuf_base <=
-		    PVTS(r, k)->cmdbuf_endp);
-
-		/* already have something in some page's buffer */
-		if (PVTS(r, k)->cmdbuf_ptr < PVTS(r, k)->cmdbuf_endp)
-		{
-		    *p_page = k;
-		    return 1;
-		}
-
-		/* output any pending chars of page's v_buffer */
-		if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
-		    rxvt_tt_write(r, k, NULL, 0);
-	    }	/* for loop */
+	    lastProcessed = k;
+	    return k;
 	}
-	else
-	{
-	    /*
-	     * Try to find a child with input, from the right to the left
-	     */
-	    for (k = LTAB(r); k >= 0; k --)
-	    {
-		assert (PVTS(r, k)->cmdbuf_base <=
-		    PVTS(r, k)->cmdbuf_endp);
 
-		/* already have something in some page's buffer */
-		if (PVTS(r, k)->cmdbuf_ptr < PVTS(r, k)->cmdbuf_endp)
-		{
-		    *p_page = k;
-		    return 1;
-		}
-
-		/* output any pending chars of page's v_buffer */
-		if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
-		    rxvt_tt_write(r, k, NULL, 0);
-	    }	/* for loop */
-	}
-#endif	/* 0 }}}*/
-    }
+#if 0
+	/*
+	 * output any pending chars of page's v_buffer
+	 *
+	 * 2006-08-31 gi1242 XXX: This should not be here! We should do this in
+	 * rxvt_cmd_getc before select()
+	 */
+	if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
+	    rxvt_tt_write(r, k, NULL, 0);
+#endif
+      }
+    while (k++ != lastProcessed);	/* until we hit the last child again */
 
     return -1; /* not found */
 }
@@ -1706,44 +1698,56 @@ rxvt_find_cmd_child (rxvt_t* r)
 void
 rxvt_check_cmdbuf (rxvt_t* r, int page)
 {
-    if (PVTS(r, page)->cmdbuf_ptr == PVTS(r, page)->cmdbuf_endp)
+    assert( PVTS(r, page)->cmdbuf_base <= PVTS(r, page)->cmdbuf_endp );
+
+    if(
+	  IS_NULL( PVTS(r, page)->cmdbuf_escstart )		    &&
+	  PVTS(r, page)->cmdbuf_ptr == PVTS(r, page)->cmdbuf_endp
+      )
     {
 	/*
 	 * If there is no data in the buffer, reset it to the beginning
 	 * of the buffer.
 	 */
-	assert (PVTS(r, page)->cmdbuf_base <=
-	    PVTS(r, page)->cmdbuf_endp);
-	PVTS(r, page)->cmdbuf_ptr =
-	PVTS(r, page)->cmdbuf_endp =
-	PVTS(r, page)->cmdbuf_base;
-	assert (PVTS(r, page)->cmdbuf_base <=
-	    PVTS(r, page)->cmdbuf_endp);
+	PVTS(r, page)->cmdbuf_ptr   = PVTS(r, page)->cmdbuf_endp
+				    = PVTS(r, page)->cmdbuf_base;
+
     }
-    else
-    if ((BUFSIZ-1) == (PVTS(r, page)->cmdbuf_endp -
-		 	PVTS(r, page)->cmdbuf_base) &&
-	(PVTS(r, page)->cmdbuf_ptr > PVTS(r, page)->cmdbuf_base))
+
+    else if(
+	     (PVTS(r, page)->cmdbuf_endp - PVTS(r, page)->cmdbuf_base)
+		== (BUFSIZ-1)						 &&
+	     (
+	       PVTS(r, page)->cmdbuf_escstart ?
+		(PVTS(r, page)->cmdbuf_escstart > PVTS(r,page)->cmdbuf_base) :
+		(PVTS(r, page)->cmdbuf_ptr > PVTS(r, page)->cmdbuf_base)
+	     )
+	   )
     {
 	/*
-	 * If there is space at beginning of the buffer, but not space at
-	 * the end of the buffer, move the content of buffer forward to
-	 * free space
+	 * If there is space at beginning of the buffer, but not space at the
+	 * end of the buffer, move the content of buffer forward to free space
 	 */
-	unsigned int	n =
-	    PVTS(r, page)->cmdbuf_ptr - PVTS(r, page)->cmdbuf_base;
-	unsigned int	len =
-	    PVTS(r, page)->cmdbuf_endp - PVTS(r, page)->cmdbuf_ptr;
+	unsigned char	*start;
+	unsigned int	n, len;
 
-	assert (n == BUFSIZ - 1 - len);
-	assert (PVTS(r, page)->cmdbuf_ptr <
-		PVTS(r, page)->cmdbuf_endp);
-	MEMMOVE(PVTS(r, page)->cmdbuf_base, PVTS(r, page)->cmdbuf_ptr,
-	    len);
-	PVTS(r, page)->cmdbuf_ptr = PVTS(r, page)->cmdbuf_base;
-	PVTS(r, page)->cmdbuf_endp -= n;
-	assert (PVTS(r, page)->cmdbuf_base <=
-	    PVTS(r, page)->cmdbuf_endp);
+	start = PVTS(r, page)->cmdbuf_escstart ?: PVTS(r, page)->cmdbuf_ptr;
+
+
+	n   = start - PVTS(r, page)->cmdbuf_base;
+	len = PVTS(r, page)->cmdbuf_endp - start;
+
+	assert( n == BUFSIZ - 1 - len );
+	assert( start < PVTS(r, page)->cmdbuf_endp );
+
+	MEMMOVE( PVTS(r, page)->cmdbuf_base, start, len );
+
+	PVTS(r, page)->cmdbuf_ptr   -= n;
+	PVTS(r, page)->cmdbuf_endp  -= n;
+	if( PVTS(r, page)->cmdbuf_escstart )
+	    PVTS(r, page)->cmdbuf_escstart -= n;
+	if( PVTS(r, page)->cmdbuf_escfail )
+	    PVTS(r, page)->cmdbuf_escfail -= n;
     }
 }
 
@@ -1757,21 +1761,16 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 {
     int		    n = 0, bread = 0;
 
-#if 0
-    int		    select_res;
-    fd_set	    readfds;
-    struct timeval  value;
-#endif
-
-
-    while (count)
+    while( count )
     {
+	int readErrno;
+
 	DBG_MSG(2, (stderr, "read maximal %u bytes\n", count));
 
-	errno = 0;  /* clear errno */
+	errno = 0;
+	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp, count );
+	readErrno = errno;
 
-	n = read (PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp,
-		count);
 	DBG_MSG(1, (stderr, "read %d bytes\n", n));
 
 	if (n > 0)
@@ -1780,71 +1779,40 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	    count -= n;
 	    bread += n;
 	    PVTS(r, page)->cmdbuf_endp += n;
-
-	    /*
-	     * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry
-	     * about calls to read() blocking.
-	     */
-#if 0 /*{{{ Old code to select(fd) to check if read would block */
-	    /*
-	     * check the file descriptor to see if there are further
-	     * input, this is to avoid blocking on read(), which seems
-	     * to be an issue when running mc in bash. This will waste
-	     * several CPU cycles, but it's safer than blocking.
-	     */
-	    FD_ZERO(&readfds);
-	    FD_SET(PVTS(r, page)->cmd_fd, &readfds);
-	    value.tv_sec = 0;
-	    value.tv_usec = 0;	/* Was time out, 5us */
-	    select_res = select(r->num_fds, &readfds, NULL,
-		NULL, &value);
-	    if (0 == select_res)
-	    {
-		/* time-out, no further data to read */
-		DBG_MSG(1, (stderr, "no further data\n"));
-		break;
-	    }
-	    if (-1 == select_res)
-	    {
-		/* error, stop reading */
-		DBG_MSG(1, (stderr, "select error\n"));
-		break;
-	    }
-	    /* continue the next loop iteration */
-	    DBG_MSG(1, (stderr, "more data to read\n"));
-#endif /*}}}*/
 	}
+
 	else if (0 == n)
 	{
 	    /* DBG_MSG(1, (stderr, "Should not happen?\n")); */
 	    /* 2006-08-23 gi1242: Could happen if we have no more data. */
 	    break;
 	}
-	else if (n < 0)
+
+	else /* if (n < 0) */
 	{
 	    /*
 	     * We do not update count and buffer pointer and continue
 	     * trying read more data in the next loop iteration.
 	     */
-	    DBG_MSG(1, (stderr, "%s\n", strerror(errno))); /* NOTE this might
-							      reset errno */
+	    DBG_MSG(1, (stderr, "%s\n", strerror(readErrno)));
 
-	    if( errno == EIO )
-	    {
-		/* See if this process is dead */
+	    assert( readErrno != EBADF && readErrno != EFAULT &&
+		    readErrno != EISDIR );
+
+	    /* See if this process is dead */
+	    if( readErrno == EIO || readErrno == EINTR )
 		rxvt_mark_dead_childs(r);
 
-		break;
-	    }
+	    /*
+	     * 2006-08-31 gi1242: Old code would only break out on EAGAIN or
+	     * EINVAL.
+	     */
+	    break;
 
-	    else if (
-		      errno == EAGAIN ||
-		      errno == EINVAL	    /* Solaris */
-		    )
-		break;
 	}
     }	/* while (count) */
 
+    PVTS(r, page)->nbytes_last_read = bread;
     return bread;
 }
 
@@ -1852,12 +1820,11 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 
 /* INTPROTO */
 void
-rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
+rxvt_process_children_cmdfd( rxvt_t* r, fd_set* p_readfds )
 {
     /*
-     * Handle the children that have generate input. Notice in this
-     * loop we only process input, but do NOT determine the child we
-     * want to return.
+     * Handle the children that have generate input. Notice in this loop we only
+     * process input, but do NOT determine the child we want to return.
      */
     register int    i;
 
@@ -1868,70 +1835,35 @@ rxvt_process_children_cmdfd (rxvt_t* r, fd_set* p_readfds)
 
 	/* check next file descriptor if this one has nothing to read in. */
 	if (!FD_ISSET(PVTS(r, i)->cmd_fd, p_readfds))
+	{
+	    PVTS(r, i)->nbytes_last_read = 0;
+	    PVTS(r, i)->scrolled_lines	 = 0;
 	    continue;
+	}
 
 	DBG_MSG(1, (stderr, "reading from shell %d\n", i));
 
 	/* check our command buffer before reading data */
-	rxvt_check_cmdbuf (r, i);
+	rxvt_check_cmdbuf( r, i );
 
-	assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
 	/* The buffer size is the buffer length - used length */
 	count = bufsiz = (BUFSIZ - 1) -
 	    (PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base);
+
 	/* read data from the command fd into buffer */
 	count -= rxvt_read_child_cmdfd (r, i, count);
 
-	assert (PVTS(r, i)->cmdbuf_base <= PVTS(r, i)->cmdbuf_endp);
+#if 0
 	/* check if a child died */
-	if (PVTS(r, i)->dead && errno == EIO )
+	if( PVTS(r, i)->dead && errno == EIO )
 	    *PVTS(r, i)->cmdbuf_endp = (char) 0;
-
-	/*
-	 * 2006-08-22 gi1242: Our SIGCHLD handler now only counts the number
-	 * of calls it gets, so we will not miss any dead child signals.
-	 */
-#if 0 /* {{{ Old dead child signal loss hack */
-	else if (n < 0 && errno != EAGAIN)
-	{
-	    assert (!PVTS(r, i)->dead); /* in case */
-
-	    /*
-	     * It seems there is a signal loss if more than one children die
-	     * at almost the same moment. The result is that
-	     * rxvt_clean_cmd_page does not flag the dead value for some
-	     * dead children. Thus, the call of rxvt_cmd_getc (-1) in
-	     * rxvt_mail_loop will fall into an infinite loop on the path to
-	     * check the input from dead children since their cmd_fd are not
-	     * excluded in the select system call.
-	     * 
-	     * So we introduce the following hack to fix it. If it finds
-	     * certain dead children are processed by the select system
-	     * call, it flags it as dead.
-	     */
-	    if (PVTS(r, i)->cmd_pid ==
-		    waitpid (PVTS(r, i)->cmd_pid, NULL, WNOHANG))
-	    {
-		rxvt_print_error( "Warning: signal lost on child %d", i );
-
-		PVTS(r, i)->dead = 1;
-		if (ISSET_OPTION(r, Opt2_holdExit))
-		    PVTS(r, i)->hold = 1;
-		*PVTS(r, i)->cmdbuf_endp = (char) 0;
-
-		/*
-		 * increase vt_died number, there is a possible race condition
-		 * here (a signal comes in)
-		 */
-		r->vt_died ++;
-	    }
-	}
-#endif /*}}}*/
+#endif
 
 	/* highlight inactive tab if there is some input */
-	if (NOTSET_OPTION(r, Opt2_hlTabOnBell) &&
-	    bufsiz != count &&
-	    i != ATAB(r)
+	if(
+	     NOTSET_OPTION(r, Opt2_hlTabOnBell)	    &&
+	     bufsiz != count			    &&
+	     i != ATAB(r)
 	   )
 	{
 	    rxvt_tabbar_highlight_tab (r, i, False);
@@ -1961,7 +1893,7 @@ rxvt_check_quick_timeout (rxvt_t* r)
 	{
 	    h->mouse_slip_wheel_delay = SCROLLBAR_CONTINUOUS_DELAY;
 	    h->refresh_type |= SMOOTH_REFRESH;
-	    h->want_refresh = 1;
+	    AVTS(r)->want_refresh = 1;
 	}
     }
 #endif /* MOUSE_WHEEL && MOUSE_SLIP_WHEELING */
@@ -1979,7 +1911,7 @@ rxvt_check_quick_timeout (rxvt_t* r)
 		h->selection_save_y, h->selection_save_state);
 	    h->scroll_selection_delay = SCROLLBAR_CONTINUOUS_DELAY;
 	    h->refresh_type |= SMOOTH_REFRESH;
-	    h->want_refresh = 1;
+	    AVTS(r)->want_refresh = 1;
 	}
     }
 #endif	/* SELECTION_SCROLLING */
@@ -1995,7 +1927,7 @@ rxvt_check_quick_timeout (rxvt_t* r)
 	{
 	    h->scroll_arrow_delay = SCROLLBAR_CONTINUOUS_DELAY;
 	    h->refresh_type |= SMOOTH_REFRESH;
-	    h->want_refresh = 1;
+	    AVTS(r)->want_refresh = 1;
 	}
     }
 # endif	/* NO_SCROLLBAR_BUTTON_CONTINUAL_SCROLLING */
@@ -2030,7 +1962,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	quick_timeout = 0;
     else
     {
-	quick_timeout |= (h->want_refresh || h->want_clip_refresh);
+	quick_timeout |= (AVTS(r)->want_refresh || h->want_clip_refresh);
 #ifdef TRANSPARENT
 	quick_timeout |= h->want_full_refresh;
 #endif	/* TRANSPARENT */
@@ -2119,7 +2051,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 		DBG_MSG(3, (stderr, "%s\n", h->hidden_cursor ?
 		    "** hide cursor" : "** show cursor"));
 
-		h->want_refresh = 1;
+		AVTS(r)->want_refresh = 1;
 		csdiff = 0;
 	    }
 	    else
@@ -2170,13 +2102,66 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 }
 
 
+/* Refresh the VT screen and scrollbar if needed */
+/* INTPROTO */
+void
+rxvt_refresh_vtscr_if_needed( rxvt_t *r )
+{
+#ifdef TRANSPARENT
+    if( r->h->want_full_refresh )
+    {
+	DBG_MSG(1, (stderr, "full refresh\n"));
+	r->h->want_full_refresh = 0;
+
+	/* only work for active tab */
+	rxvt_scr_clear(r, ATAB(r));
+	rxvt_scr_touch(r, ATAB(r), False);
+	AVTS(r)->want_refresh = 1;
+    }
+#endif	/* TRANSPARENT */
+
+    /*
+     * If parts of the screen have changed, we should not honor the GC clipping.
+     */
+    if( AVTS(r)->want_refresh )
+	r->h->refresh_type &= ~CLIPPED_REFRESH;
+
+    if( AVTS(r)->want_refresh || r->h->want_clip_refresh )
+    {
+	DBG_MSG( 3, ( stderr, "Requesting refresh."
+		    " Active tab (%d) produced only %d bytes"
+		    " (%d in buffer)\n",
+		    ATAB(r), AVTS(r)->nbytes_last_read,
+		    AVTS(r)->cmdbuf_endp - AVTS(r)->cmdbuf_base ) );
+
+	rxvt_scr_refresh(r, ATAB(r), r->h->refresh_type);
+
+#ifdef HAVE_SCROLLBARS
+	rxvt_scrollbar_update(r, 1);
+#endif
+
+#ifdef USE_XIM
+	rxvt_IM_send_spot (r);
+#endif	/* USE_XIM */
+
+    }   /* if (AVTS(r)->want_refresh) */
+}
+
 
 /*
  * rxvt_cmd_getc() - Return next input character.
  *
- * Return the next input character after first passing any keyboard input to the
- * command.
+ * If *p_page == -1, then *p_page is set to a tab which returned input, and the
+ * character is returned. Calling rxvt_cmd_getc() with *p_page = -1 is a good
+ * thing, and should be done when possible.
+ *
+ * If *p_page != -1, we will either return a character from the tab *p_page, or
+ * fail by setting *p_page to -1 and return 0. If the tab *p_page is dead on
+ * entry, we will fail only when there is no data available. If the tab *p_page
+ * is alive on entry, then we will fail for whatever reason we like (e.g. X
+ * events are pending).
  */
+
 /* INTPROTO */
 unsigned char
 rxvt_cmd_getc(rxvt_t *r, int* p_page)
@@ -2199,36 +2184,11 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 
     DBG_MSG(2, (stderr, "Entering rxvt_cmd_getc on page %d\n", *p_page));
-    while (1)
+
+
+    /* loop until we can return something */
+    for(;;)
     {
-	/* loop until we can return something */
-
-
-	/*
-	 * retpage is the tab number to return. it should never be -1. if
-	 * not a tab is specified, retpage is the active tab.
-	 */
-	retpage = (-1 == selpage) ? ATAB(r) : selpage;
-	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
-
-	/* already have something in the buffer */
-	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
-	{
-	    /* if -1 == selpage, we only process the active tab here */
-	    *p_page = retpage;
-	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	}
-
-	/* output any pending chars of page's v_buffer */
-	if (PVTS(r, retpage)->v_bufstr < PVTS(r, retpage)->v_bufptr)
-	    rxvt_tt_write(r, retpage, NULL, 0);
-
-	/*
-	 * if there is no data in the active tab, we go to process the X
-	 * events before trying to find a tab that has some input/output.
-	 * this should improve the response performance of the active tab.
-	 */
-
 
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
 	/* presume == 0 implies time not yet retrieved */
@@ -2243,95 +2203,104 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif	/* POINTER_BLANK */
 
 
-	/* process all pending X events */
-	while (XPending(r->Xdisplay))
+	if( selpage == -1 )
 	{
-	    XEvent	  xev;
+	    /* Process all pending X events */
+	    while( XPending(r->Xdisplay) )
+	    {
+		XEvent	  xev;
 
-	    XNextEvent(r->Xdisplay, &xev);
+		XNextEvent(r->Xdisplay, &xev);
 
 
 #ifdef CURSOR_BLINK
-	    if (ISSET_OPTION(r, Opt_cursorBlink) &&
-		KeyPress == xev.type)
-	    {
-		if (h->hidden_cursor)
+		if (ISSET_OPTION(r, Opt_cursorBlink) &&
+		    KeyPress == xev.type)
 		{
-		    DBG_MSG(1, (stderr,"** hide cursor on keypress\n"));
-		    h->hidden_cursor = 0;
-		    h->want_refresh = 1;
+		    if (h->hidden_cursor)
+		    {
+			DBG_MSG(1, (stderr,"** hide cursor on keypress\n"));
+			h->hidden_cursor = 0;
+			AVTS(r)->want_refresh = 1;
+		    }
+		    want_keypress_time = 1;
 		}
-		want_keypress_time = 1;
-	    }
 #endif	/* CURSOR_BLINK */
 
 #ifdef POINTER_BLANK
-	    if (ISSET_OPTION(r, Opt_pointerBlank) &&
-		(h->pointerBlankDelay > 0))
-	    {
-		if (MotionNotify == xev.type ||
-		    ButtonPress == xev.type ||
-		    ButtonRelease == xev.type )
+		if (ISSET_OPTION(r, Opt_pointerBlank) &&
+		    (h->pointerBlankDelay > 0))
 		{
+		    if (MotionNotify == xev.type ||
+			ButtonPress == xev.type ||
+			ButtonRelease == xev.type )
+		    {
+			/* only work for current active tab */
+			if (AVTS(r)->hidden_pointer)
+			    rxvt_pointer_unblank(r, ATAB(r));
+			want_motion_time = 1;
+		    }
 		    /* only work for current active tab */
-		    if (AVTS(r)->hidden_pointer)
-			rxvt_pointer_unblank(r, ATAB(r));
-		    want_motion_time = 1;
+		    if (KeyPress == xev.type && !AVTS(r)->hidden_pointer)
+			rxvt_pointer_blank(r, ATAB(r));
 		}
-		/* only work for current active tab */
-		if (KeyPress == xev.type && !AVTS(r)->hidden_pointer)
-		    rxvt_pointer_blank(r, ATAB(r));
-	    }
 #endif	/* POINTER_BLANK */
 
 #ifdef USE_XIM
-	    if (NOT_NULL(r->h->Input_Context))
-	    {
-		if (!XFilterEvent(&xev, xev.xany.window))
-		    rxvt_process_x_event(r, &xev);
-		h->event_type = xev.type;
-	    }
-	    else
+		if (NOT_NULL(r->h->Input_Context))
+		{
+		    if (!XFilterEvent(&xev, xev.xany.window))
+			rxvt_process_x_event(r, &xev);
+		    h->event_type = xev.type;
+		}
+		else
 #endif	/* USE_XIM */
-	    rxvt_process_x_event(r, &xev);
+		{
+		    rxvt_process_x_event(r, &xev);
+		}
+	    }   /* while ((XPending(r->Xdisplay)) */
+	} /* if( selpage == -1 ) */
 
-
-	    /* In case button actions pushed chars to cmdbuf. */
-	    assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
-
-	    /*
-	     * if -1 == page, only try the active tab here. we will handle
-	     * inactive tabs after processed all X events.
-	     *
-	     * Notice that there might be something BAD here: the active
-	     * tab is changed by user interaction and data are pushed into
-	     * previous active tab (now inactive). Need to study on this
-	     * in the future. So far, it seems working fine.
-	     */
-	    if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
-	    {
-		*p_page = retpage;
-		return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	    }
-	}   /* while ((XPending(r->Xdisplay)) */
-
-
-	if( -1 == selpage && -1 != (retpage = rxvt_find_cmd_child (r)) )
+	else if( !PVTS(r, selpage)->dead && XPending( r->Xdisplay ) )
 	{
 	    /*
-	     * in case -1 == page, and there's no X events to process. we
-	     * will not go to the select call if there's already input/
-	     * output in some tabs. To reach here, we have tried active
-	     * tab but with no luck.
+	     * selpage != -1 on an alive tab, and X events are pending. If this
+	     * tab produces lots of output, it could potentially choke
+	     * everything else. Thus we return a failure, so the caller will
+	     * rxvt_set_escfail() and fall back to rxvt_main_loop(). We will be
+	     * called again with selpage == -1, when we can process X events.
+	     */
+	    *p_page = -1;
+	    return 0;
+	}
+
+
+
+	/*
+	 * We are done processing our X events. Check to see if we have any data
+	 * pending in our input buffer.
+	 */
+	if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
+	    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+
+	if( selpage == -1 && -1 != (retpage = rxvt_find_cmd_child (r)) )
+	{
+	    /*
+	     * In case -1 == selpage we are free to return data from any tab we
+	     * choose. Note, that rxvt_find_cmd_child() will favor returning the
+	     * active tab.
 	     */
 	    DBG_MSG(2, (stderr, "rxvt_find_cmd_child: find %d\n", retpage));
-	    *p_page = retpage;
 
+	    *p_page = retpage;
 	    return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
 	}
-	/* NOTE: retpage may be -1 below, we must reset it!!! */
 
 
+	/*
+	 * The command input buffer is empty and we have no pending X events.
+	 * We call select() to wait until some data is available.
+	 */
 #ifdef CURSOR_BLINK
 	if (want_keypress_time)
 	{
@@ -2352,14 +2321,9 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	}
 #endif	/* POINTER_BLANK */
 
-	/*
-	 * The command input buffer is empty and we have no pending X
-	 * events
-	 */
-
-
 	quick_timeout = rxvt_check_quick_timeout (r);
 	quick_timeout = rxvt_adjust_quick_timeout (r, quick_timeout, &value);
+
 	/* Now begin to read in from children's file descriptors */
 	DBG_MSG(2, (stderr, "Waiting for %lumu for child\n",
 	    quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec :
@@ -2368,6 +2332,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 
 	/* Prepare to read in from children's file descriptors */
 	FD_ZERO(&readfds);
+	FD_SET(r->Xfd, &readfds);
 	for (i = 0; i <= LTAB(r); i ++)
 	{
 	    /* remember to skip held childrens */
@@ -2377,110 +2342,24 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		continue;
 	    }
 
-	    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
 	    DBG_MSG(2, (stderr, " listen on vt[%d].cmd_fd = %d\n", i,
 		PVTS(r, i)->cmd_fd));
+	    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
+
+	    /* Write out any pending output to child */
+	    if( PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr )
+		rxvt_tt_write(r, i, NULL, 0);
 	}
-	FD_SET(r->Xfd, &readfds);
+
 #ifdef HAVE_X11_SM_SMLIB_H
 	if (-1 != r->TermWin.ice_fd)
 	    FD_SET(r->TermWin.ice_fd, &readfds);
 #endif
 
-	if (0 == (select_res = select(r->num_fds, &readfds, NULL, NULL,
-		(quick_timeout ? &value : NULL))))
-	{
-	    /*
-	     * select statement timed out - we're not hard and fast
-	     * scrolling
-	     */
-	    h->refresh_limit = 1;
-	}
+	select_res = select( r->num_fds, &readfds, NULL, NULL,
+			(quick_timeout ? &value : NULL) );
 
 	rxvt_process_children_cmdfd (r, &readfds);
-
-
-	/*
-	 * reset retpage because it is possibly altered above by call to
-	 * rxvt_find_cmd_child! retpage is the tab number to return. It should
-	 * never be -1. If not a tab is selected, retpage is the active tab.
-	 */
-	retpage = (-1 == selpage) ? ATAB(r) : selpage;
-	DBG_MSG(2, (stderr, "  selpage = %d, retpage = %d\n",
-	    selpage, retpage));
-	assert (PVTS(r, retpage)->cmdbuf_base <= PVTS(r, retpage)->cmdbuf_endp);
-
-
-	DBG_MSG(2, (stderr, "  cmdbuf_ptr = %p, cmdbuf_endp = %p\n",
-	    PVTS(r, retpage)->cmdbuf_ptr, PVTS(r, retpage)->cmdbuf_endp));
-
-	/*
-	 * Now figure out if we have something to return.
-	 */
-	if (PVTS(r, retpage)->cmdbuf_ptr < PVTS(r, retpage)->cmdbuf_endp)
-	{
-	    /* Specified child has input to return */
-	    *p_page = retpage;
-	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	}
-
-	/* No input from specified child */
-	else if (
-		  selpage == -1  &&
-		  (retpage = rxvt_find_cmd_child (r)) != -1
-		)
-	{
-	    /* No child specified, and we have input from some child */
-	    *p_page = retpage;
-	    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	}
-
-	else
-	{
-	    /* Last resort: Hope something died */
-	    if( r->vt_died )
-		rxvt_mark_dead_childs( r );
-
-	    if( r->cleanDeadChilds )
-	    {
-		/* Ok. Something died. Let's see if we can return something */
-		if( selpage != -1 && PVTS( r, selpage )->dead )
-		{
-		    /*
-		     * Specified child died (with no input). Let's fake some
-		     * input, and return it ;)
-		     */
-		    assert( PVTS( r, selpage )->hold == 1 );
-
-		    rxvt_cmd_write( r, selpage, (unsigned char*) "\0", 1 );
-		    *p_page = selpage;
-		    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
-		}
-
-		else if( selpage == -1 )
-		{
-		    /*
-		     * No child specified, and something died. Find the child
-		     * that died.
-		     */
-		    for( retpage = 0; retpage <= LTAB(r); retpage++ )
-		    {
-			if(
-			    PVTS( r, retpage )->dead &&
-			    PVTS(r,retpage)->hold == 1
-			  )
-			{
-			    /* Fake some input and return this child */
-			    rxvt_cmd_write( r, retpage,
-				    (unsigned char*) "\0", 1 );
-			    *p_page = retpage;
-			    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-			}
-		    } /* for() */
-		} /* else if( selpage == -1 ) */
-	    } /* if( r->cleanDeadChilds ) */
-	} /* else */
-
 
 #ifdef HAVE_X11_SM_SMLIB_H
 	/*
@@ -2489,47 +2368,64 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	 * IceProcessMessages may hang and make the entire terminal
 	 * unresponsive.
 	 */
-	if (-1 != r->TermWin.ice_fd &&
-	    FD_ISSET (r->TermWin.ice_fd, &readfds))
-	{
+	if( -1 != r->TermWin.ice_fd && FD_ISSET (r->TermWin.ice_fd, &readfds) )
 	    rxvt_process_ice_msgs (r);
-	}
 #endif
 
 
-	DBG_MSG(2, (stderr, "  Continue on rxvt_cmd_getc while loop\n"));
+	/*
+	 * Now figure out if we have something to return.
+	 */
+	if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
+	    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
 
-#ifdef TRANSPARENT
-	if (h->want_full_refresh)
+	/* No input from specified child. Try others. */
+	else if( (retpage = rxvt_find_cmd_child (r)) != -1 )
 	{
-	    DBG_MSG(1, (stderr, "full refresh\n"));
-	    h->want_full_refresh = 0;
-	    /* only work for active tab */
-	    rxvt_scr_clear(r, ATAB(r));
-	    rxvt_scr_touch(r, ATAB(r), False);
-	    h->want_refresh = 1;
+	    if( selpage != -1 && selpage != retpage )
+	    {
+		/*
+		 * Specified child has nothing to return, but some other child
+		 * has data to return. We set retpage = -1, and return 0.
+		 */
+		*p_page = -1;
+		return '\0';
+	    }
+
+	    else
+	    {
+		/* No child specified, and we have input from some child */
+		*p_page = retpage;
+		return *(PVTS(r, retpage)->cmdbuf_ptr)++;
+	    }
 	}
-#endif	/* TRANSPARENT */
 
-	if (h->want_refresh)
-	    h->refresh_type &= ~CLIPPED_REFRESH;
-	if (h->want_refresh || h->want_clip_refresh)
+	/* Last resort: Hope something died */
+	else
 	{
-	    DBG_MSG(3, ( stderr, "Refreshing screen ..."));
-	    rxvt_scr_refresh(r, ATAB(r), h->refresh_type);
-#ifdef HAVE_SCROLLBARS
-	    rxvt_scrollbar_update(r, 1);
-#endif
-#ifdef USE_XIM
-	    rxvt_IM_send_spot (r);
-#endif	/* USE_XIM */
-	}   /* if (h->want_refresh) */
-    }	/* while (1)	*/
+	    if( r->vt_died || select_res == -1 )
+		rxvt_mark_dead_childs( r );
+
+	    if( r->cleanDeadChilds )
+	    {
+		/* Ok. Something died. */
+		*p_page = -1;
+		return '\0';
+	    } /* if( r->cleanDeadChilds ) */
+	} /* else */
+
+
+	/*
+	 * If we get here, we have no data to return, so try and do a screen
+	 * refresh.
+	 */
+	rxvt_refresh_vtscr_if_needed( r );
+
+    }	/* for(;;) */
 
     /* NOT REACHED */
 }
 /*}}} */
-
 
 
 /* EXTPROTO */
@@ -2768,11 +2664,17 @@ rxvt_scrollbar_dispatcher (rxvt_t* r, int page, XButtonEvent* ev)
 	 * arrow buttons - send up/down
 	 * click on scrollbar - send pageup/down
 	 */
-	if (
-		(r->scrollBar.style == R_SB_NEXT && scrollbarnext_upButton(ev->y))
-		|| (r->scrollBar.style == R_SB_RXVT && scrollbarrxvt_upButton(ev->y))
-		|| (r->scrollBar.style == R_SB_SGI && scrollbarsgi_upButton(ev->y))
-	   )
+	if(
+	     (r->scrollBar.style == R_SB_NEXT && scrollbarnext_upButton(ev->y))
+	     || (
+		  r->scrollBar.style == R_SB_RXVT
+		  && scrollbarrxvt_upButton(ev->y)
+		)
+	     || (
+		  r->scrollBar.style == R_SB_SGI
+		  && scrollbarsgi_upButton(ev->y)
+		)
+	  )
 	{
 	    rxvt_tt_printf(r, page, "\033[A");
 	}
@@ -2867,7 +2769,8 @@ rxvt_scrollbar_dispatcher (rxvt_t* r, int page, XButtonEvent* ev)
 		       )
 		    {
 			rxvt_scr_move_to(r, page,
-			    scrollbar_position(ev->y) - h->csrO, scrollbar_size());
+			    scrollbar_position(ev->y) - h->csrO,
+			    scrollbar_size());
 		    }
 		    scrollbar_setMotion();
 		break;
@@ -3392,7 +3295,7 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
     {
 	DBG_MSG(2, (stderr, "FocusIn event\n"));
 	r->TermWin.focus = 1;
-	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
+	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
 #ifdef USE_XIM
 	if (NOT_NULL(r->h->Input_Context))
@@ -3415,7 +3318,7 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
     {
 	DBG_MSG(2, (stderr, "FocusOut event\n"));
 	r->TermWin.focus = 0;
-	r->h->want_refresh = 1; /* Cursor needs to be refreshed */
+	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
 #ifdef CURSOR_BLINK
 	r->h->hidden_cursor = 0;
@@ -4365,7 +4268,6 @@ rxvt_process_motionnotify (rxvt_t* r, XEvent* ev)
 	    scrollbar_position(ev->xbutton.y) - r->h->csrO,
 	    scrollbar_size());
 	rxvt_scr_refresh(r, page, r->h->refresh_type & ~CLIPPED_REFRESH);
-	r->h->refresh_limit = 0;
 	rxvt_scrollbar_update(r, 1);
     }
 #endif
@@ -4618,12 +4520,11 @@ rxvt_pclose_printer(FILE *stream)
 void
 rxvt_process_print_pipe( rxvt_t* r, int page )
 {
+    rxvt_print_error( "Print pipe not implemented in this version" );
+#if 0 /* {{{ Disabled because failures of rxvt_cmd_getc() can't be handled */
     int		readpage = page;
     int		done;
     FILE*	fd;
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
 
     if (IS_NULL(fd = rxvt_popen_printer(r, NULL)))
@@ -4687,6 +4588,7 @@ rxvt_process_print_pipe( rxvt_t* r, int page )
     }
 
     rxvt_pclose_printer(fd);
+#endif /*}}}*/
 }
 #endif		    /* PRINTPIPE */
 /*}}} */
@@ -4702,6 +4604,34 @@ enum {
 };
 /* *INDENT-ON* */
 
+/*
+ * Set cmdbuf_escfail to the place where processing an escape sequence failed.
+ * nchars is the minimum number of chars needed to be read
+ */
+/* INTPROTO */
+void
+rxvt_set_escfail( rxvt_t *r, int page, int nchars )
+{
+    assert( PVTS(r, page)->cmdbuf_escstart );
+
+    rxvt_check_cmdbuf( r, page );
+    PVTS(r, page)->cmdbuf_escfail = PVTS(r, page)->cmdbuf_ptr + nchars - 1;
+
+    if( PVTS(r, page)->cmdbuf_escfail > PVTS(r, page)->cmdbuf_base + BUFSIZ-3 )
+    {
+	/*
+	 * Escape sequence was longer than BUFSIZ. Just skip the escape
+	 * character and go on like normal
+	 */
+	PVTS(r, page)->cmdbuf_ptr = PVTS(r, page)->cmdbuf_escstart + 1;
+	SET_NULL( PVTS(r, page)->cmdbuf_escstart );
+	SET_NULL( PVTS(r, page)->cmdbuf_escfail );
+    }
+
+    else
+	/* Fall back to start of escape sequence */
+	PVTS(r, page)->cmdbuf_ptr = PVTS(r, page)->cmdbuf_escstart;
+}
 
 /*{{{ process non-printing single characters */
 /* INTPROTO */
@@ -4763,10 +4693,6 @@ rxvt_process_escape_vt52(rxvt_t* r, int page, unsigned char ch)
 {
     int	    row, col;
     int	    readpage = page;
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
-
 
     switch (ch)
     {
@@ -4809,11 +4735,19 @@ rxvt_process_escape_vt52(rxvt_t* r, int page, unsigned char ch)
 	    ** etc.
 	    */
 	    row = rxvt_cmd_getc(r, &readpage) - ' ';
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    if( readpage == -1 )
+	    {
+		rxvt_set_escfail( r, page, 2 );
+		break;
+	    }
+
 	    col = rxvt_cmd_getc(r, &readpage) - ' ';
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    if( readpage == -1 )
+	    {
+		rxvt_set_escfail( r, page, 1 );
+		break;
+	    }
+
 	    rxvt_scr_gotorc(r, page, row, col, 0);
 	    break;
 
@@ -4845,16 +4779,15 @@ rxvt_process_escape_vt52(rxvt_t* r, int page, unsigned char ch)
 void
 rxvt_process_escape_seq(rxvt_t* r, int page)
 {
-    int		readpage = page;
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
+    int		    readpage = page;
+    unsigned char   c,
+		    ch = rxvt_cmd_getc(r, &readpage);
 
-
-    unsigned char   ch = rxvt_cmd_getc(r, &readpage);
-
-    assert (page == readpage);	/* in case */
-    assert (checksum == PVTS(r, page)->checksum);
+    if( readpage == -1 )
+    {
+	rxvt_set_escfail( r, page, 1 );
+	return;
+    }
 
     if (ISSET_PMODE(r, page, PrivMode_vt52))
     {
@@ -4862,50 +4795,70 @@ rxvt_process_escape_seq(rxvt_t* r, int page)
 	return;
     }
 
-    assert (page == readpage);	/* possible race condition? */
     switch (ch)
     {
 	/* case 1:	do_tek_mode (); break; */
 	case '#':
-	    if (rxvt_cmd_getc(r, &readpage) == '8')
-	    {
-		assert (page == readpage);
-		assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else if( c == 8 )
 		rxvt_scr_E(r, readpage);
-	    }
+
 	    break;
+
 	case '(':
-	    rxvt_scr_charset_set(r, page, 0,
-		(unsigned int)rxvt_cmd_getc(r, &readpage));
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else
+		rxvt_scr_charset_set(r, page, 0, (unsigned int) c );
 	    break;
+
 	case ')':
-	    rxvt_scr_charset_set(r, page, 1,
-		(unsigned int)rxvt_cmd_getc(r, &readpage));
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else
+		rxvt_scr_charset_set(r, page, 1, (unsigned int) c);
+
 	    break;
+
 	case '*':
-	    rxvt_scr_charset_set(r, page, 2,
-		(unsigned int)rxvt_cmd_getc(r, &readpage));
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else
+		rxvt_scr_charset_set(r, page, 2, (unsigned int) c);
+
 	    break;
+
 	case '+':
-	    rxvt_scr_charset_set(r, page, 3,
-		(unsigned int)rxvt_cmd_getc(r, &readpage));
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else
+		rxvt_scr_charset_set(r, page, 3, (unsigned int) c);
+
 	    break;
+
 #ifdef MULTICHAR_SET
 	case '$':
-	    rxvt_scr_charset_set(r, page, -2,
-		(unsigned int)rxvt_cmd_getc(r, &readpage));
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+	    else
+		rxvt_scr_charset_set(r, page, -2, (unsigned int) c);
+
 	    break;
 #endif
+
 #ifndef NO_FRILLS
 	case '6':
 	    rxvt_scr_backindex(r, page);
@@ -4928,10 +4881,15 @@ rxvt_process_escape_seq(rxvt_t* r, int page)
 	    break;
 
 	case C1_40:
-	    rxvt_cmd_getc(r, &readpage);
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
+	    c = rxvt_cmd_getc( r, &readpage );
+
+	    if( readpage == -1 )
+		rxvt_set_escfail( r, page, 1 );
+
+	    /* 2006-08-31 gi1242 XXX Why is there no code here? */
+
 	    break;
+
 	case C1_44:
 	    rxvt_scr_index(r, page, UP);
 	    break;
@@ -5048,9 +5006,6 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
     unsigned int    nargs, p;
     int		    n, ndef;
     int		    arg[ESC_ARGS];
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
 
     for (nargs = ESC_ARGS; nargs > 0;)
@@ -5058,14 +5013,21 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 
     priv = 0;
     ch = rxvt_cmd_getc(r, &readpage);
-    assert (page == readpage);
-    assert (checksum == PVTS(r, page)->checksum);
+    if( readpage == -1 )
+    {
+	rxvt_set_escfail( r, page, 1 );
+	return;
+    }
+
     if (ch >= '<' && ch <= '?')		/* '<' '=' '>' '?' */
     {
 	priv = ch;
 	ch = rxvt_cmd_getc(r, &readpage);
-	assert (page == readpage);
-	assert (checksum == PVTS(r, page)->checksum);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
     }
 
     /* read any numerical arguments */
@@ -5099,8 +5061,11 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 	}
 
 	ch = rxvt_cmd_getc(r, &readpage);
-	assert (page == readpage);
-	assert (checksum == PVTS(r, page)->checksum);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
     }
 
     if (ch > CSI_7F)
@@ -5461,20 +5426,27 @@ rxvt_get_to_st(rxvt_t* r, int page, unsigned char *ends_how)
     unsigned int    n = 0;
     unsigned char*  s;
     unsigned char   ch, string[STRING_MAX];
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
 
-    for (; (ch = rxvt_cmd_getc(r, &readpage));)
+    for(;;)
     {
-	assert (readpage == page);
-	assert (checksum == PVTS(r, page)->checksum);
-	if (ch == C0_BEL ||
-	    ch == CHAR_ST ||
-	    (ch == 0x5c && seen_esc))	/* 7bit ST */
+	ch = rxvt_cmd_getc( r, &readpage );
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return NULL;
+	}
+
+	if( !ch )
 	    break;
-	if (ch == C0_ESC)
+
+	if(
+	     ch == C0_BEL || ch == CHAR_ST ||
+	     (ch == 0x5c && seen_esc)	/* 7bit ST */
+	  )
+	    break;
+
+	if( ch == C0_ESC )
 	{
 	    seen_esc = 1;
 	    continue;
@@ -5483,16 +5455,16 @@ rxvt_get_to_st(rxvt_t* r, int page, unsigned char *ends_how)
 	    ch = ' ';	/* translate '\t' to space */
 	else if (ch < 0x08 || (ch > 0x0d && ch < 0x20))
 	{
-	    /* return NULL; */ /* other control character - exit */
-
+#if 0
 	    /*
-	    ** NO! See http://vt100.net/emu/dec_ansi_parser for reason.
-	    ** I am not sure what to do with CAN or SUB, but the rest
-	    ** should be *ignored* - I will try to find out what to do
-	    ** with CAN and SUB.
-	    **            - Johann 'Mykraverk' Oskarsson
-	    **              <johann@myrkraverk.com>
-	    */
+	     * NO! See http://vt100.net/emu/dec_ansi_parser for reason. I am not
+	     * sure what to do with CAN or SUB, but the rest should be *ignored*
+	     * - I will try to find out what to do with CAN and SUB. - Johann
+	     * 'Mykraverk' Oskarsson <johann@myrkraverk.com>
+	     */
+	    return NULL;    /* other control character - exit */
+#endif
+
 	    continue; /* do nothing */
 	}
 
@@ -5500,11 +5472,12 @@ rxvt_get_to_st(rxvt_t* r, int page, unsigned char *ends_how)
 	    string[n++] = ch;
 
 	seen_esc = 0;
-    }
+    } /* for(;;) */
 
     string[n++] = '\0';
     if (IS_NULL(s = (unsigned char UNTAINTED *) STRNDUP (string, n)))
 	return NULL;
+
     *ends_how = (ch == 0x5c ? C0_ESC : ch);
 
     return s;
@@ -5539,25 +5512,27 @@ rxvt_process_osc_seq (rxvt_t* r, int page)
     int		    readpage = page;
     unsigned char   ch, eh, *s;
     int		    arg;
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
 
     DBG_MSG( 5, ( stderr, "rxvt_process_osc_seq( r, %d). Active page %d\n",
 		page, ATAB(r) ) );
 
-    ch = rxvt_cmd_getc(r, &readpage);
-    assert (page == readpage);
-    assert (checksum == PVTS(r, page)->checksum);
-    for (arg = 0; isdigit(ch); ch = rxvt_cmd_getc(r, &readpage))
+    arg = 0;
+    for(;;)
     {
-	assert (page == readpage);
-	assert (checksum == PVTS(r, page)->checksum);
-	if( page != readpage )
-	    printf( "Oops. Want char from page %d, but got %d\n", page, readpage );
-	arg = arg * 10 + (ch - '0');
+	ch = rxvt_cmd_getc(r, &readpage);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
+
+	if( isdigit(ch) )
+	    arg = arg * 10 + (ch - '0');
+	else
+	    break;
     }
+
 
     if (ch == ';')
     {
@@ -5643,33 +5618,49 @@ rxvt_process_xwsh_seq (rxvt_t* r, int page)
     int		    readpage = page;
     unsigned char   ch, string[STRING_MAX];
     int             arg;
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
 
-    ch = rxvt_cmd_getc (r, &readpage);
-    assert (page == readpage);
-    assert (checksum == PVTS(r, page)->checksum);
-    for (arg = 0; isdigit((int) ch); ch = rxvt_cmd_getc(r, &readpage))
+    arg = 0;
+    for(;;)
     {
-	assert (page == readpage);
-	assert (checksum == PVTS(r, page)->checksum);
-	arg = arg * 10 + (ch - '0');
+	ch = rxvt_cmd_getc (r, &readpage);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
+
+	if( isdigit(ch) )
+	    arg = arg * 10 + (ch - '0');
+	else
+	    break;
     }
 
     if (ch == '.')
     {
-	if ((ch = rxvt_cmd_getc(r, &readpage)) == 'y')
+	ch = rxvt_cmd_getc(r, &readpage);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
+
+	if ( ch == 'y')
 	{
 	    int             n = 0;
 
-	    assert (page == readpage);
-	    assert (checksum == PVTS(r, page)->checksum);
-	    while ((ch = rxvt_cmd_getc(r, &readpage)) != '\033')
+	    for(;;)
 	    {
-		assert (page == readpage);
-		assert (checksum == PVTS(r, page)->checksum);
+		ch = rxvt_cmd_getc( r, &readpage );
+		if( readpage == -1 )
+		{
+		    rxvt_set_escfail( r, page, 1 );
+		    return;
+		}
+
+		if( ch == '\033' )
+		    break;
+
 		if (ch)
 		{
 		    if (ch == '\t')
@@ -5682,15 +5673,20 @@ rxvt_process_xwsh_seq (rxvt_t* r, int page)
 		}
 	    }
 
-	    if ((ch = rxvt_cmd_getc(r, &readpage)) == '\\')
+	    ch = rxvt_cmd_getc( r, &readpage );
+	    if( readpage == -1 )
 	    {
-		assert (page == readpage);
-		assert (checksum == PVTS(r, page)->checksum);
+		rxvt_set_escfail( r, page, 1 );
+		return;
+	    }
+
+	    if( ch == '\\' )
+	    {
 		string[n] = '\0';
 		rxvt_xwsh_seq(r, arg, (char*) string);
 	    }
-	}
-    }
+	} /* if( ch == 'y' ) */
+    } /* if( ch == '.' ) */
 }
 
 
@@ -6264,9 +6260,16 @@ rxvt_process_terminal_mode(rxvt_t* r, int page, int mode, int priv __attribute__
 		break;
 	    case 4:	    /* smooth scrolling */
 		if (state)
-		    UNSET_OPTION(r, Opt_jumpScroll);
+		{
+		    /* Unset jump scroll */
+		    r->h->refresh_limit = BUFSIZ-1;
+		    r->h->skip_pages	= 1;
+		}
 		else
-		    SET_OPTION(r, Opt_jumpScroll);
+		{
+		    /* Set jump scroll */
+		    rxvt_set_jumpscroll(r);
+		}
 		break;
 	    case 5:	    /* reverse video */
 		rxvt_scr_rvideo_mode(r, page, state);
@@ -6504,13 +6507,13 @@ rxvt_process_graphics(rxvt_t* r, int page)
 {
     int		    readpage = page;
     unsigned char   ch, cmd = rxvt_cmd_getc(r, &readpage);
-#ifdef DEBUG
-    clock_t	checksum = PVTS(r, page)->checksum;
-#endif	/* DEBUG */
 
+    if( readpage == -1 )
+    {
+	rxvt_set_escfail( r, page, 1 );
+	return;
+    }
 
-    assert (page == readpage);
-    assert (checksum == PVTS(r, page)->checksum);
     if (cmd == 'Q')		    /* query graphics */
     {
 	rxvt_tt_printf(r, page, "\033G0\n");	/* no graphics */
@@ -6521,11 +6524,13 @@ rxvt_process_graphics(rxvt_t* r, int page)
     do
       {
 	ch = rxvt_cmd_getc(r, &readpage);
-	assert (page == readpage);
-	assert (checksum == PVTS(r, page)->checksum);
+	if( readpage == -1 )
+	{
+	    rxvt_set_escfail( r, page, 1 );
+	    return;
+	}
       }
-    while (ch != ':')
-	;
+    while (ch != ':');
 }
 /*}}} */
 
@@ -6539,97 +6544,162 @@ rxvt_process_graphics(rxvt_t* r, int page)
 void
 rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 {
-    unsigned char   *str;
-    static int	    refreshnow = 0;
+    int		    limit;	/* Number of lines to read before asking for a
+				   refresh */
 
-    /* handle the case where we have input */
-    if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
+    limit = r->h->skip_pages * r->TermWin.nrow;
+    
+
+    /*
+     * Process as much input from the tab as is available. Keep a count of the
+     * (approximate) number of lines we have scrolled, so we know when to
+     * refresh.
+     */
+    for(;;)
     {
-	/* Read a text string from the input buffer */
-	int	    nlines = 0;
-
-	/*
-	 * point `str' to the start of the string, decrement first since
-	 * it was post incremented in rxvt_cmd_getc()
-	 */
-	str = --(PVTS(r, page)->cmdbuf_ptr);
-	while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
+	if (ch >= ' ' || ch == '\t' || ch == '\n' || ch == '\r')
 	{
-	    assert (PVTS(r, page)->cmdbuf_base <=
-		PVTS(r, page)->cmdbuf_endp);
+	    /*
+	     * Read the longest text string we can from the input buffer.
+	     */
 
-	    ch = *(PVTS(r, page)->cmdbuf_ptr)++;
-	    if (ch == '\n')
+	    int	    nlines = 0,		/* #lines read */
+		    nchars,		/* #chars read before newline */
+		    refreshnow = 0;	/* If we should request a refresh */
+
+	    unsigned char   *str;
+
+
+	    nchars = PSCR(r, page).cur.col;
+
+	    /*
+	     * point `str' to the start of the string, decrement first since
+	     * it was post incremented in rxvt_cmd_getc()
+	     */
+	    str = --(PVTS(r, page)->cmdbuf_ptr);
+	    while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
 	    {
-		register int    limit;
+		ch = *(PVTS(r, page)->cmdbuf_ptr)++;
+		
+		if (ch == '\n')
+		{
+		    nchars = 0;
+		    nlines++;
+		    PVTS(r, page)->scrolled_lines++;
+		}
 
-		limit = r->h->refresh_limit * (r->TermWin.nrow - 1);
-		nlines++;
-		r->h->refresh_count++;
+		else if (ch < ' ' && ch != '\t' && ch != '\r')
+		{
+		    /*
+		     * Unprintable. Reduce cmdbuf_ptr so that this character
+		     * will be processed later.
+		     */
+		    PVTS(r, page)->cmdbuf_ptr--;
+		    break;
+		}
+
+		else if( ++nchars > r->TermWin.ncol )
+		{
+		    PVTS(r, page)->scrolled_lines++;
+		    nchars = 0;
+		}
+
 		if(
-		     NOTSET_OPTION(r, Opt_jumpScroll)	||
-		     (r->h->refresh_count >= limit)
+		     PVTS(r, page)->mapped			&&
+		     PVTS(r, page)->scrolled_lines >= limit
 		  )
 		{
 		    refreshnow = 1;
 		    break;
 		}
 	    }
-	    else if (ch < ' ' && ch != '\t' && ch != '\r')
+
+	    DBG_MSG( 3, ( stderr,
+			"\e[31mAdding %d chars %d lines in tab %d\e[0m\n%.*s\n",
+			PVTS(r, page)->cmdbuf_ptr - str, nlines, page,
+			PVTS(r, page)->cmdbuf_ptr - str, str ) );
+
+	    /*
+	     * NOTE: nlines can not be MORE than the number of lines we will
+	     * actually add!
+	     */
+	    rxvt_scr_add_lines(r, page, str, nlines,
+		(PVTS(r, page)->cmdbuf_ptr - str));
+
+	    /*
+	     * Only refresh the screen if we've scrolled more than
+	     * MAX_SKIPPED_PAGES pages.
+	     *
+	     * Refreshing should be correct for small scrolls, because
+	     * nbytes_last_read will be small, forcing the refresh.
+	     */
+	    if (refreshnow)
 	    {
-		/* Unprintable. Reduce cmdbuf_ptr so it is processed later */
-		PVTS(r, page)->cmdbuf_ptr--;
-		break;
+		refreshnow = 0;
+
+		/*
+		 * Note: If the tab is not visible, then rxvt_scr_refresh
+		 * returns immediately. Also rxvt_scr_refresh resets
+		 * scrolled_lines.
+		 */
+		DBG_MSG( 3, ( stderr, "Requesting refresh."
+			    " Active tab (%d) scrolled %d lines\n",
+			    ATAB(r), AVTS(r)->scrolled_lines ) );
+		rxvt_scr_refresh(r, page,
+			(r->h->refresh_type & ~CLIPPED_REFRESH) );
+
+		/* If we have X events to process, then do so now. */
+		if( XPending( r->Xdisplay ) )
+		    break;
 	    }
 	}
 
-	DBG_MSG(2, (stderr, "adding '%s' in %d\n", str, page));
-	rxvt_scr_add_lines(r, page, str, nlines,
-	    (PVTS(r, page)->cmdbuf_ptr - str));
+	/*
+	 * Process escape sequence
+	 */
+	else if( ch == C0_ESC )
+	{
+	    /* Save the start of the escape sequence */
+	    if( IS_NULL( PVTS(r, page)->cmdbuf_escstart ) )
+		PVTS(r, page)->cmdbuf_escstart =
+		    PVTS(r, page)->cmdbuf_ptr-1;
+
+	    /* Forget the previous escape sequence failure (if any) */
+	    SET_NULL( PVTS(r, page)->cmdbuf_escfail );
+
+	    /* Attempt to process the escape sequence */
+	    rxvt_process_escape_seq(r, page);
+
+	    /* If we succeeded, then clear the start. */
+	    if( IS_NULL( PVTS(r, page)->cmdbuf_escfail ) )
+		SET_NULL( PVTS(r, page)->cmdbuf_escstart );
+	    else
+		/* Otherwise don't process any more data from this tab */
+		break;
+	}
 
 	/*
-	 * If there have been a lot of new lines, then update the
-	 * screen. I'll cheat and only refresh less than every
-	 * page-full. The number of pages between refreshes is
-	 * h->refresh_limit, which is incremented here because we must
-	 * be doing flat-out scrolling.
-	 *
-	 * Refreshing should be correct for small scrolls, because of
-	 * the time-out
+	 * Anything else must be a non-printing character
 	 */
-	if (refreshnow)
+	else
 	{
-	    refreshnow = 0;
-	    if (ISSET_OPTION(r, Opt_jumpScroll) &&
-		    r->h->refresh_limit < REFRESH_PERIOD)
-		r->h->refresh_limit++;
-# ifdef XFT_SUPPORT
-	    /*
-	     * disable screen refresh if XFT antialias is used to
-	     * improve performance
-	     */
-	    if (!(ISSET_OPTION(r, Opt_xft) &&
-		    ISSET_OPTION(r, Opt2_xftAntialias)))
-# endif
-		rxvt_scr_refresh(r, page,
-			(r->h->refresh_type & ~CLIPPED_REFRESH));
+	    rxvt_process_nonprinting(r, page, ch);
 	}
-    }
-    else
-    {
-	switch (ch)
-	{
-	    case C0_ESC:	/* escape char */
-		rxvt_process_escape_seq(r, page);
-		break;
 
-	    default:
-		rxvt_process_nonprinting(r, page, ch);
-		break;
-	    /* case 0x9b: */    /* CSI */
-	    /*  rxvt_process_csi_seq(r, ATAB(r)); */
-	}
-    }
+
+	/*
+	 * Check if we can keep reading on this tab.
+	 *
+	 * NOTE: We could check if we also have pending X events, but this will
+	 * generate many many extra protocol requests, which can be quite a
+	 * problem on a slow connection. Thus for now we only process X events
+	 * on screen refreshes or in rxvt_cmd_getc().
+	 */
+	if( rxvt_cmdbuf_has_input( r, page ) )
+	    ch = *PVTS(r,page)->cmdbuf_ptr++;
+	else
+	    break;
+    } /* for(;;) */
 }
 
 
@@ -6640,7 +6710,7 @@ rxvt_main_loop(rxvt_t *r)
 {
     register int	i;
     unsigned char	ch;
-    int			page, refreshnow;
+    int			page;
 
 
     DBG_MSG( 2, ( stderr, "Entering rxvt_main_loop()\n" ) );
@@ -6652,7 +6722,6 @@ rxvt_main_loop(rxvt_t *r)
 	    r->TermWin.ncol, r->TermWin.nrow, PVTS(r, i)->cmd_pid);
     }
 
-    refreshnow = 0;
     while (1)
     {
 	/* wait for something */
@@ -6673,12 +6742,29 @@ rxvt_main_loop(rxvt_t *r)
 	 * value of rxvt_cmd_getc.
 	 */
 
-	if( ch != 0 )
+	if( page != -1 && ch != 0 )
 	    /* rxvt_cmd_getc() returned something */
 	    rxvt_process_getc( r, page, ch );
 
 	/*
-	 * handle the case that some children have died (regardless of what
+	 * See if we need a refresh. If we read a large number of bytes from
+	 * this tabs cmd_fd, then we should let rxvt_process_getc() handle the
+	 * refresh (because we might be "flat out" scrolling).
+	 *
+	 * If we read a small number of bytes on our last read(), then we should
+	 * refresh the screen here, because if other tabs are busy, we can not
+	 * count on rxvt_cmd_getc() refreshing the screen.
+	 *
+	 * XXX 2006-09-01 gi1242: If we have multiple visible terminal windows,
+	 * then we should do this refresh for ALL tabs with visible terminal
+	 * windows (and not only the active tab).
+	 */
+
+	if( AVTS(r)->nbytes_last_read <= r->h->refresh_limit )
+	    rxvt_refresh_vtscr_if_needed( r );
+
+	/*
+	 * handle the case that some children have died regardless of what
 	 * rxvt_cmd_getc returned
 	 */
 	if (r->vt_died > 0 || r->cleanDeadChilds )
@@ -6765,11 +6851,11 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	}
 
 	/*
-	** Append to the block we already have. Always doing this
-	** simplifies the code, and isn't too bad, either. If this
-	** is a short block, it isn't too expensive, and if this is
-	** a long block, we won't be able to write it all anyway.
-	*/
+	 * Append to the block we already have. Always doing this simplifies the
+	 * code, and isn't too bad, either. If this is a short block, it isn't
+	 * too expensive, and if this is a long block, we won't be able to write
+	 * it all anyway.
+	 */
 	if (len > 0)
 	{
 	    if (v_bufend < v_bufptr + len)
@@ -6790,7 +6876,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 		    unsigned int    size = v_bufptr - v_buffer;
 		    unsigned int    reallocto;
 
-		    reallocto = ((size+len) / MAX_PTY_WRITE + 1) * MAX_PTY_WRITE;
+		    reallocto = ((size+len) / MAX_PTY_WRITE + 1) *MAX_PTY_WRITE;
 		    v_buffer = rxvt_realloc(v_buffer, reallocto);
 		    /* save across realloc */
 		    if (v_buffer)
@@ -6802,7 +6888,8 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 		    else
 		    {
 			/* no memory: ignore entire write request */
-			rxvt_print_error("data loss: cannot allocate buffer space");
+			rxvt_print_error(
+				"data loss: cannot allocate buffer space");
 			/* restore clobbered pointer */
 			v_buffer = v_bufstr;
 		    }
@@ -6817,23 +6904,24 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	}
 
 	/*
-	** Write out as much of the buffer as we can. Be careful not
-	** to overflow the pty's input silo. We are conservative here
-	** and only write a small amount at a time.
-	**
-	** If we can't push all the data into the pty yet, we expect
-	** write to return a non-negative number less than the length
-	** requested (if some data written) or -1 and set errno to
-	** EAGAIN, EWOULDBLOCK, or EINTR (if no data written).
-	**
-	** (Not all systems do this, sigh, so the code is actually
-	** a little more forgiving.)
-	*/
+	 * Write out as much of the buffer as we can. Be careful not to overflow
+	 * the pty's input silo. We are conservative here and only write a small
+	 * amount at a time.
+	 *
+	 * If we can't push all the data into the pty yet, we expect write to
+	 * return a non-negative number less than the length requested (if some
+	 * data written) or -1 and set errno to EAGAIN, EWOULDBLOCK, or EINTR
+	 * (if no data written).
+	 *
+	 * (Not all systems do this, sigh, so the code is actually a little more
+	 * forgiving.)
+	 */
 
 	if ((p = v_bufptr - v_bufstr) > 0)
 	{
 	    riten = write(PVTS(r, k)->cmd_fd, v_bufstr, min(p, MAX_PTY_WRITE));
-	    DBG_MSG(3, (stderr, " tt_write %d chars to vts[%d].cmd_fd = %d\n", riten, k, PVTS(r, k)->cmd_fd));
+	    DBG_MSG( 3, (stderr, "tt_write %d chars to vts[%d].cmd_fd = %d\n",
+			riten, k, PVTS(r, k)->cmd_fd));
 	    if (riten < 0)
 		riten = 0;
 	    v_bufstr += riten;
@@ -6842,8 +6930,8 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	}
 
 	/*
-	** If we have lots of unused memory allocated, return it
-	*/
+	 * If we have lots of unused memory allocated, return it
+	 */
 	if (v_bufend - v_bufptr > MAX_PTY_WRITE * 8)
 	{
 	    /* arbitrary hysteresis, save pointers across realloc */

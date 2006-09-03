@@ -33,9 +33,6 @@
 # define DndLink    7
 #endif
 
-/* a large REFRESH_PERIOD causes problems with `cat' */
-#define REFRESH_PERIOD	    1
-
 #ifndef MULTICLICK_TIME
 # define MULTICLICK_TIME    500
 #endif

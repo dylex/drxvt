@@ -516,6 +516,18 @@
 #define DEFAULT_FOCUS_DELAY_INTERVAL 100000L
 
 /*
+ * Default number of pages to skip when jump scrolling.
+ */
+#define DEFAULT_SKIP_PAGES	(10)
+
+/*
+ * If an active tab produces fewer than these many characters, a screen refresh
+ * is requested immediately. Otherwise it is delayed slightly (about 10ms) to
+ * ensure that the active tab is not "flat out" scrolling.
+ */
+#define DEFAULT_REFRESH_LIMIT	(10)
+
+/*
  * Provide termcap/terminfo bw support
  */
 /* #define TERMCAP_HAS_BW */

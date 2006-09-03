@@ -312,7 +312,6 @@ typedef enum {
 #define Opt_mc_hack		    ((1LU<<17) | IS_OPTION1)
 #define Opt_tripleclickwords	    ((1LU<<18) | IS_OPTION1)
 #define Opt_scrollWithBuffer	    ((1LU<<19) | IS_OPTION1)
-#define Opt_jumpScroll		    ((1LU<<20) | IS_OPTION1)
 #define Opt_mouseWheelScrollPage    ((1LU<<21) | IS_OPTION1)
 #define Opt_pointerBlank	    ((1LU<<22) | IS_OPTION1)
 #define Opt_cursorBlink		    ((1LU<<23) | IS_OPTION1)
@@ -329,7 +328,7 @@ typedef enum {
 # define Opt_xft		    ((1LU<<29) | IS_OPTION1)
 #endif
 #define DEFAULT_OPTIONS	    \
-    (Opt_scrollBar | Opt_jumpScroll)
+    (Opt_scrollBar)
 
 /* rxvt_vars.Options2 */
 #define Opt2_protectSecondary	    ((1LU<<2) | IS_OPTION2)
@@ -720,17 +719,39 @@ typedef struct {
     /* the terminal TERM type */
     termenv_t	    termenv;
 
-    clock_t	    checksum;	/* unique id of this terminal */
+    int		    scrolled_lines;	/* If this tab is producing lots of
+					   data, this is the number of lines
+					   that have scrolled without a refresh
+					   request */
 
-    /* write out buffer */
-    unsigned char*  v_buffer;	/* pointer to physical buffer */
-    unsigned char*  v_bufstr;	/* beginning of area to write */
-    unsigned char*  v_bufptr;	/* end of area to write */
-    unsigned char*  v_bufend;	/* end of physical buffer */
+    /*
+     * Moved from hidden: want_refresh needs to be local to each tab.
+     * want_full_refresh, refresh_type (except for SMOOTH_REFRESH), and
+     * want_clip_refresh should be window (not tab) variables.
+     */
+    unsigned char   BOOLVAR( want_refresh, 1);		/* Awaiting screen
+							   refresh */
 
-    /* command input buffering */
-    unsigned char*  cmdbuf_ptr;
-    unsigned char*  cmdbuf_endp;
+    int		    nbytes_last_read;	/* Number of bytes read on the last
+					   read() call to child's fd */
+
+    /*
+     * Data we want to write into cmd_fd is buffered in here, before being
+     * written by rxvt_tt_write(). [Child's input buffer]
+     */
+    unsigned char   *v_buffer,		/* pointer to physical buffer */
+		    *v_bufstr,		/* beginning of area to write */
+		    *v_bufptr,		/* end of area to write */
+		    *v_bufend;		/* end of physical buffer */
+
+    /*
+     * Data read from cmd_fd is buffered in here [Child's output buffer]
+     */
+    unsigned char   *cmdbuf_escstart,	/* Start of an escape sequence */
+		    *cmdbuf_escfail,	/* Position where processing of an
+					   escape sequence last failed */
+		    *cmdbuf_ptr,	/* current char */
+		    *cmdbuf_endp;	/* End of read child's output */
     unsigned char   cmdbuf_base[BUFSIZ];
 } term_t;
 

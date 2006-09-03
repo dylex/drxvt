@@ -628,7 +628,7 @@ rxvt_scr_reset(rxvt_t* r, int page)
 	return;
 
     DBG_MSG(1,(stderr, "rxvt_scr_reset %d () refresh screen\n", page));
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
 
     total_rows = nrow + SVLINES;
     prev_total_rows = prev_nrow + SVLINES;
@@ -788,7 +788,7 @@ rxvt_scr_cursor(rxvt_t* r, int page, int mode)
 	    s->s_charset_char = PVTS(r, page)->charsets[s->charset];
 	    break;
 	case RESTORE:
-	    r->h->want_refresh = 1;
+	    PVTS(r, page)->want_refresh = 1;
 	    s->cur.row = s->s_cur.row;
 	    s->cur.col = s->s_cur.col;
 	    s->flags &= ~Screen_WrapNext;
@@ -821,7 +821,7 @@ rxvt_scr_change_screen(rxvt_t* r, int page, int scrn)
     unsigned int	i, offset;
 #endif
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
 
     DBG_MSG(1, (stderr, "rxvt_scr_change_screen %d (%d)\n", page, scrn));
 
@@ -929,7 +929,7 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
     if (count == 0 || (row1 > row2))
 	return 0;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     DBG_MSG(2, (stderr, "rxvt_scroll_text %d (%d,%d,%d,%d): %s\n",
 		page, row1, row2, count, spec,
 		(PVTS(r, page)->current_screen == PRIMARY) ?
@@ -1060,25 +1060,33 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
  */
 /* EXTPROTO */
 void
-rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines, int len)
+rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
+	int len)
 {
     unsigned char   checksel, clearsel;
     char	    c;
     int		 i, row, last_col;
     text_t	 *stp;
     rend_t	 *srp;
-    struct rxvt_hidden *h = r->h;
+
+    DBG_MSG( 2, ( stderr, "rxvt_scr_add_lines( r, %d, %.*s, %d, %d)\n",
+		page, min(len, 36), str, nlines, len ) );
 
     if (len <= 0)	/* sanity */
-    return;
+	return;
 
-    h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     last_col = r->TermWin.ncol;
 
-    DBG_MSG(2,(stderr, "rxvt_scr_add_lines %d (%d,%d)\n", page, nlines, len));
     ZERO_SCROLLBACK(r, page);
     if (nlines > 0)
     {
+	/*
+	 * 2006-09-02 gi1242 TODO: The code below is *horrible*. When we call
+	 * rxvt_scroll_text(), we might end up with a negative CURROW. We try
+	 * and be clever using this information, but rxvt_scr_gotorc() will
+	 * reset this information!
+	 */
 	nlines += (CURROW - PSCR(r, page).bscroll);
 	if (
 	      (nlines > 0)
@@ -1089,7 +1097,11 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines, in
 	    /* _at least_ this many lines need to be scrolled */
 	    rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
 		PSCR(r, page).bscroll, nlines, 0);
+
 	    CURROW -= nlines;
+
+	    DBG_MSG( 2, ( stderr, "\e[32mScrolling %d lines. CURROW=%d\e[0m\n",
+			nlines, CURROW ) );
 	}
     }
 
@@ -1110,11 +1122,14 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines, in
     srp = PSCR(r, page).rend[row];
 
 #ifdef MULTICHAR_SET
-    if (PVTS(r, page)->lost_multi &&
-	CURCOL > 0 &&
-	IS_MULTI1(srp[CURCOL - 1]) &&
-	*str != '\n' && *str != '\r' && *str != '\t')
+    if(
+	 PVTS(r, page)->lost_multi && CURCOL > 0 &&
+	 IS_MULTI1(srp[CURCOL - 1]) &&
+	 *str != '\n' && *str != '\r' && *str != '\t'
+      )
+    {
 	PVTS(r, page)->chstat = WBYTE;
+    }
 #endif
 
     for (i = 0; i < len;)
@@ -1128,18 +1143,23 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines, in
 
 	    case '\n':
 		/* XXX: think about this */
-		if (PSCR(r, page).tlen[row] != -1)
+		if( PSCR(r, page).tlen[row] != -1 )
 		    MAX_IT(PSCR(r, page).tlen[row], CURCOL);
-		    PSCR(r, page).flags &= ~Screen_WrapNext;
-		    if (CURROW == PSCR(r, page).bscroll)
-			rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
-			    PSCR(r, page).bscroll, 1, 0);
-		    else if (CURROW < (r->TermWin.nrow - 1))
-			row = (++CURROW) + SVLINES;
-		    stp = PSCR(r, page).text[row];  /* _must_ refresh */
-		    srp = PSCR(r, page).rend[row];  /* _must_ refresh */
-		    RESET_CHSTAT(r, page);
-		    continue;
+
+		PSCR(r, page).flags &= ~Screen_WrapNext;
+		if (CURROW == PSCR(r, page).bscroll)
+		{
+		    DBG_MSG( 9, ( stderr, "%s:%d ", __FILE__, __LINE__ ) );
+		    rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
+			PSCR(r, page).bscroll, 1, 0);
+		}
+		else if (CURROW < (r->TermWin.nrow - 1))
+		    row = (++CURROW) + SVLINES;
+
+		stp = PSCR(r, page).text[row];  /* _must_ refresh */
+		srp = PSCR(r, page).rend[row];  /* _must_ refresh */
+		RESET_CHSTAT(r, page);
+		continue;
 
 	    case '\r':
 		/* XXX: think about this */
@@ -1313,7 +1333,7 @@ void
 rxvt_scr_backspace(rxvt_t* r, int page)
 {
     RESET_CHSTAT(r, page);
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     if (CURCOL == 0)
     {
 	if (CURROW > 0)
@@ -1342,7 +1362,7 @@ rxvt_scr_tab(rxvt_t* r, int page, int count)
     int		 i, x;
 
     DBG_MSG(3,(stderr, "rxvt_scr_tab %d (%d)\n", page, count));
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     RESET_CHSTAT(r, page);
     i = x = CURCOL;
     if (count == 0)
@@ -1373,8 +1393,18 @@ rxvt_scr_tab(rxvt_t* r, int page, int count)
 	if (count)
 	    x = 0;
     }
+
+#if 0
     if (x != CURCOL)
 	rxvt_scr_gotorc(r, page, 0, x, R_RELATIVE);
+#else
+    /*
+     * 2006-09-02 gi1242: Don't call rxvt_scr_gotorc() because that might change
+     * CURROW (if it was negative). If we're adding lines to the screen
+     * structure, then CURROW is allowed to be negative.
+     */
+    CURCOL = x;
+#endif
 }
 
 /* ------------------------------------------------------------------------- */
@@ -1437,7 +1467,7 @@ rxvt_scr_forwardindex(rxvt_t* r, int page)
 void
 rxvt_scr_gotorc(rxvt_t* r, int page, int row, int col, int relative)
 {
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
 
@@ -1494,7 +1524,7 @@ rxvt_scr_index(rxvt_t* r, int page, enum page_dirn direction)
 {
     int		 dirn;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     dirn = ((direction == UP) ? 1 : -1);
     DBG_MSG(1,(stderr, "rxvt_scr_index %d (%d)\n", page, dirn));
 
@@ -1525,7 +1555,7 @@ rxvt_scr_erase_line(rxvt_t* r, int page, int mode)
 {
     unsigned int    row, col, num;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     DBG_MSG(2,(stderr, "rxvt_scr_erase_line %d (%d) at screen row: %d\n",
 		page, mode, CURROW));
     ZERO_SCROLLBACK(r, page);
@@ -1591,7 +1621,7 @@ rxvt_scr_erase_screen(rxvt_t* r, int page, int mode)
     rend_t	ren;
     XGCValues	gcvalue;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     DBG_MSG(2,(stderr, "rxvt_scr_erase_screen %d (%d) at screen row: %d\n",
 		page, mode, CURROW));
     ZERO_SCROLLBACK(r, page);
@@ -1712,7 +1742,7 @@ rxvt_scr_E(rxvt_t* r, int page)
     int		 i, j, k;
     rend_t	 *r1, fs;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     r->h->num_scr_allow = 0;
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
@@ -1774,7 +1804,7 @@ rxvt_scr_insdel_chars(rxvt_t* r, int page, int count, int insdel)
     rend_t*	srp;
     RINT16T*	slp;
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     ZERO_SCROLLBACK(r, page);
 #if 0
     RESET_CHSTAT(r, page);
@@ -1918,7 +1948,7 @@ rxvt_scr_scroll_region(rxvt_t* r, int page, int top, int bot)
 void
 rxvt_scr_cursor_visible(rxvt_t* r, int page, int mode)
 {
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     if (mode)
 	PSCR(r, page).flags |= Screen_VisibleCursor;
     else
@@ -2227,7 +2257,6 @@ rxvt_scr_page(rxvt_t* r, int page, enum page_dirn direction, int nlines)
     DBG_MSG( 2, (stderr, "rxvt_scr_page %d (%s, %d) view_start:%d\n",
 		page, ((direction == UP) ? "UP" : "DN"), nlines, VSTART));
 
-    assert((nlines >= 0) && (nlines <= r->TermWin.nrow));
     oldviewstart = VSTART;
     if (direction == UP)
     {
@@ -2249,7 +2278,7 @@ rxvt_scr_change_view(rxvt_t* r, int page, RUINT16T oldviewstart)
 {
     if (VSTART != oldviewstart)
     {
-	r->h->want_refresh = 1;
+	PVTS(r, page)->want_refresh = 1;
 	PVTS(r, page)->num_scr -= (VSTART - oldviewstart);
     }
     return (int)(VSTART - oldviewstart);
@@ -3257,6 +3286,9 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     int		drawfunc, image_drawfunc;
     struct rxvt_hidden *h = r->h;
 
+    if( !(refresh_type & CLIPPED_REFRESH) )
+	PVTS( r, page)->scrolled_lines = 0;
+
     if (refresh_type == NO_REFRESH || !PVTS(r, page)->mapped)
     {
 	DBG_MSG(4, (stderr, "Skipping refresh (%d, %d)\n",
@@ -3308,7 +3340,6 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	h->buffer = rxvt_realloc(h->buffer, sizeof(char) * (h->currmaxcol + 1));
     }
     buffer = h->buffer;
-    h->refresh_count = 0;
 
     row_offset = SVLINES - VSTART;
 #ifdef XFT_SUPPORT
@@ -4427,7 +4458,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     }
     else
 	/* If we performed an unclipped refresh, then the screen is current */
-	h->want_refresh = 0;
+	PVTS(r, page)->want_refresh = 0;
 
     h->refresh_type &= ~CLIPPED_REFRESH;
     h->want_clip_refresh = 0; /* clipping is current (regardless of wether we
@@ -4467,7 +4498,7 @@ rxvt_scr_clear(rxvt_t* r, int page)
     DBG_MSG( 2, (stderr, "rxvt_scr_clear()\n"));
 
     r->h->num_scr_allow = 0;
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
 #ifdef TRANSPARENT
     if ISSET_OPTION(r, Opt_transparent)
     {
@@ -4891,7 +4922,7 @@ rxvt_process_selectionclear(rxvt_t* r, int page)
 {
     DBG_MSG(2,(stderr, "rxvt_process_selectionclear %d ()\n", page));
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     if (SEL(r).text)
 	rxvt_free(SEL(r).text);
     SEL(r).text = NULL;
@@ -5129,7 +5160,7 @@ rxvt_selection_click(rxvt_t* r, int page, int clicks, int x, int y)
 void
 rxvt_selection_start_colrow(rxvt_t* r, int page, int col, int row)
 {
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     SEL(r).mark.col = col;
     SEL(r).mark.row = row - VSTART;
     MAX_IT(SEL(r).mark.row, -(RINT32T)PVTS(r, page)->nscrolled);
@@ -5295,7 +5326,7 @@ rxvt_selection_extend(rxvt_t* r, int page, int x, int y, int flag)
 	    SEL(r).beg.row = SEL(r).end.row = 0;
 	    SEL(r).beg.col = SEL(r).end.col = 0;
 	    SEL(r).clicks = 4;
-	    r->h->want_refresh = 1;
+	    PVTS(r, page)->want_refresh = 1;
 	    DBG_MSG( 2, (stderr,
 			"rxvt_selection_extend %d () sel.clicks = 4\n", page));
 	    return;
@@ -5359,7 +5390,7 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, RINT32T col, RINT32T row, int 
     DBG_MSG(2,(stderr, "rxvt_selection_extend_colrow %d (c:%d, r:%d, %d, %d) clicks:%d, op:%d\n", page, col, row, button3, buttonpress, SEL(r).clicks, SEL(r).op));
     DBG_MSG(2,(stderr, "rxvt_selection_extend_colrow %d () ENT  b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col));
 
-    r->h->want_refresh = 1;
+    PVTS(r, page)->want_refresh = 1;
     switch (SEL(r).op)
     {
 	case SELECTION_INIT:

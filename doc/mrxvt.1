@@ -283,14 +283,6 @@ Apply tabbar background image to tabs.
 .Bd -filled
 .Bl -tag -width 4n
 .
-.BO j
-Enable / disable jump scrolling. Normally, text is scrolled one line at a time; this option allows
-.Nm
-to move multiple lines at a time so that it does not fall as far behind. Its use is strongly recommended since it makes
-.Nm
-much faster when scanning through large amounts of text.
-.Op Cm jumpScroll
-.
 .BO mp
 scroll one page when press mouse wheel button
 .Op Cm mouseWheelScrollPage
@@ -1061,6 +1053,34 @@ Delay (ms) to blank pointer after.
 .It Cm printPipe Ar cmd
 Specify a command pipe for vt100 printer.
 .
+.It Cm refreshLimit Ar N
+This option and
+.Cm skipPages
+are to be used to replace the
+.Sq jump scroll
+behaviour of other terminal emulators (and previous version of
+.Nm ) .
+Generally when data is available from a tab,
+.Nm
+reads as much of it as is available (up to our buffer size), and process it. After we are done processing it (generally takes a fraction of a mili-second), we look for more data from the tab. If we obtain not more than
+.Ar N
+characters, then we request a screen refresh (which takes a while, especially if you use Xft with anti aliasing). If we obtain more than
+.Ar N
+characters from the tab, then we delay the screen refresh until the tab eventually has either
+.Ar N
+or fewer characters of output, or the tab has (cumulatively) produced at least
+.Cm skipPages
+of data.
+.Pp
+The default value is 10. If say
+.Vb
+ls -Rl --color /
+.Ve
+produces text which scrolls too slowly, then you should reduce this value (even to 0 if necessary). Otherwise you can increase this value. Setting it to something enormous (say BUFSIZ) will cause
+.Nm
+to request screen refreshes every time the active tab has data, and effectively disable the so called
+.Sq jump scrolling .
+.
 .It Cm scrollColor Ar color
 Color of scrollbar (see also
 .Cm troughColor ) .
@@ -1071,6 +1091,25 @@ Set mouse selection style to
 which is 2.20,
 .Cm oldword
 which is xterm style with 2.20 old word selection, or anything else which gives xterm style selection.
+.
+.It Cm skipPages Ar N
+This option and
+.Cm refreshLimit
+are to be used to replace the
+.Sq jump scroll
+behaviour of other terminal emulators (and previous version of
+.Nm ) .
+If the screen refresh is delayed because of the
+.Cm refreshLimit
+option, then
+.Nm
+will refresh the screen every
+.Ar N
+pages of output. The default is 10. If you set it to a very large value (say LONG_MAX), then
+.Nm
+will refresh the screen only after the tab has stopped
+.Sq flat out
+scrolling.
 .
 .It Cm smartResize Ar True Ns | Ns Ar False
 Enable / disable smart resize. When the tabbar is shown, or font size is increased, the resize terminal window could be partially off screen. If

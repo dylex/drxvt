@@ -736,13 +736,14 @@ rxvt_init_vars(rxvt_t *r)
 # endif
     /* SET_NULL(h->v_bufstr); */
     SET_NULL(h->buffer);
-#ifdef TRANSPARENT
+
+# ifdef TRANSPARENT
     h->am_pixmap_trans = 0;
     h->am_transparent  = 0;
     UNSET_PIXMAP(h->rootPixmap);
     h->bgRefreshInterval = DEFAULT_BG_REFRESH_INTERVAL;
     h->lastCNotify.tv_sec = 0;	    /* No BG update pending */
-#endif
+# endif
 
     /* Initialize timeouts to 0 */
     for( i=NUM_TIMEOUTS; i--;)
@@ -760,7 +761,6 @@ rxvt_init_vars(rxvt_t *r)
     r->Options[1] = DEFAULT_OPTIONS2;
     r->Options[2] = DEFAULT_OPTIONS3;
     r->Options[3] = DEFAULT_OPTIONS4;
-    h->want_refresh = 1;
     h->want_clip_refresh = 0;
     /*
      * We only want to set want_resize when we call XResizeWindow. In that
@@ -815,7 +815,6 @@ rxvt_init_vars(rxvt_t *r)
 #ifdef GREEK_SUPPORT
     h->ks_greekmodeswith = GREEK_KEYBOARD_MODESWITCH;
 #endif
-    h->refresh_limit = 1;
     h->refresh_type = SLOW_REFRESH;
     UNSET_REGION(h->refreshRegion);	    /* Will be created when needed */
     h->prev_nrow = h->prev_ncol = 0;
@@ -971,6 +970,30 @@ rxvt_init_shadow_mode (rxvt_t* r, const char* shadow_mode)
 
 
 /*----------------------------------------------------------------------*/
+/* EXTPROTO */
+void
+rxvt_set_jumpscroll( rxvt_t *r )
+{
+    if( r->h->rs[Rs_refreshLimit] )
+    {
+	r->h->refresh_limit = atol( r->h->rs[Rs_refreshLimit] );
+	if( r->h->refresh_limit < 0 )
+	    r->h->refresh_limit = 0;
+    }
+    else
+	r->h->refresh_limit = DEFAULT_REFRESH_LIMIT;
+
+    if( r->h->rs[Rs_skipPages] )
+    {
+	r->h->skip_pages = atol( r->h->rs[Rs_skipPages] );
+	if( r->h->skip_pages <= 0 )
+	    r->h->skip_pages = 1;
+    }
+    else
+	r->h->skip_pages = DEFAULT_SKIP_PAGES;
+}
+
+
 /* EXTPROTO */
 const char**
 rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
@@ -1176,6 +1199,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->TermWin.shade = 100 - shade;
     }
 #endif
+
+    rxvt_set_jumpscroll(r);
 
 #ifdef TRANSPARENT
     if (rs[Rs_bgRefreshInterval])
@@ -2587,7 +2612,6 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 #ifdef TTY_GID_SUPPORT
     struct group*   gr = getgrnam( "tty" );
 #endif
-    struct tms	    tp;
     register int    i;
 
 
@@ -2664,7 +2688,7 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	SET_PMODE(r, page, PrivMode_TtyOutputInh);
     if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
 	SET_PMODE(r, page, PrivMode_Keypress);
-    if (NOTSET_OPTION(r, Opt_jumpScroll))
+    if( r->h->skip_pages > 1 /* jump scroll is unset */ )
 	SET_PMODE(r, page, PrivMode_smoothScroll);
 #ifndef NO_BACKSPACE_KEY
     if (STRCMP(r->h->key_backspace, "DEC") == 0)
@@ -2698,9 +2722,8 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 #endif
 
     /* Initialize input buffer */
-    PVTS(r, page)->cmdbuf_ptr =
-	PVTS(r, page)->cmdbuf_endp = 
-	PVTS(r, page)->cmdbuf_base;
+    PVTS(r, page)->cmdbuf_ptr	= PVTS(r, page)->cmdbuf_endp
+				= PVTS(r, page)->cmdbuf_base;
     
     /* Initialize write out buffer */
     SET_NULL(PVTS(r, page)->v_buffer);
@@ -2708,11 +2731,11 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     SET_NULL(PVTS(r, page)->v_bufptr);
     SET_NULL(PVTS(r, page)->v_bufend);
 
-    /* Initialize checksum */
-    PVTS(r, page)->checksum = times (&tp);
-
     /* Set screen structure initialization flag */
     PVTS(r, page)->init_screen = 0;
+
+    /* Request a refresh */
+    PVTS(r, page)->want_refresh = 1;
 }
 
 
@@ -3494,12 +3517,12 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 #endif
 
 
-	    if (rxvt_control_tty( PVTS(r, page)->tty_fd,
-				  PVTS(r, page)->ttydev ) < 0
+	    if(
+		 rxvt_control_tty( PVTS(r, page)->tty_fd,
+				    PVTS(r, page)->ttydev ) < 0
 	      )
 	    {
 		rxvt_print_error("Could not obtain control of tty");
-		clean_sigmasks_and_fds( r, page );
 	    }
 	    else
 	    {
@@ -3517,16 +3540,23 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 		 * Spin off command interpreter.
 		 */
 		rxvt_run_child(r, page, argv);
+
+		/*
+		 * If we got here, then we failed to exec the child process.
+		 */
+		fprintf( stderr, "Could not execute %s.\n",
+			(argv && argv[0]) ? argv[0] : "shell");
 	    }
 
-	    /*
-	     * If we got here, then we failed to exec the child process.
-	     * We must kill the child's thread, and NOT return.
-	     */
-	    fprintf( stderr, "Could not execute %s.\n",
-		    (argv && argv[0]) ? argv[0] : "shell");
+	    /* Something went wrong. Kill the child. */
+	    if(
+		 !(PVTS(r,page)->holdOption & HOLD_STATUSBIT) &&
+		 !(PVTS(r,page)->holdOption & HOLD_ALWAYSBIT)
+	      )
+		/* If tab won't be held open, wait a little */
+		sleep(5);
+	    exit( EXIT_FAILURE );
 
-	    exit(EXIT_FAILURE);
 	    /* NOT REACHED */
 
 	default:

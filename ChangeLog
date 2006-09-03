@@ -2,6 +2,9 @@
 \-----------------------------------
 Gautam Iyer <gi1242@users.sourceforge.net>
     * Bug Fixes:
+	0. Did a HUGE REWRITE of the multi-tab code base. Incomplete escape
+	   sequences longer cause lockups. Really busy tabs no longer starve
+	   everything else!
 	1. Fixed detecting xft support if xft-config is missing.
 	2. Fixed segfault obtained when the last macro in r->macros is executed
 	4. Convert sources from ts=8 to ts=4. Yes ts=8 was a bug :). Added a
@@ -22,6 +25,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   even if they exit very quickly.
 
     * Enhancements:
+	0. Really busy tabs (even with Xft+anti aliasing) no longer starves
+	   anything else!
 	1. Reduced memory footprint by roughly 5kb.
 	2. Converted all source files to use the standard ts=8 for easier
 	   diffing / online viewing.
@@ -37,6 +42,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	7. Added --holdExitTitle and --holdExitText options to specify the
 	   title of an exited tab, and the text printed in the tab of an
 	   exited child process.
+	8. Removed the "jumpScroll" option, and replaced it with
+	   --refreshLimit and --skipPages (see man page).
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Bug Fixes:

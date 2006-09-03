@@ -1166,6 +1166,8 @@ enum {
     Rs_textShadowMode,	/* text shadow color mode */
 #endif
 
+    Rs_skipPages,	/* Number of pages to skip when jump scrolling */
+    Rs_refreshLimit,	/* Number of chars to tolerate when refreshing */
 #ifdef TINTING_SUPPORT
     Rs_shade,	/* shade percentage */
     Rs_tint,	/* tinting color */
@@ -1489,18 +1491,12 @@ enum {
  *****************************************************************************
  */
 struct rxvt_hidden {
-    unsigned char   BOOLVAR( want_refresh, 1),		/* Awaiting screen
-							   refresh */
-		    BOOLVAR( want_clip_refresh, 1),	/* Only refresh region
+    unsigned char   BOOLVAR( want_clip_refresh, 1),	/* Only refresh region
 							   specified by
 							   refreshRegion */
 		    BOOLVAR( want_resize, 2),		/* perform resize even
 							   if window size has
 							   not changed */
-#ifdef TRANSPARENT
-		    BOOLVAR( want_full_refresh, 1),	/* awaiting full screen
-							   refresh */
-#endif
 #if defined(BACKGROUND_IMAGE) || defined(TRANSPARENT)
 		    BOOLVAR( am_transparent, 1),	/* is transparent */
 		    BOOLVAR( am_pixmap_trans, 1),	/* transparency without
@@ -1514,8 +1510,22 @@ struct rxvt_hidden {
 		    BOOLVAR( num_scr_allow, 1),
 		    BOOLVAR( bypass_keystate, 1);
 
+#ifdef TRANSPARENT
+    unsigned char   BOOLVAR( want_full_refresh, 1);	/* awaiting full screen
+							   refresh, including
+							   borders. */
+#endif
+
     Region	    refreshRegion;			/* Region for
 							   CLIPPED_REFRESH */
+
+    int		    skip_pages,				/* Number of pages to
+							   skip when jump
+							   scrolling */
+		    refresh_limit;			/* Request screen
+							   refresh only if ATAB
+							   produces <= these
+							   many chars */
     unsigned char   BOOLVAR( refresh_type, 5),
 #ifdef META8_OPTION
 		    meta_char,				/* Alt-key prefix */
@@ -1557,8 +1567,7 @@ struct rxvt_hidden {
 		    mouse_slip_wheel_delay,
 		    mouse_slip_wheel_speed,
 #endif
-		    refresh_count,
-		    refresh_limit,
+		    max_skipped_pages,
 		    fnum,				/* logical font
 							   number */
 		    last_bot,				/* scrollbar last bottom

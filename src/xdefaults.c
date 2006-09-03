@@ -168,7 +168,9 @@ static const struct {
     BOOL( "fullscreen", "fs", Opt2_fullscreen, "Start fullscreen" ),
     BOOL( "reverseVideo", "rv", Opt_reverseVideo, "reverse video" ),
     BOOL( "loginShell", "ls", Opt_loginShell, "login shell" ),
-    BOOL( "jumpScroll", "j", Opt_jumpScroll, "jump scrolling" ),
+
+    RSTRG( Rs_refreshLimit, "refreshLimit", "nchars", 0 ),
+    RSTRG( Rs_skipPages, "skipPages", "%d", 0 ),
 
 #ifdef TINTING_SUPPORT
     STRG(Rs_color + Color_tint, "tintColor", "tint", "color", "tint color", 0),
@@ -242,7 +244,7 @@ static const struct {
     BOOL( "utmpInhibit", "ut", Opt_utmpInhibit,
 	    "utmp inhibit - do not log to utmp" ),
     STRG(Rs_confFile, NULL, "cf", "file",
-	"X resource configuration file instead of ~/.mrxvtrc", 0),
+	"Configuration file instead of ~/.mrxvtrc", 0),
 
 #ifndef NO_BELL
     BOOL( "visualBell", "vb", Opt_visualBell,

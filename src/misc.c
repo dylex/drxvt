@@ -327,8 +327,10 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 	dst[j++] = src[i++];
 
     /* NULL terminate dst */
-    if( j > maxLen - 1 )	j = maxLen - 1;
-    if( dst[j] )		dst[j++] = 0;
+    if( j > maxLen - 1 )
+	j = maxLen - 1;
+    if( j == 0 || dst[j-1] )
+	dst[j++] = 0;
 
     /* % expansion done. Copy the string and length over */
     return j;

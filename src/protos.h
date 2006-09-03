@@ -27,7 +27,7 @@
 
 
 /* Begin prototypes of command.c */
-unsigned int     rxvt_cmd_write                   __PROTO((rxvt_t* r, int page, const unsigned char* str, unsigned int count));
+void		 rxvt_cmd_write                   __PROTO((rxvt_t* r, int page, const unsigned char* str, unsigned int count));
 FILE*            rxvt_popen_printer               __PROTO((rxvt_t *r, const char *pipeName));
 int              rxvt_pclose_printer              __PROTO((FILE *stream));
 void             rxvt_xterm_seq                   __PROTO((rxvt_t* r, int page, int op, const char* str, unsigned char resp __attribute__((unused))));
@@ -83,6 +83,7 @@ void		 rxvt_toggle_subwin		  __PROTO((rxvt_t*, const unsigned char *));
 /* Begin prototypes of init.c */
 int              rxvt_init_vars                   __PROTO((rxvt_t* r));
 void             rxvt_init_secondary              __PROTO((rxvt_t* r));
+void		 rxvt_set_jumpscroll		  __PROTO((rxvt_t* r));
 const char    ** rxvt_init_resources              __PROTO((rxvt_t* r, int argc, const char* const *argv));
 #ifdef XFT_SUPPORT
 void		 rxvt_fade_color                  __PROTO((rxvt_t* r, unsigned long pixel, unsigned long *pix_return, XftColor *xft_return));
