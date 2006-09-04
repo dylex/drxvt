@@ -1520,23 +1520,11 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		PVTS(r, i)->hold++;
 
 		/*
-		 * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry
-		 * about calls to read() blocking.
-		 */
-		DBG_MSG( 9, ( stderr, "Reading from tab %d. (O_NDELAY %d)\n",
-			i, O_NDELAY & fcntl( PVTS(r,i)->cmd_fd, F_GETFL ) ) );
-
-		/*
 		 * Process any pending data from the child.
 		 */
 		do
 		  {
-		    /*
-		     * Write out pending data in the child's input buffer. NOTE:
-		     * Since the child is dead, rxvt_cmd_write is OK here.
-		     */
-		    if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
-			rxvt_cmd_write(r, i, NULL, 0);
+		    unsigned char *last_escfail = NULL;
 
 		    /*
 		     * Process information in the child's output buffer.
@@ -1545,23 +1533,41 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		    {
 			rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
 
-			/* Incomplete escape sequence, ignore it. */
+			/* Incomplete escape sequence. */
 			if( PVTS(r, i)->cmdbuf_escfail )
 			{
-			    DBG_TMSG( 3, ( stderr,
-				    "Incomplete escape sequence '%.*s'\n",
-				    PVTS(r, i)->cmdbuf_escfail - 
-					PVTS(r, i)->cmdbuf_escstart + 1,
-				    PVTS(r, i)->cmdbuf_escstart+1
-				    ) );
+			    /*
+			     * See if reading from the child's fd will complete
+			     * this escape seqeunce.
+			     */
+			    if( IS_NULL( last_escfail ) )
+				last_escfail = PVTS(r, i)->cmdbuf_escfail;
 
-			    SET_NULL( PVTS(r, i)->cmdbuf_escstart );
-			    SET_NULL( PVTS(r, i)->cmdbuf_escfail );
+			    else
+			    {
+				/* Really incomplete escape sequence */
+				DBG_MSG( 3, ( stderr,
+					"Incomplete escape sequence '%.*s'\n",
+					PVTS(r, i)->cmdbuf_escfail - 
+					    PVTS(r, i)->cmdbuf_escstart + 1,
+					PVTS(r, i)->cmdbuf_escstart+1
+					) );
 
-			    /* Skip the escape char */
-			    PVTS(r, i)->cmdbuf_ptr++;
-			}
+				SET_NULL( last_escfail );
+				SET_NULL( PVTS(r, i)->cmdbuf_escstart );
+				SET_NULL( PVTS(r, i)->cmdbuf_escfail );
+
+				/* Skip the escape char */
+				PVTS(r, i)->cmdbuf_ptr++;
+			    }
+			} /* if( PVTS(r, i)->cmdbuf_escfail ) */
 		    }
+
+		    /*
+		     * Write out pending data in the child's input buffer.
+		     */
+		    if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
+			rxvt_cmd_write(r, i, NULL, 0);
 
 		    /* Make place for new data */
 		    rxvt_check_cmdbuf( r, i );
@@ -1610,9 +1616,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 		    rxvt_tabbar_set_title( r, i, tabTitle );
 		}
-
-		rxvt_scr_refresh (r, i, SMOOTH_REFRESH);
-	    }
+	    } /* if( SHOULD_HOLD( r, i ) ) */
 	    else
 		rxvt_remove_page( r, i );
 	}
@@ -1677,16 +1681,6 @@ rxvt_find_cmd_child (rxvt_t* r)
 	    return k;
 	}
 
-#if 0
-	/*
-	 * output any pending chars of page's v_buffer
-	 *
-	 * 2006-08-31 gi1242 XXX: This should not be here! We should do this in
-	 * rxvt_cmd_getc before select()
-	 */
-	if (PVTS(r, k)->v_bufstr < PVTS(r, k)->v_bufptr)
-	    rxvt_tt_write(r, k, NULL, 0);
-#endif
       }
     while (k++ != lastProcessed);	/* until we hit the last child again */
 
@@ -1767,6 +1761,10 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 
 	DBG_MSG(2, (stderr, "read maximal %u bytes\n", count));
 
+	/*
+	 * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry about
+	 * calls to read() blocking.
+	 */
 	errno = 0;
 	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp, count );
 	readErrno = errno;
@@ -2359,65 +2357,71 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	select_res = select( r->num_fds, &readfds, NULL, NULL,
 			(quick_timeout ? &value : NULL) );
 
-	rxvt_process_children_cmdfd (r, &readfds);
+	if( select_res > 0 )
+	{
+	    /* Select succeeded, and some tab has input */
+	    rxvt_process_children_cmdfd (r, &readfds);
 
 #ifdef HAVE_X11_SM_SMLIB_H
-	/*
-	 * ICE file descriptor must be processed after we process all file
-	 * descriptors of children. Otherwise, if a child exit,
-	 * IceProcessMessages may hang and make the entire terminal
-	 * unresponsive.
-	 */
-	if( -1 != r->TermWin.ice_fd && FD_ISSET (r->TermWin.ice_fd, &readfds) )
-	    rxvt_process_ice_msgs (r);
+	    /*
+	     * ICE file descriptor must be processed after we process all file
+	     * descriptors of children. Otherwise, if a child exit,
+	     * IceProcessMessages may hang and make the entire terminal
+	     * unresponsive.
+	     */
+	    if(
+		 -1 != r->TermWin.ice_fd &&
+		 FD_ISSET (r->TermWin.ice_fd, &readfds)
+	      )
+		rxvt_process_ice_msgs (r);
 #endif
 
+	    /*
+	     * Now figure out if we have something to return.
+	     */
+	    if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
+		return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+
+	    /* No input from specified child. Try others. */
+	    else if( (retpage = rxvt_find_cmd_child (r)) != -1 )
+	    {
+		if( selpage != -1 && selpage != retpage )
+		{
+		    /*
+		     * Specified child has nothing to return, but some other
+		     * child has data to return. We set retpage = -1, and return
+		     * 0.
+		     */
+		    *p_page = -1;
+		    return '\0';
+		}
+
+		else
+		{
+		    /* No child specified, and we have input from some child */
+		    *p_page = retpage;
+		    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
+		}
+	    } /* else if( (retpage = rxvt_find_cmd_child (r)) != -1 ) */
+	} /* if( select_res >= 0 ) */
 
 	/*
-	 * Now figure out if we have something to return.
+	 * If we get here, we either have a select() error, or no tabs had any
+	 * input. Check to see if something died.
 	 */
-	if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
-	    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+	if( r->vt_died || select_res == -1 )
+	    rxvt_mark_dead_childs( r );
 
-	/* No input from specified child. Try others. */
-	else if( (retpage = rxvt_find_cmd_child (r)) != -1 )
+	if( r->cleanDeadChilds )
 	{
-	    if( selpage != -1 && selpage != retpage )
-	    {
-		/*
-		 * Specified child has nothing to return, but some other child
-		 * has data to return. We set retpage = -1, and return 0.
-		 */
-		*p_page = -1;
-		return '\0';
-	    }
-
-	    else
-	    {
-		/* No child specified, and we have input from some child */
-		*p_page = retpage;
-		return *(PVTS(r, retpage)->cmdbuf_ptr)++;
-	    }
-	}
-
-	/* Last resort: Hope something died */
-	else
-	{
-	    if( r->vt_died || select_res == -1 )
-		rxvt_mark_dead_childs( r );
-
-	    if( r->cleanDeadChilds )
-	    {
-		/* Ok. Something died. */
-		*p_page = -1;
-		return '\0';
-	    } /* if( r->cleanDeadChilds ) */
-	} /* else */
+	    /* Ok. Something died. */
+	    *p_page = -1;
+	    return '\0';
+	} /* if( r->cleanDeadChilds ) */
 
 
 	/*
-	 * If we get here, we have no data to return, so try and do a screen
-	 * refresh.
+	 * Nothing to return. Screen refresh, and call select() again.
 	 */
 	rxvt_refresh_vtscr_if_needed( r );
 
@@ -2993,11 +2997,6 @@ rxvt_process_wheel_button(rxvt_t* r, int page, XButtonEvent *ev)
 # ifdef JUMP_MOUSE_WHEEL
     rxvt_scr_page(r, ATAB(r), v, i);
 
-#  ifdef XFT_SUPPORT
-    /* disable screen refresh if XFT antialias is used to improve performance */
-    if (!(ISSET_OPTION(r, Opt_xft) && ISSET_OPTION(r, Opt2_xftAntialias)))
-#  endif    /* XFT_SUPPORT */
-	rxvt_scr_refresh(r, page, SMOOTH_REFRESH);
 #  ifdef HAVE_SCROLLBARS
     rxvt_scrollbar_update(r, 1);
 #  endif    /* HAVE_SCROLLBARS */
@@ -4267,6 +4266,7 @@ rxvt_process_motionnotify (rxvt_t* r, XEvent* ev)
 	rxvt_scr_move_to(r, page,
 	    scrollbar_position(ev->xbutton.y) - r->h->csrO,
 	    scrollbar_size());
+
 	rxvt_scr_refresh(r, page, r->h->refresh_type & ~CLIPPED_REFRESH);
 	rxvt_scrollbar_update(r, 1);
     }

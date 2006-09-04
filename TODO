@@ -15,6 +15,8 @@ Menus:
     tab titles / menus with an X11 font.
 7   Multichar Xft support in menus.
 7   Extend menu language / facility.
+5   Write decent menus. Almost all options we have now should be available via
+    some menu.
 
 Windows and tabs:
 7   Split window support (e.g. like screen / vim).
@@ -60,9 +62,10 @@ Code Cleanup:
 				      BUGS
 
 9   vt100 printer support is now broken. Fix it.
-8   rxvt_cmd_write should be replaced with rxvt_tt_write in rxvt_clean_cmd_page
 8   When sending escape sequences to mrxvt via macros, make sure we are not
     disrupting processing of another escape sequence.
+8   fg/bg profile colors are not fully correct for tabs that are opened on
+    startup via -ip 0,1,2,3. E.g. colors are messed up when Vim is launched.
 1   PNG and JPEG background support on Solaris looks broken
 
 --------------------------------------------------------------------------------
@@ -141,4 +144,4 @@ That's it. Happy hacking
 --------------------------------------------------------------------------------
 
  Authors	: Jimmy Zhou, Gautam Iyer
- Last Changed	: Sun 03 Sep 2006 09:11:19 AM PDT
+ Last Changed	: Mon 04 Sep 2006 01:19:19 AM PDT
