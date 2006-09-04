@@ -875,8 +875,11 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 
 # ifdef DEBUG
 	{
-	    face = XftLockFace (r->TermWin.xftbfont);
-	    XftUnlockFace (r->TermWin.xftbfont);
+	    if (!IS_NULL(r->TermWin.xftbfont)) 
+	    {
+		face = XftLockFace (r->TermWin.xftbfont);
+		XftUnlockFace (r->TermWin.xftbfont);
+	    }
 	}
 # endif
     }
