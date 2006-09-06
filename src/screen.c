@@ -925,6 +925,7 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 {
     int		    i, j;
     unsigned int    nscrolled;
+	size_t 			size;
 
     if (count == 0 || (row1 > row2))
 	return 0;
@@ -1002,19 +1003,21 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	/* A: scroll up */
 
 	/* A1: Copy lines that will get clobbered by the rotation */
-	for (i = 0, j = row1; i < count; i++, j++)
-	{
-	    PVTS(r, page)->buf_text[i] = PSCR(r, page).text[j];
-	    PVTS(r, page)->buf_rend[i] = PSCR(r, page).rend[j];
-	}
+	size = sizeof(*PSCR(r, page).text);
+	MEMCPY(PVTS(r, page)->buf_text, &PSCR(r, page).text[row1], count * size);
+	MEMCPY(PVTS(r, page)->buf_rend, &PSCR(r, page).rend[row1], count * size);
 
 	/* A2: Rotate lines */
-	for (j = row1, i = j + count; i <= row2; i++, j++)
-	{
-	    PSCR(r, page).tlen[j] = PSCR(r, page).tlen[i];
-	    PSCR(r, page).text[j] = PSCR(r, page).text[i];
-	    PSCR(r, page).rend[j] = PSCR(r, page).rend[i];
-	}
+	size = sizeof(*PSCR(r, page).tlen);
+	MEMMOVE(&(PSCR(r, page).tlen[row1]), &(PSCR(r, page).tlen[row1+count]),
+			(row2 - row1 - count + 1) * size);
+	size = sizeof(*PSCR(r, page).text);
+	MEMMOVE(&(PSCR(r, page).text[row1]), &(PSCR(r, page).text[row1+count]),
+			(row2 - row1 - count + 1) * size);
+	size = sizeof(*PSCR(r, page).rend);
+	MEMMOVE(&(PSCR(r, page).rend[row1]), &(PSCR(r, page).rend[row1+count]),
+			(row2 - row1 - count + 1) * size);
+
 	j = row2 - count + 1, i = count;
     }
     else /* if (j < 0) */
@@ -1022,19 +1025,21 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	/* B: scroll down */
 
 	/* B1: Copy lines that will get clobbered by the rotation */
-	for (i = 0, j = row2; i < count; i++, j--)
-	{
-	    PVTS(r, page)->buf_text[i] = PSCR(r, page).text[j];
-	    PVTS(r, page)->buf_rend[i] = PSCR(r, page).rend[j];
-	}
+	size = sizeof(*PSCR(r, page).text);
+	MEMCPY(PVTS(r, page)->buf_text, &PSCR(r, page).text[row2], count * size);
+	MEMCPY(PVTS(r, page)->buf_rend, &PSCR(r, page).rend[row2], count * size);
 
 	/* B2: Rotate lines */
-	for (j = row2, i = j - count; i >= row1; i--, j--)
-	{
-	    PSCR(r, page).tlen[j] = PSCR(r, page).tlen[i];
-	    PSCR(r, page).text[j] = PSCR(r, page).text[i];
-	    PSCR(r, page).rend[j] = PSCR(r, page).rend[i];
-	}
+	size = sizeof(*PSCR(r, page).tlen);
+	MEMMOVE(&(PSCR(r, page).tlen[row1 + count]), &(PSCR(r, page).tlen[row1]),
+			(row2 - row1 - count + 1) * size);
+	size = sizeof(*PSCR(r, page).text);
+	MEMMOVE(&(PSCR(r, page).text[row1 + count]), &(PSCR(r, page).text[row1]),
+			(row2 - row1 - count + 1) * size);
+	size = sizeof(*PSCR(r, page).rend);
+	MEMMOVE(&(PSCR(r, page).rend[row1 + count]), &(PSCR(r, page).rend[row1]),
+			(row2 - row1 - count + 1) * size);
+
 	j = row1, i = count;
 	count = -count;
     }
