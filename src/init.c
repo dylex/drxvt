@@ -2469,11 +2469,17 @@ rxvt_string_to_argv( const char *string, int *argc )
 	pcur ++;
 
 	/* now fetch the new token */
-	while (*pcur &&			/* not end of string */
-	    ((dq && *pcur != '\"') ||	/* not end of double quote */
-	     (sq && *pcur != '\'') ||	/* not end of single quote */
-	     (!dq && !sq && !isspace ((int) *pcur))))
-	    *pcur ++;
+	while(
+		*pcur &&			/* not end of string */
+		(
+		  (dq && *pcur != '\"') ||	/* not end of double quote */
+		  (sq && *pcur != '\'') ||	/* not end of single quote */
+		  (!dq && !sq && !isspace ((int) *pcur))
+		)
+	     )
+	{
+	    pcur ++;
+	}
 
 	if (!*pcur &&	/* end of string */
 	    (dq || sq))	/* no match of quote is found */
