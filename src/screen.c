@@ -923,9 +923,9 @@ rxvt_scr_rendition(rxvt_t* r, int page, int set, int style)
 int
 rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 {
-    int		    i, j;
+    int		    i, j, ret;
     unsigned int    nscrolled;
-	size_t 			size;
+    size_t 	    size;
 
     if (count == 0 || (row1 > row2))
 	return 0;
@@ -1003,9 +1003,11 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	/* A: scroll up */
 
 	/* A1: Copy lines that will get clobbered by the rotation */
-	size = sizeof(*PSCR(r, page).text);
-	MEMCPY(PVTS(r, page)->buf_text, &PSCR(r, page).text[row1], count * size);
-	MEMCPY(PVTS(r, page)->buf_rend, &PSCR(r, page).rend[row1], count * size);
+	for (i = count - 1, j = row1; i >= 0; i--, j++)
+	{
+	    PVTS(r, page)->buf_text[i] = PSCR(r, page).text[j];
+	    PVTS(r, page)->buf_rend[i] = PSCR(r, page).rend[j];
+	}
 
 	/* A2: Rotate lines */
 	size = sizeof(*PSCR(r, page).tlen);
@@ -1018,7 +1020,8 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	MEMMOVE(&(PSCR(r, page).rend[row1]), &(PSCR(r, page).rend[row1+count]),
 			(row2 - row1 - count + 1) * size);
 
-	j = row2 - count + 1, i = count;
+	j = row2 - count + 1;
+	ret = i = count;
     }
     else /* if (j < 0) */
     {
@@ -1026,8 +1029,9 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 
 	/* B1: Copy lines that will get clobbered by the rotation */
 	size = sizeof(*PSCR(r, page).text);
-	MEMCPY(PVTS(r, page)->buf_text, &PSCR(r, page).text[row2], count * size);
-	MEMCPY(PVTS(r, page)->buf_rend, &PSCR(r, page).rend[row2], count * size);
+	MEMCPY(PVTS(r, page)->buf_text, &PSCR(r, page).text[row2 - count + 1], count * size);
+	size = sizeof(*PSCR(r, page).rend);
+	MEMCPY(PVTS(r, page)->buf_rend, &PSCR(r, page).rend[row2 - count + 1], count * size);
 
 	/* B2: Rotate lines */
 	size = sizeof(*PSCR(r, page).tlen);
@@ -1041,22 +1045,26 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 			(row2 - row1 - count + 1) * size);
 
 	j = row1, i = count;
-	count = -count;
+	ret = -count;
     }
 
     /* C: Resurrect lines */
+    size = sizeof(*PSCR(r, page).tlen);
+    MEMSET(&PSCR(r, page).tlen[j], 0, count * size);
+    size = sizeof(*PSCR(r, page).text);
+    MEMCPY(&PSCR(r, page).text[j], PVTS(r, page)->buf_text, count * size);
+    size = sizeof(*PSCR(r, page).rend);
+    MEMCPY(&PSCR(r, page).rend[j], PVTS(r, page)->buf_rend, count * size);
+
     for (; i--; j++)
     {
-	PSCR(r, page).tlen[j] = 0;
-	PSCR(r, page).text[j] = PVTS(r, page)->buf_text[i];
-	PSCR(r, page).rend[j] = PVTS(r, page)->buf_rend[i];
 	if (!spec)	/* line length may not equal TermWin.ncol */
 	    rxvt_blank_screen_mem(r, page, PSCR(r, page).text,
 		    PSCR(r, page).rend, (unsigned int)j,
 		    PVTS(r, page)->rstyle);
     }
 
-    return count;
+    return ret;
 }
 
 /* ------------------------------------------------------------------------- */
