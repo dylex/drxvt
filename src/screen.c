@@ -1125,7 +1125,14 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 
     assert(CURCOL < last_col);
     assert(CURROW < r->TermWin.nrow);
+
+#if 0 /*{{{ Possibly incorrection assertion */
+    /*
+     * XXX 2006-09-12 gi1242: I think this assertion is wrong! Note that a few
+     * lines later we set CURROW to be the max of CURROW and -PVTS()->nscrolled
+     */
     assert(CURROW >= -(RINT32T)PVTS(r, page)->nscrolled);
+#endif /*}}}*/
 
     MIN_IT(CURCOL, last_col - 1);
     MIN_IT(CURROW, (RINT32T)r->TermWin.nrow - 1);
