@@ -797,8 +797,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
     {
 	/* % interpolate the action string */
 	astr = expstr;
-	alen = rxvt_percent_interpolate( r, ATAB(r), action->str, action->len,
-		astr, maxLen );
+	alen = rxvt_percent_interpolate( r, ATAB(r), (char *) action->str,
+		action->len, astr, maxLen );
     }
 
 

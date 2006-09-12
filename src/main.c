@@ -270,96 +270,6 @@ rxvt_Child_signal(int sig __attribute__((unused)))
     DBG_MSG( 1, ( stderr, "done rxvt_Child_signal()\n"));
 }
 
-#if 0 /* Old child signal handler */
-RETSIGTYPE
-rxvt_Child_signal(int sig __attribute__((unused)))
-{
-    int			pid, page,
-			save_errno = errno;
-    rxvt_t*		r;
-
-    /* enable signal reentry, it's ok here */
-    signal(SIGCHLD, rxvt_Child_signal);
-
-    DBG_TMSG( 1, ( stderr, "rxvt_Child_signal()\n"));
-    r = rxvt_get_r();
-
-    /*
-     * 2006-02-17 gi1242: If a child process exits BEFORE we had a chance to
-     * initialize it's PID, then we should not wait for the child here. This
-     * will be done in rxvt_getc.
-     */
-    for( page=0; page <= LTAB(r); page++)
-	if( PVTS( r, page)->cmd_pid <=0 )
-	{
-	    DBG_TMSG( 1, ( stderr,
-			"Tab %d not initialized. Dropping signal\n", page));
-	    return;
-	}
-    ;
-
-#if 0
-    /*
-     * 2006-02-17 gi1242: If we do a while loop, then more than one child could
-     * die when we call wait. This might be the cause of the error we sometimes
-     * get when more than one child dies at the same time ...
-     */
-    do
-      {
-	errno = 0;
-      }
-    while ( (pid = waitpid(-1, NULL, WNOHANG)) == -1 && errno == EINTR );
-#endif
-
-    pid = waitpid( -1, NULL, WNOHANG );
-
-    if (pid > 0)
-    {
-	int i;
-
-	for (i = 0; i <= LTAB(r); i ++)
-	{
-	    DBG_MSG( 3, ( stderr, "Tab %d child pid: %d\n", i+1,
-			PVTS( r, i)->cmd_pid));
-
-	    if (pid == PVTS(r, i)->cmd_pid)
-		break;
-	}
-
-	if (i <= LTAB(r))
-	{
-	    DBG_MSG(1,(stderr, "Dead child %d is tab %d\n", (int) pid, i));
-	    /* one more vt died */
-	    r->vt_died ++;
-
-	    /* update child members */
-	    PVTS(r, i)->dead = 1;
-	    if (ISSET_OPTION(r, Opt2_holdExit))
-		PVTS(r, i)->hold = 1;
-	}
-	else
-	{
-	    /*
-	     * PID of child process was not on any tab. We should never get
-	     * here.
-	     *
-	     * 2006-07-31 jimmy:: we can get here if a printPipe dies, or
-	     * it is executed by macro.
-	     */
-	    DBG_MSG(1,(stderr, "Dead child %d is not a tab\n", (int)pid));
-	}
-    }
-    else
-    {
-	/*
-	 * Restore errno for other functions.
-	 */
-	DBG_MSG( 1, ( stderr, "No children died.\n"));
-	errno = save_errno;
-    }
-}
-#endif
-
 
 /*
  * Catch a fatal signal and tidy up before quitting
@@ -2372,8 +2282,7 @@ Done:
     if (ufbg_switched)
 	rxvt_restore_ufbg_color (r);
 
-    /* XXX Need to save the fg / bg colors of each tab here. */
-    if ( idx == Color_bg )
+    if( idx == Color_bg )
     {
 	PVTS( r, page )->p_bg	= r->PixColors[idx];
 #ifdef XFT_SUPPORT
@@ -2404,10 +2313,8 @@ Done:
 	    if (NOT_PIXMAP(PVTS(r, page)->pixmap))
 #endif
 	    {
-		DBG_MSG( 3, ( stderr, "Changing background of page %d\n",
-			    page ) );
-		XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
-		    r->PixColors[Color_bg]);
+		XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
+		    r->PixColors[Color_bg] );
 	    }
 	}
     }

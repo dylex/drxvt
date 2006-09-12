@@ -39,6 +39,7 @@
 #include "../config.h"
 #include "rxvt.h"
 
+
 #ifdef DEBUG_VERBOSE
 # define DEBUG_LEVEL 1
 #else
@@ -3655,7 +3656,8 @@ rxvt_resize_on_configure (rxvt_t* r, unsigned int width, unsigned int height)
     int		    fix_screen;
 
 
-    DBG_MSG(2, (stderr, "rxvt_resize_on_configure\n"));
+    DBG_MSG(2, (stderr, "%s(r, width=%u, height=%u)\n",
+		__func__, width, height ));
     /* update ncol/nrow of new window */
     fix_screen = rxvt_calc_colrow (r, width, height);
 

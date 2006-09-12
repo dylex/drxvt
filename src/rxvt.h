@@ -1839,7 +1839,9 @@ struct rxvt_hidden {
  * Macro that always prints the debug messages. Useful if you want to just print
  * a few debug messages temporarily while hacking.
  */
-#define DBG_TMSG( d, x) fprintf x
+#define DBG_TMSG( d, x)					\
+    fprintf( stderr, "%s:%d ", __FILE__, __LINE__ );	\
+    fprintf x
 
 #endif		    /* __RXVT_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

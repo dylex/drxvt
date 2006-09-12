@@ -411,8 +411,7 @@
 #define SMART_WINDOW_TITLE
 
 /*
- * Allow foreground/background colour to be changed with an
- * xterm escape sequence "\E]39;colour^G" -- still experimental
+ * Allow colors to be changed with an xterm escape sequence.
  */
 #define XTERM_COLOR_CHANGE
 

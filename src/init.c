@@ -912,7 +912,13 @@ rxvt_xerror_handler(const Display *display __attribute__((unused)), const XError
     r->h->xerror_return = event->error_code;
 
     if( !r->h->allowedxerror )
+    {
 	rxvt_print_error("%s", error_msg);
+
+#ifdef DEBUG_X
+	abort();
+#endif
+    }
 
     return 0;	    /* ignored anyway */
 }
@@ -1074,12 +1080,19 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
 
 #ifdef DEBUG_X
+    /*
+     * Makes life a lot simpler when handling X events, as they are not cached,
+     * but processed immediately.
+     */
     XSynchronize( r->Xdisplay, True );
-    XSetErrorHandler( (XErrorHandler) abort );
-    /* XSetErrorHandler((XErrorHandler) rxvt_xerror_handler); */
-#else
-    XSetErrorHandler( (XErrorHandler) rxvt_xerror_handler );
 #endif
+
+    /*
+     * Always set XErrorHandler to our own error handler because sometimes
+     * errors are legal! Our error handler will abort when errors are not
+     * allowed.
+     */
+    XSetErrorHandler( (XErrorHandler) rxvt_xerror_handler );
 
     /* Initialize all atoms after establishing connection to X */
     for (i = 0; i < NUM_XA; i++)
@@ -2826,9 +2839,10 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
     rxvt_switch_fgbg_color (r, page);
 
     /* create the terminal window */
-    DBG_MSG (1, (stderr, "Create VT %d (%dx%d+%dx%d)\n",
+    DBG_MSG( 2, (stderr, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n",
 		page, r->h->window_vt_x, r->h->window_vt_y,
-		VT_WIDTH(r), VT_HEIGHT(r)));
+		VT_WIDTH(r), VT_HEIGHT(r),
+		r->PixColors[Color_fg], r->PixColors[Color_bg] ));
 
     PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
 				r->h->window_vt_x, r->h->window_vt_y,

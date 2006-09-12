@@ -469,7 +469,9 @@ rxvt_scr_add_row (rxvt_t* r, int page, unsigned int total_rows, unsigned int pre
     register int    i;
 
 
-    DBG_MSG(2, (stderr, "rxvt_scr_add_row %d ()\n", page));
+    DBG_MSG(2, (stderr, "%s( page=%d, total_rows=%u, prev_total_rows=%u )\n",
+		__func__, page, total_rows, prev_total_rows ) );
+
     nrow = r->TermWin.nrow;
     prev_nrow = PVTS(r, page)->prev_nrow;
 
@@ -534,7 +536,10 @@ rxvt_scr_adjust_col (rxvt_t* r, int page, unsigned int total_rows)
     ncol = r->TermWin.ncol;
     prev_ncol = PVTS(r, page)->prev_ncol;
 
-    DBG_MSG(2, (stderr, "rxvt_scr_adjust_col %d (ncol=%d, prev_ncol = %d, nrow=%d, total_row=%d)\n", page, ncol, prev_ncol, nrow, total_rows));
+    DBG_MSG( 2, ( stderr, "%s( r, page=%d, total_rows=%u ):"
+		    "ncol=%d, prev_ncol=%d, nrow=%d\n",
+		__func__, page, total_rows, ncol, prev_ncol, nrow ) );
+
 
     for (p = 0; p < total_rows; p++)
     {
@@ -1119,8 +1124,9 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
     }
 
     assert(CURCOL < last_col);
-    assert((CURROW < r->TermWin.nrow) &&
-	(CURROW >= -(RINT32T)PVTS(r, page)->nscrolled));
+    assert(CURROW < r->TermWin.nrow);
+    assert(CURROW >= -(RINT32T)PVTS(r, page)->nscrolled);
+
     MIN_IT(CURCOL, last_col - 1);
     MIN_IT(CURROW, (RINT32T)r->TermWin.nrow - 1);
     MAX_IT(CURROW, -(RINT32T)PVTS(r, page)->nscrolled);
@@ -1706,31 +1712,43 @@ rxvt_scr_erase_screen(rxvt_t* r, int page, int mode)
     }
 
     r->h->refresh_type |= REFRESH_BOUNDS;
-    if (SEL(r).op &&
-	SEL(r).vt == page &&
-	PVTS(r, page)->current_screen == SEL(r).screen &&
-	((SEL(r).beg.row >= row && SEL(r).beg.row <= row + num) ||
-	 (SEL(r).end.row >= row && SEL(r).end.row <= row + num)))
+    if(
+	 SEL(r).op && SEL(r).vt == page &&
+	 PVTS(r, page)->current_screen == SEL(r).screen &&
+	 (
+	   (SEL(r).beg.row >= row && SEL(r).beg.row <= row + num) ||
+	   (SEL(r).end.row >= row && SEL(r).end.row <= row + num)
+	 )
+      )
+    {
 	CLEAR_SELECTION(r);
+    }
+
     if (row >= r->TermWin.nrow)	/* Out Of Bounds */
 	return;
+
     MIN_IT(num, (r->TermWin.nrow - row));
     if (PVTS(r, page)->rstyle & (RS_RVid | RS_Uline))
 	ren = (rend_t) ~RS_None;
+
     else if (GET_BASEBG(PVTS(r, page)->rstyle) == Color_bg)
     {
 	ren = DEFAULT_RSTYLE;
 	CLEAR_ROWS(row, num);
     }
+
     else
     {
 	ren = (PVTS(r, page)->rstyle & (RS_fgMask | RS_bgMask));
+
 	gcvalue.foreground = r->PixColors[GET_BGCOLOR(PVTS(r, page)->rstyle)];
 	XChangeGC(r->Xdisplay, r->TermWin.gc, GCForeground, &gcvalue);
 	ERASE_ROWS(row, num);
+
 	gcvalue.foreground = r->PixColors[Color_fg];
 	XChangeGC(r->Xdisplay, r->TermWin.gc, GCForeground, &gcvalue);
     }
+
     for (; num--; row++)
     {
 	rxvt_blank_screen_mem(r, page, PSCR(r, page).text,
@@ -2051,23 +2069,43 @@ rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
     if (PVTS(r, page)->rvideo != mode)
     {
 	PVTS(r, page)->rvideo = mode;
-	SWAP_IT(r->PixColors[Color_fg], r->PixColors[Color_bg],
-	    unsigned long);
+
+	SWAP_IT( PVTS(r, page)->p_fg, PVTS(r, page)->p_bg, unsigned long );
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    SWAP_IT( PVTS(r, page)->p_xftfg, PVTS(r, page)->p_xftbg, XftColor );
+#endif
+
+	if( page == ATAB(r) )
+	{
+	    SWAP_IT( r->PixColors[Color_fg], r->PixColors[Color_bg],
+		    unsigned long );
+
+	    XSetBackground( r->Xdisplay, r->TermWin.gc,
+		    r->PixColors[Color_bg] );
+	    XSetForeground( r->Xdisplay, r->TermWin.gc,
+		    r->PixColors[Color_fg] );
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		SWAP_IT( r->XftColors[Color_fg], r->XftColors[Color_bg],
+			XftColor );
+#endif
+	}
+
 #if defined(BACKGROUND_IMAGE)
 	if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
 #endif
 #if defined(TRANSPARENT)
-	    if ( NOTSET_OPTION(r, Opt_transparent) ||
+	    if(
+		 NOTSET_OPTION(r, Opt_transparent) ||
 		 (!r->h->am_transparent && !r->h->am_pixmap_trans)
-		)
+	      )
 #endif
-		XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
-		     r->PixColors[Color_bg]);
+		XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
+		     PVTS(r, page)->p_bg );
 
-	XSetForeground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_fg]);
-	XSetBackground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_bg]);
-	rxvt_scr_clear(r, page);
-	rxvt_scr_touch(r, page, True);
+	rxvt_scr_clear( r, page );
+	rxvt_scr_touch( r, page, True );
     }
 }
 
@@ -4513,7 +4551,7 @@ rxvt_scr_clear(rxvt_t* r, int page)
     r->h->num_scr_allow = 0;
     PVTS(r, page)->want_refresh = 1;
 #ifdef TRANSPARENT
-    if ISSET_OPTION(r, Opt_transparent)
+    if( ISSET_OPTION(r, Opt_transparent) )
     {
 	if (IS_WIN(r->TermWin.parent))
 	    XClearWindow(r->Xdisplay, r->TermWin.parent);

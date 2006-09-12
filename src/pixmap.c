@@ -179,13 +179,14 @@ rxvt_resize_pixmap(rxvt_t *r, int page)
     if (IS_PIXMAP(PVTS(r, page)->pixmap))
 	XFreePixmap(r->Xdisplay, PVTS(r, page)->pixmap);
 
-    if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap)) {
+    if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
+    {
 	/* So be it: I'm not using pixmaps */
 # ifdef TRANSPARENT
 	if ( !r->h->am_transparent && !r->h->am_pixmap_trans )
 # endif
-	XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
-	    r->PixColors[Color_bg]);
+	XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
+	    PVTS(r, page)->p_bg );
 	return;
     }
 
@@ -375,7 +376,8 @@ rxvt_load_bg_pixmap(rxvt_t *r, int page, const char *file)
     PVTS(r, page)->bg.pixmap = pixmap;
 
     if (NOT_PIXMAP(pixmap)) {
-	XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt, r->PixColors[Color_bg]);
+	XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
+		PVTS(r, page)->p_bg );
 	return None;
     }
 
