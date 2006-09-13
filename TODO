@@ -64,8 +64,7 @@ Code Cleanup:
 9   vt100 printer support is now broken. Fix it.
 8   When sending escape sequences to mrxvt via macros, make sure we are not
     disrupting processing of another escape sequence.
-8   fg/bg profile colors are not fully correct for tabs that are opened on
-    startup via -ip 0,1,2,3. E.g. colors are messed up when Vim is launched.
+8   fg bg profile colors are not perfect yet. E.g. when ufbg is enabled.
 1   PNG and JPEG background support on Solaris looks broken
 
 --------------------------------------------------------------------------------
@@ -144,4 +143,4 @@ That's it. Happy hacking
 --------------------------------------------------------------------------------
 
  Authors	: Jimmy Zhou, Gautam Iyer
- Last Changed	: Mon 04 Sep 2006 01:19:19 AM PDT
+ Last Changed	: Tue 12 Sep 2006 09:50:35 PM PDT
