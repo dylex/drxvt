@@ -524,7 +524,7 @@
  * is requested immediately. Otherwise it is delayed slightly (about 10ms) to
  * ensure that the active tab is not "flat out" scrolling.
  */
-#define DEFAULT_REFRESH_LIMIT	(10)
+#define DEFAULT_REFRESH_LIMIT	(0)
 
 /*
  * Provide termcap/terminfo bw support

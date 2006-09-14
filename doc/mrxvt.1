@@ -1072,11 +1072,7 @@ or fewer characters of output, or the tab has (cumulatively) produced at least
 .Cm skipPages
 of data.
 .Pp
-The default value is 10. If say
-.Vb
-ls -Rl --color /
-.Ve
-produces text which scrolls too slowly, then you should reduce this value (even to 0 if necessary). Otherwise you can increase this value. Setting it to something enormous (say BUFSIZ) will cause
+The default value is 0. On new fast machines, this is probably the best. If you find screen refreshes laggy on on slow older machines, then increase this value a little (say to 10). Setting it to something enormous (say BUFSIZ) will cause
 .Nm
 to request screen refreshes every time the active tab has data, and effectively disable the so called
 .Sq jump scrolling .
