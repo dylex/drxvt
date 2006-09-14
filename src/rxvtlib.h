@@ -169,9 +169,7 @@ typedef struct {
     int		    shade;  /* tinting shade percentage */
 #endif
 
-#ifdef OFF_FOCUS_FADING
     int		    fade;   /* off-focus fading percentage */
-#endif
 
 #ifdef TEXT_SHADOW
     enum {
@@ -835,14 +833,12 @@ typedef struct _profile_t
     XftColor		xftfg,
 			xftbg;
 #endif
-#ifdef OFF_FOCUS_FADING
     unsigned long	fg_fade,
 			bg_fade;
 # ifdef XFT_SUPPORT
     XftColor		xftfg_fade,
 			xftbg_fade;
 # endif
-#endif /* OFF_FOCUS_FADING */
 
     int			saveLines;
 
@@ -1000,7 +996,6 @@ typedef enum {
     ((R)->profile[(P)].xftbg)
 #endif	/* XFT_SUPPORT */
 
-#ifdef OFF_FOCUS_FADING
 # define VTFG_FADE(R, P)	    \
     ((R)->profile[(P)].fg_fade)
 # define VTBG_FADE(R, P)	    \
@@ -1012,7 +1007,6 @@ typedef enum {
 #  define VTXFTBG_FADE(R, P)	    \
     ((R)->profile[(P)].xftbg_fade)
 # endif /* XFT_SUPPORT */
-#endif /* OFF_FOCUS_FADING */
 
 #define ISSET_VTFG(R, P)    \
     (NULL != ((R)->h->rs[Rs_foreground + (P)] ) )

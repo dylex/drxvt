@@ -184,9 +184,7 @@ static const struct {
 
     RSTRG(Rs_focusDelay, "focusDelay", "ms", 0 ),
 
-#ifdef OFF_FOCUS_FADING
     STRG(Rs_fade, "fading", "fade", "%", "make colors x% darker when losing focus", 0),
-#endif
 
 #ifdef HAVE_SCROLLBARS
     BOOL( "scrollBar", "sb", Opt_scrollBar, "scrollbar" ),
@@ -585,9 +583,7 @@ static const char optionsstring[] = "Options: "
 #if defined(TRANSPARENT)
     "transparent,"
 #endif
-#if defined(OFF_FOCUS_FADING)
     "fade,"
-#endif
 #if defined(BACKGROUND_IMAGE) || defined(TRANSPARENT)
 # if defined(TINTING_SUPPORT)
     "tint,"

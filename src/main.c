@@ -127,7 +127,6 @@ rxvt_pre_show_init( rxvt_t *r )
     }
 #endif
 
-#ifdef OFF_FOCUS_FADING
     if( r->TermWin.fade )
     {
 	DBG_MSG( 5, ( stderr, "Allocating space for fade colors\n" ) );
@@ -150,7 +149,6 @@ rxvt_pre_show_init( rxvt_t *r )
 	SET_NULL( r->xftColorsUnfocus );
 # endif
     }
-#endif /* OFF_FOCUS_FADING */
 }
 
 /* rxvt_init() */
@@ -511,7 +509,7 @@ rxvt_clean_exit (rxvt_t* r)
 
     rxvt_free (r->tabstop);	    SET_NULL(r->tabstop);
     rxvt_free (r->pixColors);	    SET_NULL(r->pixColors);
-# ifdef OFF_FOCUS_FADING
+
     if( NOT_NULL( r->pixColorsUnfocus ) )
     {
 	rxvt_free (r->pixColorsUnfocus);
@@ -525,7 +523,6 @@ rxvt_clean_exit (rxvt_t* r)
 	SET_NULL( r->xftColorsUnfocus );
     }
 #  endif /* XFT_SUPPORT */
-# endif /* OFF_FOCUS_FADING */
 
 # ifdef XFT_SUPPORT
     if( NOT_NULL( r->xftColors ) )

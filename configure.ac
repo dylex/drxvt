@@ -146,7 +146,7 @@ support_smart_resize=no
 support_menubar=no
 support_background_image=yes
 support_transparency=yes
-support_fading=yes
+dnl: support_fading=yes
 support_tinting=yes
 support_xrender=yes
 support_xpm=yes
@@ -201,7 +201,7 @@ if test "x$support_everything" = "xyes"; then
     support_menubar=yes
     support_background_image=yes
     support_transparency=yes
-    support_fading=yes
+    dnl: support_fading=yes
     support_tinting=yes
     support_xrender=yes
     support_xpm=yes
@@ -255,7 +255,7 @@ if test "x$support_minimal" = "xyes"; then
     support_menubar=no
     support_background_image=no
     support_transparency=no
-    support_fading=no
+    dnl: support_fading=no
     support_tinting=no
     support_xrender=no
     support_xpm=no
@@ -564,14 +564,17 @@ if test "x$support_transparency" = "xyes"; then
 fi
 
 
-AC_ARG_ENABLE(
-    fading,
-    AC_HELP_STRING([--enable-fading],[enable colors fading when off focus [[yes]]]),
-    [support_fading=$enableval]
-)
-if test "x$support_fading" = "xyes"; then
-    AC_DEFINE(OFF_FOCUS_FADING, [], [set fading support])
-fi
+dnl: No longer a compile time option, and OFF_FOCUS_FADING is now always
+dnl: enabled. 2006-09-14 gi1242.
+dnl:
+dnl: AC_ARG_ENABLE(
+dnl:     fading,
+dnl:     AC_HELP_STRING([--enable-fading],[enable colors fading when off focus [[yes]]]),
+dnl:     [support_fading=$enableval]
+dnl: )
+dnl: if test "x$support_fading" = "xyes"; then
+dnl:     AC_DEFINE(OFF_FOCUS_FADING, [], [set fading support])
+dnl: fi
 
 
 AC_ARG_ENABLE(
@@ -1494,7 +1497,7 @@ echo "XPM background image        : $support_xpm"
 echo "JPEG background image       : $support_jpeg"
 echo "PNG background image        : $support_png"
 echo "Transparent background      : $support_transparency"
-echo "Off focus fading            : $support_fading"
+dnl: echo "Off focus fading            : $support_fading"
 if test "x$support_tinting" = "xno"; then
     echo "Background tinting          : $support_tinting"
 else

@@ -1157,9 +1157,7 @@ enum {
     Rs_itabfg,	/* inactive tab foreground */
     Rs_itabbg,	/* inactive tab background */
 
-#ifdef OFF_FOCUS_FADING
     Rs_fade,	/* fade percentage */
-#endif
 
 #ifdef TEXT_SHADOW
     Rs_textShadow,	/* text shadow color */

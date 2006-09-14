@@ -1222,7 +1222,6 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->h->focusDelay = interval * 1000L; /* convert to micro-sec */
     }
 
-#ifdef OFF_FOCUS_FADING
     if (rs[Rs_fade])
     {
 	register int	fade;
@@ -1237,7 +1236,6 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->TermWin.fade = 100 - fade;
     }
     /* else r->TermWin.fade is 0 */
-#endif
 
 #ifdef CURSOR_BLINK
     if (rs[Rs_cursorBlinkInterval])
@@ -1702,7 +1700,6 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
 }
 
 
-#ifdef OFF_FOCUS_FADING
 /* EXTPROTO */
 void
 rxvt_fade_color( rxvt_t* r, const XColor *xcol,
@@ -1744,7 +1741,6 @@ rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 # endif
     }
 }
-#endif
 
 
 /*
