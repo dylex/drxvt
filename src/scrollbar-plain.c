@@ -62,16 +62,16 @@ rxvt_scrollbar_init_plain (rxvt_t* r)
     /* Initialize the colors */
 #ifdef KEEP_SCROLLCOLOR
     r->scrollBar.plain_fg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
-	r->PixColors[Color_scroll] : r->PixColors[Color_bg];
+	r->pixColors[Color_scroll] : r->pixColors[Color_bg];
 
     r->scrollBar.plain_bg = ISSET_PIXCOLOR( r->h, Color_scroll) ?
-	r->PixColors[Color_trough] : r->PixColors[Color_bg];
+	r->pixColors[Color_trough] : r->pixColors[Color_bg];
 #else
     /*
      * Draw in uglyass reverse video
      */
-    r->scrollBar.plain_fg = r->PixColors[Color_bg];
-    r->scrollBar.plain_bg = r->PixColors[Color_fg];
+    r->scrollBar.plain_fg = r->pixColors[Color_bg];
+    r->scrollBar.plain_bg = r->pixColors[Color_fg];
 #endif
 
     /* Create GC */

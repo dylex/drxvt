@@ -1502,8 +1502,9 @@ rxvt_remove_page (rxvt_t* r, short page)
     }
 
     /* Switch fg/bg colors */
-    rxvt_switch_fgbg_color (r, ATAB(r));
-    XMapRaised  (r->Xdisplay, AVTS(r)->vt);
+    rxvt_set_vt_colors( r, ATAB(r) );
+    XMapRaised( r->Xdisplay, AVTS(r)->vt );
+
     /*
      * We don't need to touch the screen here. XMapRaised will generate a
      * MapNotify and Expose events, which will refresh the screen as needed.
@@ -1604,8 +1605,8 @@ rxvt_activate_page (rxvt_t* r, short index)
     refresh_tabbar_tab( r, PTAB(r));
 
     /* Switch VT fg/bg colors */
-    rxvt_switch_fgbg_color (r, ATAB(r));
-    XMapRaised  (r->Xdisplay, AVTS(r)->vt);
+    rxvt_set_vt_colors( r, ATAB(r) );
+    XMapRaised( r->Xdisplay, AVTS(r)->vt );
     /*
      * We don't need to touch the screen here. XMapRaised will generate a
      * MapNotify and Expose events, which will refresh the screen as needed.
@@ -1613,15 +1614,17 @@ rxvt_activate_page (rxvt_t* r, short index)
      * under slow connections).
      */
     /* rxvt_scr_touch (r, ATAB(r), True); */
-    DBG_MSG(1,(stderr,"active page is %d\n",ATAB(r)));
+    DBG_MSG( 1, (stderr, "active page is %d\n",ATAB(r)) );
 
     /* synchronize terminal title with tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle))
-	rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	rxvt_set_term_title (r,
+		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon))
-	rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	rxvt_set_icon_name (r,
+		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
 
@@ -1963,12 +1966,12 @@ rxvt_tabbar_create (rxvt_t* r)
     /* initialize the colors */
     if (XDEPTH <= 2)
     {
-	r->tabBar.fg = r->PixColors[Color_fg];
-	r->tabBar.bg = r->PixColors[Color_bg];
-	r->tabBar.ifg = r->PixColors[Color_fg];
-	r->tabBar.ibg = r->PixColors[Color_bg];
-	r->tabBar.frame = r->PixColors[Color_bg];
-	r->tabBar.delimit = r->PixColors[Color_fg];
+	r->tabBar.fg = r->pixColors[Color_fg];
+	r->tabBar.bg = r->pixColors[Color_bg];
+	r->tabBar.ifg = r->pixColors[Color_fg];
+	r->tabBar.ibg = r->pixColors[Color_bg];
+	r->tabBar.frame = r->pixColors[Color_bg];
+	r->tabBar.delimit = r->pixColors[Color_fg];
     }
     else 
     {
@@ -1977,7 +1980,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	    rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_tabfg]))
 	    r->tabBar.fg = color.pixel;
 	else
-	    r->tabBar.fg = r->PixColors[Color_Black];
+	    r->tabBar.fg = r->pixColors[Color_Black];
 
 	/* create the background color */
 	if (r->h->rs[Rs_tabbg]	&&
@@ -1991,14 +1994,14 @@ rxvt_tabbar_create (rxvt_t* r)
 	    if (rxvt_alloc_color (r, &color, "Active_Tab"))
 		r->tabBar.bg = color.pixel;
 	    else
-		r->tabBar.bg = r->PixColors[Color_bg];
+		r->tabBar.bg = r->pixColors[Color_bg];
 	}
 
 	/* create the tab frame color */
-	r->tabBar.frame = r->PixColors[Color_fg];
+	r->tabBar.frame = r->pixColors[Color_fg];
 
 	/* Create the tab delimit color */
-	/* r->tabBar.delimit = r->PixColors[Color_Grey25]; */
+	/* r->tabBar.delimit = r->pixColors[Color_Grey25]; */
 
 	/* create the inactive tab foreground color */
 	if(
@@ -2007,7 +2010,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	  )
 	    r->tabBar.ifg = color.pixel;
 	else
-	    r->tabBar.ifg = r->PixColors[Color_Black];
+	    r->tabBar.ifg = r->pixColors[Color_Black];
 
 	/* create the inactive tab background color */
 	if(
@@ -2023,14 +2026,14 @@ rxvt_tabbar_create (rxvt_t* r)
 	    if( rxvt_alloc_color( r, &color, "Inactive_Tab_Bg" ) )
 		r->tabBar.ibg = color.pixel;
 	    else
-		r->tabBar.ibg = r->PixColors[Color_bg];
+		r->tabBar.ibg = r->pixColors[Color_bg];
 	}
 
 	/* create the delimit color (average of 3*fg & bg) */
-	color.pixel	= r->PixColors[Color_fg];
+	color.pixel	= r->pixColors[Color_fg];
 	XQueryColor( r->Xdisplay, XCMAP, &color );
 
-	bgcolor.pixel	= r->PixColors[Color_bg];
+	bgcolor.pixel	= r->pixColors[Color_bg];
 	XQueryColor( r->Xdisplay, XCMAP, &bgcolor );
 
 	color.red   = ( bgcolor.red	+ 3 * color.red	    ) / 4;
@@ -2040,7 +2043,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	if( rxvt_alloc_color( r, &color, "Tab_Delimit" ) )
 	    r->tabBar.delimit = color.pixel;
 	else
-	    r->tabBar.delimit = r->PixColors[Color_fg];
+	    r->tabBar.delimit = r->pixColors[Color_fg];
 
 	DBG_MSG( 2, (stderr, "Delimit color: %hx, %hx, %hx (#%lx)\n",
 		color.red, color.green, color.blue, r->tabBar.delimit));

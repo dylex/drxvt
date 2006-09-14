@@ -599,7 +599,9 @@ typedef struct {
      */
     short	    vts_idx;
 
-    unsigned char   profileNum;	/* Profile used to init settings */
+    unsigned char   profileNum;	    /* Profile used to init settings */
+    int		    globalTabNum;   /* Number of tabs created before this tab
+				       during this processes lifetime */
 
     /* moved from TermWin_t */
     RUINT16T	    saveLines;	/* number of lines to save */
@@ -622,11 +624,15 @@ typedef struct {
 #endif
 
     /* Apparently, people like fg/bg colors for individual terminal */
-    unsigned long   p_fg;
-    unsigned long   p_bg;
+    unsigned long   p_fg,
+		    p_bg,
+		    p_fgfade,
+		    p_bgfade;
 #ifdef XFT_SUPPORT
-    XftColor	    p_xftfg;
-    XftColor	    p_xftbg;
+    XftColor	    p_xftfg,
+		    p_xftbg,
+		    p_xftfgfade,
+		    p_xftbgfade;
 #endif
 
     /* moved from rxvt_t */
@@ -889,21 +895,25 @@ typedef struct rxvt_vars {
 					       "macros" */
 
     Colormap        Xcmap;
-#ifdef OFF_FOCUS_FADING
-    char	    color_switched;	    /* PixColorsUnfocus and PixColor has
-					       been switched */
 
-    unsigned long*  PixColorsUnfocus;	    /* Array of size TOTAL_COLORS */
-# ifdef XFT_SUPPORT
-    XftColor*	    XftColorsUnfocus;	    /* Array of size TOTAL_COLORS */
-# endif
-#endif /* OFF_FOCUS_FADING */
+    unsigned long   *pixColorsFocus,
+		    *pixColorsUnfocus;	    /* Arrays of size TOTAL_COLORS.
+					       Pixel colors to be used when
+					       focused / unfocussed. */
+    unsigned long   *pixColors;		    /* Array of size TOTAL_COLORS */
 
-    char	    ufbg_switched;	    /* Bg and UfBg has been switched */
-    unsigned long*  PixColors;		    /* Array of size TOTAL_COLORS */
+    int		    ntabs;		    /* Number of tabs created so far
+					       during process lifetime */
+    int		    fgbg_tabnum;	    /* (Global) tab number corresponding
+					       to which Color_fg/bg are set */
+
 #ifdef XFT_SUPPORT
-    XftColor*	    XftColors;		    /* Array of size TOTAL_COLORS */
-#endif
+    XftColor*	    xftColors;		    /* Array of size TOTAL_COLORS */
+
+    XftColor	    *xftColorsFocus,	    /* Same as above, but for Xft */
+		    *xftColorsUnfocus;
+# endif
+
 
     profile_t	    profile[MAX_PROFILES];
 
@@ -963,14 +973,14 @@ typedef enum {
 /* MACROS for colors of individual terminals */
 #if 0
 #define VTFG(R, P)	\
-    ((R)->PixColors[TOTAL_COLORS + (P)])
+    ((R)->pixColors[TOTAL_COLORS + (P)])
 #define VTBG(R, P)	\
-    ((R)->PixColors[TOTAL_COLORS + MAX_PAGES + (P)])
+    ((R)->pixColors[TOTAL_COLORS + MAX_PAGES + (P)])
 #ifdef XFT_SUPPORT
 # define VTXFTFG(R, P)	    \
-    ((R)->XftColors[TOTAL_COLORS + (P)])
+    ((R)->xftColors[TOTAL_COLORS + (P)])
 # define VTXFTBG(R, P)	    \
-    ((R)->XftColors[TOTAL_COLORS + MAX_PAGES + (P)])
+    ((R)->xftColors[TOTAL_COLORS + MAX_PAGES + (P)])
 #endif	/* XFT_SUPPORT */
 #define ISSET_VTFG(R, P)    \
     (NULL != ((R)->h->rs[Rs_color + TOTAL_COLORS + (P)]))

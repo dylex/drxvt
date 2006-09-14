@@ -41,7 +41,7 @@
 # define DEBUG_X
 #else
 # define DEBUG_LEVEL	0
-# undef DEBUG_X
+# define DEBUG_X
 #endif
 
 #if DEBUG_LEVEL
@@ -668,14 +668,6 @@ rxvt_init_vars(rxvt_t *r)
 	SET_NULL(r->vts[i]);
     }
 
-    /*
-     * 2006-08-18 gi1242 TODO: If we're using Xft, then we don't need to
-     * initialize this array.
-     */
-    r->PixColors = (unsigned long*) rxvt_malloc(
-	sizeof(unsigned long) * (TOTAL_COLORS));
-
-
     SET_NULL(r->Xdisplay);
 #ifdef USE_XIM
     SET_NULL(r->TermWin.fontset);
@@ -705,9 +697,6 @@ rxvt_init_vars(rxvt_t *r)
 # endif	/* MULTICHAR_SET */
 #endif	/* XFT_SUPPORT */
 
-#ifdef OFF_FOCUS_FADING
-    r->color_switched = 0;  /* color is not switched */
-#endif
     UNSET_ATOM(h->xa[XA_COMPOUND_TEXT]);
     UNSET_ATOM(h->xa[XA_MULTIPLE]);
     UNSET_ATOM(h->xa[XA_TARGETS]);
@@ -1716,7 +1705,7 @@ rxvt_init_command(rxvt_t* r, const char *const *argv)
 #ifdef OFF_FOCUS_FADING
 /* EXTPROTO */
 void
-rxvt_fade_color( rxvt_t* r, unsigned long pixel,
+rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 	unsigned long	*pix_return,
 # ifdef XFT_SUPPORT
 	XftColor	*xft_return
@@ -1729,14 +1718,11 @@ rxvt_fade_color( rxvt_t* r, unsigned long pixel,
     {
 	XColor	faded_xcol;
 
-	faded_xcol.pixel = pixel;
-	XQueryColor (r->Xdisplay, XCMAP, &faded_xcol);
-	faded_xcol.red   = (faded_xcol.red / 100) * r->TermWin.fade;
-	faded_xcol.green = (faded_xcol.green / 100) * r->TermWin.fade;
-	faded_xcol.blue  = (faded_xcol.blue / 100) * r->TermWin.fade;
+	faded_xcol.red   = (xcol->red	/ 100) * r->TermWin.fade;
+	faded_xcol.green = (xcol->green	/ 100) * r->TermWin.fade;
+	faded_xcol.blue  = (xcol->blue	/ 100) * r->TermWin.fade;
 
 	rxvt_alloc_color( r, &faded_xcol, "Faded" );
-
 
 	*pix_return = faded_xcol.pixel;
 # ifdef XFT_SUPPORT
@@ -1762,110 +1748,141 @@ rxvt_fade_color( rxvt_t* r, unsigned long pixel,
 
 
 /*
- * rxvt_restore_ufbg_color should always be called before
- * rxvt_restore_pix_color.
+ * Sets r->pixColors[Color_fg] / etc to the correct color (depending on the ufbg
+ * color, off focus fading and weather we have focus or not).
  */
 /* EXTPROTO */
 int
-rxvt_restore_ufbg_color( rxvt_t* r )
+rxvt_set_fgbg_colors( rxvt_t *r, int page )
 {
-    DBG_MSG( 2, ( stderr, "rxvt_restore_ufbg_color()\n" ) );
+    DBG_MSG( 2, ( stderr, "%s(r, page=%d)"
+		": fgbg_tabnum=%d, globalTabNum=%d\n",
+		__func__, page, r->fgbg_tabnum, PVTS(r, page)->globalTabNum ) );
 
-    /* Restore bg and ufbg color state now */
-    if (ISSET_PIXCOLOR(r->h, Color_ufbg) && r->ufbg_switched)
-    {
-	DBG_MSG(2, (stderr, "switch back to bg color\n"));
-	SWAP_IT (r->PixColors[Color_bg], r->PixColors[Color_ufbg],
-	    unsigned long);
+    if(
+	 r->fgbg_tabnum == PVTS(r, page)->globalTabNum &&
+	 (
+	   r->TermWin.fade			||
+	   !ISSET_PIXCOLOR( r->h, Color_ufbg )	||
+	   (
+	     /*
+	      * If we dont have fading, but have ufbg, then make sure that
+	      * Color_bg points to the correct color.
+	      */
+	     r->TermWin.focus						?
+		( r->pixColors[Color_bg] == PVTS(r, page)->p_bg )	:
+		( r->pixColors[Color_bg] == r->pixColors[Color_ufbg] )
+	   )
+	 )
+      )
+	return 0;   /* No change */
+
+    r->pixColorsFocus[Color_fg] = PVTS( r, page)->p_fg;
 #ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    SWAP_IT( r->XftColors[Color_bg], r->XftColors[Color_ufbg],
-		    XftColor );
+    if( ISSET_OPTION( r, Opt_xft ) )
+	r->xftColorsFocus[Color_fg] = PVTS(r, page)->p_xftfg;
 #endif
-	r->ufbg_switched = 0;
-	return (1); /* switched */
-    }
-    return (0);	/* no change */
-}
 
-
-/*
- * rxvt_switch_pix_color should always be called before rxvt_switch_ufbg_color.
- */
-/* EXTPROTO */
-int
-rxvt_switch_ufbg_color (rxvt_t* r)
-{
-    DBG_MSG( 2, ( stderr, "rxvt_switch_ufbg_color()\n" ) );
-
-    if (ISSET_PIXCOLOR(r->h, Color_ufbg) && !r->ufbg_switched)
+    if( r->TermWin.fade )
     {
-	DBG_MSG(2, (stderr, "switch to ufbg color\n"));
-	SWAP_IT (r->PixColors[Color_bg], r->PixColors[Color_ufbg],
-	    unsigned long);
-#ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    SWAP_IT( r->XftColors[Color_bg], r->XftColors[Color_ufbg],
-		    XftColor );
-#endif
-	r->ufbg_switched = 1;
-	return (1); /* switched */
-    }
-    return (0);	/* no change */
-}
+	/* Ignore ufbg, and use faded colors */
+	r->pixColorsFocus[Color_bg] = PVTS(r, page)->p_bg;
 
-
-#ifdef OFF_FOCUS_FADING
-/* EXTPROTO */
-int
-rxvt_restore_pix_color (rxvt_t* r)
-{
-    /* Restore off-focus color state now */
-    if( r->TermWin.fade && r->color_switched)
-    {
-	DBG_MSG(2, (stderr, "switch back to focus color\n"));
-	SWAP_IT (r->PixColors, r->PixColorsUnfocus, unsigned long*);
-
-# ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    SWAP_IT( r->XftColors, r->XftColorsUnfocus, XftColor* );
-# endif
-
-	r->color_switched = 0;
-	return (1); /* switched */
-    }
-    return (0);	/* no change */
-}
-
-
-/* EXTPROTO */
-int
-rxvt_switch_pix_color (rxvt_t* r)
-{
-    if (r->TermWin.fade && !r->color_switched)
-    {
-	DBG_MSG(2, (stderr, "switch back to unfocus color\n"));
-	/* set correct fading color of the current profile */
-	r->PixColorsUnfocus[Color_fg] = VTFG_FADE(r, ATAB(r));
-	r->PixColorsUnfocus[Color_bg] = VTBG_FADE(r, ATAB(r));
-	SWAP_IT (r->PixColors, r->PixColorsUnfocus, unsigned long*);
+	r->pixColorsUnfocus[Color_fg] = PVTS(r, page)->p_fgfade;
+	r->pixColorsUnfocus[Color_bg] = PVTS(r, page)->p_bgfade;
 
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
 	{
-	    r->XftColorsUnfocus[Color_fg] = VTXFTFG_FADE( r, ATAB(r) );
-	    r->XftColorsUnfocus[Color_bg] = VTXFTBG_FADE( r, ATAB(r) );
+	    r->xftColorsFocus[Color_bg] = PVTS(r, page)->p_xftbg;
 
-	    SWAP_IT( r->XftColors, r->XftColorsUnfocus, XftColor* );
+	    r->xftColorsUnfocus[Color_fg] = PVTS(r, page)->p_xftfgfade;
+	    r->xftColorsUnfocus[Color_bg] = PVTS(r, page)->p_xftbgfade;
 	}
 #endif
-
-	r->color_switched = 1;
-	return (1); /* switched */
     }
-    return (0);	/* no change */
+
+    else if( ISSET_PIXCOLOR( r->h, Color_ufbg ) && !r->TermWin.focus )
+    {
+	/* No fading. But use Color_ufbg */
+	r->pixColorsFocus[Color_bg] = r->pixColorsFocus[Color_ufbg];
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    r->xftColorsFocus[Color_bg] = r->xftColorsFocus[Color_ufbg];
+#endif
+    }
+
+    else
+    {
+	/* Use fgbg from profile */
+	r->pixColorsFocus[Color_bg] = PVTS(r, page)->p_bg;
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    r->xftColorsFocus[Color_bg] = PVTS(r, page)->p_xftbg;
+#endif
+    }
+
+    r->fgbg_tabnum = PVTS( r, page )->globalTabNum;
+    return 1; /* Changed */
 }
-#endif	/* OFF_FOCUS_FADING */
+
+
+void
+rxvt_copy_color( rxvt_t *r, int dst_index, int src_index )
+{
+    r->pixColorsFocus[ dst_index ] = r->pixColorsFocus[ src_index ];
+
+    if( r->TermWin.fade )
+	r->pixColorsUnfocus[ dst_index ] = r->pixColorsUnfocus[ src_index ];
+
+#ifdef XFT_SUPPORT
+    if( ISSET_OPTION( r, Opt_xft ) )
+    {
+	r->xftColorsFocus[ dst_index ] = r->xftColorsFocus[ src_index ];
+
+	if( r->TermWin.fade )
+	    r->xftColorsUnfocus[ dst_index ] = r->xftColorsUnfocus[ src_index ];
+    }
+#endif
+
+    SET_PIXCOLOR( r->h, dst_index );
+}
+
+
+void
+rxvt_set_color( rxvt_t *r, int cIndex, const XColor *xcol )
+{
+    /* xcol must contain an ALLOCATED color */
+    r->pixColorsFocus[cIndex] = xcol->pixel;
+#ifdef XFT_SUPPORT
+    if( ISSET_OPTION( r, Opt_xft ) )
+	rxvt_alloc_xft_color( r, xcol->pixel, &r->xftColorsFocus[cIndex] );
+#endif
+
+    if( r->TermWin.fade )
+    {
+	if( cIndex == Color_pointer )
+	{
+	    /* Don't fade these colors */
+	    r->pixColorsUnfocus[cIndex] = r->pixColorsFocus[cIndex];
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		r->xftColorsUnfocus[cIndex] = r->xftColorsFocus[cIndex];
+#endif
+	}
+
+	else
+	    rxvt_fade_color( r, xcol, &r->pixColorsUnfocus[cIndex],
+#ifdef XFT_SUPPORT
+		ISSET_OPTION(r, Opt_xft) ? &r->xftColorsUnfocus[cIndex] : NULL
+#else
+		NULL
+#endif
+		);
+    }
+
+    SET_PIXCOLOR( r->h, cIndex );
+}
 
 
 /*
@@ -1899,20 +1916,15 @@ rxvt_init_colors( rxvt_t *r )
 	if( rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtfg]) )
 	{
 	    VTFG(r, i) = xcol.pixel;
+
 #ifdef XFT_SUPPORT
 	    rxvt_alloc_xft_color (r, VTFG(r, i), &(VTXFTFG(r, i)));
-#endif
-
-#ifdef OFF_FOCUS_FADING
-# ifdef XFT_SUPPORT
-	    rxvt_fade_color( r, VTFG( r, i ),
-		    &VTFG_FADE(r, i), &VTXFTFG_FADE(r, i) );
-# else
-	    rxvt_fade_color( r, VTFG( r, i ),
-		    &VTFG_FADE(r, i), NULL );
-# endif /* XFT_SUPPORT */
-#endif /* OFF_FOCUS_FADING */
+	    rxvt_fade_color( r, &xcol, &VTFG_FADE(r, i), &VTXFTFG_FADE(r, i) );
+#else
+	    rxvt_fade_color( r, &xcol, &VTFG_FADE(r, i), NULL );
+#endif /* XFT_SUPPORT */
 	}
+
 	else
 	{
 	    rxvt_print_error( "Could not alloc foreground color of profile %d",
@@ -1923,14 +1935,11 @@ rxvt_init_colors( rxvt_t *r )
 
 	    /* Use foreground from profie 0 */
 	    VTFG( r, i ) = VTFG( r, 0 );
+	    VTFG_FADE( r, i ) = VTFG_FADE( r, 0 );
+
 #ifdef XFT_SUPPORT
 	    VTXFTFG( r, i ) = VTXFTFG( r, 0 );
-#endif
-#ifdef OFF_FOCUS_FADING
-	    VTFG_FADE( r, i ) = VTFG_FADE( r, 0 );
-# ifdef XFT_SUPPORT
 	    VTXFTFG_FADE( r, i ) = VTXFTFG_FADE( r, 0 );
-# endif
 #endif
 	}
 
@@ -1938,20 +1947,15 @@ rxvt_init_colors( rxvt_t *r )
 	if( rxvt_parse_alloc_color(r, &xcol, r->h->rs[vtbg]) )
 	{
 	    VTBG(r, i) = xcol.pixel;
+
 #ifdef XFT_SUPPORT
 	    rxvt_alloc_xft_color( r, VTBG(r, i), &(VTXFTBG(r, i)) );
-#endif
-
-#ifdef OFF_FOCUS_FADING
-# ifdef XFT_SUPPORT
-	    rxvt_fade_color( r, VTBG( r, i ),
-		    &VTBG_FADE(r, i), &VTXFTBG_FADE(r, i) );
-# else
-	    rxvt_fade_color( r, VTBG( r, i ),
-		    &VTBG_FADE(r, i), NULL );
-# endif /* XFT_SUPPORT */
-#endif /* OFF_FOCUS_FADING */
+	    rxvt_fade_color( r, &xcol, &VTBG_FADE(r, i), &VTXFTBG_FADE(r, i) );
+#else
+	    rxvt_fade_color( r, &xcol, &VTBG_FADE(r, i), NULL );
+#endif /* XFT_SUPPORT */
 	}
+
 	else
 	{
 	    rxvt_print_error( "Could not alloc background color of profile %d",
@@ -1962,134 +1966,119 @@ rxvt_init_colors( rxvt_t *r )
 
 	    /* Use background from profie 0 */
 	    VTBG( r, i ) = VTBG( r, 0 );
+	    VTBG_FADE( r, i ) = VTBG_FADE( r, 0 );
+
 #ifdef XFT_SUPPORT
 	    VTXFTBG( r, i ) = VTXFTBG( r, 0 );
-#endif
-#ifdef OFF_FOCUS_FADING
-	    VTBG_FADE( r, i ) = VTBG_FADE( r, 0 );
-# ifdef XFT_SUPPORT
 	    VTXFTBG_FADE( r, i ) = VTXFTBG_FADE( r, 0 );
-# endif
 #endif
 	}
     }
 
     /* Set foreground / background colors */
-    r->PixColors[ Color_fg ] = VTFG( r, 0 );
-    r->PixColors[ Color_bg ] = VTBG( r, 0 );
+    r->pixColorsFocus[ Color_fg ] = VTFG( r, 0 );
+    r->pixColorsFocus[ Color_bg ] = VTBG( r, 0 );
+
+    if( r->TermWin.fade )
+    {
+	r->pixColorsUnfocus[ Color_fg ] = VTFG_FADE( r, 0 );
+	r->pixColorsUnfocus[ Color_bg ] = VTBG_FADE( r, 0 );
+    }
 
 #ifdef XFT_SUPPORT
     if( ISSET_OPTION( r, Opt_xft ) )
     {
-	r->XftColors[ Color_fg ] = VTXFTFG( r, 0 );
-	r->XftColors[ Color_bg ] = VTXFTBG( r, 0 );
+	r->xftColorsFocus[ Color_fg ] = VTXFTFG( r, 0 );
+	r->xftColorsFocus[ Color_bg ] = VTXFTBG( r, 0 );
+
+	if( r->TermWin.fade )
+	{
+	    r->xftColorsUnfocus[ Color_fg ] = VTXFTFG( r, 0 );
+	    r->xftColorsUnfocus[ Color_bg ] = VTXFTBG( r, 0 );
+	}
     }
 #endif
 
-#ifdef OFF_FOCUS_FADING
-    if( r->TermWin.fade )
-    {
-	rxvt_fade_color( r, r->PixColors[Color_fg],
-		&r->PixColorsUnfocus[Color_fg],
-# ifdef XFT_SUPPORT
-		ISSET_OPTION( r, Opt_xft )
-		    ? &r->XftColorsUnfocus[Color_fg] : NULL
-# else
-		NULL
-# endif
-	    );
-    }
-#endif /* OFF_FOCUS_FADING */
+    r->fgbg_tabnum = -1;    /* fg/bg corresponds to profile 0, not any
+			       particular tab during initialization. */
 
 
+    /*
+     * Allocate generic colors.
+     */
     for (i = minCOLOR; i < (XDEPTH <= 2 ? 2 : NRS_COLORS); i++)
     {
 	XColor		xcol;
 
-	if (!r->h->rs[Rs_color + i])
+	if( IS_NULL(r->h->rs[Rs_color + i]) )
 	    continue;
 
-	if (!rxvt_parse_alloc_color(r, &xcol, r->h->rs[Rs_color + i]))
+	if( !rxvt_parse_alloc_color(r, &xcol, r->h->rs[Rs_color + i]) )
 	{
-	    r->h->rs[Rs_color + i] = def_colorName[i];
-
-	    if (!r->h->rs[Rs_color + i])
-		continue;
-	    if (!rxvt_parse_alloc_color (r, &xcol, r->h->rs[Rs_color + i]))
+	    if( r->h->rs[Rs_color+i] != def_colorName[i] )
 	    {
-		switch (i)
-		{
+		rxvt_print_error( "Could not allocate color '%s'\n",
+			r->h->rs[Rs_color + i] );
+
+		/* Try again with default color */
+		r->h->rs[Rs_color + i] = def_colorName[i];
+		i--;
+		continue;
+	    }
+
+	    /*
+	     * Unable to alloc even the default color. Fall back to fg/bg.
+	     */
+	    switch( i )
+	    {
 #ifndef NO_CURSORCOLOR
-		    case Color_cursor2:
-			xcol.pixel = r->PixColors[Color_fg];
-			break;
+		case Color_cursor2:
 #endif /* !NO_CURSORCOLOR */
+		case Color_pointer:
+		    rxvt_copy_color( r, i, Color_fg );
+		    break;
 
-		    case Color_pointer:
-			xcol.pixel = r->PixColors[Color_fg];
-			break;
-
-		    default:
-			xcol.pixel = r->PixColors[Color_bg];	/* None */
-			break;
-		}
+		default:
+		    rxvt_copy_color( r, i, Color_bg );
+		    break;
 	    }
 	}
-	r->PixColors[i] = xcol.pixel;
-#ifdef OFF_FOCUS_FADING
-	if( r->TermWin.fade )
+
+	else
 	{
-	    rxvt_fade_color( r, xcol.pixel,
-		    &r->PixColorsUnfocus[i],
-# ifdef XFT_SUPPORT
-		    ISSET_OPTION( r, Opt_xft ) ? &r->XftColorsUnfocus[i] : NULL
-# else
-		    NULL
-# endif
-		    );
+	    /*
+	     * Succeeded allocating the color. Store it in pixColors.
+	     */
+	    rxvt_set_color( r, i, &xcol );
 	}
-#endif /* OFF_FOCUS_FADING */
+    } /* for(i) */
 
+
+    /*
+     * Allocate colors which are essential if they have not been allocated.
+     */
+    if( XDEPTH <= 2 || !ISSET_PIXCOLOR( r->h, Color_pointer ) )
+    {
+	/*
+	 * NOTE: Fading should be disabled for low depths. And the pointer color
+	 * should not be faded.
+	 */
+	r->pixColorsFocus[Color_pointer]    = VTFG(r, 0);
+	if( r->TermWin.fade )
+	    r->pixColorsUnfocus[Color_pointer]  = VTFG(r, 0);
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
-	    rxvt_alloc_xft_color (r, xcol.pixel, &(r->XftColors[i]));
+	{
+	    r->xftColorsFocus[Color_pointer]	= VTXFTFG(r, 0);
+	    if( r->TermWin.fade )
+		r->xftColorsUnfocus[Color_pointer]  = VTXFTFG(r, 0);
+	}
 #endif
-
-	SET_PIXCOLOR(r->h, i);
+	SET_PIXCOLOR( r->h, Color_pointer );
     }
 
-    if (XDEPTH <= 2 || !r->h->rs[Rs_color + Color_pointer])
-    {
-	r->PixColors[Color_pointer] = r->PixColors[Color_fg];
-#ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    r->XftColors[Color_pointer] = r->XftColors[Color_fg];
-#endif
-    }
-    if (XDEPTH <= 2 || !r->h->rs[Rs_color + Color_border])
-    {
-	r->PixColors[Color_border] = r->PixColors[Color_fg];
-#ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    r->XftColors[Color_border] = r->XftColors[Color_fg];
-#endif
-    }
-
-
-    /* we have not switched the bg/ufbg color */
-    r->ufbg_switched = 0;
-
-    /* Save global foreground/background colors */
-    r->h->global_fg = r->PixColors[Color_fg];
-    r->h->global_bg = r->PixColors[Color_bg];
-#ifdef XFT_SUPPORT
-    if( ISSET_OPTION( r, Opt_xft ) )
-    {
-	r->h->global_xftfg = r->XftColors[Color_fg];
-	r->h->global_xftbg = r->XftColors[Color_bg];
-    }
-#endif
-
+    if( XDEPTH <= 2 || !ISSET_PIXCOLOR( r->h, Color_border ) )
+	rxvt_copy_color( r, Color_border, Color_fg );
 
 
     /*
@@ -2101,10 +2090,11 @@ rxvt_init_colors( rxvt_t *r )
 #ifdef KEEP_SCROLLCOLOR
     if (XDEPTH <= 2)	    /* Monochrome */
     {
-	r->PixColors[Color_scroll]	    = r->PixColors[Color_fg];
-	r->PixColors[Color_topShadow]	    = r->PixColors[Color_bg];
-	r->PixColors[Color_bottomShadow]    = r->PixColors[Color_bg];
+	rxvt_copy_color( r, Color_scroll,	Color_fg );
+	rxvt_copy_color( r, Color_topShadow,	Color_bg );
+	rxvt_copy_color( r, Color_bottomShadow, Color_bg );
     }
+
     else
     {
 	XColor		xcol[3];
@@ -2114,11 +2104,10 @@ rxvt_init_colors( rxvt_t *r )
 	 * xcol[2] == bot shadow
 	 */
 
-	xcol[1].pixel = r->PixColors[Color_scroll];
+	xcol[1].pixel = r->pixColorsFocus[Color_scroll];
 # ifdef PREFER_24BIT
-	xcol[0].red = xcol[0].green = xcol[0].blue = (unsigned short)~0;
-	rxvt_alloc_color(r, &(xcol[0]), "White");
-/*	XFreeColors(r->Xdisplay, XCMAP, &(xcol[0].pixel), 1, ~0); */
+	xcol[0].red = xcol[0].green = xcol[0].blue = 0xffffu;
+	rxvt_alloc_color( r, &(xcol[0]), "White" );
 	XQueryColors(r->Xdisplay, XCMAP, &(xcol[1]), 1);
 # else
 	xcol[0].pixel = WhitePixel(r->Xdisplay, XSCREEN);
@@ -2126,24 +2115,29 @@ rxvt_init_colors( rxvt_t *r )
 # endif
 
 	/* bottomShadowColor */
-	xcol[2].red = xcol[1].red / 2;
-	xcol[2].green = xcol[1].green / 2;
-	xcol[2].blue = xcol[1].blue / 2;
-	if (!rxvt_alloc_color(r, &(xcol[2]), "Color_bottomShadow"))
-	    xcol[2].pixel = r->PixColors[Color_Black];
-	r->PixColors[Color_bottomShadow] = xcol[2].pixel;
+	xcol[2].red	= xcol[1].red	/ 2;
+	xcol[2].green	= xcol[1].green / 2;
+	xcol[2].blue	= xcol[1].blue	/ 2;
+	if( !rxvt_alloc_color( r, &(xcol[2]), "Color_bottomShadow" ) )
+	    rxvt_copy_color( r, Color_bottomShadow, Color_Black );
+
+	else
+	    rxvt_set_color( r, Color_bottomShadow, &xcol[2] );
+
 
 	/* topShadowColor */
-	xcol[1].red = max((xcol[0].red / 5), xcol[1].red);
-	xcol[1].green = max((xcol[0].green / 5), xcol[1].green);
-	xcol[1].blue = max((xcol[0].blue / 5), xcol[1].blue);
-	xcol[1].red = min(xcol[0].red, (xcol[1].red * 7) / 5);
-	xcol[1].green = min(xcol[0].green, (xcol[1].green * 7) / 5);
-	xcol[1].blue = min(xcol[0].blue, (xcol[1].blue * 7) / 5);
+	xcol[1].red	= max((xcol[0].red   / 5), xcol[1].red	);
+	xcol[1].green	= max((xcol[0].green / 5), xcol[1].green);
+	xcol[1].blue	= max((xcol[0].blue  / 5), xcol[1].blue	);
+	xcol[1].red	= min(xcol[0].red,   (xcol[1].red   * 7) / 5);
+	xcol[1].green	= min(xcol[0].green, (xcol[1].green * 7) / 5);
+	xcol[1].blue	= min(xcol[0].blue,  (xcol[1].blue  * 7) / 5);
 
-	if (!rxvt_alloc_color(r, &(xcol[1]), "Color_topShadow"))
-	    xcol[1].pixel = r->PixColors[Color_White];
-	r->PixColors[Color_topShadow] = xcol[1].pixel;
+	if( !rxvt_alloc_color(r, &(xcol[1]), "Color_topShadow") )
+	    rxvt_copy_color( r, Color_topShadow, Color_White );
+	else
+	    rxvt_set_color( r, Color_topShadow, &xcol[1] );
+
     }
 #endif	/* KEEP_SCROLLCOLOR */
 
@@ -2155,7 +2149,7 @@ rxvt_init_colors( rxvt_t *r )
 	if (rxvt_parse_alloc_color (r, &xcol, r->h->rs[Rs_textShadow]))
 	    r->TermWin.shadow = xcol.pixel;
 	else
-	    r->TermWin.shadow = r->PixColors[Color_Black];
+	    r->TermWin.shadow = r->pixColors[Color_Black];
 # ifdef XFT_SUPPORT
 	rxvt_alloc_xft_color (r, r->TermWin.shadow, &(r->TermWin.xftshadow));
 # endif
@@ -2567,37 +2561,59 @@ NotMatch:
 }
 
 
+/*
+ * Sets up the fg/bg correctly in pixColorsFocus/unfocus, the fg/bg of
+ * TermWin.gc, and the fg/bg of the window (if active).
+ */
 /* EXTPROTO */
-void
-rxvt_switch_fgbg_color( rxvt_t *r, int page )
+int
+rxvt_set_vt_colors( rxvt_t *r, int page )
 {
-    /* Restore bg/ufbg color */
-    rxvt_restore_ufbg_color (r);
-#ifdef OFF_FOCUS_FADING
-    /* Restore off-focus color */
-    rxvt_restore_pix_color (r);
-#endif
+    int		    changed = 0;
+    int		    useFocusColors;
+    unsigned long   *pix_colors;
 
-    /*
-     * Set fg/bg color of individual terminal
-     */
-    r->PixColors[Color_fg] = PVTS(r, page)->p_fg;
-    r->PixColors[Color_bg] = PVTS(r, page)->p_bg;
+    DBG_MSG( 2, ( stderr, "%s(r, page=%d)\n", __func__, page ) );
+
+    useFocusColors = ( r->TermWin.focus || !r->TermWin.fade );
+    pix_colors = (useFocusColors ? r->pixColorsFocus : r->pixColorsUnfocus);
+    if( r->pixColors != pix_colors )
+    {
+	changed		= 1;
+	r->pixColors	= pix_colors;
+    }
+
 #ifdef XFT_SUPPORT
     if( ISSET_OPTION( r, Opt_xft ) )
-    {
-	r->XftColors[Color_fg] = PVTS(r, page)->p_xftfg;
-	r->XftColors[Color_bg] = PVTS(r, page)->p_xftbg;
-    }
-#endif	/* XFT_SUPPORT */
+	r->xftColors = useFocusColors ? r->xftColorsFocus : r->xftColorsUnfocus;
+#endif
 
-    /*
-     * Set foreground/background color for GC. This is necessary. Since all VTs
-     * share the same GC, if we do not set the color here, color from other VTs
-     * will be used to draw the following text till there is a color change.
-     */
-    XSetForeground( r->Xdisplay, r->TermWin.gc, r->PixColors[Color_fg] );
-    XSetBackground( r->Xdisplay, r->TermWin.gc, r->PixColors[Color_bg] );
+    if( rxvt_set_fgbg_colors( r, page ) )
+	changed = 1;
+
+    if( changed )
+    {
+	/*
+	 * Set foreground/background color for GC. This is necessary. Since all
+	 * VTs share the same GC, if we do not set the color here, color from
+	 * other VTs will be used to draw the following text till there is a
+	 * color change.
+	 */
+	XSetForeground( r->Xdisplay, r->TermWin.gc, r->pixColors[Color_fg] );
+	XSetBackground( r->Xdisplay, r->TermWin.gc, r->pixColors[Color_bg] );
+
+	if( IS_WIN( PVTS(r, page)->vt ) )
+# ifdef TRANSPARENT
+	    if (NOTSET_OPTION(r, Opt_transparent))
+# endif	/* TRANSPARENT */
+#ifdef BACKGROUND_IMAGE
+		if (NOT_PIXMAP(PVTS(r, page)->pixmap))
+#endif	/* BACKGROUND_IMAGE */
+		    XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
+			r->pixColors[Color_bg]);
+    }
+
+    return changed;
 }
 
 
@@ -2652,6 +2668,9 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 
     /* Set the profile number */
     PVTS(r, page)->profileNum	= profile;
+
+    /* Save the "static" number of this tab */
+    PVTS(r, page)->globalTabNum	= r->ntabs++;
 
 #ifdef TTY_GID_SUPPORT
     /* change group ownership of tty to "tty" */
@@ -2729,15 +2748,27 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 #endif
 
     /* Now set VT fg/bg color */
-    PVTS(r, page)->p_fg = ISSET_VTFG(r, profile) ?
-				VTFG(r, profile) : r->h->global_fg;
-    PVTS(r, page)->p_bg = ISSET_VTBG(r, profile) ?
-				VTBG(r, profile) : r->h->global_bg;
+    PVTS(r, page)->p_fg = VTFG(r, profile);
+    PVTS(r, page)->p_bg = VTBG(r, profile);
+
+    if( r->TermWin.fade )
+    {
+	PVTS(r, page)->p_fgfade = VTFG_FADE(r, profile);
+	PVTS(r, page)->p_bgfade = VTBG_FADE(r, profile);
+    }
+
 #ifdef XFT_SUPPORT
-    PVTS(r, page)->p_xftfg = ISSET_VTFG(r, profile) ?
-				VTXFTFG(r, profile) : r->h->global_xftfg;
-    PVTS(r, page)->p_xftbg = ISSET_VTBG(r, profile) ?
-				VTXFTBG(r, profile) : r->h->global_xftbg;
+    if( ISSET_OPTION( r, Opt_xft ) )
+    {
+	PVTS(r, page)->p_xftfg = VTXFTFG(r, profile);
+	PVTS(r, page)->p_xftbg = VTXFTBG(r, profile);
+
+	if( r->TermWin.fade )
+	{
+	    PVTS(r, page)->p_xftfgfade = VTXFTFG_FADE(r, profile);
+	    PVTS(r, page)->p_xftbgfade = VTXFTBG_FADE(r, profile);
+	}
+    }
 #endif
 
     /* Initialize input buffer */
@@ -2807,9 +2838,6 @@ void
 rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	const char TAINTED *title )
 {
-#ifdef DEBUG_X
-    char	    vt_name[32];
-#endif
     long	    vt_emask;
 
 
@@ -2833,23 +2861,23 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
     PVTS(r, page)->tab_width = rxvt_tab_width (r, PVTS(r, page)->tab_title);
 
     /*
-    ** Now switch fg/bg colors before creating VT because this
-    ** will use the fg/bg colors
-    */
-    rxvt_switch_fgbg_color (r, page);
+     * Now switch fg/bg colors before creating VT because this will use the
+     * fg/bg colors
+     */
+    rxvt_set_vt_colors( r, page );
 
     /* create the terminal window */
     DBG_MSG( 2, (stderr, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n",
 		page, r->h->window_vt_x, r->h->window_vt_y,
 		VT_WIDTH(r), VT_HEIGHT(r),
-		r->PixColors[Color_fg], r->PixColors[Color_bg] ));
+		r->pixColors[Color_fg], r->pixColors[Color_bg] ));
 
     PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
 				r->h->window_vt_x, r->h->window_vt_y,
 				VT_WIDTH(r), VT_HEIGHT(r),
 				0,
-				r->PixColors[Color_fg],
-				r->PixColors[Color_bg]);
+				r->pixColors[Color_fg],
+				r->pixColors[Color_bg]);
     assert (IS_WIN(PVTS(r, page)->vt));
 #ifdef XFT_SUPPORT
     if (ISSET_OPTION(r, Opt_xft))
@@ -2858,11 +2886,6 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	    PVTS(r, page)->vt, XVISUAL, XCMAP);
 	assert (NOT_NULL(PVTS(r, page)->xftvt));
     }
-#endif
-
-#ifdef DEBUG_X
-    sprintf (vt_name, "vt %d window", page);
-    rxvt_set_win_title (r, PVTS(r, page)->vt, vt_name);
 #endif
 
 
@@ -3189,8 +3212,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
      */
 
 #ifdef PREFER_24BIT
-    attributes.background_pixel = r->PixColors[Color_bg];
-    attributes.border_pixel = r->PixColors[Color_border];
+    attributes.background_pixel = r->pixColors[Color_bg];
+    attributes.border_pixel = r->pixColors[Color_border];
     attributes.colormap = XCMAP;
     r->TermWin.parent = XCreateWindow(r->Xdisplay, parent,
 		    r->szHint.x, r->szHint.y,
@@ -3206,8 +3229,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			r->szHint.width,
 			r->szHint.height,
 			r->TermWin.ext_bwidth,
-			r->PixColors[Color_border],
-			r->PixColors[Color_bg]);
+			r->pixColors[Color_border],
+			r->pixColors[Color_bg]);
 #endif
 
 #ifdef XFT_SUPPORT
@@ -3381,8 +3404,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     if (NOTSET_OPTION(r, Opt_xft))
 #endif
     gcvalue.font = r->TermWin.font->fid;
-    gcvalue.foreground = r->PixColors[Color_fg];
-    gcvalue.background = r->PixColors[Color_bg];
+    gcvalue.foreground = r->pixColors[Color_fg];
+    gcvalue.background = r->pixColors[Color_bg];
     gcvalue.graphics_exposures = 1;
     gcmask = GCForeground | GCBackground | GCGraphicsExposures;
 #ifdef XFT_SUPPORT

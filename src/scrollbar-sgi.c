@@ -315,9 +315,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
     xcol.blue = 0xde00;
     if (!rxvt_alloc_color (r, &xcol, "light gray")) {
 #ifndef NO_BRIGHTCOLOR
-	r->scrollBar.sgi_fg = r->PixColors [Color_AntiqueWhite];
+	r->scrollBar.sgi_fg = r->pixColors [Color_AntiqueWhite];
 #else
-	r->scrollBar.sgi_fg = r->PixColors [Color_White];
+	r->scrollBar.sgi_fg = r->pixColors [Color_White];
 #endif	
     }
     else
@@ -328,9 +328,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
     xcol.blue = 0xaa00;
     if (!rxvt_alloc_color (r, &xcol, "light medium gray")) {
 #ifndef NO_BRIGHTCOLOR
-	r->scrollBar.sgi_lmedium = r->PixColors [Color_AntiqueWhite];
+	r->scrollBar.sgi_lmedium = r->pixColors [Color_AntiqueWhite];
 #else
-	r->scrollBar.sgi_lmedium = r->PixColors [Color_White];
+	r->scrollBar.sgi_lmedium = r->pixColors [Color_White];
 #endif	
     }
     else
@@ -341,9 +341,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
     xcol.blue = 0xbd00;
     if (!rxvt_alloc_color (r, &xcol, "medium gray")) {
 #ifndef NO_BRIGHTCOLOR
-	r->scrollBar.sgi_bg = r->PixColors [Color_Black];
+	r->scrollBar.sgi_bg = r->pixColors [Color_Black];
 #else
-	r->scrollBar.sgi_bg = r->PixColors [Color_Grey50];
+	r->scrollBar.sgi_bg = r->pixColors [Color_Grey50];
 #endif	
     }
     else
@@ -354,9 +354,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
     xcol.blue = 0x8e00;
     if (!rxvt_alloc_color (r, &xcol, "dark gray")) {
 #ifndef NO_BRIGHTCOLOR
-	r->scrollBar.sgi_dark = r->PixColors [Color_Grey25];
+	r->scrollBar.sgi_dark = r->pixColors [Color_Grey25];
 #else
-	r->scrollBar.sgi_dark = r->PixColors [Color_Black];
+	r->scrollBar.sgi_dark = r->pixColors [Color_Black];
 #endif	
     }
     r->scrollBar.sgi_dark = xcol.pixel;
@@ -366,9 +366,9 @@ rxvt_scrollbar_init_sgi (rxvt_t* r)
     xcol.blue = 0x5e00;
     if (!rxvt_alloc_color (r, &xcol, "very dark gray")) {
 #ifndef NO_BRIGHTCOLOR
-	r->scrollBar.sgi_vdark = r->PixColors [Color_Grey25];
+	r->scrollBar.sgi_vdark = r->pixColors [Color_Grey25];
 #else
-	r->scrollBar.sgi_vdark = r->PixColors [Color_Black];
+	r->scrollBar.sgi_vdark = r->pixColors [Color_Black];
 #endif	
     }
     r->scrollBar.sgi_vdark = xcol.pixel;

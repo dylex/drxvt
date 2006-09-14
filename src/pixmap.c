@@ -180,17 +180,10 @@ rxvt_resize_pixmap(rxvt_t *r, int page)
 	XFreePixmap(r->Xdisplay, PVTS(r, page)->pixmap);
 
     if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
-    {
 	/* So be it: I'm not using pixmaps */
-# ifdef TRANSPARENT
-	if ( !r->h->am_transparent && !r->h->am_pixmap_trans )
-# endif
-	XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
-	    PVTS(r, page)->p_bg );
 	return;
-    }
 
-    gcvalue.foreground = r->PixColors[Color_bg];
+    gcvalue.foreground = r->pixColors[Color_bg];
     gc = XCreateGC(r->Xdisplay, PVTS(r, page)->vt, GCForeground, &gcvalue);
 
     if (IS_GC(gc) && IS_PIXMAP(PVTS(r, page)->bg.pixmap)) {
@@ -375,9 +368,15 @@ rxvt_load_bg_pixmap(rxvt_t *r, int page, const char *file)
 	XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
     PVTS(r, page)->bg.pixmap = pixmap;
 
-    if (NOT_PIXMAP(pixmap)) {
-	XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
-		PVTS(r, page)->p_bg );
+    if( NOT_PIXMAP(pixmap) )
+    {
+	if( page == ATAB(r) )
+	{
+	    /* Force resetting the background color */
+	    r->fgbg_tabnum = -1;
+	    rxvt_set_vt_colors( r, page );
+	}
+
 	return None;
     }
 

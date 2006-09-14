@@ -1594,12 +1594,6 @@ struct rxvt_hidden {
 #ifndef NO_BRIGHTCOLOR
     unsigned long   colorfgbg;
 #endif
-    unsigned long   global_fg;
-    unsigned long   global_bg;
-#ifdef XFT_SUPPORT
-    XftColor	    global_xftfg;
-    XftColor	    global_xftbg;
-#endif
 
     gid_t	    ttygid;
 

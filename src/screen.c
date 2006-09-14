@@ -1748,11 +1748,11 @@ rxvt_scr_erase_screen(rxvt_t* r, int page, int mode)
     {
 	ren = (PVTS(r, page)->rstyle & (RS_fgMask | RS_bgMask));
 
-	gcvalue.foreground = r->PixColors[GET_BGCOLOR(PVTS(r, page)->rstyle)];
+	gcvalue.foreground = r->pixColors[GET_BGCOLOR(PVTS(r, page)->rstyle)];
 	XChangeGC(r->Xdisplay, r->TermWin.gc, GCForeground, &gcvalue);
 	ERASE_ROWS(row, num);
 
-	gcvalue.foreground = r->PixColors[Color_fg];
+	gcvalue.foreground = r->pixColors[Color_fg];
 	XChangeGC(r->Xdisplay, r->TermWin.gc, GCForeground, &gcvalue);
     }
 
@@ -2073,6 +2073,9 @@ rxvt_scr_set_tab(rxvt_t* r, int page, int mode)
 void
 rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 {
+    DBG_MSG( 2, (stderr, "%s(r, page=%d, mode=%d)\n",
+		__func__, page, mode ) );
+
     if (PVTS(r, page)->rvideo != mode)
     {
 	PVTS(r, page)->rvideo = mode;
@@ -2082,34 +2085,23 @@ rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 	if( ISSET_OPTION( r, Opt_xft ) )
 	    SWAP_IT( PVTS(r, page)->p_xftfg, PVTS(r, page)->p_xftbg, XftColor );
 #endif
-
-	if( page == ATAB(r) )
+	if( r->TermWin.fade )
 	{
-	    SWAP_IT( r->PixColors[Color_fg], r->PixColors[Color_bg],
+	    SWAP_IT( PVTS(r, page)->p_fgfade, PVTS(r, page)->p_bgfade,
 		    unsigned long );
-
-	    XSetBackground( r->Xdisplay, r->TermWin.gc,
-		    r->PixColors[Color_bg] );
-	    XSetForeground( r->Xdisplay, r->TermWin.gc,
-		    r->PixColors[Color_fg] );
 #ifdef XFT_SUPPORT
 	    if( ISSET_OPTION( r, Opt_xft ) )
-		SWAP_IT( r->XftColors[Color_fg], r->XftColors[Color_bg],
+		SWAP_IT( PVTS(r, page)->p_xftfgfade, PVTS(r, page)->p_xftbgfade,
 			XftColor );
 #endif
 	}
 
-#if defined(BACKGROUND_IMAGE)
-	if (NOT_PIXMAP(PVTS(r, page)->bg.pixmap))
-#endif
-#if defined(TRANSPARENT)
-	    if(
-		 NOTSET_OPTION(r, Opt_transparent) ||
-		 (!r->h->am_transparent && !r->h->am_pixmap_trans)
-	      )
-#endif
-		XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
-		     PVTS(r, page)->p_bg );
+	if( page == ATAB(r) )
+	{
+	    /* Background colors need to be forcibly reset */
+	    r->fgbg_tabnum = -1;
+	    rxvt_set_vt_colors( r, ATAB(r) );
+	}
 
 	rxvt_scr_clear( r, page );
 	rxvt_scr_touch( r, page, True );
@@ -2418,7 +2410,7 @@ rxvt_scr_bell(rxvt_t *r, int page)
 		    GCForeground | GCFillStyle, &values);
 
 	    XSetForeground( r->Xdisplay, r->TermWin.gc,
-		    r->PixColors[Color_fg] );
+		    r->pixColors[Color_fg] );
 	    XSetFillStyle( r->Xdisplay, r->TermWin.gc, FillSolid);
 
 	    XFillRectangle( r->Xdisplay, PVTS(r, page)->vt, r->TermWin.gc,
@@ -2991,7 +2983,7 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 **    len :  actual number of characters in the string. It is NOT
 **           the byte length!
 **    drawfunc: function to draw string
-**    fore, back: color index to r->PixColors array. It is only
+**    fore, back: color index to r->pixColors array. It is only
 **           used by the XFT drawing, not X11 drawing
 **    rend:  rendition value (text attributes). Only used for the RS_acsFont
 **	     attribute with Xft for correct drawing of ACS graphics characters.
@@ -3050,7 +3042,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	 * background of text by ourselves.
 	 */
 	if (fillback)
-	    XftDrawRect( PVTS(r, page)->xftvt, &(r->XftColors[back]),
+	    XftDrawRect( PVTS(r, page)->xftvt, &(r->xftColors[back]),
 		    x, y, Width2Pixel(len * (1 + adjust)), Height2Pixel(1));
 
 	/* We use TermWin.xftfont->ascent here */
@@ -3209,7 +3201,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 
 	    rxvt_draw_string_xft(r, PVTS( r, page)->vt, r->TermWin.gc,
 		    refreshRegion, rend, NO_PFONT,
-		    PVTS(r, page)->xftvt, &(r->XftColors[fore]),
+		    PVTS(r, page)->xftvt, &(r->xftColors[fore]),
 		    x, y, pstr, plen, xftdraw_string);
 
 	    x += Width2Pixel (loopitem);
@@ -3426,8 +3418,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     /*
      * set base colours to avoid check in "single glyph writing" below
      */
-    gcvalue.foreground = r->PixColors[Color_fg];
-    gcvalue.background = r->PixColors[Color_bg];
+    gcvalue.foreground = r->pixColors[Color_fg];
+    gcvalue.background = r->pixColors[Color_bg];
 
     /*
      * Set clippings on our XftDrawables and GC's to make sure we don't waste
@@ -4065,8 +4057,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		{
 		    if (
 			  XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_BD)
-			  && r->PixColors[fore] != r->PixColors[Color_BD]
-			  && r->PixColors[back] != r->PixColors[Color_BD]
+			  && r->pixColors[fore] != r->pixColors[Color_BD]
+			  && r->pixColors[back] != r->pixColors[Color_BD]
 		       )
 		    {
 
@@ -4086,8 +4078,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		{
 		    if (
 			  XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_UL)
-			  && r->PixColors[fore] != r->PixColors[Color_UL]
-			  && r->PixColors[back] != r->PixColors[Color_UL]
+			  && r->pixColors[fore] != r->pixColors[Color_UL]
+			  && r->pixColors[back] != r->pixColors[Color_UL]
 		       )
 		    {
 			fore = Color_UL;
@@ -4107,8 +4099,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    {
 		if (
 		      XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_HC)
-		      && r->PixColors[fore] != r->PixColors[Color_HC]
-		      && r->PixColors[back] != r->PixColors[Color_HC]
+		      && r->pixColors[fore] != r->pixColors[Color_HC]
+		      && r->pixColors[back] != r->pixColors[Color_HC]
 # ifndef NO_CURSORCOLOR
 			/* Don't do this for the cursor */
 		      && (
@@ -4137,8 +4129,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #ifndef NO_BOLD_UNDERLINE_REVERSE
 		if (
 		      XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_RV)
-		      && r->PixColors[fore] != r->PixColors[Color_RV]
-		      && r->PixColors[back] != r->PixColors[Color_RV]
+		      && r->pixColors[fore] != r->pixColors[Color_RV]
+		      && r->pixColors[back] != r->pixColors[Color_RV]
 # ifndef NO_CURSORCOLOR
 		      /* Don't do this for the cursor */
 		      && (
@@ -4166,12 +4158,12 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    gcmask = 0;
 	    if (back != Color_bg)
 	    {
-		gcvalue.background = r->PixColors[back];
+		gcvalue.background = r->pixColors[back];
 		gcmask = GCBackground;
 	    }
 	    if (fore != Color_fg)
 	    {
-		gcvalue.foreground = r->PixColors[fore];
+		gcvalue.foreground = r->pixColors[fore];
 		gcmask |= GCForeground;
 	    }
 #ifndef NO_BOLD_UNDERLINE_REVERSE
@@ -4188,7 +4180,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		else
 # endif
 		{
-		    gcvalue.foreground = r->PixColors[Color_BD];
+		    gcvalue.foreground = r->pixColors[Color_BD];
 		    gcmask |= GCForeground;
 		}
 
@@ -4207,7 +4199,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		else
 # endif
 		{
-		    gcvalue.foreground = r->PixColors[Color_UL];
+		    gcvalue.foreground = r->pixColors[Color_UL];
 		    gcmask |= GCForeground;
 		}
 		rend &= ~RS_Uline;  /* we've taken care of it */
@@ -4381,8 +4373,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 	    if (gcmask)	    /* restore normal colours */
 	    {
-		gcvalue.foreground = r->PixColors[Color_fg];
-		gcvalue.background = r->PixColors[Color_bg];
+		gcvalue.foreground = r->pixColors[Color_fg];
+		gcvalue.background = r->pixColors[Color_bg];
 		XChangeGC(r->Xdisplay, r->TermWin.gc, gcmask, &gcvalue);
 	    }
 	} /* for (col....) */
@@ -4446,10 +4438,10 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    gcmask = 0;
 	    if (XDEPTH > 2 && ISSET_PIXCOLOR(h, Color_cursor))
 	    {
-		gcvalue.foreground = r->PixColors[Color_cursor];
+		gcvalue.foreground = r->pixColors[Color_cursor];
 		gcmask = GCForeground;
 		XChangeGC(r->Xdisplay, r->TermWin.gc, gcmask, &gcvalue);
-		    gcvalue.foreground = r->PixColors[Color_fg];
+		    gcvalue.foreground = r->pixColors[Color_fg];
 	    }
 #endif
 

@@ -190,19 +190,19 @@ rxvt_scrollbar_init_next (rxvt_t *r)
 
 
     /* Initialize the colors */
-    r->scrollBar.next_fg = r->PixColors[Color_Black];
+    r->scrollBar.next_fg = r->pixColors[Color_Black];
     xcol.red = 0xaeba;
     xcol.green = 0xaaaa;
     xcol.blue = 0xaeba;
     if (!rxvt_alloc_color(r, &xcol, "light gray"))
-	xcol.pixel = r->PixColors[Color_AntiqueWhite];
+	xcol.pixel = r->pixColors[Color_AntiqueWhite];
     r->scrollBar.next_bg = xcol.pixel;
-    r->scrollBar.next_white = r->PixColors[Color_White];
+    r->scrollBar.next_white = r->pixColors[Color_White];
     xcol.red = 0x51aa;
     xcol.green = 0x5555;
     xcol.blue = 0x5144;
     if (!rxvt_alloc_color(r, &xcol, "dark gray"))
-	xcol.pixel = r->PixColors[Color_Grey25];
+	xcol.pixel = r->pixColors[Color_Grey25];
     r->scrollBar.next_dark = xcol.pixel;
 
     

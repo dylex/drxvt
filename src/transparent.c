@@ -87,8 +87,7 @@ rxvt_set_opacity (rxvt_t* r)
     /* Override pseudo-transparent in case */
     if (ISSET_OPTION(r, Opt_transparent))
 	UNSET_OPTION(r, Opt_transparent);
-    XSetWindowBackground(r->Xdisplay, r->TermWin.parent,
-	r->h->global_bg);
+    XSetWindowBackground(r->Xdisplay, r->TermWin.parent, VTBG(r,0) );
 #endif
 
     opacity = (CARD32) (r->TermWin.opacity * (0xffffffff / 100));
@@ -193,8 +192,7 @@ tempDisableTransparent( rxvt_t *r)
 
 	if( NOTSET_OPTION(r, Opt_forceTransparent) )
 	{
-	    XSetWindowBackground( r->Xdisplay, r->TermWin.parent,
-		    r->h->global_bg );
+	    XSetWindowBackground( r->Xdisplay, r->TermWin.parent, VTBG(r,0) );
 
 	    expose_transparent_subwin( r );
 	}
@@ -430,8 +428,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 	r->h->am_pixmap_trans = 0;
 	r->h->bgGrabbed = False;
 
-	XSetWindowBackground (r->Xdisplay, r->TermWin.parent,
-	    r->h->global_bg);
+	XSetWindowBackground (r->Xdisplay, r->TermWin.parent, VTBG(r, 0) );
 
 	for (i = 0; i <= LTAB(r); i ++)
 	{
@@ -441,8 +438,12 @@ rxvt_toggle_transparency (rxvt_t* r)
 		    PVTS(r, i)->vt, PVTS(r, i)->pixmap);
 	    else
 # endif	/* BACKGROUND_IMAGE */
-	    XSetWindowBackground (r->Xdisplay, PVTS(r, i)->vt,
-		    PVTS(r, i)->p_bg);
+	    if( i == ATAB(r) )
+	    {
+		/* Background colors need to be forcibly reset */
+		r->fgbg_tabnum = -1;
+		rxvt_set_vt_colors( r, ATAB(r) );
+	    }
 	}
 
 # ifdef HAVE_SCROLLBARS
@@ -798,7 +799,7 @@ rxvt_check_our_parents(rxvt_t *r)
 		have_changed = 1;
 
 		XSetWindowBackground(r->Xdisplay, r->TermWin.parent,
-		    r->h->global_bg);
+			VTBG(r, 0) );
 
 		expose_transparent_subwin( r );
 	    }
@@ -946,7 +947,7 @@ reset_parent_pixmap (rxvt_t* r, XImage* image, int nx, int ny)
     {
 	XColor	    xcol;
 
-	xcol.pixel = r->PixColors[Color_tint];
+	xcol.pixel = r->pixColors[Color_tint];
 	XQueryColor (r->Xdisplay, XCMAP, &xcol);
 	shade_ximage (r, image, r->TermWin.shade,
 	    xcol.red, xcol.green, xcol.blue);
@@ -1068,7 +1069,7 @@ xrender_shade_ximage( rxvt_t *r, XImage *ximg)
     format = XRenderFindVisualFormat( r->Xdisplay, XVISUAL);
     pic = XRenderCreatePicture( r->Xdisplay, pmap, format, 0, &attrs);
 
-    xcol.pixel = r->PixColors[Color_tint];
+    xcol.pixel = r->pixColors[Color_tint];
     XQueryColor (r->Xdisplay, XCMAP, &xcol);
     xrcol.red = xcol.red;
     xrcol.green = xcol.green;
@@ -1180,7 +1181,7 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
     /* Shade root background. */
     xrenderShadeIntersect( r, pic,
 	    ISSET_PIXCOLOR( r->h, Color_tint ) ?
-		    r->PixColors[Color_tint] : r->h->global_bg,
+		    r->pixColors[Color_tint] : VTBG(r, 0),
 	    r->TermWin.shade,
 	    nx, ny, nw, nh,
 	    rx, ry, rw, rh);
@@ -1298,7 +1299,7 @@ shade_ximage (rxvt_t* r, XImage* srcImage)
 
     if (ISSET_PIXCOLOR (r->h, Color_tint) && r->h->rs[Rs_shade])
     {
-	color.pixel = r->PixColors[Color_tint];
+	color.pixel = r->pixColors[Color_tint];
 	XQueryColor (r->Xdisplay, XCMAP, &color);
 
 	shade = r->TermWin.shade;

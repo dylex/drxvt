@@ -281,8 +281,8 @@ rxvt_scrollbar_create (rxvt_t* r)
 			r->TermWin.parent,
 			sb_x, sb_y, sb_w, sb_h,
 			0,
-			r->PixColors[Color_fg],
-			r->PixColors[Color_bg]);
+			r->pixColors[Color_fg],
+			r->pixColors[Color_bg]);
     assert (IS_WIN(r->scrollBar.win));
 
 # ifdef DEBUG_X
@@ -550,7 +550,7 @@ rxvt_scrollbar_bg( rxvt_t *r )
 #  ifdef SGI_SCROLLBAR
 	case R_SB_SGI:   return r->scrollBar.sgi_bg;
 #  endif
-	default: assert (0); return r->h->global_bg;
+	default: assert (0); return VTBG( r, 0);
     }	/* switch */
 }
 

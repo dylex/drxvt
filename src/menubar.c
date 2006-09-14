@@ -1277,8 +1277,8 @@ rxvt_menu_show(rxvt_t *r)
 			    x, ActiveMenu->y,
 			    ActiveMenu->width, ActiveMenu->height,
 			    0,
-			    r->PixColors[Color_fg],
-			    r->PixColors[Color_scroll]);
+			    r->pixColorsFocus[Color_fg],
+			    r->pixColorsFocus[Color_scroll]);
 #endif
 	/*
 	 * 2006-02-05 gi1242: We should make menu windows childs of the root
@@ -1290,8 +1290,8 @@ rxvt_menu_show(rxvt_t *r)
 	attrs.override_redirect = True;
 	attrs.save_under = True;
 	attrs.cursor = r->h->bar_pointer;
-	attrs.background_pixel = r->PixColors[ Color_scroll ];
-	attrs.border_pixel = r->PixColors[Color_fg];
+	attrs.background_pixel = r->pixColorsFocus[ Color_scroll ];
+	attrs.border_pixel = r->pixColorsFocus[Color_fg];
 
 	ActiveMenu->win = XCreateWindow( r->Xdisplay, XROOT,
 		r->szHint.x + ActiveMenu->x, r->szHint.y + ActiveMenu->y,
@@ -1915,8 +1915,8 @@ rxvt_menubar_create (rxvt_t* r)
 		    r->TermWin.parent,
 		    0, 0,
 		    TWIN_WIDTH(r), rxvt_menubar_rheight (r),
-		    0, r->PixColors[Color_fg],
-		    r->PixColors[Color_scroll]);
+		    0, r->pixColorsFocus[Color_fg],
+		    r->pixColorsFocus[Color_scroll]);
     assert (IS_WIN(r->menuBar.win));
 
 #  ifdef DEBUG_X
@@ -1967,19 +1967,19 @@ rxvt_menubar_create (rxvt_t* r)
 	 */
 	XColor xcol;
 
-	xcol.pixel = r->PixColors[Color_scroll];
+	xcol.pixel = r->pixColorsFocus[Color_scroll];
 	XQueryColor( r->Xdisplay, XCMAP, &xcol);
 
-	r->menuBar.fg = r->PixColors[ (xcol.red <= 0x60 && xcol.green <= 0x60
-					&& xcol.blue <= 0x60 )
-				? Color_White : Color_Black ];
+	r->menuBar.fg = r->pixColorsFocus[
+		(xcol.red <= 0x60 && xcol.green <= 0x60 && xcol.blue <= 0x60 )
+		    ? Color_White : Color_Black ];
     }
     else
-	r->menuBar.fg = r->PixColors[ Color_bg ]; /* Reverse video */
+	r->menuBar.fg = r->pixColorsFocus[ Color_bg ]; /* Reverse video */
 
-    r->menuBar.bg = r->PixColors[XDEPTH <= 2 ? Color_fg : Color_scroll];
-    r->menuBar.topshadow = r->PixColors[Color_topShadow];
-    r->menuBar.botshadow = r->PixColors[Color_bottomShadow];
+    r->menuBar.bg = r->pixColorsFocus[XDEPTH <= 2 ? Color_fg : Color_scroll];
+    r->menuBar.topshadow = r->pixColorsFocus[Color_topShadow];
+    r->menuBar.botshadow = r->pixColorsFocus[Color_bottomShadow];
 
 
     gcvalue.foreground = r->menuBar.fg;

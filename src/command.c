@@ -188,7 +188,7 @@ void           rxvt_process_visibilitynotify (rxvt_t*, XVisibilityEvent*);
 void           rxvt_process_enter            (rxvt_t*, XCrossingEvent*);
 void           rxvt_process_leave            (rxvt_t*, XCrossingEvent*);
 #endif
-void	       rxvt_focus_colorchange	     (rxvt_t*);
+void	       rxvt_change_colors_on_focus	     (rxvt_t*);
 void           rxvt_process_focusin          (rxvt_t*, XFocusChangeEvent*);
 void           rxvt_process_focusout         (rxvt_t*, XFocusChangeEvent*);
 int            rxvt_calc_colrow              (rxvt_t* r, unsigned int width, unsigned int height);
@@ -1981,7 +1981,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	    fsdiff = 0;
 	    h->lastFocusChange.tv_sec = 0;
 
-	    rxvt_focus_colorchange(r);
+	    rxvt_change_colors_on_focus(r);
 	}
 	else
 	    fsdiff = h->focusDelay - fsdiff;
@@ -2437,7 +2437,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 void
 rxvt_pointer_unblank(rxvt_t* r, int page)
 {
-    DBG_MSG(1, ( stderr, "Unblanking pointer\n"));
+    DBG_MSG( 1, (stderr, "%s(r, page=%d)\n", __func__, page ) );
     XDefineCursor(r->Xdisplay, PVTS(r, page)->vt, r->term_pointer);
     rxvt_recolour_cursor(r);
 #ifdef POINTER_BLANK
@@ -2547,71 +2547,6 @@ rxvt_mouse_report(rxvt_t* r, const XButtonEvent *ev)
 	  (32 + y + 1));
 #endif
 }
-
-
-/*
- * Before calling rxvt_set_bg_focused, bg and ufbg are already restored to
- * correct state
- */
-/* INTPROTO */
-void
-rxvt_set_bg_focused(rxvt_t* r, int page, Bool focus)
-{
-    XGCValues	    gcvalue;
-
-
-    /* Make sure bg and ufbg are in correct state */
-    assert (0 == r->ufbg_switched);
-    if (focus)
-	rxvt_restore_ufbg_color (r);
-    else
-	rxvt_switch_ufbg_color (r);
-    gcvalue.background = r->PixColors[Color_bg];
-
-# ifdef TRANSPARENT
-    if (NOTSET_OPTION(r, Opt_transparent))
-# endif	/* TRANSPARENT */
-#ifdef BACKGROUND_IMAGE
-    if (NOT_PIXMAP(PVTS(r, page)->pixmap))
-#endif	/* BACKGROUND_IMAGE */
-    {
-	XSetBackground(r->Xdisplay, r->TermWin.gc,
-	    r->PixColors[Color_bg]);
-	XSetWindowBackground(r->Xdisplay, PVTS(r, page)->vt,
-	    r->PixColors[Color_bg]);
-    }
-
-#ifdef TRANSPARENT
-    if (ISSET_OPTION(r, Opt_transparent))
-	rxvt_check_our_parents(r);
-    else
-#endif	/* TRANSPARENT */
-#ifdef BACKGROUND_IMAGE
-    if (IS_PIXMAP(PVTS(r, page)->pixmap))
-    {
-	DBG_MSG (1, (stderr, "reset pixmap bg of vt %d\n", page));
-	XSetWindowBackgroundPixmap(r->Xdisplay, PVTS(r, page)->vt,
-	    PVTS(r, page)->pixmap);
-    }
-#endif	/* BACKGROUND_IMAGE */
-    {
-	/* Nothing to do, avoid compile error when defined
-	** TRANSPARENT but not BACKGROUND_IMAGE
-	*/
-    }
-
-    /*
-    ** Set foreground/background color for GC. This is necessary.
-    ** Otherwise, the old color will be used for drawing the 
-    ** following text before a color change.
-    */
-    XSetForeground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_fg]);
-    XSetBackground (r->Xdisplay, r->TermWin.gc, r->PixColors[Color_bg]);
-
-    rxvt_scr_clear(r, page);
-    rxvt_scr_touch(r, page, True);
-}
-
 
 
 /*
@@ -3232,57 +3167,12 @@ rxvt_process_leave (rxvt_t* r, XCrossingEvent* ev)
  */
 /* INTPROTO */
 void
-rxvt_focus_colorchange( rxvt_t *r )
+rxvt_change_colors_on_focus( rxvt_t *r )
 {
-#ifdef OFF_FOCUS_FADING
-    int	    changed = 0;
-#endif
-
-    /* If we have switched bg/ufbg color, restore it */
-    rxvt_restore_ufbg_color (r);
-
-    if( r->TermWin.focus )
+    if( rxvt_set_vt_colors( r, ATAB(r) ) )
     {
-#ifdef OFF_FOCUS_FADING
-	/* if we have switched to off-focus color, restore it */
-	changed = rxvt_restore_pix_color (r);
-#endif
-
-	if (
-		ISSET_PIXCOLOR(r->h, Color_ufbg)
-#ifdef OFF_FOCUS_FADING
-		|| ( r->TermWin.fade && changed)
-#endif
-	   )
-	{
-	    /*
-	     * Before calling rxvt_set_bg_focused, bg and ufbg are already
-	     * restored to correct state
-	     */
-	    rxvt_set_bg_focused(r, ATAB(r), True);
-	}
-    }
-
-    else
-    {
-#ifdef OFF_FOCUS_FADING
-	/* if we are using on-focus color, switch it */
-	changed = rxvt_switch_pix_color (r);
-#endif
-
-	if (
-		ISSET_PIXCOLOR(r->h, Color_ufbg)
-#ifdef OFF_FOCUS_FADING
-		|| ( r->TermWin.fade && changed)
-#endif
-	   )
-	{
-	    /*
-	     * Before calling rxvt_set_bg_focused, bg and ufbg are already
-	     * restored to correct state
-	     */
-	    rxvt_set_bg_focused(r, ATAB(r), False);
-	}
+	rxvt_scr_clear(r, ATAB(r) );
+	rxvt_scr_touch(r, ATAB(r), True);
     }
 }
 
@@ -3301,12 +3191,12 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 	if (NOT_NULL(r->h->Input_Context))
 	    XSetICFocus(r->h->Input_Context);
 #endif
-    }
 
-    if (r->h->focusDelay)
-	gettimeofday( &r->h->lastFocusChange, NULL);
-    else
-	rxvt_focus_colorchange (r);
+	if (r->h->focusDelay)
+	    gettimeofday( &r->h->lastFocusChange, NULL);
+	else
+	    rxvt_change_colors_on_focus (r);
+    }
 }
 
 
@@ -3328,12 +3218,12 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 	if (NOT_NULL(r->h->Input_Context))
 	    XUnsetICFocus(r->h->Input_Context);
 #endif
-    }
 
-    if (r->h->focusDelay)
-	gettimeofday( &r->h->lastFocusChange, NULL);
-    else
-	rxvt_focus_colorchange (r);
+	if (r->h->focusDelay)
+	    gettimeofday( &r->h->lastFocusChange, NULL);
+	else
+	    rxvt_change_colors_on_focus (r);
+    }
 }
 
 

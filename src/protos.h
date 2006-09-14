@@ -86,17 +86,14 @@ void             rxvt_init_secondary              __PROTO((rxvt_t* r));
 void		 rxvt_set_jumpscroll		  __PROTO((rxvt_t* r));
 const char    ** rxvt_init_resources              __PROTO((rxvt_t* r, int argc, const char* const *argv));
 #ifdef XFT_SUPPORT
-void		 rxvt_fade_color                  __PROTO((rxvt_t* r, unsigned long pixel, unsigned long *pix_return, XftColor *xft_return));
+void		 rxvt_fade_color                  __PROTO((rxvt_t* r, const XColor *xcol, unsigned long *pix_return, XftColor *xft_return));
 #else
-void	         rxvt_fade_color                  __PROTO((rxvt_t* r, unsigned long pixel, unsigned long *pix_return, void *xft_return));
+void	         rxvt_fade_color                  __PROTO((rxvt_t* r, const XColor *xcol, unsigned long *pix_return, void *xft_return));
 #endif
-void             rxvt_switch_fgbg_color           __PROTO((rxvt_t* r, int page));
-int              rxvt_restore_ufbg_color          __PROTO((rxvt_t* r));
-int              rxvt_switch_ufbg_color           __PROTO((rxvt_t* r));
-#ifdef OFF_FOCUS_FADING
-int              rxvt_restore_pix_color           __PROTO((rxvt_t* r));
-int              rxvt_switch_pix_color            __PROTO((rxvt_t* r));
-#endif
+int		 rxvt_set_fgbg_colors		  __PROTO((rxvt_t* r, int page));
+int		 rxvt_set_vt_colors		  __PROTO((rxvt_t* r, int page));
+void		 rxvt_copy_color                  __PROTO((rxvt_t*, int, int));
+void		 rxvt_set_color                   __PROTO((rxvt_t*, int, const XColor*));
 void             rxvt_init_env                    __PROTO((rxvt_t *r));
 void             rxvt_init_xlocale                __PROTO((rxvt_t *r));
 void             rxvt_init_command                __PROTO((rxvt_t* r, const char* const *argv));

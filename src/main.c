@@ -106,37 +106,48 @@ const char**	cmd_argv;
 void
 rxvt_pre_show_init( rxvt_t *r )
 {
+    /*
+     * 2006-08-18 gi1242 TODO: If we're using Xft, then we don't need to
+     * initialize this array.
+     */
+    r->pixColorsFocus = rxvt_malloc( sizeof(unsigned long) * (TOTAL_COLORS));
+    r->pixColors = r->pixColorsFocus;
+
+
 #ifdef XFT_SUPPORT
     if( ISSET_OPTION( r, Opt_xft ) )
     {
-	r->XftColors = (XftColor*) rxvt_malloc (
-	    sizeof (XftColor) * (TOTAL_COLORS));
+	r->xftColorsFocus = rxvt_malloc( sizeof(XftColor) * (TOTAL_COLORS) );
+	r->xftColors = r->xftColorsFocus;
     }
     else
-	SET_NULL( r->XftColors );
+    {
+	SET_NULL( r->xftColors );
+	SET_NULL( r->xftColorsFocus );
+    }
 #endif
 
 #ifdef OFF_FOCUS_FADING
     if( r->TermWin.fade )
     {
 	DBG_MSG( 5, ( stderr, "Allocating space for fade colors\n" ) );
-	r->PixColorsUnfocus = (unsigned long*)
+	r->pixColorsUnfocus =
 	    rxvt_malloc( sizeof(unsigned long) * (TOTAL_COLORS) );
 
 # ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
-	    r->XftColorsUnfocus = (XftColor*)
+	    r->xftColorsUnfocus =
 		rxvt_malloc( sizeof(XftColor) * TOTAL_COLORS );
 	else
-	    SET_NULL( r->XftColorsUnfocus );
+	    SET_NULL( r->xftColorsUnfocus );
 # endif /* XFT_SUPPORT */
     }
 
     else
     {
-	SET_NULL( r->PixColorsUnfocus );
+	SET_NULL( r->pixColorsUnfocus );
 # ifdef XFT_SUPPORT
-	SET_NULL( r->XftColorsUnfocus );
+	SET_NULL( r->xftColorsUnfocus );
 # endif
     }
 #endif /* OFF_FOCUS_FADING */
@@ -499,28 +510,28 @@ rxvt_clean_exit (rxvt_t* r)
     SET_NULL(r->Xdisplay);
 
     rxvt_free (r->tabstop);	    SET_NULL(r->tabstop);
-    rxvt_free (r->PixColors);	    SET_NULL(r->PixColors);
+    rxvt_free (r->pixColors);	    SET_NULL(r->pixColors);
 # ifdef OFF_FOCUS_FADING
-    if( NOT_NULL( r->PixColorsUnfocus ) )
+    if( NOT_NULL( r->pixColorsUnfocus ) )
     {
-	rxvt_free (r->PixColorsUnfocus);
-	SET_NULL(r->PixColorsUnfocus);
+	rxvt_free (r->pixColorsUnfocus);
+	SET_NULL(r->pixColorsUnfocus);
     }
 
 #  ifdef XFT_SUPPORT
-    if( NOT_NULL( r->XftColorsUnfocus ) )
+    if( NOT_NULL( r->xftColorsUnfocus ) )
     {
-	rxvt_free( r->XftColorsUnfocus );
-	SET_NULL( r->XftColorsUnfocus );
+	rxvt_free( r->xftColorsUnfocus );
+	SET_NULL( r->xftColorsUnfocus );
     }
 #  endif /* XFT_SUPPORT */
 # endif /* OFF_FOCUS_FADING */
 
 # ifdef XFT_SUPPORT
-    if( NOT_NULL( r->XftColors ) )
+    if( NOT_NULL( r->xftColors ) )
     {
-	rxvt_free (r->XftColors);
-	SET_NULL(r->XftColors);
+	rxvt_free (r->xftColors);
+	SET_NULL(r->xftColors);
     }
 # endif
     rxvt_free (r->h);		    SET_NULL(r->h);
@@ -2168,28 +2179,23 @@ void
 rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
 {
     XColor	    xcol;
-    int		    ufbg_switched;
-#ifdef OFF_FOCUS_FADING
-    int		    color_switched;
-#endif
     int		    color_set;
     register int    i;
 
 
-    DBG_MSG( 2, ( stderr, "rxvt_set_window_color( r, %d, %d, %s), ATAB=%d\n",
-		page, idx, color, ATAB(r) ) );
+    DBG_MSG( 2, ( stderr, "%s( r, %d, %d, %s), ATAB=%d\n",
+		__func__, page, idx, color, ATAB(r) ) );
 
     if (IS_NULL(color) || (char) 0 == *color)
 	return;
 
-    color_set = ISSET_PIXCOLOR(r->h, idx);
     /*
-     * Restore colors now. Remember to restore ufbg color before PixColors
+     * Set the fg/bg colors from this page, just in case the fg/bg is to be
+     * changed.
      */
-    ufbg_switched = rxvt_restore_ufbg_color (r);
-#ifdef OFF_FOCUS_FADING
-    color_switched = rxvt_restore_pix_color (r);
-#endif
+    rxvt_set_fgbg_colors( r, page );
+
+    color_set = ISSET_PIXCOLOR(r->h, idx);
 
     /* handle color aliases */
     if( isdigit((int) *color) )
@@ -2199,29 +2205,20 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
 	{
 	    i -= 8;
 # ifndef NO_BRIGHTCOLOR
-	    r->PixColors[idx] = r->PixColors[minBrightCOLOR + i];
-	    SET_PIXCOLOR(r->h, idx);
+	    rxvt_copy_color( r, idx, minBrightCOLOR + i );
 	    goto Done;
 # endif
 	}
 	if (i >= 0 && i <= 7)		/* normal colors */
 	{
-	    r->PixColors[idx] = r->PixColors[minCOLOR + i];
-	    SET_PIXCOLOR(r->h, idx);
+	    rxvt_copy_color( r, idx, minCOLOR + i );
 	    goto Done;
 	}
     }
-    if (!rxvt_parse_alloc_color(r, &xcol, color))
-    {
-	/* restore to original state and return */
-#ifdef OFF_FOCUS_FADING
-	if (color_switched)
-	    rxvt_switch_pix_color (r);
-#endif
-	if (ufbg_switched)
-	    rxvt_switch_ufbg_color (r);
+
+    if( !rxvt_parse_alloc_color(r, &xcol, color) )
+	/* Could not alloc color */
 	return;
-    }
 
     /* XStoreColor (r->Xdisplay, XCMAP, XColor*); */
 
@@ -2229,99 +2226,79 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
      * FIXME: should free colors here, but no idea how to do it so instead,
      * so just keep gobbling up the colormap
      */
-# if 0
+# if 0 /*{{{*/
     for (i = Color_Black; i <= Color_White; i++)
-	if (r->PixColors[idx] == r->PixColors[i])
+	if (r->pixColors[idx] == r->pixColors[i])
 	    break;
 
     if (i > Color_White)
     {
-	fprintf (stderr, "XFreeColors: r->PixColors [%d] = %lu\n",
-		idx, r->PixColors [idx]);
-	XFreeColors(r->Xdisplay, XCMAP, (r->PixColors + idx), 1,
+	fprintf (stderr, "XFreeColors: r->pixColors [%d] = %lu\n",
+		idx, r->pixColors [idx]);
+	XFreeColors(r->Xdisplay, XCMAP, (r->pixColors + idx), 1,
 		DisplayPlanes(r->Xdisplay, XSCREEN));
     }
-# endif
+# endif /*}}}*/
 
-    r->PixColors[idx] = xcol.pixel;
-
-#ifdef OFF_FOCUS_FADING
-    if( r->TermWin.fade )
-    {
-	rxvt_fade_color( r, xcol.pixel, &r->PixColorsUnfocus[idx],
-# ifdef XFT_SUPPORT
-		ISSET_OPTION( r, Opt_xft ) ? &r->XftColorsUnfocus[idx] : NULL
-# else
-		NULL
-# endif
-	    );
-    }
-#endif /* OFF_FOCUS_FADING */
-
-#ifdef XFT_SUPPORT
-    if( ISSET_OPTION( r, Opt_xft ) )
-    {
-	if (color_set)
-	{
-	    XftColorFree (r->Xdisplay, XVISUAL, XCMAP, &(r->XftColors[idx]));
-	}
-	rxvt_alloc_xft_color (r, r->PixColors[idx], &(r->XftColors[idx]));
-    }
-#endif
-    SET_PIXCOLOR(r->h, idx);
+    rxvt_set_color( r, idx, &xcol );
 
 Done:
-    /*
-     * Ok, now return to original state before restoring colors. Remember to
-     * change PixColors before ufbg color
-     */
-#ifdef OFF_FOCUS_FADING
-    if (color_switched)
-	rxvt_switch_pix_color (r);
-#endif
-    if (ufbg_switched)
-	rxvt_restore_ufbg_color (r);
-
     if( idx == Color_bg )
     {
-	PVTS( r, page )->p_bg	= r->PixColors[idx];
+	PVTS( r, page )->p_bg	= r->pixColorsFocus[idx];
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
-	    PVTS( r, page )->p_xftbg = r->XftColors[idx];
+	    PVTS( r, page )->p_xftbg = r->xftColorsFocus[idx];
 #endif
-    }
-    else if ( idx == Color_fg )
-    {
-	PVTS( r, page )->p_fg	= r->PixColors[idx];
+
+	if( r->TermWin.fade )
+	{
+	    PVTS( r, page )->p_bgfade	= r->pixColorsUnfocus[idx];
 #ifdef XFT_SUPPORT
-	if( ISSET_OPTION( r, Opt_xft ) )
-	    PVTS( r, page )->p_xftfg = r->XftColors[idx];
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		PVTS( r, page )->p_xftbgfade = r->xftColorsUnfocus[idx];
 #endif
+	}
+
+	/*
+	 * Update the GC / window background if necessary.
+	 */
+	if( page == ATAB(r) )
+	    r->fgbg_tabnum = -1;
     }
 
-    /* background color has changed */
-    if (
-	  (idx == Color_bg && !ufbg_switched)
-	  || (idx == Color_ufbg && ufbg_switched)
-       )
+    else if ( idx == Color_fg )
     {
-#ifdef TRANSPARENT
-	if (NOTSET_OPTION(r, Opt_transparent))
+	PVTS( r, page )->p_fg	= r->pixColorsFocus[idx];
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	    PVTS( r, page )->p_xftfg = r->xftColorsFocus[idx];
 #endif
+
+	if( r->TermWin.fade )
 	{
-#ifdef BACKGROUND_IMAGE
-	    if (NOT_PIXMAP(PVTS(r, page)->pixmap))
+	    PVTS( r, page )->p_fgfade	= r->pixColorsUnfocus[idx];
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		PVTS( r, page )->p_xftfgfade = r->xftColorsUnfocus[idx];
 #endif
-	    {
-		XSetWindowBackground( r->Xdisplay, PVTS(r, page)->vt,
-		    r->PixColors[Color_bg] );
-	    }
 	}
+
+	if( page == ATAB(r) )
+	    /* Force rxvt_set_vt_colors() to update the GC / background. */
+	    r->fgbg_tabnum = -1;
     }
 
     /* handle Color_BD, scrollbar background, etc. */
+#if 0 /*{{{*/
+    /*
+     * Setting the environment will not propogate to an already running child
+     * process.
+     */
     rxvt_set_colorfgbg(r);
-    rxvt_recolour_cursor(r);
+#endif /*}}}*/
+    if( idx == Color_pointer )
+	rxvt_recolour_cursor(r);
 
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
 # ifdef TINTING_SUPPORT
@@ -2345,8 +2322,12 @@ Done:
 #endif	/* TRANSPARENT || BACKGROUND_IMAGE */
 
     /*
-     *  Just clear the window and generate expose events. The screen refresh
-     *  will get put on our queue of X events :)
+     * Restore the fg/bg colors from the active tab.
+     */
+    rxvt_set_fgbg_colors( r, ATAB(r) );
+
+    /*
+     *  If our palette has changed, the screen must be refreshed.
      */
     XClearArea( r->Xdisplay, AVTS(r)->vt, 0, 0, 0, 0, True );
 }
@@ -2362,10 +2343,13 @@ rxvt_recolour_cursor(rxvt_t *r)
 {
     XColor	    xcol[2];
 
-    xcol[0].pixel = r->PixColors[Color_pointer];
-    xcol[1].pixel = r->PixColors[Color_bg];
+    xcol[0].pixel = r->pixColorsFocus[Color_pointer];
+    xcol[1].pixel = VTBG(r, 0);
     XQueryColors(r->Xdisplay, XCMAP, xcol, 2);
     XRecolorCursor(r->Xdisplay, r->term_pointer, &(xcol[0]), &(xcol[1]));
+
+    DBG_MSG( 3, ( stderr, "%s(r): fg=%06lx, bg=%06lx\n",
+		__func__, xcol[0].pixel, xcol[1].pixel ) );
 }
 
 
@@ -2386,13 +2370,13 @@ rxvt_set_colorfgbg(rxvt_t *r)
     STRCPY(fstr, "default");
     STRCPY(bstr, "default");
     for (i = Color_Black; i <= Color_White; i++)
-	if (r->PixColors[Color_fg] == r->PixColors[i])
+	if (r->pixColors[Color_fg] == r->pixColors[i])
 	{
 	    sprintf(fstr, "%d", (i - Color_Black));
 	    break;
 	}
     for (i = Color_Black; i <= Color_White; i++)
-	if (r->PixColors[Color_bg] == r->PixColors[i])
+	if (r->pixColors[Color_bg] == r->pixColors[i])
 	{
 	    sprintf(bstr, "%d", (i - Color_Black));
 #ifdef BACKGROUND_IMAGE
@@ -2408,9 +2392,9 @@ rxvt_set_colorfgbg(rxvt_t *r)
     for (i = minCOLOR; i <= maxCOLOR; i++)
     {
 	if (
-		r->PixColors[Color_fg] == r->PixColors[i]
+		r->pixColors[Color_fg] == r->pixColors[i]
 # ifndef NO_BOLD_UNDERLINE_REVERSE
-		&& r->PixColors[Color_fg] == r->PixColors[Color_BD]
+		&& r->pixColors[Color_fg] == r->pixColors[Color_BD]
 # endif
 		/* if we wanted boldFont to have precedence */
 # if 0	/* was ifndef NO_BOLDFONT */
@@ -2418,7 +2402,7 @@ rxvt_set_colorfgbg(rxvt_t *r)
 # endif	
 	   )
 	    r->h->colorfgbg = SET_FGCOLOR(r->h->colorfgbg, i);
-	if (r->PixColors[Color_bg] == r->PixColors[i])
+	if (r->pixColors[Color_bg] == r->pixColors[i])
 	    r->h->colorfgbg = SET_BGCOLOR(r->h->colorfgbg, i);
     }
 #endif	/* NO_BRIGHTCOLOR */
@@ -2561,8 +2545,8 @@ rxvt_IM_set_position(rxvt_t* r, XPoint *pos)
 void
 rxvt_IM_set_color(rxvt_t* r, unsigned long *fg, unsigned long *bg)
 {
-    *fg = r->PixColors[Color_fg];
-    *bg = r->PixColors[Color_bg];
+    *fg = r->pixColors[Color_fg];
+    *bg = r->pixColors[Color_bg];
 }
 
 /* Checking whether input method is running. */
