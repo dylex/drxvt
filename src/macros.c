@@ -520,7 +520,8 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     else
     {
 	/* Macro action string needs to be freed (as it will be replaced) */
-	rxvt_free( r->macros[replaceIndex].action.str );
+	if( r->macros[replaceIndex].action.str )
+	    rxvt_free( r->macros[replaceIndex].action.str );
     }
 
 
