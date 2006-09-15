@@ -1752,11 +1752,17 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 		break;
 
 	    case 2 : /* delete the active vt if it's in primary screen */
-		if (NOTSET_OPTION(r, Opt2_protectSecondary) ||
-		    ( ISSET_OPTION(r, Opt2_protectSecondary) &&
-		      PRIMARY == AVTS(r)->current_screen
-		    ))
+		if(
+		    NOTSET_OPTION(r, Opt2_protectSecondary) ||
+		    (
+		       ISSET_OPTION(r, Opt2_protectSecondary) &&
+		       PRIMARY == AVTS(r)->current_screen
+		    )
+		  )
+		{
+		    AVTS(r)->holdOption &= ~HOLD_NORMALBIT;
 		    rxvt_kill_page (r, ATAB(r));
+		}
 		break;
 
 	    case 3 : /* create a new vt*/
