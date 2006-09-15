@@ -2319,9 +2319,11 @@ Done:
 #endif	/* TRANSPARENT || BACKGROUND_IMAGE */
 
     /*
-     * Restore the fg/bg colors from the active tab.
+     * Restore the fg/bg colors from the active tab. Call rxvt_set_vt_colors
+     * instead of rxvt_set_fgbg_colors, so that the GC fgbg & window background
+     * will be refreshed if necessary.
      */
-    rxvt_set_fgbg_colors( r, ATAB(r) );
+    rxvt_set_vt_colors( r, ATAB(r) );
 
     /*
      *  If our palette has changed, the screen must be refreshed.
