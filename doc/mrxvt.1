@@ -1255,7 +1255,7 @@ create a new tab
 .It Ctrl+Shift+q
 Close all tabs and exit
 .It Ctrl+Shift+w
-close active tab
+Close active tab, and do not hold it open if it exits abnormally.
 .It Ctrl+PgUp
 activate left tab
 .It Ctrl+PgDn
@@ -1595,8 +1595,33 @@ Toggle pseudo transparency.
 .It Ic ToggleBroadcast
 Toggle broadcasting of input to all tabs.
 .\" ------------------------------------------------------------
-.It Ic ToggleHold
-Close all tabs who's child processes have exited.
+.It Ic ToggleHold Op Ar mask
+If
+.Ar mask
+is not specified, then just close all tabs who's child processes have exited. (This is almost compatible with the behaviour of
+.Nm
+0.5.1 and earlier). If
+.Ar mask
+is specified, then change the hold status of the current tab.
+.Ar mask
+must begin with
+.Sq Sy + ,
+.Sq Sy - ,
+or
+.Sq Sy \&!
+and be followed by a bit mask (as in the
+.Ic holdExit
+option).
+.Sq Sy +
+will add bits to the
+.Ic holdExit
+option for this tab,
+.Sq Sy -
+will subtract, and
+.Sq Sy \&!
+will toggle. Remember that if the lowest bit of the current tabs
+.Ic holdExit
+option is set, then the tab will always be held open and everything else will be ignored.
 .\" ------------------------------------------------------------
 .It Ic ToggleFullscreen
 Toggle between full screen and regular mode. Also enable

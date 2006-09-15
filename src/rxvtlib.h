@@ -1055,6 +1055,22 @@ typedef enum {
     ((R)->vts[(P)]->SavedModes &= ~(V))
 
 
+/* Macro to determine weather we should the i-th tab or not */
+#define SHOULD_HOLD( r, i )					\
+    (								\
+      ( HOLD_ALWAYSBIT & PVTS((r),(i))->holdOption )		\
+      ||							\
+      (								\
+	( HOLD_NORMALBIT & PVTS((r),(i))->holdOption )		\
+	&& !WIFEXITED( PVTS((r),(i))->status )			\
+      )								\
+      ||							\
+      (								\
+	( HOLD_STATUSBIT & PVTS((r),(i))->holdOption )		\
+	&& WEXITSTATUS( PVTS((r),(i))->status ) != 0		\
+      )								\
+    )
+
 
 /*****************************************************************************
  *                                PROTOTYPES                                 *

@@ -1448,22 +1448,6 @@ rxvt_mark_dead_childs( rxvt_t *r )
 }
 
 
-/* Macro to determine weather we should the i-th tab or not */
-#define SHOULD_HOLD( r, i )					\
-    (								\
-      ( HOLD_ALWAYSBIT & PVTS((r),(i))->holdOption )		\
-      ||							\
-      (								\
-	( HOLD_NORMALBIT & PVTS((r),(i))->holdOption )		\
-	&& !WIFEXITED( PVTS((r),(i))->status )			\
-      )								\
-      ||							\
-      (								\
-	( HOLD_STATUSBIT & PVTS((r),(i))->holdOption )		\
-	&& WEXITSTATUS( PVTS((r),(i))->status ) != 0		\
-      )								\
-    )
-
 /*
  * Cleans out tabs which have died but have not been cleaned up. (i.e. dead &&
  * hold == 1)
