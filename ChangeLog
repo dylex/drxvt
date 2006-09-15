@@ -27,6 +27,9 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   correctly if tabs are switched on on unfocussed window, or if the
 	   bg is changed (via an escape sequence) from an inactive tab /
 	   unfocussed window.
+       14. Removed round trip to server when allocing Xft colors. (Reduces
+	   protocol requests by about 750 on startup, which should speed
+	   things up on a slow connection).
 
     * Enhancements:
 	0. Really busy tabs (even with Xft+anti aliasing) no longer starves

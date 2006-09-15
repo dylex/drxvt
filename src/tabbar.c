@@ -1976,41 +1976,72 @@ rxvt_tabbar_create (rxvt_t* r)
     else 
     {
 	/* create the foreground color */
-	if (r->h->rs[Rs_tabfg] && 
-	    rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_tabfg]))
+	if(
+	     r->h->rs[Rs_tabfg] && 
+	     rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_tabfg])
+	  )
+	{
 	    r->tabBar.fg = color.pixel;
-	else
-	    r->tabBar.fg = r->pixColors[Color_Black];
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		rxvt_alloc_xft_color( r, &color, &r->tabBar.xftfg );
+#endif
+	}
 
-	/* create the background color */
-	if (r->h->rs[Rs_tabbg]	&&
-	    rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_tabbg]))
-	    r->tabBar.bg = color.pixel;
 	else
 	{
-	    color.red = 0xd300;
+	    r->tabBar.fg = r->pixColorsFocus[Color_Black];
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		r->tabBar.xftfg = r->xftColorsFocus[Color_Black];
+#endif
+	}
+
+	/*
+	 * create the background color
+	 */
+	if(
+	     r->h->rs[Rs_tabbg]	&&
+	     rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_tabbg])
+	  )
+	{
+	    r->tabBar.bg = color.pixel;
+	}
+
+	else
+	{
+	    color.red	= 0xd300;
 	    color.green = 0xd300;
-	    color.blue = 0xdd00;
-	    if (rxvt_alloc_color (r, &color, "Active_Tab"))
+	    color.blue	= 0xdd00;
+	    if( rxvt_alloc_color (r, &color, "Active_Tab") )
 		r->tabBar.bg = color.pixel;
 	    else
-		r->tabBar.bg = r->pixColors[Color_bg];
+		r->tabBar.bg = VTBG(r,0);
 	}
 
 	/* create the tab frame color */
-	r->tabBar.frame = r->pixColors[Color_fg];
-
-	/* Create the tab delimit color */
-	/* r->tabBar.delimit = r->pixColors[Color_Grey25]; */
+	r->tabBar.frame = r->pixColorsFocus[Color_fg];
 
 	/* create the inactive tab foreground color */
 	if(
 	     r->h->rs[Rs_itabfg]
 	     && rxvt_parse_alloc_color (r, &color, r->h->rs[Rs_itabfg])
 	  )
+	{
 	    r->tabBar.ifg = color.pixel;
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		rxvt_alloc_xft_color( r, &color, &r->tabBar.xftifg );
+#endif
+	}
 	else
-	    r->tabBar.ifg = r->pixColors[Color_Black];
+	{
+	    r->tabBar.ifg = r->pixColorsFocus[Color_Black];
+#ifdef XFT_SUPPORT
+	    if( ISSET_OPTION( r, Opt_xft ) )
+		r->tabBar.xftifg = r->xftColorsFocus[Color_Black];
+#endif
+	}
 
 	/* create the inactive tab background color */
 	if(
@@ -2018,6 +2049,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	     && rxvt_parse_alloc_color( r, &color, r->h->rs[Rs_itabbg] )
 	  )
 	    r->tabBar.ibg = color.pixel;
+
 	else
 	{
 	    color.red	= 0xa100;
@@ -2026,7 +2058,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	    if( rxvt_alloc_color( r, &color, "Inactive_Tab_Bg" ) )
 		r->tabBar.ibg = color.pixel;
 	    else
-		r->tabBar.ibg = r->pixColors[Color_bg];
+		r->tabBar.ibg = VTBG(r,0);
 	}
 
 	/* create the delimit color (average of 3*fg & bg) */
@@ -2043,19 +2075,11 @@ rxvt_tabbar_create (rxvt_t* r)
 	if( rxvt_alloc_color( r, &color, "Tab_Delimit" ) )
 	    r->tabBar.delimit = color.pixel;
 	else
-	    r->tabBar.delimit = r->pixColors[Color_fg];
+	    r->tabBar.delimit = VTFG(r,0);
 
 	DBG_MSG( 2, (stderr, "Delimit color: %hx, %hx, %hx (#%lx)\n",
 		color.red, color.green, color.blue, r->tabBar.delimit));
     }
-
-#ifdef XFT_SUPPORT
-    if (ISSET_OPTION (r, Opt_xft))
-    {
-	rxvt_alloc_xft_color (r, r->tabBar.fg, &(r->tabBar.xftfg));
-	rxvt_alloc_xft_color (r, r->tabBar.ifg, &(r->tabBar.xftifg));
-    }
-#endif
 
 
     sx = 0;
@@ -2356,7 +2380,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 	    {
 		r->tabBar.fg = xcol.pixel;
 #ifdef XFT_SUPPORT
-		rxvt_alloc_xft_color (r, xcol.pixel, &(r->tabBar.xftfg));
+		rxvt_alloc_xft_color( r, &xcol, &(r->tabBar.xftfg) );
 #endif
 		if (r->tabBar.rsfg)	/* free previous string */
 		    rxvt_free ((void*) r->h->rs[Rs_tabfg]);
@@ -2391,7 +2415,7 @@ rxvt_tabbar_change_color (rxvt_t* r, int item, const char* str)
 	    {
 		r->tabBar.ifg = xcol.pixel;
 #ifdef XFT_SUPPORT
-		rxvt_alloc_xft_color (r, xcol.pixel, &(r->tabBar.xftifg));
+		rxvt_alloc_xft_color( r, &xcol, &(r->tabBar.xftifg) );
 #endif
 		if (r->tabBar.rsifg)	/* free previous string */
 		    rxvt_free ((void*) r->h->rs[Rs_itabfg]);

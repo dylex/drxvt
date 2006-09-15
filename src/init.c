@@ -1724,20 +1724,8 @@ rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 	*pix_return = faded_xcol.pixel;
 # ifdef XFT_SUPPORT
 	if( NOT_NULL( xft_return ) )
-	{
-	    /*
-	     * Calling rxvt_alloc_xft_color() involves a second XQueryColor
-	     * call, so we alloc the xft color ourself here.
-	     */
-	    XRenderColor    xrc;
+	    rxvt_alloc_xft_color( r, &faded_xcol, xft_return );
 
-	    xrc.red	= faded_xcol.red;
-	    xrc.green	= faded_xcol.green;
-	    xrc.blue	= faded_xcol.blue;
-	    xrc.alpha	= 0xffff;
-
-	    XftColorAllocValue( r->Xdisplay, XVISUAL, XCMAP, &xrc, xft_return );
-	}
 # endif
     }
 }
@@ -1852,7 +1840,7 @@ rxvt_set_color( rxvt_t *r, int cIndex, const XColor *xcol )
     r->pixColorsFocus[cIndex] = xcol->pixel;
 #ifdef XFT_SUPPORT
     if( ISSET_OPTION( r, Opt_xft ) )
-	rxvt_alloc_xft_color( r, xcol->pixel, &r->xftColorsFocus[cIndex] );
+	rxvt_alloc_xft_color( r, xcol, &r->xftColorsFocus[cIndex] );
 #endif
 
     if( r->TermWin.fade )
@@ -1914,7 +1902,7 @@ rxvt_init_colors( rxvt_t *r )
 	    VTFG(r, i) = xcol.pixel;
 
 #ifdef XFT_SUPPORT
-	    rxvt_alloc_xft_color (r, VTFG(r, i), &(VTXFTFG(r, i)));
+	    rxvt_alloc_xft_color( r, &xcol, &(VTXFTFG(r, i)) );
 	    rxvt_fade_color( r, &xcol, &VTFG_FADE(r, i), &VTXFTFG_FADE(r, i) );
 #else
 	    rxvt_fade_color( r, &xcol, &VTFG_FADE(r, i), NULL );
@@ -1945,7 +1933,7 @@ rxvt_init_colors( rxvt_t *r )
 	    VTBG(r, i) = xcol.pixel;
 
 #ifdef XFT_SUPPORT
-	    rxvt_alloc_xft_color( r, VTBG(r, i), &(VTXFTBG(r, i)) );
+	    rxvt_alloc_xft_color( r, &xcol, &(VTXFTBG(r, i)) );
 	    rxvt_fade_color( r, &xcol, &VTBG_FADE(r, i), &VTXFTBG_FADE(r, i) );
 #else
 	    rxvt_fade_color( r, &xcol, &VTBG_FADE(r, i), NULL );
@@ -2142,13 +2130,20 @@ rxvt_init_colors( rxvt_t *r )
     if (r->h->rs[Rs_textShadow])
     {
 	XColor	xcol;
-	if (rxvt_parse_alloc_color (r, &xcol, r->h->rs[Rs_textShadow]))
+	if( rxvt_parse_alloc_color( r, &xcol, r->h->rs[Rs_textShadow] ) )
+	{
 	    r->TermWin.shadow = xcol.pixel;
-	else
-	    r->TermWin.shadow = r->pixColors[Color_Black];
 # ifdef XFT_SUPPORT
-	rxvt_alloc_xft_color (r, r->TermWin.shadow, &(r->TermWin.xftshadow));
+	    rxvt_alloc_xft_color( r, &xcol, &(r->TermWin.xftshadow));
 # endif
+	}
+	else
+	{
+	    r->TermWin.shadow = r->pixColorsFocus[Color_Black];
+# ifdef XFT_SUPPORT
+	    r->TermWin.xftshadow = r->xftColorsFocus[Color_Black];
+# endif
+	}
     }
 #endif
 }

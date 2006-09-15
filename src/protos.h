@@ -151,7 +151,7 @@ void             rxvt_set_icon_name               __PROTO((rxvt_t* r, const unsi
 void             rxvt_set_window_color            __PROTO((rxvt_t* r, int page, int idx, const char* color));
 void             rxvt_recolour_cursor             __PROTO((rxvt_t *r));
 #ifdef XFT_SUPPORT
-int              rxvt_alloc_xft_color             __PROTO((rxvt_t *r, unsigned long pixel, XftColor* xftcolor));
+int              rxvt_alloc_xft_color             __PROTO((rxvt_t *r, const XColor *xcol, XftColor* xftcolor));
 #endif
 int              rxvt_parse_alloc_color           __PROTO((rxvt_t* r, XColor *screen_in_out, const char* colour));
 int              rxvt_alloc_color                 __PROTO((rxvt_t* r, XColor *screen_in_out, const char* colour));

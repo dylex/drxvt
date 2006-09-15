@@ -2013,10 +2013,14 @@ rxvt_menubar_create (rxvt_t* r)
 	/*
 	 * Set up Xft stuff here.
 	 */
+	XColor	xcol;
+
 	r->menuBar.xftDraw = XftDrawCreate( r->Xdisplay, r->menuBar.win,
 		XVISUAL, XCMAP);
 
-	rxvt_alloc_xft_color( r, r->menuBar.fg, &r->menuBar.xftFore);
+	xcol.pixel = r->menuBar.fg;
+	XQueryColor( r->Xdisplay, XCMAP, &xcol );
+	rxvt_alloc_xft_color( r, &xcol, &r->menuBar.xftFore);
     }
     else
 #  endif

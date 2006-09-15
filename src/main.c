@@ -2415,22 +2415,33 @@ rxvt_set_colorfgbg(rxvt_t *r)
 #ifdef XFT_SUPPORT
 /* EXTPROTO */
 int
-rxvt_alloc_xft_color (rxvt_t* r, unsigned long pixel, XftColor* xftcolor)      
+rxvt_alloc_xft_color( rxvt_t* r, const XColor *xcol, XftColor* xftcolor )
 {
-    XColor          xcol;
+    /*
+     * xcol is an already allocated color, so we don't need a round trip to the
+     * server.
+     */
+
+    xftcolor->color.red	    = xcol->red;
+    xftcolor->color.green   = xcol->green;
+    xftcolor->color.blue    = xcol->blue;
+    xftcolor->color.alpha   = 0xffff;
+
+    xftcolor->pixel	    = xcol->pixel;
+
+    return 1;
+#if 0
     XRenderColor    render; 
 
     assert (xftcolor);
 
-    xcol.pixel = pixel;
-    if (!XQueryColor (r->Xdisplay, XCMAP, &xcol))
-	return 0;
+    render.red   = xcol->red;
+    render.green = xcol->green;
+    render.blue  = xcol->blue;
+    render.alpha = 0xffff; 
 
-    render.red   = xcol.red;
-    render.green = xcol.green;
-    render.blue  = xcol.blue;
-    render.alpha = 0xFFFF; 
-    return (XftColorAllocValue (r->Xdisplay, XVISUAL, XCMAP, &render, xftcolor));
+    return XftColorAllocValue(r->Xdisplay, XVISUAL, XCMAP, &render, xftcolor);
+#endif
 }
 #endif  /* XFT_SUPPORT */
 
