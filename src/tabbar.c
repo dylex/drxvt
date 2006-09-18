@@ -1183,9 +1183,11 @@ rxvt_append_page( rxvt_t* r, int profile,
 	return ;
     }
 
-    DBG_MSG( 1, (stderr,"append_page (%s, %s)\n",
-		title ? title : "NULL",
-		command ? command : "NULL") );
+    if( profile < 0 || profile >= MAX_PROFILES )
+    {
+	rxvt_print_error( "Warning: Profile %d out of range", profile );
+	profile = 0;
+    }
 
     /* indicate that we add a new tab */
     LTAB(r)++;

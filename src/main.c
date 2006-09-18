@@ -216,9 +216,7 @@ rxvt_init(int argc, const char *const *argv)
 	  {
 	    int profile = atoi( s );
 
-	    rxvt_append_page( r,
-		    ( profile < 0 || profile >= MAX_PAGES ? 0 : profile ),
-		    NULL, NULL );
+	    rxvt_append_page( r, profile, NULL, NULL );
 
 	    s = STRCHR( s, ',' );
 	  }
