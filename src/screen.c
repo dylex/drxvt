@@ -191,7 +191,7 @@ void rxvt_scr_adjust_col          (rxvt_t*, int, unsigned int);
 void rxvt_set_font_style          (rxvt_t*, int);
 int  rxvt_scr_change_view         (rxvt_t*, int, RUINT16T);
 void rxvt_scr_reverse_selection   (rxvt_t*, int);
-void rxvt_PasteIt                 (rxvt_t*, int, const unsigned char*, unsigned int);
+void rxvt_paste_str                 (rxvt_t*, int, const unsigned char*, unsigned int);
 int  rxvt_selection_request_other (rxvt_t*, int, Atom, int);
 void rxvt_selection_start_colrow  (rxvt_t*, int, int, int);
 void rxvt_selection_delimit_word  (rxvt_t*, int, enum page_dirn, const row_col_t*, row_col_t*);
@@ -2489,7 +2489,7 @@ escSetColor( char *s, int color, int fg)
 /* EXTPROTO */
 void
 rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
-	const char *pipeName )
+	int linecont, const char *pipeName )
 {
 #ifdef PRINTPIPE
     int		row, col, nrows, row_offset;
@@ -2522,13 +2522,19 @@ rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
 	txt = PSCR( r, page ).text[ row + row_offset ];
 	rnd = PSCR( r, page ).rend[ row + row_offset ];
 
-	/* Trim trailing spaces */
-	for(
-	     lineEnd = r->TermWin.ncol - 1;
-	     lineEnd >= 0 && isspace( txt[lineEnd] );
-	     lineEnd--
-	   )
-	;
+	if( linecont && PSCR(r, page).tlen[row+row_offset] == -1 )
+	    /* Line continues over. Don't trim trailing spaces */
+	    lineEnd = r->TermWin.ncol - 1;
+	else
+	{
+	    /* Trim trailing spaces */
+	    for(
+		 lineEnd = r->TermWin.ncol - 1;
+		 lineEnd >= 0 && isspace( txt[lineEnd] );
+		 lineEnd--
+	       )
+	    ;
+	}
 
 	if( pretty )
 	{
@@ -2584,14 +2590,16 @@ rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
 		    fprintf( fd, "%.*s", col - start, txt + start );
 
 	    }
-	    fputc( '\n', fd );
-	}
+	} /* if( pretty ) */
 
 	else
 	    /* Vanilla text */
-	    fprintf( fd, "%.*s\n", (lineEnd + 1), txt );
+	    fprintf( fd, "%.*s", (lineEnd + 1), txt );
 
-    }
+	if( !linecont || PSCR(r, page).tlen[row+row_offset] != -1 )
+	    fputc( '\n', fd );
+
+    } /* for( row ... ) */
 
     rxvt_pclose_printer(fd);
 #endif
@@ -3510,7 +3518,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 	    *srp = SET_FGCOLOR(*srp, ccol1);
 	    *srp = SET_BGCOLOR(*srp, ccol2);
-#endif
+#endif /* NO_CURSORCOLOR */
+
 #ifdef MULTICHAR_SET
 	    if (IS_MULTI1(*srp))
 	    {
@@ -4689,7 +4698,8 @@ rxvt_selection_check(rxvt_t* r, int page, int check_more)
  */
 /* INTPROTO */
 void
-rxvt_PasteIt(rxvt_t* r, int page, const unsigned char *data, unsigned int nitems)
+rxvt_paste_str(rxvt_t* r, int page,
+	const unsigned char *data, unsigned int nitems)
 {
     unsigned int    i, j, n;
     unsigned char  *ds = rxvt_malloc(PROP_SIZE);
@@ -4790,13 +4800,13 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 	      && cl
 	   )
 	{
-	    rxvt_PasteIt(r, ATAB(r), (const unsigned char*) cl[0],
+	    rxvt_paste_str(r, ATAB(r), (const unsigned char*) cl[0],
 		    STRLEN(cl[0]));
 	    XFreeStringList(cl);
 	}
 	else
 #endif
-	    rxvt_PasteIt(r, ATAB(r), ct.value, (unsigned int)ct.nitems);
+	    rxvt_paste_str(r, ATAB(r), ct.value, (unsigned int)ct.nitems);
 
 	if (bytes_after == 0)
 	    break;
@@ -4895,7 +4905,7 @@ rxvt_selection_request(rxvt_t* r, int page, Time tm, int x, int y)
     {
 	DBG_MSG( 2, ( stderr, "rxvt_selection_request %d: pasting internal\n",
 		    page ) );
-	rxvt_PasteIt( r, page, SEL(r).text, SEL(r).len );
+	rxvt_paste_str( r, page, SEL(r).text, SEL(r).len );
 	return;
     }
     else

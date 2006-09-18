@@ -263,7 +263,7 @@ void             rxvt_scr_touch                   __PROTO((rxvt_t* r, int page, 
 int              rxvt_scr_move_to                 __PROTO((rxvt_t* r, int page, int y, int len));
 int              rxvt_scr_page                    __PROTO((rxvt_t* r, int page, enum page_dirn direction, int nlines));
 void             rxvt_scr_bell                    __PROTO((rxvt_t *r, int page));
-void             rxvt_scr_printscreen             __PROTO((rxvt_t* r, int page, int fullhist, int pretty, const char *pipeName));
+void             rxvt_scr_printscreen             __PROTO((rxvt_t* r, int page, int fullhist, int pretty, int linecont, const char *pipeName));
 void             rxvt_scr_refresh                 __PROTO((rxvt_t* r, int page, unsigned char refresh_type));
 void             rxvt_scr_clear                   __PROTO((rxvt_t* r, int page));
 void             rxvt_scr_dump                    __PROTO((rxvt_t* r, int page, int fd));

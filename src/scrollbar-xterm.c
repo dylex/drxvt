@@ -64,9 +64,9 @@ rxvt_scrollbar_init_xterm (rxvt_t* r)
     UNSET_GC(r->scrollBar.gc);
 
     /* Initialize the colors */
-    r->scrollBar.xterm_fg = r->pixColors[Color_fg];
-    r->scrollBar.xterm_bg = r->pixColors[Color_bg];
-    r->scrollBar.xterm_shadow = r->pixColors[Color_border];
+    r->scrollBar.xterm_fg = r->pixColorsFocus[Color_fg];
+    r->scrollBar.xterm_bg = r->pixColorsFocus[Color_bg];
+    r->scrollBar.xterm_shadow = r->pixColorsFocus[Color_border];
 
 
     gcvalue.stipple = XCreateBitmapFromData (r->Xdisplay,

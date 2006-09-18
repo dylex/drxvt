@@ -281,8 +281,8 @@ rxvt_scrollbar_create (rxvt_t* r)
 			r->TermWin.parent,
 			sb_x, sb_y, sb_w, sb_h,
 			0,
-			r->pixColors[Color_fg],
-			r->pixColors[Color_bg]);
+			r->pixColorsFocus[Color_fg],
+			r->pixColorsFocus[Color_bg]);
     assert (IS_WIN(r->scrollBar.win));
 
 # ifdef DEBUG_X

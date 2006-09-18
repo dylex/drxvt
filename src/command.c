@@ -4996,7 +4996,7 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 	    switch (arg[0])
 	    {
 		case 0:		/* initiate transfer to primary aux device */
-		    rxvt_scr_printscreen( r, page, 0, 0, NULL );
+		    rxvt_scr_printscreen( r, page, 0, 0, 0, NULL );
 		    break;
 		case 5:		/* start relay to primary aux device */
 		    rxvt_process_print_pipe( r, page );

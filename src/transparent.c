@@ -1181,7 +1181,7 @@ xrenderShadeParentPixmap( rxvt_t *r, Pixmap pmap,
     /* Shade root background. */
     xrenderShadeIntersect( r, pic,
 	    ISSET_PIXCOLOR( r->h, Color_tint ) ?
-		    r->pixColors[Color_tint] : VTBG(r, 0),
+		    r->pixColorsFocus[Color_tint] : VTBG(r, 0),
 	    r->TermWin.shade,
 	    nx, ny, nw, nh,
 	    rx, ry, rw, rh);
@@ -1299,7 +1299,7 @@ shade_ximage (rxvt_t* r, XImage* srcImage)
 
     if (ISSET_PIXCOLOR (r->h, Color_tint) && r->h->rs[Rs_shade])
     {
-	color.pixel = r->pixColors[Color_tint];
+	color.pixel = r->pixColorsFocus[Color_tint];
 	XQueryColor (r->Xdisplay, XCMAP, &color);
 
 	shade = r->TermWin.shade;

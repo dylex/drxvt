@@ -30,6 +30,10 @@ Gautam Iyer <gi1242@users.sourceforge.net>
        14. Removed round trip to server when allocing Xft colors. (Reduces
 	   protocol requests by about 750 on startup, which should speed
 	   things up on a slow connection).
+       15. Defined CURSOR_COLOR_IS_RENDITION_COLOR by default in
+	   src/feature.h. This makes the cursor better visible when the cursor
+	   color is not defined, and makes the behaviour similar to the
+	   default behaviour of Xterm.
 
     * Enhancements:
 	0. Really busy tabs (even with Xft+anti aliasing) no longer starves

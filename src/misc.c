@@ -274,7 +274,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 		case 't':
 		    /* Active tab title */
 		    j += snprintf( dst + j, maxLen -j,
-					"%s", PVTS(r, page)->tab_title );
+			    "%s", PVTS(r, page)->tab_title );
 		    i ++;
 		    break;
 
@@ -308,7 +308,14 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 		     */
 		    if( NOT_NULL( r->selection.text ) )
 			j += snprintf( dst + j, maxLen -j,
-					    "%s", r->selection.text );
+				"%s", r->selection.text );
+		    i++;
+		    break;
+
+		case 'p':
+		    /* Pid of process in current tab */
+		    j += snprintf( dst + j, maxLen - j, "%d",
+			    PVTS(r, page)->cmd_pid );
 		    i++;
 		    break;
 

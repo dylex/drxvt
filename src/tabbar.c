@@ -1972,12 +1972,12 @@ rxvt_tabbar_create (rxvt_t* r)
     /* initialize the colors */
     if (XDEPTH <= 2)
     {
-	r->tabBar.fg = r->pixColors[Color_fg];
-	r->tabBar.bg = r->pixColors[Color_bg];
-	r->tabBar.ifg = r->pixColors[Color_fg];
-	r->tabBar.ibg = r->pixColors[Color_bg];
-	r->tabBar.frame = r->pixColors[Color_bg];
-	r->tabBar.delimit = r->pixColors[Color_fg];
+	r->tabBar.fg = r->pixColorsFocus[Color_fg];
+	r->tabBar.bg = r->pixColorsFocus[Color_bg];
+	r->tabBar.ifg = r->pixColorsFocus[Color_fg];
+	r->tabBar.ibg = r->pixColorsFocus[Color_bg];
+	r->tabBar.frame = r->pixColorsFocus[Color_bg];
+	r->tabBar.delimit = r->pixColorsFocus[Color_fg];
     }
     else 
     {
@@ -2068,10 +2068,10 @@ rxvt_tabbar_create (rxvt_t* r)
 	}
 
 	/* create the delimit color (average of 3*fg & bg) */
-	color.pixel	= r->pixColors[Color_fg];
+	color.pixel	= r->pixColorsFocus[Color_fg];
 	XQueryColor( r->Xdisplay, XCMAP, &color );
 
-	bgcolor.pixel	= r->pixColors[Color_bg];
+	bgcolor.pixel	= r->pixColorsFocus[Color_bg];
 	XQueryColor( r->Xdisplay, XCMAP, &bgcolor );
 
 	color.red   = ( bgcolor.red	+ 3 * color.red	    ) / 4;

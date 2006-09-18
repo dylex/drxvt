@@ -183,7 +183,7 @@ rxvt_resize_pixmap(rxvt_t *r, int page)
 	/* So be it: I'm not using pixmaps */
 	return;
 
-    gcvalue.foreground = r->pixColors[Color_bg];
+    gcvalue.foreground = r->pixColorsFocus[Color_bg];
     gc = XCreateGC(r->Xdisplay, PVTS(r, page)->vt, GCForeground, &gcvalue);
 
     if (IS_GC(gc) && IS_PIXMAP(PVTS(r, page)->bg.pixmap)) {

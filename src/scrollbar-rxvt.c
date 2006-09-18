@@ -150,10 +150,10 @@ rxvt_scrollbar_init_rxvt (rxvt_t* r)
 
 
     /* Initialize the colors */
-    r->scrollBar.rxvt_fg = r->pixColors[Color_trough];
-    r->scrollBar.rxvt_bg = r->pixColors[Color_bottomShadow];
-    r->scrollBar.rxvt_topshadow = r->pixColors[Color_topShadow];
-    r->scrollBar.rxvt_botshadow = r->pixColors[Color_bottomShadow];
+    r->scrollBar.rxvt_fg = r->pixColorsFocus[Color_trough];
+    r->scrollBar.rxvt_bg = r->pixColorsFocus[Color_bottomShadow];
+    r->scrollBar.rxvt_topshadow = r->pixColorsFocus[Color_topShadow];
+    r->scrollBar.rxvt_botshadow = r->pixColorsFocus[Color_bottomShadow];
 
 
     gcvalue.foreground = r->scrollBar.rxvt_fg;

@@ -1632,12 +1632,16 @@ to get true full screen. This will only work if you are running an EWMH compatib
 Set title of active tab to selection. (The selection must be owned by
 .Nm )
 .\" ------------------------------------------------------------
-.It Ic PrintScreen Oo Fl ps Oc Op Ar command
-Dump screen to printer. If the
+.It Ic PrintScreen Oo Fl psn Oc Op Ar command
+Dump screen to printer (or
+.Ar command ) .
+If
 .Fl p
-option is specified, then the output is pretty printed (i.e. escape sequences are used to get the same color in the output as on your screen). If the
+is specified, then the output is pretty printed (i.e. escape sequences are used to get the same color in the output as on your screen). If
 .Fl s
-option is specified, then the entire scroll back is printed (instead of just the current screen). Finally, if command is specified it is used as the printer pipe (if not the value of
+is specified, then the entire scroll back is printed (instead of just the current screen). If
+.Fl n
+is specified, then every screen line is terminated with a newline char (by default screen lines that wrap to the next line are not terminated with a newline). Finally, if command is specified it is used as the printer pipe (if not the value of
 .Ic printPipe
 or the compiled in default is used).
 .\" ------------------------------------------------------------
@@ -1677,12 +1681,8 @@ Char with octal ASCII code
 .It Sy ^@ , ^A .. ^Z .. ^_ , ^?
 Control-@, Control-A ...
 .Pp
-.It Sy %s
-Text selected in the
-.Nm
-window.
-.It Sy %S
-If the process in this tab is dead, then it expands to the exit status of the child process. Otherwise left unchanged.
+.It Sy %p
+PID of child process in current tab.
 .It Sy %n
 Tab number.
 .It Sy % Ns Sy N
@@ -1693,6 +1693,12 @@ if the process exited normally (e.g. by calling
 or
 .Sq abnormally
 otherwise. (Note this is independent of the exit status).
+.It Sy %s
+Text selected in the
+.Nm
+window.
+.It Sy %S
+If the process in this tab is dead, then it expands to the exit status of the child process. Otherwise left unchanged.
 .It Sy %t
 Tab title.
 .El

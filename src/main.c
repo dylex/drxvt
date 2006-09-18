@@ -507,8 +507,8 @@ rxvt_clean_exit (rxvt_t* r)
     XCloseDisplay (r->Xdisplay);
     SET_NULL(r->Xdisplay);
 
-    rxvt_free (r->tabstop);	    SET_NULL(r->tabstop);
-    rxvt_free (r->pixColors);	    SET_NULL(r->pixColors);
+    rxvt_free (r->tabstop);		    SET_NULL(r->tabstop);
+    rxvt_free (r->pixColorsFocus);	    SET_NULL(r->pixColorsFocus);
 
     if( NOT_NULL( r->pixColorsUnfocus ) )
     {
@@ -2369,13 +2369,13 @@ rxvt_set_colorfgbg(rxvt_t *r)
     STRCPY(fstr, "default");
     STRCPY(bstr, "default");
     for (i = Color_Black; i <= Color_White; i++)
-	if (r->pixColors[Color_fg] == r->pixColors[i])
+	if (r->pixColorsFocus[Color_fg] == r->pixColorsFocus[i])
 	{
 	    sprintf(fstr, "%d", (i - Color_Black));
 	    break;
 	}
     for (i = Color_Black; i <= Color_White; i++)
-	if (r->pixColors[Color_bg] == r->pixColors[i])
+	if (r->pixColorsFocus[Color_bg] == r->pixColorsFocus[i])
 	{
 	    sprintf(bstr, "%d", (i - Color_Black));
 #ifdef BACKGROUND_IMAGE
@@ -2391,9 +2391,9 @@ rxvt_set_colorfgbg(rxvt_t *r)
     for (i = minCOLOR; i <= maxCOLOR; i++)
     {
 	if (
-		r->pixColors[Color_fg] == r->pixColors[i]
+		r->pixColorsFocus[Color_fg] == r->pixColorsFocus[i]
 # ifndef NO_BOLD_UNDERLINE_REVERSE
-		&& r->pixColors[Color_fg] == r->pixColors[Color_BD]
+		&& r->pixColorsFocus[Color_fg] == r->pixColorsFocus[Color_BD]
 # endif
 		/* if we wanted boldFont to have precedence */
 # if 0	/* was ifndef NO_BOLDFONT */
@@ -2401,7 +2401,7 @@ rxvt_set_colorfgbg(rxvt_t *r)
 # endif	
 	   )
 	    r->h->colorfgbg = SET_FGCOLOR(r->h->colorfgbg, i);
-	if (r->pixColors[Color_bg] == r->pixColors[i])
+	if (r->pixColorsFocus[Color_bg] == r->pixColorsFocus[i])
 	    r->h->colorfgbg = SET_BGCOLOR(r->h->colorfgbg, i);
     }
 #endif	/* NO_BRIGHTCOLOR */
@@ -2555,8 +2555,8 @@ rxvt_IM_set_position(rxvt_t* r, XPoint *pos)
 void
 rxvt_IM_set_color(rxvt_t* r, unsigned long *fg, unsigned long *bg)
 {
-    *fg = r->pixColors[Color_fg];
-    *bg = r->pixColors[Color_bg];
+    *fg = r->pixColorsFocus[Color_fg];
+    *bg = r->pixColorsFocus[Color_bg];
 }
 
 /* Checking whether input method is running. */

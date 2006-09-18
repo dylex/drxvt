@@ -3203,8 +3203,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
      */
 
 #ifdef PREFER_24BIT
-    attributes.background_pixel = r->pixColors[Color_bg];
-    attributes.border_pixel = r->pixColors[Color_border];
+    attributes.background_pixel = r->pixColorsFocus[Color_bg];
+    attributes.border_pixel = r->pixColorsFocus[Color_border];
     attributes.colormap = XCMAP;
     r->TermWin.parent = XCreateWindow(r->Xdisplay, parent,
 		    r->szHint.x, r->szHint.y,
@@ -3220,8 +3220,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 			r->szHint.width,
 			r->szHint.height,
 			r->TermWin.ext_bwidth,
-			r->pixColors[Color_border],
-			r->pixColors[Color_bg]);
+			r->pixColorsFocus[Color_border],
+			r->pixColorsFocus[Color_bg]);
 #endif
 
 #ifdef XFT_SUPPORT
@@ -3395,8 +3395,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     if (NOTSET_OPTION(r, Opt_xft))
 #endif
     gcvalue.font = r->TermWin.font->fid;
-    gcvalue.foreground = r->pixColors[Color_fg];
-    gcvalue.background = r->pixColors[Color_bg];
+    gcvalue.foreground = r->pixColorsFocus[Color_fg];
+    gcvalue.background = r->pixColorsFocus[Color_bg];
     gcvalue.graphics_exposures = 1;
     gcmask = GCForeground | GCBackground | GCGraphicsExposures;
 #ifdef XFT_SUPPORT

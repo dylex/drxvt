@@ -479,12 +479,12 @@
 #define DEFAULT_BLINK_TIME	    (500)
 #define MAX_BLINK_TIME		    (5000)
 
-/* Make text cursor highlighting be the same as color of char
-** that the cursor is currently on */
 /*
+ * Make text cursor highlighting be the same as color of char that the cursor is
+ * currently on.
+ */
 #define CURSOR_COLOR_IS_RENDITION_COLOR
-#define SIMULATE_LINUX_CONSOLE_CURSOR_COLOR
-*/
+/* #define SIMULATE_LINUX_CONSOLE_CURSOR_COLOR */
 
 /* Set tab title on Xterm escape sequence to change window title */
 #define SET_TAB_TITLE_ON_XTERM_SEQUENCE

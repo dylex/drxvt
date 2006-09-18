@@ -33,7 +33,6 @@ Core:
 9   UTF-8 support.
 9   Monitor tabs for output / silence (very easy as of 2006-09-02).
 8   Better performance with vttest.
-7   Draw the cursor with reverse video if the colors are not specified.
 7   I18N support
 7   regexp based selection, and URL highlighting
 7   Smart insertion of newlines in the selection
@@ -142,4 +141,4 @@ That's it. Happy hacking
 --------------------------------------------------------------------------------
 
  Authors	: Jimmy Zhou, Gautam Iyer
- Last Changed	: Thu 14 Sep 2006 05:25:31 PM PDT
+ Last Changed	: Sun 17 Sep 2006 12:13:12 AM PDT
