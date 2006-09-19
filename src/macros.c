@@ -801,7 +801,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
     const int	maxLen = 1024;
     char	expstr[ maxLen ];
     char	*astr;
-    int		alen;
+    int		alen,
+		retval = 1;	    /* Succeed by default */
 
     if( IS_NULL( action->str ) )
     {
@@ -946,6 +947,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		{
 		    rxvt_kill_page (r, tabno);
 		}
+		else
+		    retval = -1;
 	    }
 	    else
 		rxvt_exit_request( r );
@@ -1005,6 +1008,9 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		else
 		    rxvt_tabbar_move_tab( r, tabno-1 );
 	    }
+
+	    else
+		retval = -1;
 	    break;
 
 	case MacroFnScroll:
@@ -1039,6 +1045,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	case MacroFnPaste:
 	    if (NOT_NULL(ev))
 		rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
+	    else
+		retval = -1;
 	    break;
 
 	case MacroFnToggleSubwin:
@@ -1070,6 +1078,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	case MacroFnToggleTransp:
 #ifdef TRANSPARENT
 	    rxvt_toggle_transparency(r);
+#else
+	    retval = -1;
 #endif
 	    break;
 
@@ -1102,6 +1112,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		    default:
 			rxvt_print_error( "Badly formed argument '%s' to %s\n",
 				astr, macroNames[action->type] );
+			retval = -1;
 			break;
 		}
 
@@ -1143,6 +1154,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    else if (NOT_NULL(r->selection.text))
 		rxvt_tabbar_set_title( r, ATAB(r),
 			(const unsigned char TAINTED*) r->selection.text);
+	    else
+		retval = -1;
 	    break;
 
 	case MacroFnPrintScreen:
@@ -1174,6 +1187,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			default:
 			    rxvt_print_error( "Bad option %c to macro %s",
 				    *s, macroNames[action->type] );
+			    retval = -1;
 		    }
 		}
 
@@ -1203,8 +1217,8 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    }
 	    cfile[PATH_MAX-1] = (char) 0;   /* Null terminate */
 
-	    return rxvt_save_options (r, cfile) ? 1 : -1;
-	    /* Not reached */
+	    retval = rxvt_save_options (r, cfile) ? 1 : -1;
+	    break;
 	}
 
 	case MacroFnToggleMacros:
@@ -1216,9 +1230,10 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 	    rxvt_print_error( "Macro type '%s' not implemented yet",
 		    macroNames[action->type]);
-	    return -1;
+	    retval = -1;
     }
-    return 1;
+
+    return retval;
 }
 /* }}} */
 

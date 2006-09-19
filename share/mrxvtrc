@@ -45,8 +45,8 @@ Mrxvt.macro.Shift+KP_Subtract:		ResizeFont -1
 #
 # ---------------------------------------------------------------------------- #
 Mrxvt.macro.Ctrl+Shift+t:		NewTab
-Mrxvt.macro.Ctrl+Shift+w:		ToggleHold -2
-Mrxvt.macro.Add+Ctrl+Shift+w:		Close 0
+Mrxvt.macro.Ctrl+Shift+w:		Close 0
+Mrxvt.macro.Add+Ctrl+Shift+w:		ToggleHold -6
 Mrxvt.macro.Ctrl+Shift+q:		Close
 
 Mrxvt.macro.Ctrl+Prior:			GotoTab -1

@@ -1762,7 +1762,11 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 		    )
 		  )
 		{
-		    AVTS(r)->holdOption &= ~HOLD_NORMALBIT;
+		    /*
+		     * 2006-09-19 gi1242: If user presses the X button, don't
+		     * hold the tab open, regardless of exit status.
+		     */
+		    AVTS(r)->holdOption &= ~(HOLD_NORMALBIT|HOLD_STATUSBIT);
 		    rxvt_kill_page (r, ATAB(r));
 		}
 		break;
