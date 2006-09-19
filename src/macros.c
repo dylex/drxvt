@@ -227,10 +227,20 @@ macro_cmp( const void *p1, const void *p2)
 	     	    *macro2 = p2;
 
     /* First compare keysyms, then modflags. Ignore the "Primary" modifier */
-    return  (macro1->keysym == macro2->keysym)			?
-		(macro1->modFlags & ~MACRO_PRIMARY)
-			- (macro2->modFlags & ~MACRO_PRIMARY)	:
-		macro1->keysym - macro2->keysym;
+    if( macro1->keysym == macro2->keysym )
+    {
+	if(
+	     (macro1->modFlags & ~MACRO_PRIMARY & MACRO_MODMASK)
+		== (macro2->modFlags & ~MACRO_PRIMARY & MACRO_MODMASK)
+	  )
+	    return MACRO_GET_NUMBER( macro1->modFlags )
+			- MACRO_GET_NUMBER( macro2->modFlags );
+	else
+	    return (macro1->modFlags & ~MACRO_PRIMARY & MACRO_MODMASK)
+			- (macro2->modFlags & ~MACRO_PRIMARY & MACRO_MODMASK);
+    }
+    else
+	return macro1->keysym - macro2->keysym;
 }
 
 /* {{{1 macro_set_number( flag, num ) */
@@ -615,13 +625,17 @@ rxvt_cleanup_macros( rxvt_t *r )
 
     DBG_MSG( 3, ( stderr, "Read %d macros. (Have space for %d macros)\n",
 		r->nmacros, r->maxMacros));
+
 #if 0	/* {{{ Debug info */
     for( i=0; i < r->nmacros; i++)
     {
-	DBG_TMSG( 3, ( stderr,
-		"%2d. Key 0x%08lx, Mods 0x%02hhx, Type %2hu, Action: %s\n",
-		i, r->macros[i].keysym, r->macros[i].modFlags,
-		r->macros[i].action.type, r->macros[i].action.str ) );
+	fprintf( stderr, "%2d. Key 0x%08lx, Mods 0x%1hhx, Chain# 0x%1hhx,"
+		" Type %s %s\n",
+		i, r->macros[i].keysym, r->macros[i].modFlags & MACRO_MODMASK,
+		MACRO_GET_NUMBER( r->macros[i].modFlags ),
+		macroNames[r->macros[i].action.type],
+		r->macros[i].action.str && *r->macros[i].action.str != '\e' ?
+		    r->macros[i].action.str : NULL );
     }
 #endif	/* }}} */
 }

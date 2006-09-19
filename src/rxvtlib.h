@@ -774,7 +774,7 @@ typedef struct {
 
 /* Get / set the macro number from modFlags */
 #define MACRO_GET_NUMBER(x)	\
-    ( (x) & ~MACRO_MODMASK ) >> MACRO_N_MOD_BITS
+    (( (x) & ~MACRO_MODMASK ) >> MACRO_N_MOD_BITS)
 
 
 /*
