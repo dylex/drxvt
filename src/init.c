@@ -3567,7 +3567,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 	    /* NOT REACHED */
 
 	default:
-	    DBG_MSG( 5, ( stderr, "Forked %s", astr ) );
+	    DBG_MSG( 5, ( stderr, "Forked %s", cmd ) );
 	    return 1;
     }
 }
