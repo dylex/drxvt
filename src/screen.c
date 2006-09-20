@@ -4709,9 +4709,8 @@ rxvt_paste_str(rxvt_t* r, int page,
     unsigned char  *ds = rxvt_malloc(PROP_SIZE);
     
     /*
-    ** convert normal newline chars into common keyboard Return key
-    ** sequence
-    */
+     * Convert normal newline chars into common keyboard Return key sequence
+     */
     for (i = 0; i < nitems; i += PROP_SIZE)
     {
 	n = min(nitems - i, PROP_SIZE);
@@ -4761,33 +4760,39 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 
     for (;;)
     {
-	if (XGetWindowProperty(r->Xdisplay, win, prop, (long)(nread/4),
-	    (long)(PROP_SIZE / 4), delete_prop, AnyPropertyType,
-	    &ct.encoding, &ct.format, &ct.nitems, &bytes_after,
-	    &ct.value) != Success)
+	if(
+	     XGetWindowProperty( r->Xdisplay, win, prop, (long) (nread/4),
+		    (long) (PROP_SIZE / 4), delete_prop, AnyPropertyType,
+		    &ct.encoding, &ct.format, &ct.nitems, &bytes_after,
+		    &ct.value)
+		!= Success
+	  )
 	    break;
-	if (ct.encoding == None)
+	if( ct.encoding == None )
 	{
 	    DBG_MSG( 2, (stderr,
 			"rxvt_selection_paste: property didn't exist!\n"));
 	    break;
 	}
+
 	if (ct.value == NULL)
 	{
 	    DBG_MSG( 2, (stderr,
 			"rxvt_selection_paste: property shooting blanks!\n"));
 	    continue;
 	}
+
 	if (ct.nitems == 0)
 	{
 	    DBG_MSG( 2, (stderr,
 		    "rxvt_selection_paste: property empty - also INCR end\n"));
-	    if (r->h->selection_wait == Sel_normal && nread == 0)
+
+	    if( r->h->selection_wait == Sel_normal && nread == 0 )
 	    {
 		/*
-		** pass through again trying CUT_BUFFER0 if we've come
-		** from XConvertSelection() but nothing was presented
-		*/
+		 * pass through again trying CUT_BUFFER0 if we've come from
+		 * XConvertSelection() but nothing was presented
+		 */
 		DBG_MSG( 2, ( stderr,
 			    "rxvt_selection_request: pasting CUT_BUFFER0\n"));
 		rxvt_selection_paste(r, XROOT, XA_CUT_BUFFER0, False);
@@ -4810,15 +4815,18 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 	}
 	else
 #endif
-	    rxvt_paste_str(r, ATAB(r), ct.value, (unsigned int)ct.nitems);
+	    rxvt_paste_str(r, ATAB(r), ct.value, (unsigned int) ct.nitems);
 
-	if (bytes_after == 0)
+	if( bytes_after == 0 )
 	    break;
+
 	XFree(ct.value);
+	ct.value = 0;
     }
 
     if (ct.value)
 	XFree(ct.value);
+
     if (r->h->selection_wait == Sel_normal)
 	r->h->selection_wait = Sel_none;
 

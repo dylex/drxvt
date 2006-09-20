@@ -3095,6 +3095,7 @@ rxvt_process_clientmessage(rxvt_t* r, XClientMessageEvent* ev)
 	   &Size, &RemainingBytes, &data);
 	XChangeProperty(r->Xdisplay, XROOT, XA_CUT_BUFFER0,
 	    XA_STRING, 8, PropModeReplace, data, STRLEN(data));
+
 	rxvt_selection_paste(r, ATAB(r), XROOT, XA_CUT_BUFFER0, True);
 	XSetInputFocus(r->Xdisplay, XROOT, RevertToNone, CurrentTime);
     }
