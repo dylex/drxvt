@@ -304,6 +304,12 @@
 # define ACS_CHARS ".#    o+  ----+---__++--|<> =#. "
 #endif
 
+/*
+ * When executing external commands (e.g. via NewTab macro) use attempt to word
+ * split at quotes internally.
+ */
+/* #define INTERNAL_ARGV_SPLIT */
+
 /*--------------------------------BELL----------------------------------*/
 /*
  * Disable all bell indications

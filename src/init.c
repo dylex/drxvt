@@ -2526,58 +2526,59 @@ rxvt_string_to_argv( const char *string, int *argc )
 #else /* !INTERNAL_ARGV_SPLIT */
 
     /*
-     * Pass strings beginning with "!" to /bin/sh -c
+     * Pass strings beginning with "!" but not "!!" to /bin/sh -c
      */
-    if( *string == '!' )
+    if( *string == '!' && *(++string) != '!' )
     {
-
 	/* Pass command to the shell for word splitting */
 	pret[i++] = STRDUP( "/bin/sh" );
 	pret[i++] = STRDUP( "-c" );
-	pret[i++] = STRDUP( string + 1 );
-
-	goto DoneArgv;
+	pret[i++] = STRDUP( string );
     }
 
-
-    /*
-     * Split command into words at spaces. White spaces can be quoted with \
-     */
-    pcur = string;
-    for( ; i < MAX_ARGV && *pcur; i++ )
+    else
     {
-	const int	max_argv_len = 1024;
-	char		argval[max_argv_len];
-	int		j = 0;
-
-	/* Skip leading spaces */
-	while( *pcur == ' ' || *pcur == '\t' ) pcur++;
-
-	while( *pcur && *pcur != ' ' && *pcur != '\t' && j < max_argv_len - 1 )
+	/*
+	 * Split command into words at spaces. White spaces can be quoted with \
+	 */
+	pcur = string;
+	for( ; i < MAX_ARGV && *pcur; i++ )
 	{
-	    if( *pcur == '\\' )
+	    const int	max_argv_len = 1024;
+	    char	argval[max_argv_len];
+	    int		j = 0;
+
+	    /* Skip leading spaces */
+	    while( *pcur == ' ' || *pcur == '\t' ) pcur++;
+
+	    while(
+		    *pcur && *pcur != ' ' && *pcur != '\t' &&
+		    j < max_argv_len - 1
+		 )
 	    {
-		pcur ++;
+		if( *pcur == '\\' )
+		{
+		    pcur ++;
 
-		if( *pcur != ' ' && *pcur != '\t' && *pcur != '\\' )
-		    argval[j++] = '\\'; /* Copy backslash over */
+		    if( *pcur != ' ' && *pcur != '\t' && *pcur != '\\' )
+			argval[j++] = '\\'; /* Copy backslash over */
 
-		argval[j++] = *pcur++;
+		    argval[j++] = *pcur++;
+		}
+
+		else
+		    argval[j++] = *pcur++;
 	    }
 
+	    if( j )
+	    {
+		argval[j] = '\0';
+		pret[i] = STRDUP( argval );
+	    }
 	    else
-		argval[j++] = *pcur++;
+		break;
 	}
-
-	if( j )
-	{
-	    argval[j] = '\0';
-	    pret[i] = STRDUP( argval );
-	}
-	else
-	    break;
-    }
-DoneArgv:
+    } /* else [ if( *string != '!' ) ] */
 #endif /* !INTERNAL_ARGV_SPLIT */
 
 #undef MAX_ARGV

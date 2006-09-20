@@ -273,7 +273,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 
 		case 'n':
 		    /* Active tab number */
-		    j += snprintf( dst + j, maxLen - j, "%d", page );
+		    j += snprintf( dst + j, maxLen - j, "%d", page+1 );
 		    i ++;
 		    break;
 

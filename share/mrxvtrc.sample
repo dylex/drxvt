@@ -266,10 +266,10 @@ Mrxvt.macro.Ctrl+Shift+F4:	NewTab -4
 # tab. Useful for searching, or cut/paste from the scroll back buffer.
 #
 Mrxvt.macro.Primary+Ctrl+Shift+question: PrintScreen -ps perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
-Mrxvt.macro.Primary+Add+Ctrl+Shift+question: NewTab "(Search)" /bin/sh -c "less -ifLR +G /tmp/scrollback; rm /tmp/scrollback"
+Mrxvt.macro.Primary+Add+Ctrl+Shift+question: NewTab "(Tab %n scrollback)" \!less -ifLR +G /tmp/%p-scrollback; rm /tmp/%p-scrollback
 
 Mrxvt.macro.Primary+Ctrl+slash: PrintScreen -s perl -e '$_=join("",<STDIN>); s/\n+$/\n/g; print' > /tmp/scrollback
-Mrxvt.macro.Primary+Add+Ctrl+slash: NewTab "(Search)" /bin/sh -c 'view +"syn off|set nospell notitle |normal G" /tmp/scrollback; rm /tmp/scrollback'
+Mrxvt.macro.Primary+Add+Ctrl+slash: NewTab "(Tab %n scrollback)" view +"syn off|set nospell notitle |normal G" /tmp/%p-scrollback; rm /tmp/%p-scrollback
 
 
 # ---------------------------------------------------------------------------- #

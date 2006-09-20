@@ -853,8 +853,17 @@ Cursor blink interval (ms)
 Use a borderless window.
 .Op Cm borderLess
 .
-.It Fl blc Ar string
-bell command instead of beeping
+.It Fl blc Ar cmd
+Bell command instead of beeping. If
+.Ar cmd
+begins with
+.Sq \&!
+then it is passed to
+.Cd /bin/sh -c
+for execution. Otherwise it is split into words at spaces or tabs only, and executed via
+.Xr execvp 3 .
+If you don't want a space or tab to cause word splitting, then precede it with a
+.Sq Sy \e .
 .Op Cm bellCommand
 .
 .It Fl bw Ns | Ns Fl w Ar number
@@ -1288,7 +1297,7 @@ Activate left tab (Primary only)
 .It Shift+Right
 Activate right tab (Primary only)
 .It Ctrl+Shift+n
-Create a new tab
+Create a new tab with the same profile as the current tab.
 .El
 .Pp
 .
@@ -1500,6 +1509,29 @@ Executes
 asynchronously. The command run without any controlling shell or TTY. This is generally used to launch X11 programs (e.g. open the selected text in firefox). If you want a command run in a new tab, see the
 .Ic NewTab
 macro).
+.Pp
+If
+.Ar command
+begins with
+.Sq \&!
+it is passed to
+.Cd /bin/sh -c
+for execution. Otherwise
+.Ar command
+is split into words at spaces or tabs only, and executed via
+.Xr execvp 3 .
+If you do not want a particular space or tab character to cause word splitting, then precede it
+.Sq Sy \e .
+Keep in mind that like all macro arguments,
+.Ar command
+is first
+.Sq Sy \e
+interpolated. Thus if on the rare occasion you want
+.Sq \e\ 
+to be part of
+.Ar command ,
+then you will have to do something like
+.Sq \e\e\e\  .
 .\" ------------------------------------------------------------
 .It Ic NewTab Oo Ar -N Oc Oo Ar \*qtitle\*q Oc Op Oo ! Oc Ns Ar command
 Open a new tab.
@@ -1510,9 +1542,23 @@ specifies the profile number. If omitted, profile 0 is used. If only
 .Ar title
 is specified (needs to be double quoted), use that for the tab title. If
 .Ar command
-is specified, execute that command in the new tab (instead of the one specified by the resource file, or the shell). If command begins with an
+is specified, execute that command in the new tab (instead of the one specified by the resource file, or the shell).
+.Pp
+.Ar command
+is word split as described in the
+.Ic Exec
+macro. However if command begins with an
 .So ! Sc
-then run a shell first, and execute the command in the shell.
+then run a shell first, and execute the command in the shell as if the user had typed
+.Ar command
+at the shell prompt. If instead you want
+.Ar command
+to be passed to
+.Cd /bin/sh -c
+for execution, then begin
+.Ar command
+with
+.Sq \e! .
 .\" ------------------------------------------------------------
 .It Ic Close Op Ar N
 Close a tab. If no argument is specified, close all tabs and exit. If

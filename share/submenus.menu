@@ -121,8 +121,8 @@
 # Selection related operations
 [menu:selection]
 ./Open selection in/*
-{Firefox}			    Exec firefox %s
-{w3m}				    NewTab "w3m" w3m %s
-{mutt}				    NewTab "mutt" mutt %s
+{Firefox}			    Exec	    firefox %s
+{w3m}				    NewTab "w3m"    w3m %s
+{mutt}				    NewTab "mutt"   mutt %s
 ../
 [done:selection]

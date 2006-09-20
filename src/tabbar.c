@@ -1216,8 +1216,13 @@ rxvt_append_page( rxvt_t* r, int profile,
 
 	if( command != NULL && *command != '!' )
 	{
+	    const char *cmd = command;
+
 	    /* If "command" starts with '!', we should run it in the shell. */
-	    argv = rxvt_string_to_argv( command, &num_cmd_args );
+	    if( cmd[0] == '\\' && cmd[1] == '!' )
+		cmd++;
+
+	    argv = rxvt_string_to_argv( cmd, &num_cmd_args );
 	}
 	else
 	    argv = NULL;

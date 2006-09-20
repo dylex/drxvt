@@ -34,6 +34,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   src/feature.h. This makes the cursor better visible when the cursor
 	   color is not defined, and makes the behaviour similar to the
 	   default behaviour of Xterm.
+       16. BugFix: Str and Esc macros caused a beep on execution.
+       17. Updated examples / menus to use new word splitting.
 
     * Enhancements:
 	0. Really busy tabs (even with Xft+anti aliasing) no longer starves
@@ -55,6 +57,11 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   exited child process.
 	8. Removed the "jumpScroll" option, and replaced it with
 	   --refreshLimit and --skipPages (see man page).
+	9. Changed word splitting of commands executed via NewTab and exec
+	   macros. Now words are split only at spaces or tabs (unless
+	   backslashed). If command starts with "!", it is passed to /bin/sh
+	   -c, which does all the word splitting / executing. For the old
+	   behaviour define INERNAL_WORD_SPLIT in src/feature.h.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Bug Fixes:
