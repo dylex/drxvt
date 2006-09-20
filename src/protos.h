@@ -103,6 +103,7 @@ void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page))
 void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
 const char*	 getProfileOption		  __PROTO(( rxvt_t *r, int profile, int resource ));
 Status		 ewmh_message			  __PROTO(( Display *, Window, Window, Atom, long, long, long, long, long));
+int		 rxvt_async_exec		  __PROTO((rxvt_t*, const char *));
 int              rxvt_run_command                 __PROTO((rxvt_t* r, int page, const char** argv));
 void             clean_sigmasks_and_fds           __PROTO((rxvt_t* r, int page));
 termenv_t        rxvt_get_termenv                 __PROTO((const char* str));

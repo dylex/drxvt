@@ -149,12 +149,6 @@ rxvt_str_trim(char *str)
  *      backslash-escaped:      "\a\b\E\e\n\r\t", "\octal"
  *      Ctrl chars:     ^@ .. ^_, ^?
  *
- *      Emacs-style:    "M-" prefix
- *
- * Also,
- *      "M-x" prefixed strings, append "\r" if needed
- *      "\E]" prefixed strings (XTerm escape sequence) append ST if needed
- *
  * returns the converted string length
  */
 /* EXTPROTO */
@@ -162,7 +156,7 @@ int
 rxvt_str_escaped(char *str)
 {
     char            ch, *s, *d;
-    int             i, num, append = 0;
+    int             i, num;
 
     if (IS_NULL(str) || *str == '\0') return 0;
 
@@ -220,16 +214,27 @@ rxvt_str_escaped(char *str)
 		ch = '\r';  /* carriage-return */
 	    else if (ch == 't')
 		ch = C0_HT; /* tab */
+
+	    else if (ch != '\\' && ch != '^' )
+		*d++ = '\\'; /* Copy over backslash */
 	}
+
 	else if (ch == '^')
 	{
 	    ch = *s++;
-	    ch = toupper((int) ch);
-	    ch = (ch == '?' ? 127 : (ch - '@'));
+
+	    if( ch == '?' )
+		ch = 127;
+	    else if( toupper(ch) >= 'A' && toupper(ch) <= 'Z' )
+		ch = toupper(ch) - '@';
+	    else
+		*d++ = '^'; /* Copy over caret */
 	}
+
 	*d++ = ch;
     }
 
+#if 0 /* Users can terminate their own stinking strings */
     /* ESC] is an XTerm escape sequence, must be terminated */
     if (*str == '\0' && str[1] == C0_ESC && str[2] == ']')
 	append = CHAR_ST;
@@ -237,6 +242,7 @@ rxvt_str_escaped(char *str)
     /* add trailing character as required */
     if (append && d[-1] != append)
 	*d++ = append;
+#endif
     *d = '\0';
 
     return (d - str);

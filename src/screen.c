@@ -2375,7 +2375,11 @@ rxvt_scr_bell(rxvt_t *r, int page)
     if (r->h->rs[Rs_bellCommand])
     {
 	/* execute bell command */
+#if 0
 	system (r->h->rs[Rs_bellCommand]);
+#else
+	rxvt_async_exec( r, r->h->rs[Rs_bellCommand] );
+#endif
 	return ;
     }
 

@@ -2405,17 +2405,21 @@ rxvt_get_ourmods( rxvt_t *r )
 char**
 rxvt_string_to_argv( const char *string, int *argc )
 {
-    register int    i;
+    int		    i = 0;
     char**	    pret;
-    const char*	    pbeg;
     const char*	    pcur;
+#ifdef INTERNAL_ARGV_SPLIT
+    const char*	    pbeg;
+#endif
 
-    /* not implemented yet */
     *argc = 0;
-    if (IS_NULL(string))
+    if( IS_NULL(string) || *string == '\0' )
+    {
+	*argc = 0;
 	return NULL;
+    }
 
-#define MAX_ARGV    (64)
+#define MAX_ARGV    (1024)
     /* Up to 64 argv.
      *
      * 2006-02-23 gi1242: Use calloc instead of malloc. Thus when freeing pret,
@@ -2424,9 +2428,13 @@ rxvt_string_to_argv( const char *string, int *argc )
     pret = (char**) rxvt_calloc (MAX_ARGV, sizeof (char*));
 
     DBG_MSG(1, (stderr, "fetch command argv for the tab\n"));
+#ifdef INTERNAL_ARGV_SPLIT
+    /*{{{*/
+    /*
+     * 2006-02-23 gi1242: Remember to leave space for a NULL terminated pointer
+     * at the end
+     */
     pbeg = pcur = string;
-    /* 2006-02-23 gi1242: Remember to leave space for a NULL terminated pointer
-     * at the end */
     for (i = 0; i < MAX_ARGV-2; i ++)
     {
 	int	dq = 0;	/* double quote */
@@ -2514,6 +2522,63 @@ rxvt_string_to_argv( const char *string, int *argc )
 	/* shouldn't get here */
 	assert (0);
     }
+    /*}}}*/
+#else /* !INTERNAL_ARGV_SPLIT */
+
+    /*
+     * Pass strings beginning with "!" to /bin/sh -c
+     */
+    if( *string == '!' )
+    {
+
+	/* Pass command to the shell for word splitting */
+	pret[i++] = STRDUP( "/bin/sh" );
+	pret[i++] = STRDUP( "-c" );
+	pret[i++] = STRDUP( string + 1 );
+
+	goto DoneArgv;
+    }
+
+
+    /*
+     * Split command into words at spaces. White spaces can be quoted with \
+     */
+    pcur = string;
+    for( ; i < MAX_ARGV && *pcur; i++ )
+    {
+	const int	max_argv_len = 1024;
+	char		argval[max_argv_len];
+	int		j = 0;
+
+	/* Skip leading spaces */
+	while( *pcur == ' ' || *pcur == '\t' ) pcur++;
+
+	while( *pcur && *pcur != ' ' && *pcur != '\t' && j < max_argv_len - 1 )
+	{
+	    if( *pcur == '\\' )
+	    {
+		pcur ++;
+
+		if( *pcur != ' ' && *pcur != '\t' && *pcur != '\\' )
+		    argval[j++] = '\\'; /* Copy backslash over */
+
+		argval[j++] = *pcur++;
+	    }
+
+	    else
+		argval[j++] = *pcur++;
+	}
+
+	if( j )
+	{
+	    argval[j] = '\0';
+	    pret[i] = STRDUP( argval );
+	}
+	else
+	    break;
+    }
+DoneArgv:
+#endif /* !INTERNAL_ARGV_SPLIT */
 
 #undef MAX_ARGV
     /* set the end of argv */
@@ -3468,6 +3533,45 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 }
 
 /*----------------------------------------------------------------------*/
+/*
+ * Executes a command in the background, and returns immediately. Returns 1 on
+ * success, 0 otherwise.
+ */
+int
+rxvt_async_exec( rxvt_t *r, const char *cmd)
+{
+    int	    argc;
+    char    **argv;
+
+    switch( fork() )
+    {
+	case -1:
+	    rxvt_print_error( "Unable to fork" );
+	    return 0;	/* Failure */
+	    /* NOT REACHED */
+
+	case 0:
+	    /*
+	     * Close all file descriptors, and reset signal masks to their
+	     * default values before exec'ing the child process.
+	     */
+	    clean_sigmasks_and_fds( r, ATAB(r) );
+
+	    argv = rxvt_string_to_argv( cmd, &argc );
+
+	    execvp( argv[0], argv );
+
+	    rxvt_print_error( "Failed to exec %s", argv[0] );
+	    exit(1);
+	    /* NOT REACHED */
+
+	default:
+	    DBG_MSG( 5, ( stderr, "Forked %s", astr ) );
+	    return 1;
+    }
+}
+
+
 /*
  * Run the command in a subprocess and return a file descriptor for the
  * master end of the pseudo-teletype pair with the command talking to

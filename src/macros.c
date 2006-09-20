@@ -822,12 +822,26 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
     {
 	case MacroFnEsc:
 	    /* Send action to rxvt */
-	    rxvt_cmd_write( r, ATAB(r), (unsigned char*) astr, alen);
+	    if( NOT_NULL( astr ) && alen > 1 )
+		rxvt_cmd_write( r, ATAB(r), (unsigned char*) astr, alen - 1);
+	    else
+	    {
+		rxvt_print_error( "Macro %s requires argument.",
+			macroNames[action->type] );
+		retval = -1;
+	    }
 	    break;
 
 	case MacroFnStr:
 	    /* Send action to child process */
-	    rxvt_tt_write( r, ATAB(r), (unsigned char*) astr, alen);
+	    if( NOT_NULL( astr ) && alen > 1 )
+		rxvt_tt_write( r, ATAB(r), (unsigned char*) astr, alen - 1);
+	    else
+	    {
+		rxvt_print_error( "Macro %s requires argument.",
+			macroNames[action->type] );
+		retval = -1;
+	    }
 	    break;
 
 	case MacroFnNewTab:
@@ -894,39 +908,15 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 	case MacroFnExec:
 	    if( NOT_NULL( astr ) )
-	    {
-		int	argc;
-		char	**argv;
+		retval = rxvt_async_exec( r, astr ) ? 1 : -1;
 
-		switch( fork() )
-		{
-		    case -1:
-			rxvt_print_error( "Unable to fork" );
-			break;
-
-		    case 0:
-			/*
-			 * Close all file descriptors, and reset signal
-			 * masks to their default values before exec'ing
-			 * the child process.
-			 */
-			clean_sigmasks_and_fds( r, ATAB(r) );
-
-			argv = rxvt_string_to_argv( astr, &argc );
-
-			execvp( argv[0], argv );
-
-			rxvt_print_error( "Failed to exec %s", argv[0] );
-			exit(1);
-			/* NOT REACHED */
-
-		    default:
-			/* Nothing to be done */
-			DBG_MSG( 5, ( stderr, "Forked %s", astr ) );
-		}
-	    }
 	    else
-		rxvt_print_error( "Macro Exec requires an argument." );
+	    {
+		rxvt_print_error( "Macro %s requires argument.",
+			macroNames[action->type] );
+		retval = -1;
+	    }
+
 	    break;
 
 	case MacroFnClose:
