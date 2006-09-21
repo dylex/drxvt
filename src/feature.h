@@ -453,10 +453,8 @@
 #define MAX_SAVELINES		    (0xffff)
 
 /* Default bell throttle interval */
-/*
 #define THROTTLE_BELL_MSEC	    (500)
 #define THROTTLE_BELL_COUNT	    (3)
-*/
 
 /* Default tabstop size */
 #define TABSTOP_SIZE		    (8)

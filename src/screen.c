@@ -2344,44 +2344,29 @@ rxvt_scr_bell(rxvt_t *r, int page)
 
 #if defined(THROTTLE_BELL_MSEC) && THROTTLE_BELL_MSEC > 0
     /* Maximal number of bell per pre-defined time interval */
-    static int		    bellcount = 0;
-    static struct timeval   tvbase = {0, 0};
-    struct timeval	    tvnow = {0, 0};
+    static int		    bellcount	= 0;
+    static struct timeval   lastBell	= {0, 0};
+    struct timeval	    tvnow	= {0, 0};
     long		    tminterval;
 
     if (gettimeofday (&tvnow, NULL) >= 0)
     {
-	if (0 == tvbase.tv_sec && 0 == tvbase.tv_usec)
-	{
+	if (0 == lastBell.tv_sec && 0 == lastBell.tv_usec)
 	    /* first time bell, try avoid integer overflow */
-	    tvbase = tvnow;
 	    tminterval = 0;
-	}
+
 	else
-	    tminterval = (tvnow.tv_sec - tvbase.tv_sec) * 1000 +
-			(tvnow.tv_usec - tvbase.tv_usec) / 1000;
+	    tminterval = (tvnow.tv_sec - lastBell.tv_sec) * 1000 +
+			(tvnow.tv_usec - lastBell.tv_usec) / 1000;
+
+	lastBell = tvnow;
 	if (tminterval > THROTTLE_BELL_MSEC)
-	{
-	    tvbase = tvnow;
 	    bellcount = 1;
-	}
+
 	else if (bellcount ++ >= THROTTLE_BELL_COUNT)
-	{
 	    return;
-	}
     }
 #endif	/* THROTTLE_BELL_MSEC && THROTTLE_BELL_MSEC > 0 */
-
-    if (r->h->rs[Rs_bellCommand])
-    {
-	/* execute bell command */
-#if 0
-	system (r->h->rs[Rs_bellCommand]);
-#else
-	rxvt_async_exec( r, r->h->rs[Rs_bellCommand] );
-#endif
-	return ;
-    }
 
 # ifndef NO_MAPALERT
 #  ifdef MAPALERT_OPTION
@@ -2426,6 +2411,8 @@ rxvt_scr_bell(rxvt_t *r, int page)
 		    GCForeground | GCFillStyle, &values);
 
 	    XSync( r->Xdisplay, False);
+
+#if 0 /* {{{ Don't need to sleep */
 # ifdef HAVE_NANOSLEEP
 	    struct timespec rqt;
 	    rqt.tv_sec = 0;
@@ -2436,6 +2423,7 @@ rxvt_scr_bell(rxvt_t *r, int page)
 	     * Sleeping for 1 whole second seems just wrong, so we do nothing.
 	     */
 # endif
+#endif /*}}}*/
 
 	    XClearArea( r->Xdisplay, PVTS(r, page)->vt, 0, 0, 0, 0, True);
 	}
@@ -2447,9 +2435,13 @@ rxvt_scr_bell(rxvt_t *r, int page)
 	    rxvt_scr_rvideo_mode(r, page, !PVTS(r, page)->rvideo);
 	}
     }
+
+    else if( r->h->rs[Rs_bellCommand] && *r->h->rs[Rs_bellCommand] )
+	rxvt_async_exec( r, r->h->rs[Rs_bellCommand] );
+
     else
 	XBell(r->Xdisplay, 0);
-#endif
+#endif /* NO_BELL */
 }
 
 /* ------------------------------------------------------------------------- */
