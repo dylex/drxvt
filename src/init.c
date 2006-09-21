@@ -2539,7 +2539,11 @@ rxvt_string_to_argv( const char *string, int *argc )
     else
     {
 	/*
-	 * Split command into words at spaces. White spaces can be quoted with \
+	 * Split command into words at spaces. White spaces can be quoted with
+	 * a backslash. However we don't processes chains of "\\" which don't
+	 * end in a space or tab. That is "\\a" expands to "\\a" however "\\ "
+	 * expands to "\ ", and "\ " expands to a " " which does not split
+	 * words.
 	 */
 	pcur = string;
 	for( ; i < MAX_ARGV && *pcur; i++ )
@@ -2558,17 +2562,39 @@ rxvt_string_to_argv( const char *string, int *argc )
 	    {
 		if( *pcur == '\\' )
 		{
-		    pcur ++;
+		    const char *s = pcur + 1;
 
-		    if( *pcur != ' ' && *pcur != '\t' && *pcur != '\\' )
-			argval[j++] = '\\'; /* Copy backslash over */
+		    /* Count backslashes */
+		    while( *s == '\\' )
+			s++;
 
-		    argval[j++] = *pcur++;
-		}
+		    if( *s == ' ' || *s == '\t' )
+		    {
+			int nbslashs = s - pcur;
+			int nbytes = min( nbslashs / 2, max_argv_len - j - 1);
 
-		else
-		    argval[j++] = *pcur++;
-	    }
+			/* Halve # backslashes */
+			MEMSET( &argval[j], '\\', nbytes );
+			pcur	=  s;
+			j	+= nbytes;
+
+			if( nbslashs % 2 == 0 )
+			    break;  /* Split word here */
+		    }
+
+		    else
+		    {
+			/* Copy backslashes over verbatim */
+			int nbytes = min( s - pcur, max_argv_len -j -1 );
+
+			MEMCPY( &argval[j], pcur, nbytes );
+			j	+= nbytes;
+			pcur	=  s;
+		    }
+		} /* if( pcur = '\\' ) */
+
+		argval[j++] = *pcur++;
+	    } /* while( *pcur ... ) */
 
 	    if( j )
 	    {

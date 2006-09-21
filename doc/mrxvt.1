@@ -864,6 +864,24 @@ for execution. Otherwise it is split into words at spaces or tabs only, and exec
 .Xr execvp 3 .
 If you don't want a space or tab to cause word splitting, then precede it with a
 .Sq Sy \e .
+If you want to pass
+.Sq \e\ 
+as an argument, double the
+.Sq \e .
+.Pp
+Note: Only backslashes (or chains of backslashes) that precede a space or tab character are treated specially. That is
+.Sq \e\ea
+will be left untouched, however
+.Sq \e\e\ 
+will expand to a
+.Sq \e
+and the
+.Sq \ 
+will cause a word break, and
+.Sq \e\ 
+will expand to a
+.Sq \ 
+which does not cause a word break.
 .Op Cm bellCommand
 .
 .It Fl bw Ns | Ns Fl w Ar number
@@ -1510,19 +1528,15 @@ asynchronously. The command run without any controlling shell or TTY. This is ge
 .Ic NewTab
 macro).
 .Pp
-If
+The argument
 .Ar command
-begins with
+is word split exactly as described in the
+.Fl blc
+option (thus for instance beginning it with 
 .Sq \&!
-it is passed to
+will pass it to
 .Cd /bin/sh -c
-for execution. Otherwise
-.Ar command
-is split into words at spaces or tabs only, and executed via
-.Xr execvp 3 .
-If you do not want a particular space or tab character to cause word splitting, then precede it
-.Sq Sy \e .
-Keep in mind that like all macro arguments,
+for word splitting and execution). However keep in mind that like all macro arguments,
 .Ar command
 is first
 .Sq Sy \e
@@ -1531,7 +1545,11 @@ interpolated. Thus if on the rare occasion you want
 to be part of
 .Ar command ,
 then you will have to do something like
-.Sq \e\e\e\  .
+.Sq \e\e\e\e\e\e\ 
+and not
+.Sq \e\e\e\ 
+as you would with the argument of
+.Fl blc .
 .\" ------------------------------------------------------------
 .It Ic NewTab Oo Ar -N Oc Oo Ar \*qtitle\*q Oc Op Oo ! Oc Ns Ar command
 Open a new tab.
@@ -1555,7 +1573,7 @@ at the shell prompt. If instead you want
 .Ar command
 to be passed to
 .Cd /bin/sh -c
-for execution, then begin
+for word splitting and execution, then begin
 .Ar command
 with
 .Sq \e! .
