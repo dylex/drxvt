@@ -527,7 +527,7 @@
 /*
  * Default number of pages to skip when jump scrolling.
  */
-#define DEFAULT_SKIP_PAGES	(10)
+#define DEFAULT_SKIP_PAGES	(25)
 
 /*
  * If an active tab produces fewer than these many characters, a screen refresh

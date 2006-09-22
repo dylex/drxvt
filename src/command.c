@@ -6453,6 +6453,9 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 				   refresh */
 
     limit = r->h->skip_pages * r->TermWin.nrow;
+    if( limit < 0 )
+	/* Integer overflow */
+	limit = INT_MAX;
     
 
     /*
