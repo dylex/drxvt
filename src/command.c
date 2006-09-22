@@ -1349,16 +1349,19 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
 void
 rxvt_mark_dead_childs( rxvt_t *r )
 {
-    int	    status, i;
-    short   vt_died = r->vt_died;
+    int	    i, j;
+    short   ndead_childs = r->ndead_childs;
 
     DBG_MSG(1, (stderr, "rxvt_mark_dead_childs(): %d children are dead\n",
-		r->vt_died) );
+		r->ndead_childs) );
 
 
+    /*
+     * Check processes running in each tab.
+     */
     for (i = LTAB(r); i >= 0 ; i--)
     {
-	int pid;
+	int	    status, pid;
 
 	errno = 0;  /* Clear errno */
 	if(
@@ -1381,10 +1384,10 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	    else
 	    {
 		/* Process in tab i is dead. */
-		r->vt_died--;				/* Reduce number of
+		r->ndead_childs--;			/* Reduce number of
 							   unprocessed dead vt's
 							   by one */
-		vt_died--;				/* This variable is safe
+		ndead_childs--;				/* This variable is safe
 							   from being modified
 							   in a signal */
 		PVTS( r, i )->status = status;		/* Save exit status */
@@ -1401,28 +1404,48 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	}
     }
 
-    if( r->vt_died < 0 )
+    /*
+     * Check processes we launched via rxvt_async_exec(). We don't care about
+     * status info here, so this is much simpler.
+     */
+    for( i=0, j=0; i < r->nAsyncChilds; )
+    {
+	if( waitpid( r->asyncChilds[i], NULL, WNOHANG ) != 0 )
+	{
+	    r->ndead_childs--;
+	    ndead_childs--;
+
+	    i++;
+	}
+	
+	else
+	    r->asyncChilds[j++] = r->asyncChilds[i++];
+    }
+    r->nAsyncChilds -= (i-j);
+
+
+    if( r->ndead_childs < 0 )
     {
 	/*
 	 * Oops. Some child died, but we never got a dead child signal on it. As
 	 * long as we got here, we're fine.
 	 *
-	 * NOTE: It is OK for vt_died < 0. r->vt_died is updated for processes
-	 * that die when we are in this function. vt_died is not.
+	 * NOTE: It is OK for ndead_childs < 0. r->ndead_childs is updated for
+	 * processes that die when we are in this function. ndead_childs is not.
 	 */
 	DBG_MSG( 1, ( stderr,  "Lost child signal." ) );
-	r->vt_died = 0;
+	r->ndead_childs = 0;
     }
 
-    else if ( vt_died > 0 )
+    else if ( ndead_childs > 0 )
     {
 	/*
 	 * This is problematic. The number of processes that were promised as
 	 * "dead" on entry to this function is not actually the number of
 	 * processes that are dead!
 	 *
-	 * NOTE: It is OK for r->vt_died > 0, as r->vt_died could be externally
-	 * modified while we are in this function.
+	 * NOTE: It is OK for r->ndead_childs > 0, as r->ndead_childs could be
+	 * externally modified while we are in this function.
 	 *
 	 * We should only get here when one of our child processes that is NOT
 	 * running in a tab dies. For instance, when we print something with our
@@ -1432,19 +1455,20 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	DBG_MSG( 3, ( stderr, "Spurious dead child signal received\n") );
 
 	/*
-	 * We should reset r->vt_died to 0. But there is a possible race
+	 * We should reset r->ndead_childs to 0. But there is a possible race
 	 * condition with doing that. Suppose we received a dead child signal
 	 * *after* looping over all childs, but just before getting here!
 	 *
-	 * To avoid this we only reduce r->vt_died by the number of processes we
-	 * failed to catch as dead. Further, when we get EIO errors reading from
-	 * a child, we call this function to see if the child is dead or not.
+	 * To avoid this we only reduce r->ndead_childs by the number of
+	 * processes we failed to catch as dead. Further, when we get EIO errors
+	 * reading from a child, we call this function to see if the child is
+	 * dead or not.
 	 */
-	r->vt_died -= vt_died;
+	r->ndead_childs -= ndead_childs;
     }
 
     DBG_MSG(1, (stderr, "Exit rxvt_mark_dead_childs(): %d children are dead\n",
-		r->vt_died) );
+		r->ndead_childs) );
 }
 
 
@@ -1462,7 +1486,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
     int		i;
 
     DBG_MSG( 1, ( stderr, "rxvt_clean_cmd_page()\n" ) );
-    if( r->vt_died )
+    if( r->ndead_childs )
 	rxvt_mark_dead_childs( r );
 
    /*
@@ -1479,7 +1503,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
      *
      * Why do we need to restart dead value from LTAB(r) again? Because a
      * child may have died when we do something following and changed the
-     * value of r->vt_died! This child may be later than any dead children
+     * value of r->ndead_childs! This child may be later than any dead children
      * we have examined.
      */
     for (i = LTAB(r); i >= 0; i--)
@@ -2398,7 +2422,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	 * If we get here, we either have a select() error, or no tabs had any
 	 * input. Check to see if something died.
 	 */
-	if( r->vt_died || select_res == -1 )
+	if( r->ndead_childs || select_res == -1 )
 	    rxvt_mark_dead_childs( r );
 
 	if( r->cleanDeadChilds )
@@ -6611,16 +6635,16 @@ rxvt_main_loop(rxvt_t *r)
 	ch = 0;
 
 	while(
-	       r->vt_died == 0		&&	/* Nothing dead */
+	       r->ndead_childs == 0		&&	/* Nothing dead */
 	       r->cleanDeadChilds == 0	&&	/* Nothing to be cleaned up */
 	       ( (ch = rxvt_cmd_getc(r, &page)) == 0 )	/* No input */
 	     )
 	    ;
 
 	/*
-	 * 2006-08-23 gi1242: If rxvt_cmd_getc is called, and then r->vt_died
-	 * gets set during this call, then we should not discard the return
-	 * value of rxvt_cmd_getc.
+	 * 2006-08-23 gi1242: If rxvt_cmd_getc is called, and then
+	 * r->ndead_childs gets set during this call, then we should not discard
+	 * the return value of rxvt_cmd_getc.
 	 */
 
 	if( page != -1 && ch != 0 )
@@ -6648,7 +6672,7 @@ rxvt_main_loop(rxvt_t *r)
 	 * handle the case that some children have died regardless of what
 	 * rxvt_cmd_getc returned
 	 */
-	if (r->vt_died > 0 || r->cleanDeadChilds )
+	if (r->ndead_childs > 0 || r->cleanDeadChilds )
 	    rxvt_clean_cmd_page (r);
 
     } /* while(1) */

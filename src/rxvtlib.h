@@ -932,13 +932,19 @@ typedef struct rxvt_vars {
     short	    tabClicked;		    /* Tab clicked by user. Used for
 					       moving tabs by drag and drop. */
 
-      /*
-       * True if we have marked some children as dead, but not called
-       * rxvt_clean_cmd_page() to clean them out
-       */
     unsigned char   BOOLVAR( cleanDeadChilds, 1 );
-    short	    vt_died;		    /* number of children that have
+					    /* True if we have marked some
+					       children as dead, but not called
+					       rxvt_clean_cmd_page() to clean
+					       them out */
+
+    short	    ndead_childs;		    /* number of children that have
 					       died */
+    short	    nAsyncChilds;	    /* Number of alive children launched
+					       via rxvt_async_exec */
+    short	    asyncChilds[MAX_CHILDS];
+					    /* PIDS of children exec'ed via
+					     * rxvt_async_exec */
 
     int		    num_fds;		    /* number of fd to monitor */
 

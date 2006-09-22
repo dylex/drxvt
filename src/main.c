@@ -272,7 +272,7 @@ rxvt_Child_signal(int sig __attribute__((unused)))
     DBG_MSG( 1, ( stderr, "\e[31mrxvt_Child_signal()\e[0m\n"));
 
     r = rxvt_get_r();
-    r->vt_died++;
+    r->ndead_childs++;
 
     DBG_MSG( 1, ( stderr, "done rxvt_Child_signal()\n"));
 }

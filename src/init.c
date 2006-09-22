@@ -759,7 +759,9 @@ rxvt_init_vars(rxvt_t *r)
     h->want_resize = 0;
     h->ttygid = -1;
     r->Xfd = -1;
-    r->vt_died = 0;
+    r->ndead_childs = 0;
+
+    r->nAsyncChilds = 0;
 
     /* default values */
 #ifdef NO_FRILLS
@@ -3567,10 +3569,19 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 int
 rxvt_async_exec( rxvt_t *r, const char *cmd)
 {
+    int	    pid;
     int	    argc;
     char    **argv;
 
-    switch( fork() )
+    if( r->nAsyncChilds >= MAX_CHILDS )
+    {
+	rxvt_print_error( "Too many childs."
+		" Increase MAX_CHILDS in src/feature.h" );
+	return 0;
+    }
+
+    pid = fork();
+    switch( pid )
     {
 	case -1:
 	    rxvt_print_error( "Unable to fork" );
@@ -3594,6 +3605,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 
 	default:
 	    DBG_MSG( 5, ( stderr, "Forked %s", cmd ) );
+	    r->asyncChilds[ r->nAsyncChilds++ ] = pid;
 	    return 1;
     }
 }

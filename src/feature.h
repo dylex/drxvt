@@ -42,7 +42,7 @@
 #define HAVE_EXTRA_XRESOURCE_FILES
 
 
-/*-----------------------SCREEN OPTIONS AND COLOURS---------------------*/
+/*-----------------------SCREEN OPTIONS AND COLOURS-----------------{{{1*/
 /*
  * Define the name of the environment variable to be used in
  * addition to the "PATH" environment and the `path' resource.
@@ -153,7 +153,7 @@
  */
 /* #define ALLOW_132_MODE */
  
-/*------------------------------RESOURCES-------------------------------*/
+/*------------------------------RESOURCES---------------------------{{{1*/
 /*
  * Define to find installed application defaults for rxvt
  */
@@ -164,7 +164,7 @@
  */
 /* #define OFFIX_DND */
 
-/*---------------------------------KEYS---------------------------------*/
+/*---------------------------------KEYS-----------------------------{{{1*/
 
 /*
  * Define defaults for backspace and delete keys - unless they have been
@@ -214,7 +214,7 @@
 # define GREEK_KEYBOARD_MODESWITCH XK_Mode_switch
 #endif
 
-/*--------------------------------MOUSE---------------------------------*/
+/*--------------------------------MOUSE-----------------------------{{{1*/
 /*
  *  Enable jump scrolling when use mouse wheel
  */
@@ -281,7 +281,7 @@
  */
 #define SELECTION_SCROLL_LINE_SPEEDUP 4
 
-/*--------------------------------MISC----------------------------------*/
+/*--------------------------------MISC------------------------------{{{1*/
 /*
  * Disable to reset tty device to pre-incovation state
  */
@@ -310,7 +310,13 @@
  */
 /* #define INTERNAL_ARGV_SPLIT */
 
-/*--------------------------------BELL----------------------------------*/
+/*
+ * Maximum number of process (executed via Exec / NewTab macros, or -blc option)
+ * that can be alive at one time.
+ */
+#define MAX_CHILDS  (16)
+
+/*--------------------------------BELL------------------------------{{{1*/
 /*
  * Disable all bell indications
  */
@@ -326,12 +332,12 @@
  */
 #define MAPALERT_OPTION
 
-/*------------------------------TAB BAR---------------------------------*/
+/*------------------------------TAB BAR-----------------------------{{{1*/
 
 /* Default title of new tabs if unspecified */
 #define DEFAULT_TAB_TITLE   "Terminal"
 
-/*-----------------------------SCROLL BAR-------------------------------*/
+/*-----------------------------SCROLL BAR---------------------------{{{1*/
 /*
  * Choose the rxvt style scrollbar width
  * - should be an even number [default: 10]
@@ -356,7 +362,7 @@
  */
 /* #define SB_BORDER */
 
-/*------------------------------MENU BAR--------------------------------*/
+/*------------------------------MENU BAR----------------------------{{{1*/
 /*
  * Choose how many of (experimental) menuBars you want to be able to stack at
  * one time.
@@ -382,13 +388,13 @@
  */
 #define MENU_SHADOW_IN
 
-/*---------------------------MULTILINGUAL-------------------------------*/
+/*---------------------------MULTILINGUAL---------------------------{{{1*/
 /*
  * Allow run-time selection of Meta (Alt) to set the 8th bit on
  */
 #define META8_OPTION
 
-/*---------------------------DISPLAY OPTIONS----------------------------*/
+/*---------------------------DISPLAY OPTIONS------------------------{{{1*/
 /*
  * Force local connection to be socket (or other local) communication
  */
@@ -536,4 +542,7 @@
 /* #define TERMCAP_HAS_BW */
 
 #endif	/* __FEATURE_H__ */
+
+/*}}}1*/
+/* vim: set fdm=marker: */
 /*----------------------- end-of-file (H source) -----------------------*/
