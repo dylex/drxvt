@@ -56,6 +56,7 @@
 /*--------------------------------------------------------------------*
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
+void rxvt_alarm_signal	       ( __attribute__((unused)) int sig );
 void rxvt_pre_show_init	       (rxvt_t* r);
 void rxvt_clean_commands       (rxvt_t* r, int command_number);
 void rxvt_free_hidden          (rxvt_t*);
@@ -305,7 +306,26 @@ rxvt_Exit_signal(int sig)
 
     /* resend signal to default handler */
     /* kill (getpid (), sig); */
-    rxvt_clean_exit( r );
+    rxvt_close_all_tabs( r );
+}
+
+
+void
+rxvt_alarm_signal( __attribute__((unused)) int sig )
+{
+    int i;
+    rxvt_t *r = rxvt_get_r();
+
+    if( LTAB(r) >= 0 )
+    {
+	fprintf( stderr, APL_NAME ": WARNING Processes ");
+	for( i=0; i <= LTAB(r); i ++ )
+	    fprintf( stderr, "%d%c", PVTS(r, i)->cmd_pid,
+		    i == LTAB(r) ? ' ' : ',' );
+	fprintf( stderr, " have not responded to SIGHUP, and are still "
+		"running. Either 'kill -9' these processes or close the "
+		APL_NAME " window again within 3 seconds.\n" );
+    }
 }
 
 
@@ -376,31 +396,79 @@ rxvt_exit_request( rxvt_t *r )
 	}
     }
 
-    rxvt_clean_exit(r);
+    rxvt_close_all_tabs(r);
+}
+
+/*
+ * Remove all held tabs, and send SIGHUP to processes in all live tabs
+ *
+ * 2006-09-22 gi1242: In mrxvt-0.5.1 and before, we would exit mrxvt by calling
+ * rxvt_clean_exit(). This would send SIGHUP to all child processes, and then
+ * call exit(). This however is flawed! If some processes do not exit on SIGHUP,
+ * then they will remain in the background and the user will not know.
+ *
+ * To fix this issue, we call rxvt_close_all_tabs() instead of rxvt_clean_exit()
+ * when we want to exit mrxvt. rxvt_close_all_tabs() will send SIGHUP's to all
+ * child processes, and remove all held tabs. If mrxvt does not exit within two
+ * seconds, then it will sound an alarm warning the user of the offending
+ * processes which ignored SIGHUP. The user can either kill -9 those processes
+ * manually, or request another exit of mrxvt within the next 3 seconds to have
+ * mrxvt forcefully exit (but leaving the child processes running).
+ */
+/* EXTPROTO */
+void
+rxvt_close_all_tabs( rxvt_t *r)
+{
+    static struct timeval   lastRequest = {0, 0};
+    struct timeval	    now;
+    int			    i;
+
+    for( i=LTAB(r); i >=0; i-- )
+    {
+	if( PVTS(r, i)->dead )
+	    rxvt_remove_page( r, i );
+
+	else
+	{
+	    PVTS(r, i)->holdOption = 0;
+	    kill( PVTS(r, i)->cmd_pid, SIGHUP );
+	}
+    }
+
+    gettimeofday( &now, NULL );
+    if( lastRequest.tv_sec != 0 && now.tv_sec - lastRequest.tv_sec < 5 )
+	/* Second request within 5 seconds. Kill mrxvt */
+	rxvt_clean_exit(r);
+
+    else
+    {
+	lastRequest = now;
+
+	/* Just in case the processes don't exit on SIGHUP, warn the user */
+	signal( SIGALRM, rxvt_alarm_signal );
+	alarm( 2 );
+    }
 }
 
 /* EXTPROTO */
 void
 rxvt_clean_exit (rxvt_t* r)
 {
-    register int    i;
-
-    /* restore default SIGCHLD signal handler */
-    signal (SIGCHLD, SIG_DFL);
-
-    rxvt_free_hidden (r);
-
 #ifdef HAVE_X11_SM_SMLIB_H
     if (ISSET_OPTION(r, Opt2_enableSessionMgt))
 	rxvt_session_exit (r);
 #endif
 
+#if 0
     /*
      * Now kill all child processes, zsh puts them into background if we do not
      * do so.
+     *
+     * 2006-09-22 gi1242: No! See comments before rxvt_close_all_tabs().
      */
     for (i = 0; i <= LTAB(r); i ++)
 	kill (PVTS(r, i)->cmd_pid, SIGHUP);
+#endif
 
     /*
      * 2006-01-27 gi1242: Free all used resources. This used to be done only in
@@ -408,6 +476,8 @@ rxvt_clean_exit (rxvt_t* r)
      * anything.
      */
 /* #ifdef DEBUG	*/
+    rxvt_free_hidden (r);
+
     /* Destroy windows before other X resources */
     if (IS_WIN(r->TermWin.parent))
     {
@@ -647,8 +717,11 @@ rxvt_privileged_ttydev(rxvt_t* r, int page, char action)
     {
 	PVTS(r, page)->next_tty_action = RESTORE;
 # ifndef RESET_TTY_TO_COMMON_DEFAULTS
-/* store original tty status for restoration rxvt_clean_exit() -- rgg 04/12/95 */
-	if (lstat(PVTS(r, page)->ttydev, &h->ttyfd_stat) < 0)	/* you lose out */
+	/*
+	 * store original tty status for restoration rxvt_clean_exit() -- rgg
+	 * 04/12/95
+	 */
+	if (lstat(PVTS(r, page)->ttydev, &h->ttyfd_stat) < 0) /* you lose out */
 	    PVTS(r, page)->next_tty_action = IGNORE;
 	else
 # endif

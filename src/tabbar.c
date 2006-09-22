@@ -1447,21 +1447,19 @@ rxvt_remove_page (rxvt_t* r, short page)
     /* destroy the virtual terminal window */
     rxvt_destroy_termwin (r, page);
 
+    /* update total number of tabs */
+    LTAB(r)--;
+
     /* quit the last the terminal, exit the application */
-    if (LTAB(r) == 0)
-    {
+    if( LTAB(r) < 0 )
 	rxvt_clean_exit (r);
-    }
 
     /* update TermWin and tab_widths */
-    for (i = page; i < LTAB(r); i++)
+    for (i = page; i <= LTAB(r); i++)
     {
 	PVTS(r, i) = PVTS(r, i+1);
 	refresh_tabbar_tab( r, i);
     }
-
-    /* update total number of tabs */
-    LTAB(r)--;
 
     /* update selection */
     if (page == r->selection.vt)

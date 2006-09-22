@@ -137,6 +137,7 @@ RETSIGTYPE       rxvt_Child_signal                __PROTO((int sig __attribute__
 RETSIGTYPE       rxvt_Exit_signal                 __PROTO((int sig));
 void		 rxvt_exit_request                __PROTO((rxvt_t*));
 void             rxvt_clean_exit                  __PROTO((rxvt_t* r));
+void		 rxvt_close_all_tabs		  __PROTO((rxvt_t* r));
 void             rxvt_privileged_utmp             __PROTO((rxvt_t* r, int page, char action));
 void             rxvt_privileged_ttydev           __PROTO((rxvt_t* r, int page, char action));
 void             rxvt_tt_winsize                  __PROTO((int fd, unsigned short col, unsigned short row, pid_t pid));
