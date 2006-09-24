@@ -982,15 +982,19 @@ if test "x$support_xft" = "xyes"; then
     OLD_LDFLAGS="$LDFLAGS"
 
     dnl Get new variables.
-    if which xft-config >/dev/null 2>&1; then
-	LIBS="$LIBS `xft-config --libs`"
-	CFLAGS="$CFLAGS `xft-config --cflags`"
-	LDFLAGS="$LDFLAGS `xft-config --libs`"
-    else
-	dnl If xft-config is not found, try pkg-config instead
+    if which pkg-config >/dev/null 2>&1 && pkg-config --exists xft; then
         LIBS="$LIBS `pkg-config --libs xft`"
         CFLAGS="$CFLAGS `pkg-config --cflags xft`"
         LDFLAGS="$LDFLAGS `pkg-config --libs xft`"
+    else
+	if which xft-config >/dev/null 2>&1; then
+	    dnl If xft-config is not found, try pkg-config instead
+	    LIBS="$LIBS `xft-config --libs`"
+	    CFLAGS="$CFLAGS `xft-config --cflags`"
+	    LDFLAGS="$LDFLAGS `xft-config --libs`"
+	else
+	    support_xft="no"
+	fi
     fi
 
     dnl Solaris has wired include directory for freetype.h
