@@ -843,7 +843,7 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
     menu_t	 *menu;
 
     DBG_MSG( 2, (stderr, "rxvt_menu_add(): Adding menu %s to parent %s\n",
-	    path, NOT_NULL(parent) ? parent->name : "(nil)"));
+	    path, NOT_NULL(parent) ? (char *)parent->name : "(nil)"));
 
     if (NOT_NULL(STRCHR(path, '/')))
     {
@@ -2508,7 +2508,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 			int	     len;
 
 			DBG_MSG( 3, ( stderr, "Current menu %s\n",
-			    NOT_NULL(r->h->BuildMenu) ? r->h->BuildMenu->name :
+			    NOT_NULL(r->h->BuildMenu) ? (char *)r->h->BuildMenu->name :
 			    "(nil)"));
 
 			path = rxvt_menu_find_base(r, &(r->h->BuildMenu), path);
