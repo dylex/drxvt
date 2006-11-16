@@ -185,10 +185,6 @@ Mrxvt.macro.Primary+Shift+End:		Scroll +1000000
 Mrxvt.macro.Ctrl+Shift+v:		Paste
 Mrxvt.macro.Shift+Delete:		SetTitle
 
-# Clear scroll back and execute command
-Mrxvt.macro.Primary+Shift+Return:	Esc \ec
-Mrxvt.macro.Primary+Add+Shift+Return:	Str ^M
-
 # External programs. In keeping with the Unix "minimalist" philosophy, we don't
 # define these shortcuts by default.
 #
