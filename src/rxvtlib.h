@@ -715,6 +715,8 @@ typedef struct {
     unsigned char   BOOLVAR(hold,2),
 		    BOOLVAR(holdOption,3),  /* Copy of the profile option for
 					       this tab.*/
+		    BOOLVAR(gotEIO,1),	    /* Read on this terminal's fd
+					       got EIO */
 		    BOOLVAR(dead,1),	    /* the terminal is dead or alive? */
 		    BOOLVAR(highlight,1);   /* the terminal is highlighted? */
     int		    status;		    /* Status of child process after it
@@ -932,11 +934,12 @@ typedef struct rxvt_vars {
     short	    tabClicked;		    /* Tab clicked by user. Used for
 					       moving tabs by drag and drop. */
 
-    unsigned char   BOOLVAR( cleanDeadChilds, 1 );
+    unsigned char   BOOLVAR( cleanDeadChilds, 1 ),
 					    /* True if we have marked some
 					       children as dead, but not called
 					       rxvt_clean_cmd_page() to clean
 					       them out */
+		    BOOLVAR( gotEIO, 1 );   /* True if some read() got EIO */
 
     short	    ndead_childs;		    /* number of children that have
 					       died */

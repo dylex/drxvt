@@ -1774,7 +1774,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	 * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry about
 	 * calls to read() blocking.
 	 */
-	errno = 0;
+	errno = PVTS(r, page)->gotEIO = 0;
 	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp, count );
 	readErrno = errno;
 
@@ -1807,8 +1807,14 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 		    readErrno != EISDIR );
 
 	    /* See if this process is dead */
-	    if( readErrno == EIO || readErrno == EINTR )
-		rxvt_mark_dead_childs(r);
+	    switch (readErrno)
+	    {
+		case EIO:
+		    r->gotEIO = PVTS(r, page)->gotEIO = 1;
+		case EINTR:
+		    rxvt_mark_dead_childs(r);
+		    break;
+	    }
 
 	    /*
 	     * 2006-08-31 gi1242: Old code would only break out on EAGAIN or
@@ -2104,6 +2110,8 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
     }
 #endif	/* POINTER_BLANK || CURSOR_BLINK || TRANSPARENT */
 
+    quick_timeout |= r->gotEIO;
+    r->gotEIO = 0;
 
     return quick_timeout;
 }
@@ -2345,9 +2353,14 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	for (i = 0; i <= LTAB(r); i ++)
 	{
 	    /* remember to skip held childrens */
-	    if ( (PVTS(r, i)->hold > 1) )
+	    if ( PVTS(r, i)->hold > 1 )
 	    {
 		DBG_MSG(2,(stderr," not listen on vt[%d].cmd_fd\n",i));
+		continue;
+	    }
+	    else if ( PVTS(r, i)->gotEIO )
+	    {
+		PVTS(r, i)->gotEIO = 0;
 		continue;
 	    }
 
