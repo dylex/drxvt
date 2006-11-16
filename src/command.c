@@ -2133,12 +2133,14 @@ rxvt_refresh_vtscr_if_needed( rxvt_t *r )
     if( AVTS(r)->want_refresh )
 	r->h->refresh_type &= ~CLIPPED_REFRESH;
 
-    if( AVTS(r)->want_refresh || r->h->want_clip_refresh )
+    if(
+	 (AVTS(r)->want_refresh || r->h->want_clip_refresh)
+	 && AVTS(r)->mapped && r->h->refresh_type != NO_REFRESH
+      )
     {
-	DBG_MSG( 3, ( stderr, "Requesting refresh."
-		    " Active tab (%d) produced only %d bytes"
-		    " (%d in buffer)\n",
-		    ATAB(r), AVTS(r)->nbytes_last_read,
+	DBG_MSG( 3, ( stderr,
+		    "%lu: ATAB(%d) produced %d bytes (%d in buffer)\n",
+		    time(NULL), ATAB(r), AVTS(r)->nbytes_last_read,
 		    AVTS(r)->cmdbuf_endp - AVTS(r)->cmdbuf_base ) );
 
 	rxvt_scr_refresh(r, ATAB(r), r->h->refresh_type);
