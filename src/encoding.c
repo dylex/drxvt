@@ -445,6 +445,31 @@ rxvt_set_default_locale (rxvt_t* r)
 }
 
 
+/* This function get the encoding method from locale. This should be
+** the *correct* way to specify encoding method. The old way, using
+** -km option or multichar_encoding resource, should be abandoned in
+** the future as we steadily migrate to UTF-8.
+*/
+/* EXTPROTO */
+char* 
+rxvt_get_encoding_from_locale (rxvt_t* r)
+{
+    char*   enc;
+
+    if (IS_NULL(r->h->locale))
+	return NULL;
+
+    if (IS_NULL(enc = strchr (r->h->locale, '.')))
+	return NULL;
+
+    enc ++;
+    if ((char) 0 == *enc)
+	return NULL;
+
+    return enc;
+}
+
+
 /* EXTPROTO */
 char*
 rxvt_encoding_name (rxvt_t* r)

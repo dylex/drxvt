@@ -1283,6 +1283,10 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
     }
 #endif	/* DEBUG_CMD */
 
+    if (0 == STRCMP ("UTF-8", r->h->locale))
+    {
+	fprintf(stderr, "UTF-8 string?");
+    }
 
     rxvt_tt_write(r, ATAB(r), kbuf, (unsigned int)len);
 }
@@ -1658,7 +1662,7 @@ rxvt_find_cmd_child (rxvt_t* r)
     register int    k;
     static int	    lastProcessed = 0;  /* tab we processed last time */
 
-    DBG_MSG( 1, ( stderr, "rxvt_find_cmd_child()\n" ) );
+    DBG_MSG( 2, ( stderr, "rxvt_find_cmd_child()\n" ) );
 
     /*
      * See if the active tab has input before anything else.

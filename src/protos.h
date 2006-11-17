@@ -48,6 +48,7 @@ void             rxvt_set_multichar_encoding      __PROTO((rxvt_t* r, const char
 #endif
 void             rxvt_decode_dummy                __PROTO((unsigned char* str, int len));
 void             rxvt_set_default_locale          __PROTO((rxvt_t *r));
+char*            rxvt_get_encoding_from_locale    __PROTO((rxvt_t *r));
 void             rxvt_set_default_font_x11        __PROTO((rxvt_t *r));
 char*            rxvt_fallback_mfont_x11          __PROTO((rxvt_t *r));
 #ifdef XFT_SUPPORT

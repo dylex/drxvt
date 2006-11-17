@@ -1477,7 +1477,14 @@ rxvt_extract_resources (
     if (r->h->rs[Rs_multichar_encoding])
 	rxvt_set_multichar_encoding(r, r->h->rs[Rs_multichar_encoding]);
     else
-	rxvt_set_multichar_encoding(r, MULTICHAR_ENCODING);
+    {
+	char*    enc;
+
+	if (NOT_NULL(enc = rxvt_get_encoding_from_locale (r)))
+	    rxvt_set_multichar_encoding (r, enc);
+	else
+	    rxvt_set_multichar_encoding(r, MULTICHAR_ENCODING);
+    }
 #endif
 
 #ifdef GREEK_SUPPORT
