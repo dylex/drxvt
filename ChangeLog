@@ -1,3 +1,16 @@
+0.5.2 to 0.5.3
+\-----------------------------------
+Gautam Iyer <gi1242@users.sourceforge.net>
+    * Bug Fixes:
+	1. Handle EIO errors (got when tcsh / fish exit) properly. Patch by
+	   Zoltan Szalontai.
+	2. Disabled Shift+Enter shortcut by default, since it may confuse new
+	   users.
+
+    * Enhancements:
+	3. Added --titleFormat and --winTitleFormat options to control display
+	   of tab and window titles.
+
 0.5.1 to 0.5.2
 \-----------------------------------
 Gautam Iyer <gi1242@users.sourceforge.net>
