@@ -119,6 +119,9 @@ typedef struct {
     RUINT16T	    maxTabWidth,    /* max width of tab title to display */
 		    minVisibleTabs; /* Minimum number of tabs to try and keep
 				       visible */
+
+    char	    *winTitleFormat;	/* Format of the window title (used when
+					   syncing the tab title */
 #ifndef NO_LINESPACE
     RUINT16T	    lineSpace;	/* space between rows */
 #endif
@@ -648,8 +651,10 @@ typedef struct {
     RUINT16T	    prev_ncol; /* previous columns */
     RUINT16T	    prev_nrow; /* previous rows */
     /* moved from tab_t */
-    short		tab_width;  /* tab width */
-    char UNTAINTED *	tab_title;  /* tab title */
+    short		tab_width;	/* tab width */
+    char UNTAINTED *	tab_title;  	/* tab title */
+    char		*title_format;	/* Format to be used to display the tab
+					   title */
 
     /* moved from rxvt_t */
     int             cmd_fd; /* pty file descriptor; connected to command */

@@ -5798,6 +5798,48 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 	    rxvt_tabbar_set_title (r, page, (const unsigned char TAINTED*) str);
 	    break;
 
+	case MRxvt_tformat:
+	{
+	    int len = STRLEN(str);
+
+	    if(
+		  IS_NULL( PVTS(r, page)->title_format )	||
+		  len != STRLEN( PVTS(r, page)->title_format )
+	      )
+	    {
+		rxvt_free( PVTS(r, page)->title_format );
+		PVTS(r, page)->title_format = STRDUP(str);
+	    }
+	    else
+		STRCPY( PVTS(r, page)->title_format, str );
+
+	    /* Redraw the tab title. */
+	    refresh_tabbar_tab( r, page );
+
+	    break;
+	}
+
+	case MRxvt_wformat:
+	{
+	    int len = STRLEN(str);
+	    
+	    if(
+		 IS_NULL( r->TermWin.winTitleFormat )		||
+		 len != STRLEN( r->TermWin.winTitleFormat )
+	      )
+	    {
+		rxvt_free( r->TermWin.winTitleFormat );
+		r->TermWin.winTitleFormat = STRDUP(str);
+	    }
+	    else
+		STRCPY( r->TermWin.winTitleFormat, str );
+
+	    if( ISSET_OPTION( r, Opt2_syncTabTitle ) )
+		sync_tab_title( r, ATAB(r) );
+
+	    break;
+	}
+
 
 	/*
 	 * 2006-02-20 gi1242: These escape sequences are disabled for a possible

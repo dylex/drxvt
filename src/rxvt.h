@@ -967,6 +967,8 @@ enum {
 #define MRxvt_term	    (60) /* Change window title */
 #define MRxvt_tab	    (61) /* change tab title */
 #define MRxvt_tabterm	    (62) /* change tab and terminal title */
+#define MRxvt_wformat	    (63) /* Change window title format */
+#define MRxvt_tformat	    (64) /* Change tab title format */
 /* #define MRxvt_newtab	    (63) ** DISABLED create a new tab with title */
 /* #define MRxvt_prevtab    (64) ** DISABLED switch to previous tab */
 /* #define MRxvt_nexttab    (65) ** DISABLED switch to next tab */
@@ -1103,6 +1105,7 @@ enum {
     Rs_title,
     Rs_maxTabWidth,
     Rs_minVisibleTabs,
+    Rs_winTitleFormat,
 #if defined (BACKGROUND_IMAGE) || defined(HAVE_MENUBAR)
     Rs_path,
 #endif
@@ -1231,6 +1234,7 @@ enum {
     Rs_holdExit,	_Rs_holdExit	= MAX_PROFILES - 1 + Rs_holdExit,
     Rs_holdExitTxt,	_Rs_holdExitTxt = MAX_PROFILES - 1 + Rs_holdExitTxt,
     Rs_holdExitTtl,	_Rs_holdExitTtl = MAX_PROFILES - 1 + Rs_holdExitTtl,
+    Rs_titleFormat,	_Rs_titleFormat = MAX_PROFILES - 1 + Rs_titleFormat,
 
     NUM_RESOURCES
 } ;

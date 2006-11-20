@@ -704,7 +704,7 @@ in profile
 When a new tab is created with profile
 .Ar N
 it uses all options that are set for this profile. Currently the only options that can be set per profile are
-.Cm Pixmap , background , command , foreground , saveLines , holdExit , holdExitText , holdExitTitle , tabTitle 
+.Cm Pixmap , background , command , foreground , saveLines , holdExit , holdExitText , holdExitTitle , tabTitle , titleFormat
 and
 .Cm workingDirectory .
 Then all the settings from that profile number are used.
@@ -749,7 +749,9 @@ Synchronize icon name with tab title when switch to a new tab or the title of th
 .Op Cm syncTabIcon
 .
 .BO stt
-Synchronize terminal title with tab title when switch to a new tab or the title of the active tab changes.
+Synchronize terminal title with tab title when switch to a new tab or the title of the active tab changes. (See also the
+.Fl wtf
+option).
 .Op Cm syncTabTitle
 .
 .It Fl tnum Ar N
@@ -762,6 +764,14 @@ tabs on startup. For backward compatibility, the tabs are opened with profile 0,
 .It Fl tt Ar string
 Title of the tab
 .Op Cm tabTitle
+.
+.It Fl tf Ar format
+If set, this controls the displayed title of each tab.
+.Ar format
+is % interpolated, and the result is displayed as the tab title. NOTE: This is only the displayed tab title, thus %t will still expand to the actual tab title, as set via an escape sequence, or macro. For example, setting this option to
+.Sq %n. %t
+will cause all the tabs to be numbered.
+.Op Cm titleFormat
 .
 .BO ut
 Utmp inhibit.
@@ -777,6 +787,13 @@ Working directory of the child process. If non-empty, then the child process is 
 then the child process is run in the working directory of the current tab if possible. On Linux, this is the default. (NOTE: It is not always possible to find the working directory of the current tab. This works fine on Linux, but causes problems on other systems [e.g. OpenBSD], which is why it is only enabled by default on Linux).
 .Op Cm workingDirectory
 .
+.It Fl wtf Ar format
+Controls the format of the window title. If set, and the option
+.Fl stt
+is used, then the window title is set to
+.Ar format
+(after % interpolation), instead of the tab title.
+.Op Cm winTitleFormat
 .El
 .Ed
 .\" {{{2 multichar stuff

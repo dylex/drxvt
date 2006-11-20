@@ -1,8 +1,8 @@
 #
 # All portions of code are copyright by their respective author/s.
-# 	Copyright (c) 2002     Alexis <materm@tuxfamily.org>
-# 	Copyright (c) 2004     Jingmin Zhou <jimmyzhou@users.sourceforge.net>
-# 	Copyright (c) 2006     Gautam Iyer <gi1242@users.sourceforge.net>
+#   Copyright (c) 2002	   Alexis <materm@tuxfamily.org>
+#   Copyright (c) 2004	   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+#   Copyright (c) 2006	   Gautam Iyer <gi1242@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -21,11 +21,11 @@
 docdir = $(datadir)/doc/$(PACKAGE_NAME)
 
 dist_man_MANS = mrxvt.1
-dist_doc_DATA =	README.greek.bz2		\
-				README.menu.bz2			\
-				README.xvt.bz2			\
-				behind_mrxvt.txt.bz2	\
-				hack-mrxvt.txt.bz2		\
-				mrxvt_seq.txt.bz2		\
-				rxvtRef.txt.bz2			\
-				xterm-ctlseqs.txt.bz2
+dist_doc_DATA =	README.greek.bz2	\
+		README.menu.bz2		\
+		README.xvt.bz2		\
+		behind_mrxvt.txt.bz2	\
+		hack-mrxvt.txt.bz2	\
+		mrxvt_seq.txt.bz2	\
+		rxvtRef.txt.bz2		\
+		xterm-ctlseqs.txt.bz2

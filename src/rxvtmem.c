@@ -554,7 +554,18 @@ rxvt_free(void* ptr)
 #ifdef DEBUG
     assert (memory_initialized);
 #endif
+#if 0
     assert (NOT_NULL(ptr)); /* generate core dump */
+#else
+    /*
+     * 2006-11-19 gi1242: glibc accepts free(NULL), and has been used in a few
+     * places throughout the mrxvt code base. It's better to fail gracefully
+     * here, as opposed to code bloat by first testing if a pointer is not null
+     * before calling rxvt_free().
+     */
+    if( IS_NULL(ptr) )
+	return;
+#endif
 
 
     block = (struct block_head_t*) ptr;
@@ -730,7 +741,9 @@ rxvt_realloc(void *ptr, size_t size)
 void
 rxvt_free(void* ptr)
 {
+#if 0
     assert (NOT_NULL(ptr)); /* generate core dump */
+#endif
     free (ptr);
 }
 

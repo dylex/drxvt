@@ -248,7 +248,10 @@ rxvt_str_escaped(char *str)
     return (d - str);
 }
 
-/* % interpolate expand src, and copy into dst */
+/*
+ * % interpolate expand src, and copy into dst. Returns length of the
+ * interpolated string.
+ */
 /* EXTPROTO */
 int
 rxvt_percent_interpolate( rxvt_t *r, int page,

@@ -477,8 +477,7 @@ draw_string (rxvt_t* r, Region clipRegion,
  */
 /* INTPROTO */
 static void
-draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
-	Region region)
+draw_title (rxvt_t* r, int x, int y, int tnum, Region region)
 {
     Region	clipRegion;
     char	str[MAX_DISPLAY_TAB_TXT + 1];
@@ -497,7 +496,7 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
      * Adjust y offset, and make sure output is restricted to the current tab
      * title.
      */
-# ifdef XFT_SUPPORT
+#ifdef XFT_SUPPORT
     if (ISSET_OPTION(r, Opt_xft) && (NULL != r->tabBar.xftwin))
     {
 	if( r->TermWin.xftpfont )
@@ -527,14 +526,31 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
 	else y -= r->TermWin.xftfont->descent;
     }
     else
-# endif
+#endif /* XFT_SUPPORT */
 	y -= r->TermWin.font->descent;
 
     /*
-     * Copy the title into str, and null terminate.
+     * Get the title into str. Under Xft, we use the format specified by
+     * title_format.
      */
-    STRNCPY (str, orgstr, r->TermWin.maxTabWidth);
-    str[r->TermWin.maxTabWidth] = (char) 0;
+#ifdef XFT_SUPPORT
+    if(
+	  NOTSET_OPTION( r, Opt_xft )			||
+	  IS_NULL( PVTS(r, tnum)->title_format )   	||
+	  rxvt_percent_interpolate( r, tnum,
+		PVTS(r, tnum)->title_format,
+		STRLEN( PVTS(r, tnum)->title_format ),
+		str, r->TermWin.maxTabWidth ) <= 1
+      )
+#endif /* XFT_SUPPORT */
+    {
+	/*
+	 * If % interpolation was not possible, or returned a 1 byte long
+	 * string, then just copy the title over.
+	 */
+	STRNCPY( str, PVTS(r,tnum)->tab_title , r->TermWin.maxTabWidth );
+	str[r->TermWin.maxTabWidth] = '\0';
+    }
 
 
     /*
@@ -640,8 +656,9 @@ draw_title (rxvt_t* r, const char* orgstr, int x, int y, int tnum,
     point.y	    = (short) ay
 
 /*
- * Refresh tab number page.
+ * Refresh title of tab "page"
  */
+/* EXTPROTO */
 void
 refresh_tabbar_tab( rxvt_t *r, int page)
 {
@@ -830,8 +847,8 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 	    /* Draw the tab title. */
 	    CHOOSE_GC_FG( r, r->tabBar.fg);
-	    draw_title (r, PVTS(r, page)->tab_title,
-		    x + TXT_XOFF, ATAB_EXTRA / 2 + TXT_YOFF, page, region);
+	    draw_title (r, x + TXT_XOFF, ATAB_EXTRA / 2 + TXT_YOFF,
+		    page, region);
 	}
 
 	else /* if( page == ATAB(r) ) */
@@ -901,8 +918,7 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 	    /* Choose GC foreground for tab title. */
 	    CHOOSE_GC_FG( r, r->tabBar.ifg);
-	    draw_title (r, PVTS(r, page)->tab_title,
-		    x + TXT_XOFF,
+	    draw_title (r, x + TXT_XOFF,
 		    ISSET_OPTION(r, Opt2_bottomTabbar) ?
 		     	    TXT_YOFF : ATAB_EXTRA + TXT_YOFF,
 		    page, region);
@@ -1392,8 +1408,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 
     /* synchronize terminal title with tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle))
-	rxvt_set_term_title (r,
-		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	sync_tab_title( r, ATAB(r) );
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon))
@@ -1520,11 +1535,12 @@ rxvt_remove_page (rxvt_t* r, short page)
 
     /* synchronize terminal title with tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle))
-	rxvt_set_term_title (r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	sync_tab_title( r, ATAB(r) );
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon))
-	rxvt_set_icon_name(r, (const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	rxvt_set_icon_name(r,
+		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
 }
 
 
@@ -1567,8 +1583,7 @@ rxvt_tabbar_set_title (rxvt_t* r, short page, const unsigned char TAINTED * str)
     /* synchronize terminal title with active tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle) &&
 	(page == ATAB(r)))
-	rxvt_set_term_title (r,
-		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	sync_tab_title( r, ATAB(r) );
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon) &&
@@ -1623,8 +1638,7 @@ rxvt_activate_page (rxvt_t* r, short index)
 
     /* synchronize terminal title with tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle))
-	rxvt_set_term_title (r,
-		(const unsigned char*) PVTS(r, ATAB(r))->tab_title);
+	sync_tab_title( r, ATAB(r) );
 
     /* synchronize icon name to tab title */
     if (ISSET_OPTION(r, Opt2_syncTabIcon))
@@ -2569,6 +2583,31 @@ rxvt_tabbar_move_tab (rxvt_t* r, short newPage)
 	for( i = min( newPage, curPage ); i <= max( newPage, curPage ); i++ )
 	    refresh_tabbar_tab( r, i);
     }
+
+    if( ISSET_OPTION( r, Opt2_syncTabTitle ) )
+	sync_tab_title( r, ATAB(r) );
+}
+
+/*
+ * Synchronize the window title to the title of the tab "page".
+ */
+void
+sync_tab_title( rxvt_t *r, int page )
+{
+    char wintitle[MAX_TAB_TXT];
+
+    if(
+	 IS_NULL( r->TermWin.winTitleFormat )	||
+	 rxvt_percent_interpolate( r, page,
+	     r->TermWin.winTitleFormat, STRLEN(r->TermWin.winTitleFormat),
+	     wintitle, MAX_TAB_TXT ) <= 1
+      )
+    {
+	/* % interpolation failed / not possible */
+	rxvt_set_term_title( r, (unsigned char*) PVTS(r, page)->tab_title );
+    }
+    else
+	rxvt_set_term_title( r, (unsigned char*) wintitle );
 }
 
 /*----------------------- end-of-file (C source) -----------------------*/

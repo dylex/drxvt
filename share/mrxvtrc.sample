@@ -54,6 +54,10 @@ Mrxvt.minVisibleTabs:		8
 Mrxvt.syncTabTitle:		True
 # Mrxvt.syncTabIcon:		true
 
+# Display the tab number in the title. Useful so that you can use Alt+digit to
+# quickly switch between tabs.
+Mrxvt.titleFormat:		%n. %t
+
 # Highlight inactive tabs only when they sound a bell (and not whenever they
 # produce output).
 Mrxvt.highlightTabOnBell:	True
@@ -322,6 +326,7 @@ KitchenSink.initProfileList:	    0,2,3
 FvwmConsole.initProfileList:	    4
 FvwmConsole.profile4.tabTitle:	    FvwmConsole
 FvwmConsole.profile4.background:    #101020
+FvwmConsole.profile4.holdExit:	    4
 
 FvwmConsole.xftSize:		    12
 FvwmConsole.tintColor:		    #181830

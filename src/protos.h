@@ -435,6 +435,7 @@ void             rxvt_kill_page                 __PROTO((rxvt_t*, short));
 void             rxvt_remove_page               __PROTO((rxvt_t*, short));
 void             rxvt_activate_page             __PROTO((rxvt_t*, short));
 void		 rxvt_tabbar_set_visible_tabs   __PROTO((rxvt_t*, Bool));
+void		 refresh_tabbar_tab		__PROTO((rxvt_t*, int));
 void             rxvt_tabbar_set_title          __PROTO((rxvt_t*, short, const unsigned char TAINTED *));
 void             rxvt_tabbar_resize             __PROTO((rxvt_t*));
 void             rxvt_tabbar_dispatcher         __PROTO((rxvt_t*, XButtonEvent*));
@@ -453,7 +454,8 @@ void             rxvt_tabbar_draw_buttons       __PROTO((rxvt_t*));
 void             rxvt_tabbar_change_color       __PROTO((rxvt_t*, int, const char*));
 void             rxvt_tabbar_highlight_tab      __PROTO((rxvt_t*, short, Bool));
 void             rxvt_tabbar_move_tab           __PROTO((rxvt_t*, short));
-/* Begin prototypes of tabbar.c */
+void		 sync_tab_title		        __PROTO((rxvt_t*, int));
+/* End prototypes of tabbar.c */
 
 /* Begin prototypes of session.c */
 #ifdef HAVE_X11_SM_SMLIB_H

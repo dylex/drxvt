@@ -1,5 +1,5 @@
 # All portions of code are copyright by their respective author/s.
-# 	Copyright (c) 2006     Gautam Iyer <gi1242@users.sourceforge.net>
+#   Copyright (c) 2006	   Gautam Iyer <gi1242@users.sourceforge.net>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -25,20 +25,20 @@ confdir = $(sysconfdir)/$(PACKAGE_NAME)
 dist_scripts_DATA = scripts/mrxvt.vbs scripts/mrxvtset.pl scripts/settitle.c
 scriptsdir = $(docdir)/scripts
 
-dist_pixmap_DATA =	pixmaps/mrxvt-csh.png		\
-					pixmaps/mrxvt-root.png		\
-					pixmaps/mrxvt.png			\
-					pixmaps/mrxvt-csh.xpm		\
-					pixmaps/mrxvt-root.xpm		\
-					pixmaps/mrxvt.xpm
+dist_pixmap_DATA =  pixmaps/mrxvt-csh.png	\
+		    pixmaps/mrxvt-root.png	\
+		    pixmaps/mrxvt.png		\
+		    pixmaps/mrxvt-csh.xpm	\
+		    pixmaps/mrxvt-root.xpm	\
+		    pixmaps/mrxvt.xpm
 pixmapdir = $(datadir)/pixmaps
 
-# builds_DATA =	builds/mrxvt.SlackBuild			\
-# 				builds/mrxvt.slack-desc			\
-# 				builds/mrxvt.spec
+# builds_DATA =	builds/mrxvt.SlackBuild		\
+#		builds/mrxvt.slack-desc		\
+#		builds/mrxvt.spec
 # buildsdir = $(pkgdatadir)/builds
 
-# etc_DATA	=	etc/XTerm.ad					\
-# 				etc/rxvt.termcap				\
-# 				etc/rxvt.terminfo
-# etcdir = $(pkgdatadir)/etc
+dist_etc_DATA  =    etc/XTerm.ad		\
+		    etc/rxvt.termcap		\
+      		    etc/rxvt.terminfo
+etcdir = $(docdir)/etc

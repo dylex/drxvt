@@ -18,3 +18,5 @@
 # Ave, Cambridge, MA 02139, USA.
 
 SUBDIRS = doc src share
+
+EXTRA_DIST = CREDITS FAQ

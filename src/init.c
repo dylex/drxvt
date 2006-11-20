@@ -1109,6 +1109,10 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	    rs[Rs_iconName] = rs[Rs_name];
     }
 
+    if( NOT_NULL( rs[Rs_winTitleFormat] ) )
+	r->TermWin.winTitleFormat = STRDUP( rs[Rs_winTitleFormat] );
+    else
+	r->TermWin.winTitleFormat = NULL;
 
     if( rs[Rs_maxTabWidth] )
     {
@@ -2779,6 +2783,16 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     SET_NULL(PVTS(r, page)->xftvt);
 #endif
     SET_NULL(PVTS(r, page)->tab_title);
+    /*
+     * Set the sticky tab title. getProfileOption returns a static string, so
+     * duplicate it here
+     */
+    {
+	const char *stt = getProfileOption( r, profile, Rs_titleFormat );
+	PVTS(r, page)->title_format = NOT_NULL(stt) ? STRDUP(stt) : NULL;
+    }
+
+
 #ifdef BACKGROUND_IMAGE
     UNSET_PIXMAP(PVTS(r, page)->pixmap);
     UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
@@ -2885,6 +2899,9 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 
     rxvt_free (PVTS(r, page)->tab_title);
     SET_NULL(PVTS(r, page)->tab_title);
+
+    rxvt_free( PVTS(r, page)->title_format );
+    SET_NULL( PVTS(r, page)->title_format );
 
 #ifdef XFT_SUPPORT
     if (ISSET_OPTION(r, Opt_xft))
