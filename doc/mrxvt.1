@@ -768,8 +768,13 @@ Title of the tab
 .It Fl tf Ar format
 If set, this controls the displayed title of each tab.
 .Ar format
-is % interpolated, and the result is displayed as the tab title. NOTE: This is only the displayed tab title, thus %t will still expand to the actual tab title, as set via an escape sequence, or macro. For example, setting this option to
-.Sq %n. %t
+is % interpolated, and the result is displayed as the tab title.
+.Pp
+.Sy NOTE:
+Currently this option requires the tab titles to be drawn with a proportionally spaced font (which is currently only possible with Xft). Also, this option only affects the displayed tab title, and thus
+.Ar %t
+will still expand to the actual tab title, as set via an escape sequence, or macro. For example, setting this option to
+.Sq Ar %n. %t
 will cause all the tabs to be numbered.
 .Op Cm titleFormat
 .

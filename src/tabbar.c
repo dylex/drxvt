@@ -536,6 +536,7 @@ draw_title (rxvt_t* r, int x, int y, int tnum, Region region)
 #ifdef XFT_SUPPORT
     if(
 	  NOTSET_OPTION( r, Opt_xft )			||
+	  IS_NULL( r->TermWin.xftpfont )		||
 	  IS_NULL( PVTS(r, tnum)->title_format )   	||
 	  rxvt_percent_interpolate( r, tnum,
 		PVTS(r, tnum)->title_format,
