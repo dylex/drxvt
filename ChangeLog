@@ -11,6 +11,12 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	3. Added --titleFormat and --winTitleFormat options to control display
 	   of tab and window titles.
 
+Jimmy Zhou <jimmyzhou@users.sourceforge.net>
+    * Enhancements:
+	1. Check locale for encoding method if it is not specified by -km
+	   option or multichar_encoding resource.
+
+
 0.5.1 to 0.5.2
 \-----------------------------------
 Gautam Iyer <gi1242@users.sourceforge.net>
