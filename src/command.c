@@ -401,6 +401,24 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
 	    }
 	    break;
 
+	case XK_Return:
+	    newlen = 0;
+#ifdef META8_OPTION
+	    if (r->h->meta_char == 0x80)
+		/*
+		 * 2006-12-12 gi1242: In 8 bit mode, xterm sends 0x8d for
+		 * Alt+enter.
+		 */
+		kbuf[newlen++] = meta ? (r->h->meta_char|C0_CR) : C0_LF;
+	    else
+#endif	/* META8_OPTION */
+	    {
+		if( meta )
+		    kbuf[newlen++] = C0_ESC;
+		kbuf[newlen++] = C0_LF;
+	    }
+	    kbuf[newlen] = '\0';
+	    break;
 
 #ifdef XK_KP_Left
 	case XK_KP_Up:	    /* \033Ox or standard */
