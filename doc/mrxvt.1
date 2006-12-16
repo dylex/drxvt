@@ -1765,8 +1765,13 @@ Char with octal ASCII code
 .It Sy ^@ , ^A .. ^Z .. ^_ , ^?
 Control-@, Control-A ...
 .Pp
+.It Sy %G
+Global (static) tab number.
 .It Sy %p
 PID of child process in current tab.
+.It Sy %P
+PID of
+.Nm
 .It Sy %n
 Tab number.
 .It Sy % Ns Sy N
@@ -1785,6 +1790,10 @@ window.
 If the process in this tab is dead, then it expands to the exit status of the child process. Otherwise left unchanged.
 .It Sy %t
 Tab title.
+.It Sy %T
+Total number of tabs created in
+.Nm
+lifetime.
 .El
 .Ed
 .Ss Mouse shortcuts \"{{{2

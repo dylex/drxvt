@@ -7,6 +7,7 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	2. Disabled Shift+Enter shortcut by default, since it may confuse new
 	   users.
 	3. Make Alt+Enter behave like Xterm.
+	4. Added %T,%G,%P flags for percent interpolation (useful for dtach).
 
     * Enhancements:
 	1. Added --titleFormat and --winTitleFormat options to control display

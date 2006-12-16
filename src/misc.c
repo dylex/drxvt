@@ -263,6 +263,10 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
     DBG_MSG( 2, (stderr, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n",
 	    page, src, len, "dst", maxLen ));
 
+    /* Must only get here for a valid tab */
+    assert( page >=0 && page <= LTAB(r) );
+    assert( NOT_NULL( PVTS( r, page ) ) && PVTS( r, page )->vts_idx != -1 );
+
     while( i < len-1 && j < maxLen-1 )
     {
 	if( src[i] == '%' )
@@ -328,8 +332,28 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 		    i++;
 		    break;
 
+		case 'P':
+		    /* PID of mrxvt */
+		    j += snprintf( dst + j, maxLen - j, "%d", getpid() );
+		    i++;
+		    break;
+
+		case 'G':
+		    /* Global tab number (plus 1) */
+		    j += snprintf( dst + j, maxLen - j, "%d",
+			    PVTS( r, page )->globalTabNum + 1 );
+		    i ++;
+		    break;
+
+		case 'T':
+		    /* # tabs created so far */
+		    j += snprintf( dst + j, maxLen - j, "%d",
+			    r->ntabs + 1 );
+		    i ++;
+		    break;
+
 		default:
-		    rxvt_print_error( "Unrecognized switch %%%c in '%s'",
+		    rxvt_print_error( "Unrecognized flag %%%c in '%s'",
 			    src[i++], src );
 		    break;
 	    }
