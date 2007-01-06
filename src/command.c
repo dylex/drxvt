@@ -6514,7 +6514,10 @@ rxvt_process_graphics(rxvt_t* r, int page)
 	    return;
 	}
       }
-    while (ch != ':');
+    while( ch != ':' && ch >= ' ' && ch <= '~' ); /* 2007-01-06 gi1242: In case
+						     the escape sequence is
+						     malformed, swallow only
+						     printable characters. */
 }
 /*}}} */
 
