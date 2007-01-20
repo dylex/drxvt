@@ -127,7 +127,7 @@ static const struct {
 	    "background color for a tab", 1),
     STRG( Rs_cwd, "workingDirectory", "wd", "dir",
 	    "Working directory to open new tabs in", 1 ),
-    STRG(Rs_holdExit, "holdExit", "hold", "Always|Clean|NotClean|Never",
+    STRG(Rs_holdExit, "holdExit", "hold", "number",
 	    "Keep tab open after child exits, based on childs exit status", 1 ),
     STRG(Rs_holdExitTxt, "holdExitText", "het",
 	"string", "text to show while holding the terminal", 1),
