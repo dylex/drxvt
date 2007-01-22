@@ -202,7 +202,7 @@ rxvt_init(int argc, const char *const *argv)
 #endif
 
     rxvt_init_env(r);
-    rxvt_init_command(r, cmd_argv);
+    rxvt_init_command(r);
     rxvt_init_screen (r);
 
     /*

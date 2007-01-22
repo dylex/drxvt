@@ -1635,7 +1635,7 @@ rxvt_init_xlocale(rxvt_t *r)
 
 /* EXTPROTO */
 void
-rxvt_init_command(rxvt_t* r, const char *const *argv)
+rxvt_init_command(rxvt_t* r)
 {
     /*
      * Initialize the command connection. This should be called after the X

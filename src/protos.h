@@ -97,7 +97,7 @@ void		 rxvt_copy_color                  __PROTO((rxvt_t*, int, int));
 void		 rxvt_set_color                   __PROTO((rxvt_t*, int, const XColor*));
 void             rxvt_init_env                    __PROTO((rxvt_t *r));
 void             rxvt_init_xlocale                __PROTO((rxvt_t *r));
-void             rxvt_init_command                __PROTO((rxvt_t* r, const char* const *argv));
+void             rxvt_init_command                __PROTO((rxvt_t* r));
 CARD32           rxvt_get_desktop                 __PROTO((rxvt_t* r));
 void             rxvt_create_show_windows         __PROTO((rxvt_t* r, int argc, const char* const *argv));
 void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page));
