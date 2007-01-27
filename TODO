@@ -61,6 +61,7 @@ Code Cleanup:
 				      BUGS
 
 9   vt100 printer support is now broken. Fix it.
+8   echo "\033[1;7;30;47mHello world\033[m" prints wrong colors
 8   Looks like rvxt_scr_refresh is called twice every time. (The second refresh
     is cheap, as the screen is current). But eliminating this will save a few
     CPU cycles... NOTE: Only happens with -tr
