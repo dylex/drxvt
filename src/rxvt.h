@@ -1383,18 +1383,18 @@ enum {
 /* how to build & extract colors and attributes */
 #define GET_BASEFG(x)	    (((x) & RS_fgMask))
 #define GET_BASEBG(x)	    (((x) & RS_bgMask)>>Color_Bits)
-#ifndef NO_BRIGHTCOLOR
-# define GET_FGCOLOR(x)			    \
-    ((((x) & RS_Bold) == 0		    \
-      || GET_BASEFG(x) < minCOLOR		\
-      || GET_BASEFG(x) >= minBrightCOLOR)	    \
-     ? GET_BASEFG(x)			    \
+#if 0 /* Was ifndef NO_BRIGHTCOLOR */
+# define GET_FGCOLOR(x)						    \
+    ((((x) & RS_Bold) == 0		    	    		    \
+      || GET_BASEFG(x) < minCOLOR		    		    \
+      || GET_BASEFG(x) >= minBrightCOLOR)	    		    \
+     ? GET_BASEFG(x)				    		    \
      : (GET_BASEFG(x) + (minBrightCOLOR - minCOLOR)))
-# define GET_BGCOLOR(x)			    \
-    ((((x) & RS_Blink) == 0		    \
-      || GET_BASEBG(x) < minCOLOR		\
-      || GET_BASEBG(x) >= minBrightCOLOR)	    \
-     ? GET_BASEBG(x)			    \
+# define GET_BGCOLOR(x)						    \
+    ((((x) & RS_Blink) == 0		    			    \
+      || GET_BASEBG(x) < minCOLOR				    \
+      || GET_BASEBG(x) >= minBrightCOLOR)			    \
+     ? GET_BASEBG(x)						    \
      : (GET_BASEBG(x) + (minBrightCOLOR - minCOLOR)))
 #else
 # define GET_FGCOLOR(x)	    GET_BASEFG(x)
