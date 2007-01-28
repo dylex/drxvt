@@ -8,6 +8,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   users.
 	3. Make Alt+Enter behave like Xterm.
 	4. Added %T,%G,%P flags for percent interpolation (useful for dtach).
+	5. Bold colored text is rendered in BOTH bold font, and bright color.
+	   Use only bold font.
 
     * Enhancements:
 	1. Added --titleFormat and --winTitleFormat options to control display
