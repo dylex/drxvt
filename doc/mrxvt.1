@@ -783,7 +783,10 @@ Utmp inhibit.
 .Op Cm utmpInhibit
 .
 .BO vbf
-Show colored text with bold font.
+If unset, colored bold text will not be rendered using overstrike / bold font. See also
+.Cm boldColors
+and
+.Cm veryBright .
 .Op Cm veryBoldFont
 .
 .It Fl wd
@@ -1044,6 +1047,11 @@ Specify the delay (ms) to wait before refreshing the background in pseudo-transp
 Specifies bold font to use along with fontset
 .Ar N .
 .
+.It Cm boldColors Ar True Ns | Ns Ar False
+If true, the bold primary colors (0 -- 7) will be rendered using the brighter analogues (8--15). If
+.Cm veryBright
+is also true, then bold primary colors will also be rendered with a bold font. Otherwise the regular font will be used.
+.
 .It Cm color Ns Ar N Ar color
 Use the specified colour for the colour value
 .Ar N ,
@@ -1166,6 +1174,11 @@ Enable / disable smart resize. When the tabbar is shown, or font size is increas
 .It Cm troughColor
 Color of scrollbar trough (see also
 .Cm scrollColor ) .
+.
+.It Cm veryBright Ar True Ns | Ns Ar False
+If true, and if
+.Cm boldColors
+is also true, then bold primary colors are rendered as bright colors with a bold font.
 .
 .El
 .Ed

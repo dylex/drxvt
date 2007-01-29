@@ -158,6 +158,12 @@ static const struct {
 	    "synchronizing icon name with tab title" ),
     BOOL( "veryBoldFont", "vbf", Opt2_veryBold,
 	    "showing color text with bold font" ),
+#ifndef NO_BRIGHTCOLOR
+    BOOL( "boldColors", NULL, Opt_brightColor,
+	    "showing bold primary colors using bright colors" ),
+    BOOL( "veryBright", NULL, Opt_veryBright,
+	    "showing bold primary colors using bold font also" ),
+#endif
 
 
     STRG(Rs_container_window, NULL, "into", "WinID", "Parent window id", 0),

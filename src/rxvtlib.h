@@ -350,22 +350,25 @@ typedef enum {
 #define Opt2_bottomTabbar	    ((1LU<<13) | IS_OPTION2)
 #define Opt2_borderLess		    ((1LU<<14) | IS_OPTION2)
 #define Opt2_overrideRedirect	    ((1LU<<15) | IS_OPTION2)
-/* #define Opt2_holdExit		    ((1LU<<16) | IS_OPTION2) */
-#define Opt2_broadcast		    ((1LU<<17) | IS_OPTION2)
-#define Opt2_hideButtons	    ((1LU<<18) | IS_OPTION2)
-#define Opt2_veryBold		    ((1LU<<19) | IS_OPTION2)
-#define Opt2_noSysConfig	    ((1LU<<20) | IS_OPTION2)
-#define Opt2_disableMacros	    ((1LU<<21) | IS_OPTION2)
-#ifdef HAVE_X11_SM_SMLIB_H
-# define Opt2_enableSessionMgt	    ((1LU<<22) | IS_OPTION2)
+#define Opt2_broadcast		    ((1LU<<16) | IS_OPTION2)
+#define Opt2_hideButtons	    ((1LU<<17) | IS_OPTION2)
+#define Opt2_veryBold		    ((1LU<<18) | IS_OPTION2)
+#ifndef NO_BRIGHTCOLOR
+# define Opt_brightColor	    ((1LU<<19) | IS_OPTION2)
+# define Opt_veryBright		    ((1LU<<20) | IS_OPTION2)
 #endif
-#define Opt2_linuxHomeEndKey	    ((1LU<<23) | IS_OPTION2)
-#define Opt2_hlTabOnBell	    ((1LU<<24) | IS_OPTION2)
-#define Opt2_smoothResize	    ((1LU<<25) | IS_OPTION2)
-#define Opt2_smartResize	    ((1LU<<26) | IS_OPTION2)
-#define Opt2_autohideTabbar	    ((1LU<<27) | IS_OPTION2)
-#define Opt2_maximized		    ((1LU<<28) | IS_OPTION2)
-#define Opt2_fullscreen		    ((1LU<<29) | IS_OPTION2)
+#define Opt2_noSysConfig	    ((1LU<<21) | IS_OPTION2)
+#define Opt2_disableMacros	    ((1LU<<22) | IS_OPTION2)
+#ifdef HAVE_X11_SM_SMLIB_H
+# define Opt2_enableSessionMgt	    ((1LU<<23) | IS_OPTION2)
+#endif
+#define Opt2_linuxHomeEndKey	    ((1LU<<24) | IS_OPTION2)
+#define Opt2_hlTabOnBell	    ((1LU<<25) | IS_OPTION2)
+#define Opt2_smoothResize	    ((1LU<<26) | IS_OPTION2)
+#define Opt2_smartResize	    ((1LU<<27) | IS_OPTION2)
+#define Opt2_autohideTabbar	    ((1LU<<28) | IS_OPTION2)
+#define Opt2_maximized		    ((1LU<<29) | IS_OPTION2)
+#define Opt2_fullscreen		    ((1LU<<30) | IS_OPTION2)
 
 
 #ifdef XFT_SUPPORT
@@ -809,6 +812,8 @@ enum {
     MacroFnToggleSubwin,
     MacroFnFont,
     MacroFnToggleVeryBold,
+    MacroFnToggleBrightColor,
+    MacroFnToggleVeryBright,
     MacroFnToggleTransp,
     MacroFnToggleBcst,
     MacroFnToggleHold,

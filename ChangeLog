@@ -14,6 +14,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
     * Enhancements:
 	1. Added --titleFormat and --winTitleFormat options to control display
 	   of tab and window titles.
+	2. Added options --veryBright and --boldColors to control how bold
+	   primary colors are rendered.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

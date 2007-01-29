@@ -57,6 +57,8 @@ static const char *const macroNames[] =
     "ToggleSubwin",	    /* Toggle subwindows (scroll / menu / tabbar) */
     "ResizeFont",	    /* Resize terminal font */
     "ToggleVeryBold",	    /* Toggle use of bold font for colored text */
+    "ToggleBoldColors",	    /* Toggle option boldColors */
+    "ToggleVeryBright",	    /* Toggle option veryBright */
     "ToggleTransparency",   /* Toggle pseudo transparency */
     "ToggleBroadcast",	    /* Toggle broadcasting of input */
     "ToggleHold",	    /* Toggle holding of completed tabs */
@@ -84,18 +86,6 @@ unsigned char	macro_set_number    ( unsigned char, unsigned char);
  * without causing code bloat. The idea is that defining "macros" can also
  * enable the user to communicate with mrxvt using escape sequences!
  */
-/* {{{ Macro action functions (called from rxvt_dispatch_action) */
-/* EXTPROTO */
-void
-rxvt_toggle_verybold( rxvt_t *r )
-{
-    if (ISSET_OPTION(r, Opt2_veryBold))
-	UNSET_OPTION(r, Opt2_veryBold);
-    else
-	SET_OPTION(r, Opt2_veryBold);
-
-    rxvt_scr_touch (r, ATAB(r), True);
-}
 
 /*
  * str = [+-][s|t|m|b]
@@ -1062,7 +1052,21 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	}
 
 	case MacroFnToggleVeryBold:
-	    rxvt_toggle_verybold(r);
+	    TOGGLE_OPTION( r, Opt2_veryBold );
+
+	    rxvt_scr_touch (r, ATAB(r), True);
+	    break;
+
+	case MacroFnToggleBrightColor:
+	    TOGGLE_OPTION( r, Opt_brightColor );
+
+	    rxvt_scr_touch (r, ATAB(r), True);
+	    break;
+
+	case MacroFnToggleVeryBright:
+	    TOGGLE_OPTION( r, Opt_veryBright );
+
+	    rxvt_scr_touch (r, ATAB(r), True);
 	    break;
 
 	case MacroFnToggleTransp:

@@ -60,13 +60,19 @@
 {Toggle Scrollbar}{Ctrl-Shift-d}	ToggleSubwin s
 {Toggle Tabbar}{Ctrl-Shift-i}		ToggleSubwin t
 {Toggle Tabbar buttons}{Ctrl-Shift-a}	ToggleSubwin b
-{-}
-{Hide all subwindows}			ToggleSubwin -mst
-{Show all subwindows}			ToggleSubwin +mst
-{-}
+#2007-01-28 gi1242: Hiding all subwindows doesn't work well
+#{-}
+#{Hide all subwindows}			ToggleSubwin -mst
+#{Show all subwindows}			ToggleSubwin +mst
+#{-}
 ./Colors/*
 {Reverse video}				Esc \e[?5h
 {Normal video}				Esc \e[?5l
+{-}
+{Toggle boldColors}			ToggleBoldColors
+{Toggle veryBright}			ToggleVeryBright
+{Toggle veryBoldFont}{Ctrl-Shift-b}	ToggleVeryBold
+{-}
 [read:submenus;background]
 [read:submenus;foreground]
 ../

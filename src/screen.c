@@ -4157,6 +4157,20 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		}
 	    }
 
+#ifndef NO_BRIGHTCOLOR
+	    /* Use bright colors for bold primary colors */
+	    if(
+		 (rend & RS_Bold) && ISSET_OPTION( r, Opt_brightColor ) &&
+		 fore >= minCOLOR && fore < minBrightCOLOR
+	      )
+	    {
+		fore += minBrightCOLOR - minCOLOR;
+		if( NOTSET_OPTION( r, Opt_veryBright ) )
+		    rend &= ~RS_Bold;
+	    }
+#endif /*NO_BRIGHTCOLOR*/
+
+
 	    /*
 	     * fore and back should now have the correct colors.
 	     */
@@ -4177,8 +4191,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 # ifdef XFT_SUPPORT
 		/*
 		 * XFT won't use the colors from the GC, so we need to set
-		 * fore. Setting fore even when we're not using XFT
-		 * shouldn't make a difference, but why take a chance :)
+		 * fore.
 		 */
 		if( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 		    fore = Color_BD;
