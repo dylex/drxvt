@@ -4160,7 +4160,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #ifndef NO_BRIGHTCOLOR
 	    /* Use bright colors for bold primary colors */
 	    if(
-		 (rend & RS_Bold) && ISSET_OPTION( r, Opt_brightColor ) &&
+		 (rend & RS_Bold) && NOTSET_OPTION( r, Opt2_boldColors ) &&
 		 fore >= minCOLOR && fore < minBrightCOLOR
 	      )
 	    {

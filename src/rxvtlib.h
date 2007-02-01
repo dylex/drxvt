@@ -354,7 +354,7 @@ typedef enum {
 #define Opt2_hideButtons	    ((1LU<<17) | IS_OPTION2)
 #define Opt2_veryBold		    ((1LU<<18) | IS_OPTION2)
 #ifndef NO_BRIGHTCOLOR
-# define Opt_brightColor	    ((1LU<<19) | IS_OPTION2)
+# define Opt2_boldColors	    ((1LU<<19) | IS_OPTION2)
 # define Opt_veryBright		    ((1LU<<20) | IS_OPTION2)
 #endif
 #define Opt2_noSysConfig	    ((1LU<<21) | IS_OPTION2)

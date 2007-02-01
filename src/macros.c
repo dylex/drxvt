@@ -1058,7 +1058,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnToggleBrightColor:
-	    TOGGLE_OPTION( r, Opt_brightColor );
+	    TOGGLE_OPTION( r, Opt2_boldColors );
 
 	    rxvt_scr_touch (r, ATAB(r), True);
 	    break;

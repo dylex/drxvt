@@ -1048,9 +1048,8 @@ Specifies bold font to use along with fontset
 .Ar N .
 .
 .It Cm boldColors Ar True Ns | Ns Ar False
-If true, the bold primary colors (0 -- 7) will be rendered using the brighter analogues (8--15). If
-.Cm veryBright
-is also true, then bold primary colors will also be rendered with a bold font. Otherwise the regular font will be used.
+If false, the bold primary colors (0 -- 7) will be rendered using the brighter analogues (8--15) in a regular font. If true a bold font will be used. See also
+.Cm veryBright .
 .
 .It Cm color Ns Ar N Ar color
 Use the specified colour for the colour value
@@ -1178,7 +1177,7 @@ Color of scrollbar trough (see also
 .It Cm veryBright Ar True Ns | Ns Ar False
 If true, and if
 .Cm boldColors
-is also true, then bold primary colors are rendered as bright colors with a bold font.
+is false, then bold primary colors are rendered as bright colors with a bold font (this was the default behaviour in 0.5.2 and earlier versions).
 .
 .El
 .Ed
