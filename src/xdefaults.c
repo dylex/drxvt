@@ -159,10 +159,12 @@ static const struct {
     BOOL( "veryBoldFont", "vbf", Opt2_veryBold,
 	    "showing color text with bold font" ),
 #ifndef NO_BRIGHTCOLOR
-    BOOL( "boldColors", NULL, Opt2_boldColors,
-	    "showing bold primary colors using bright colors" ),
-    BOOL( "veryBright", NULL, Opt_veryBright,
-	    "showing bold primary colors using bold font also" ),
+    BOOL( "boldColors", NULL, Opt2_boldColors, NULL),	/* Show bold primary
+							   colors using bright
+							   colors */
+    BOOL( "veryBright", NULL, Opt_veryBright, NULL),	/* Show bold primary
+							   colors using bold
+							   font also */
 #endif
 
 
