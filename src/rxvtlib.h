@@ -93,6 +93,9 @@ typedef unsigned char text_t;
 # define rend_t	    RUINT16T
 #endif
 
+/* Size of the FIFO buffer */
+#define FIFO_BUF_SIZE (512)
+
 /*
  * TermWin elements limits
  *  ncol      : 1 <= ncol       <= MAX(RINT16T)
@@ -328,8 +331,9 @@ typedef enum {
 #ifdef XFT_SUPPORT
 # define Opt_xft		    ((1LU<<29) | IS_OPTION1)
 #endif
+# define Opt_useFifo		    ((1LU<<30) | IS_OPTION1)
 #define DEFAULT_OPTIONS	    \
-    (Opt_scrollBar)
+    (Opt_scrollBar|Opt_useFifo)
 
 /* rxvt_vars.Options2 */
 #define Opt2_protectSecondary	    ((1LU<<2) | IS_OPTION2)
@@ -817,7 +821,8 @@ enum {
     MacroFnToggleTransp,
     MacroFnToggleBcst,
     MacroFnToggleHold,
-    MacroFnToggleFullscren,
+    MacroFnToggleFullscreen,
+    MacroFnRaise,
     MacroFnSetTitle,
     MacroFnPrintScreen,
     MacroFnSaveConfig,
@@ -951,7 +956,7 @@ typedef struct rxvt_vars {
 					       them out */
 		    BOOLVAR( gotEIO, 1 );   /* True if some read() got EIO */
 
-    short	    ndead_childs;		    /* number of children that have
+    short	    ndead_childs;	    /* number of children that have
 					       died */
     short	    nAsyncChilds;	    /* Number of alive children launched
 					       via rxvt_async_exec */
@@ -960,6 +965,15 @@ typedef struct rxvt_vars {
 					     * rxvt_async_exec */
 
     int		    num_fds;		    /* number of fd to monitor */
+
+
+    int		    fifo_fd;			/* fd to read macros from */
+    char	    fifo_buf[FIFO_BUF_SIZE];	/* Buffer size of data read from
+						   fifo_fd */
+    char	    *fbuf_ptr;			/* Pointer where data from
+						   fifo_fd should be read */
+    char	    *fifo_name;			/* Name of the fifo */
+
 
     selection_t     selection;
     sstyle_t	    selection_style;
@@ -970,6 +984,7 @@ typedef struct rxvt_vars {
 
     char**	    global_argv;
     int		    global_argc;
+
 } rxvt_t;
 
 

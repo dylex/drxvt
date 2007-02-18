@@ -16,6 +16,10 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   of tab and window titles.
 	2. Added options --veryBright and --boldColors to control how bold
 	   primary colors are rendered.
+	3. Added --useFifo option, to make mrxvt listen for macros on a fifo.
+	   Code based on patch by Jozef Vesely.
+	4. Added Raise macro to "raise" the mrxvt window. Thanks to Jozef
+	   Vesely for the patch.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

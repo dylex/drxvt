@@ -567,6 +567,8 @@ static const struct {
 	"Initial number of tabs/terminals", 0),
     STRG( Rs_initProfiles, "initProfileList", "ip", "profile list",
 	"List of profiles to load on startup", 0 ),
+
+    BOOL( "useFifo", NULL, Opt_useFifo, NULL ),
     INFO("e", "command arg ...", "command to execute")
 };
 

@@ -1156,6 +1156,7 @@ rxvt_adjust_fd_number (rxvt_t* r)
      * -1 is always smaller than positive number :-)
      */
     MAX_IT( num_fds, r->Xfd );
+    MAX_IT( num_fds, r->fifo_fd );
 #ifdef HAVE_X11_SM_SMLIB_H
     /* adjust num_fds based on ICE connection. notice that we do not
      * need to check if ice_fd is a valid file descriptor here because

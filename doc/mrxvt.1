@@ -1174,6 +1174,20 @@ Enable / disable smart resize. When the tabbar is shown, or font size is increas
 Color of scrollbar trough (see also
 .Cm scrollColor ) .
 .
+.It Cm useFifo Ar True Ns | Ns Ar False
+If enabled, then mrxvt will create a
+.Xr fifo 7 Pa /tmp/.mrxvt-%pid
+and listen for macros on it. To execute macros, just write them to this fifo. For example
+.Vb
+/bin/echo -e "NewTab\enRaise" >> /tmp/.mrxvt-%pid
+.Ve
+creates a new tab and raises the
+.Nm
+window with process ID
+.Em %pid .
+.Sy NOTE:
+The meaning and syntax of this option might change in future versions.
+.
 .It Cm veryBright Ar True Ns | Ns Ar False
 If true, and if
 .Cm boldColors
@@ -1723,6 +1737,11 @@ option is set, then the tab will always be held open and everything else will be
 Toggle between full screen and regular mode. Also enable
 .Fl Fl smoothResize
 to get true full screen. This will only work if you are running an EWMH compatible window manager (e.g. Fvwm / OpenBox / KDE / Gnome).
+.\" ------------------------------------------------------------
+.It Ic Raise
+Raise the
+.Nm
+window.
 .\" ------------------------------------------------------------
 .It Ic SetTitle
 Set title of active tab to selection. (The selection must be owned by

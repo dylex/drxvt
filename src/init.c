@@ -759,6 +759,7 @@ rxvt_init_vars(rxvt_t *r)
     h->want_resize = 0;
     h->ttygid = -1;
     r->Xfd = -1;
+    r->fifo_fd = -1;
     r->ndead_childs = 0;
 
     r->nAsyncChilds = 0;
@@ -822,6 +823,9 @@ rxvt_init_vars(rxvt_t *r)
     r->TermWin.ice_fd = -1;
     SET_NULL(r->TermWin.sm_client_id);
 #endif
+
+    /* Fifo related init */
+    r->fbuf_ptr = r->fifo_buf;
 
     r->tabClicked = -1; /* No tab has been clicked by user */
 
@@ -1664,6 +1668,24 @@ rxvt_init_command(rxvt_t* r)
 #endif
 
     r->Xfd = XConnectionNumber(r->Xdisplay);
+    if( ISSET_OPTION( r, Opt_useFifo ) )
+    {
+	char fifo_name[NAME_MAX];
+
+	sprintf( fifo_name, "/tmp/.mrxvt-%d", getpid() );
+	unlink( fifo_name );
+	mkfifo( fifo_name, 0600 );
+
+	/*
+	 * Create the fifo in read write mode. If not, when no clients have the
+	 * fifo open, select() will claim our fifo has data pending and return.
+	 */
+	r->fifo_fd = open( fifo_name, O_RDWR | O_NDELAY );
+	if( r->fifo_fd != -1 )
+	    r->fifo_name = STRDUP( fifo_name );
+    }
+    else
+	r->fifo_fd = -1;
 
 #ifdef CURSOR_BLINK
     if (ISSET_OPTION(r, Opt_cursorBlink))

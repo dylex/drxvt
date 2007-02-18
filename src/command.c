@@ -2400,6 +2400,9 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    FD_SET(r->TermWin.ice_fd, &readfds);
 #endif
 
+	if( r->fifo_fd != -1 )
+	    FD_SET( r->fifo_fd, &readfds );
+
 	select_res = select( r->num_fds, &readfds, NULL, NULL,
 			(quick_timeout ? &value : NULL) );
 
@@ -2425,6 +2428,78 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	      )
 		rxvt_process_ice_msgs (r);
 #endif
+	    /* {{{ Execute commands on the fifo */
+	    if( -1 != r->fifo_fd  && FD_ISSET(r->fifo_fd, &readfds))
+	    {
+		ssize_t	len;
+		int	nbytes;
+
+		nbytes = sizeof(r->fifo_buf) - (r->fbuf_ptr - r->fifo_buf) - 1;
+		assert( nbytes > 0 );
+		
+		errno = 0;
+		len = read( r->fifo_fd, r->fbuf_ptr, nbytes );
+		
+		if( errno )
+		{
+#if DEBUG_LEVEL
+		    perror( "Error reading fifo" );
+#endif
+		}
+
+		else if( len == 0 )
+		{
+		    DBG_MSG( 2, ( stderr, "Reopening fifo %s", r->fifo_name ) );
+		    close( r->fifo_fd );
+		    unlink( r->fifo_name );
+		    mkfifo( r->fifo_name, 0600 );
+		    r->fifo_fd = open( r->fifo_name, O_RDWR | O_NDELAY );
+		}
+
+		else if( len > 0 )
+		{
+		    char	astr[FIFO_BUF_SIZE];
+		    char	*fptr = r->fifo_buf,
+				*aptr;
+		    action_t    action;
+
+		    SET_NULL( action.str );
+
+		    r->fbuf_ptr += len;	    /* Point to end of fifo_buf */
+
+		    for(;;)
+		    {
+			aptr = astr;
+			while( fptr < r->fbuf_ptr && *fptr && *fptr != '\n' )
+			    *(aptr++) = *(fptr++);
+
+			if( fptr < r->fbuf_ptr && *fptr == '\n' )
+			{
+			    /* Got complete action. Execute it */
+			    *aptr = 0;
+			    if( rxvt_set_action( &action, astr ) )
+				rxvt_dispatch_action( r, &action, NULL );
+
+			    fptr++; /* Advance to next char */
+			}
+
+			else
+			{
+			    /*
+			     * Incomplete action. Copy it to the fifo buffer and
+			     * break out
+			     */
+			    MEMCPY( r->fifo_buf, astr, aptr - astr );
+			    r->fbuf_ptr = r->fifo_buf + (aptr - astr);
+			    break;
+			}
+
+		    }
+
+		    rxvt_free( action.str );
+		}
+	    }
+	    /*}}}*/
 
 	    /*
 	     * Now figure out if we have something to return.

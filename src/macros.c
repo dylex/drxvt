@@ -63,6 +63,7 @@ static const char *const macroNames[] =
     "ToggleBroadcast",	    /* Toggle broadcasting of input */
     "ToggleHold",	    /* Toggle holding of completed tabs */
     "ToggleFullscreen",	    /* Toggle full screen mode */
+    "Raise",		    /* Raise the terminal window */
     "SetTitle",		    /* Set title of active tab to selection */
     "PrintScreen",	    /* Dump screen to file / printer */
     "SaveConfig",	    /* Save config to file */
@@ -1133,13 +1134,20 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 	    break;
 
-	case MacroFnToggleFullscren:
+	case MacroFnToggleFullscreen:
 	    ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
 		XInternAtom( r->Xdisplay, "_NET_WM_STATE", True),
 		_NET_WM_STATE_TOGGLE,
 		XInternAtom( r->Xdisplay, "_NET_WM_STATE_FULLSCREEN", True),
 		0, 0, 0 );
 	    break;
+
+	case MacroFnRaise:
+	    ewmh_message( r->Xdisplay, XROOT, r->TermWin.parent,
+		XInternAtom( r->Xdisplay, "_NET_ACTIVE_WINDOW", True),
+		1, 0 /*timestamp?*/, r->TermWin.parent, 0, 0 );
+	    break;
+
 
 	case MacroFnSetTitle:
 	    if (NOT_NULL(astr))
