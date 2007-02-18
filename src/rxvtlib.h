@@ -333,7 +333,7 @@ typedef enum {
 #endif
 # define Opt_useFifo		    ((1LU<<30) | IS_OPTION1)
 #define DEFAULT_OPTIONS	    \
-    (Opt_scrollBar|Opt_useFifo)
+    (Opt_scrollBar)
 
 /* rxvt_vars.Options2 */
 #define Opt2_protectSecondary	    ((1LU<<2) | IS_OPTION2)
