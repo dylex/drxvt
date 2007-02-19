@@ -20,6 +20,9 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   Code based on patch by Jozef Vesely.
 	4. Added Raise macro to "raise" the mrxvt window. Thanks to Jozef
 	   Vesely for the patch.
+	5. Added a UseFifo macro to enable / disable --useFifo at runtime.
+	   Defined a macro that opens a "mrxvt console" in a new tab (bound to
+	   Ctrl+Shift+c by default).
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

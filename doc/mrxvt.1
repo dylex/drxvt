@@ -1422,6 +1422,14 @@ Hide/show tabbar buttons
 .
 .It Ctrl+Shift+b
 Toggle very bold font
+.It Ctrl+Shift+c
+Open a
+.Nm
+console in a new tab, and enable the
+.Ic useFifo
+option if necessary. Anything typed in this console will be executed as a macro. On clean exit the
+.Ic useFifo
+option will be disabled.
 .It Ctrl+Shift+d
 Toggle input broadcasting (unbound by default)
 .It Ctrl+Shift+e
@@ -1746,6 +1754,17 @@ window.
 .It Ic SetTitle
 Set title of active tab to selection. (The selection must be owned by
 .Nm )
+.\" ------------------------------------------------------------
+.It Ic UseFifo Ar status
+Enable or disable using a
+.Xr fifo 1
+to listen for macros on (see the
+.Ic useFifo
+option). The argument
+.Ar status
+should be
+.Sy 0 , 1 , -1
+to disable, enable or toggle respectively.
 .\" ------------------------------------------------------------
 .It Ic PrintScreen Oo Fl psn Oc Op Ar command
 Dump screen to printer (or

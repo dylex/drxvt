@@ -825,7 +825,13 @@ rxvt_init_vars(rxvt_t *r)
 #endif
 
     /* Fifo related init */
-    r->fbuf_ptr = r->fifo_buf;
+    {
+	char fifo_name[NAME_MAX];
+
+	sprintf( fifo_name, "/tmp/.mrxvt-%d", getpid() );
+	r->fbuf_ptr = r->fifo_buf;
+	r->fifo_name = STRDUP( fifo_name );
+    }
 
     r->tabClicked = -1; /* No tab has been clicked by user */
 
@@ -1636,6 +1642,26 @@ rxvt_init_xlocale(rxvt_t *r)
 
 /*----------------------------------------------------------------------*/
 
+/* EXTPROTO */
+void
+rxvt_init_fifo( rxvt_t *r )
+{
+    unlink( r->fifo_name );
+    mkfifo( r->fifo_name, 0600 );
+
+    /*
+     * Create the fifo in read write mode. If not, when no clients have the
+     * fifo open, select() will claim our fifo has data pending and return.
+     */
+    r->fifo_fd = open( r->fifo_name, O_RDONLY|O_NDELAY );
+    if( r->fifo_fd == -1 )
+	UNSET_OPTION( r, Opt_useFifo );
+    else
+	MAX_IT( r->num_fds, r->fifo_fd + 1);
+
+    /* Reset the fifo buffer */
+    r->fbuf_ptr = r->fifo_buf;
+}
 
 /* EXTPROTO */
 void
@@ -1669,21 +1695,7 @@ rxvt_init_command(rxvt_t* r)
 
     r->Xfd = XConnectionNumber(r->Xdisplay);
     if( ISSET_OPTION( r, Opt_useFifo ) )
-    {
-	char fifo_name[NAME_MAX];
-
-	sprintf( fifo_name, "/tmp/.mrxvt-%d", getpid() );
-	unlink( fifo_name );
-	mkfifo( fifo_name, 0600 );
-
-	/*
-	 * Create the fifo in read write mode. If not, when no clients have the
-	 * fifo open, select() will claim our fifo has data pending and return.
-	 */
-	r->fifo_fd = open( fifo_name, O_RDWR | O_NDELAY );
-	if( r->fifo_fd != -1 )
-	    r->fifo_name = STRDUP( fifo_name );
-    }
+	rxvt_init_fifo( r );
     else
 	r->fifo_fd = -1;
 

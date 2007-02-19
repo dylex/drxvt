@@ -1109,7 +1109,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 #ifndef UNSHIFTED_MACROS
 	if (ctrl || meta || shft)
 #endif
-	    if ( rxvt_process_macros  (r, keysym, ev) )
+	    if( rxvt_process_macros( r, keysym, ev ) )
 		return;
 
 	DBG_MSG(2, (stderr, "bypass rxvt_process_macros\n"));
@@ -2442,18 +2442,21 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		
 		if( errno )
 		{
-#if DEBUG_LEVEL
+#if 1 /*DEBUG_LEVEL*/
 		    perror( "Error reading fifo" );
 #endif
 		}
 
-		else if( len == 0 )
+		if( len == 0 )
 		{
-		    DBG_MSG( 2, ( stderr, "Reopening fifo %s", r->fifo_name ) );
+		    DBG_MSG( 2, ( stderr, "Reopening fifo %s\n",
+				r->fifo_name ) );
 		    close( r->fifo_fd );
-		    unlink( r->fifo_name );
-		    mkfifo( r->fifo_name, 0600 );
-		    r->fifo_fd = open( r->fifo_name, O_RDWR | O_NDELAY );
+		    r->fifo_fd = open( r->fifo_name, O_RDONLY|O_NDELAY );
+		    rxvt_adjust_fd_number( r );
+
+		    /* Flush the fifo buffer */
+		    r->fbuf_ptr = r->fifo_buf;
 		}
 
 		else if( len > 0 )

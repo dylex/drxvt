@@ -1142,30 +1142,27 @@ rxvt_kill_page (rxvt_t* r, short page)
 /*
  * Reduce r->num_fds so that select() is more efficient
  */
-/* INTPROTO */
+/* EXTPROTO */
 void
-rxvt_adjust_fd_number (rxvt_t* r)
+rxvt_adjust_fd_number( rxvt_t* r )
 {
-    int	    num_fds;
+    int	    num_fds = STDERR_FILENO;
+    int	    i;
 
+    for( i=0; i <= LTAB(r); i++ )
+	MAX_IT( num_fds, PVTS(r, i)->cmd_fd );
+    DBG_MSG( 2, ( stderr, "LTAB=%d, stderr_fd=%d, num_fds=%d. ",
+		LTAB(r), STDERR_FILENO, num_fds ) );
 
-    num_fds = max( STDERR_FILENO, LVTS(r)->cmd_fd );
-
-    /* adjust num_fds based on X connection. notice that we do not
-     * need to check if Xfd is a valid file descriptor here because
-     * -1 is always smaller than positive number :-)
-     */
     MAX_IT( num_fds, r->Xfd );
     MAX_IT( num_fds, r->fifo_fd );
 #ifdef HAVE_X11_SM_SMLIB_H
-    /* adjust num_fds based on ICE connection. notice that we do not
-     * need to check if ice_fd is a valid file descriptor here because
-     * -1 is always smaller than positive number :-)
-     */
     MAX_IT( num_fds, r->TermWin.ice_fd );
 #endif
 
+#if 0
     MAX_IT( num_fds, r->num_fds-1 );
+#endif
 #ifdef OS_IRIX
     /* Alex Coventry says we need 4 & 7 too */
     MAX_IT( num_fds, 7 );
@@ -1451,13 +1448,6 @@ rxvt_remove_page (rxvt_t* r, short page)
 	PVTS(r, page)->v_buffer = NULL;
     }
 
-    /* to adjust num_fds if necessary */
-    if (PVTS(r, page)->cmd_fd == r->num_fds-1)
-    {
-	r->num_fds --;
-	DBG_MSG(1, (stderr, "Adjust num_fds to %d\n", r->num_fds));
-    }
-
     /* free screen structure */
     rxvt_scr_release (r, page);
 
@@ -1507,6 +1497,10 @@ rxvt_remove_page (rxvt_t* r, short page)
 
     /* always set mapped flag */
     AVTS(r)->mapped = 1;
+
+    /* Adjust the number of FD's we select() for.  */
+    rxvt_adjust_fd_number(r);
+
 
     /* adjust visible tabs */
     rxvt_tabbar_set_visible_tabs (r, True);

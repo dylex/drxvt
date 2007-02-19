@@ -824,6 +824,7 @@ enum {
     MacroFnToggleFullscreen,
     MacroFnRaise,
     MacroFnSetTitle,
+    MacroFnUseFifo,
     MacroFnPrintScreen,
     MacroFnSaveConfig,
     MacroFnToggleMacros,
