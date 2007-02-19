@@ -10,6 +10,7 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	4. Added %T,%G,%P flags for percent interpolation (useful for dtach).
 	5. Bold colored text is rendered in BOTH bold font, and bright color.
 	   Use only bold font.
+	6. r->num_fds is properly reduced when tabs are closed
 
     * Enhancements:
 	1. Added --titleFormat and --winTitleFormat options to control display
