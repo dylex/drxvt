@@ -23,7 +23,11 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   Vesely for the patch.
 	5. Added a UseFifo macro to enable / disable --useFifo at runtime.
 	   Defined a macro that opens a "mrxvt console" in a new tab (bound to
-	   Ctrl+Shift+c by default).
+	   Ctrl+Shift+c by default). Added --enable-use-fifo compile time
+	   option for people paranoid about security.
+	6. Added BOLD_BRIGHTENS_256_COLORS option in feature.h which attempts
+	   to brighten even non-primary colors instead of drawing them in
+	   bold. (Respects boldColors and veryBright).
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

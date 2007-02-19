@@ -159,6 +159,7 @@ support_cjk=no
 support_ttygid=yes
 support_backspace_key=yes
 support_delete_key=yes
+use_fifo=yes
 support_resources=yes
 support_xgetdefault=no
 support_swapscreen=yes
@@ -214,6 +215,7 @@ if test "x$support_everything" = "xyes"; then
     support_ttygid=yes
     support_backspace_key=yes
     support_delete_key=yes
+    use_fifo=yes
     support_resources=yes
     support_xgetdefault=no
     support_swapscreen=yes
@@ -268,6 +270,7 @@ if test "x$support_minimal" = "xyes"; then
     support_ttygid=yes
     support_backspace_key=yes
     support_delete_key=yes
+    use_fifo=no
     support_resources=yes
     support_xgetdefault=no
     support_swapscreen=yes
@@ -670,6 +673,15 @@ AC_ARG_ENABLE(
 )
 if test "x$support_delete_key" != "xyes"; then
     AC_DEFINE(NO_DELETE_KEY, [], [disable handling of the delete key])
+fi
+
+AC_ARG_ENABLE(
+    use-fifo,
+    AC_HELP_STRING([--enable-use-fifo],[Enable listening for macros on a fifo [[yes]]]),
+    [use_fifo=$enableval]
+)
+if test "x$use_fifo" == "xyes"; then
+    AC_DEFINE(USE_FIFO, [], [Enable listening for macros on a fifo])
 fi
 
 
@@ -1526,6 +1538,7 @@ echo "TTY/PTY type                : $rxvt_cv_ptys"
 echo "TTY gid                     : $support_ttygid"
 echo "Backspace key               : $support_backspace_key"
 echo "Delete key                  : $support_delete_key"
+echo "Use fifo                    : $use_fifo"
 echo "X resources                 : $support_resources"
 echo "X default resources         : $support_xgetdefault"
 echo "Swap screen                 : $support_swapscreen"

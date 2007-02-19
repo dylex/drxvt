@@ -331,7 +331,9 @@ typedef enum {
 #ifdef XFT_SUPPORT
 # define Opt_xft		    ((1LU<<29) | IS_OPTION1)
 #endif
+#ifdef USE_FIFO
 # define Opt_useFifo		    ((1LU<<30) | IS_OPTION1)
+#endif/*USE_FIFO*/
 #define DEFAULT_OPTIONS	    \
     (Opt_scrollBar)
 
@@ -816,7 +818,7 @@ enum {
     MacroFnToggleSubwin,
     MacroFnFont,
     MacroFnToggleVeryBold,
-    MacroFnToggleBrightColor,
+    MacroFnToggleBoldColors,
     MacroFnToggleVeryBright,
     MacroFnToggleTransp,
     MacroFnToggleBcst,
@@ -968,12 +970,14 @@ typedef struct rxvt_vars {
     int		    num_fds;		    /* number of fd to monitor */
 
 
+#ifdef USE_FIFO
     int		    fifo_fd;			/* fd to read macros from */
     char	    fifo_buf[FIFO_BUF_SIZE];	/* Buffer size of data read from
 						   fifo_fd */
     char	    *fbuf_ptr;			/* Pointer where data from
 						   fifo_fd should be read */
     char	    *fifo_name;			/* Name of the fifo */
+#endif
 
 
     selection_t     selection;

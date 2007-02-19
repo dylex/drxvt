@@ -575,6 +575,7 @@ rxvt_clean_exit (rxvt_t* r)
     XCloseDisplay (r->Xdisplay);
     SET_NULL(r->Xdisplay);
 
+#ifdef USE_FIFO
     if( r->fifo_fd != -1 )
     {
 	close( r->fifo_fd );
@@ -583,6 +584,7 @@ rxvt_clean_exit (rxvt_t* r)
 	unlink( r->fifo_name );
 	rxvt_free( r->fifo_name );  SET_NULL( r->fifo_name );
     }
+#endif/*USE_FIFO*/
 
     rxvt_free (r->tabstop);		    SET_NULL(r->tabstop);
     rxvt_free (r->pixColorsFocus);	    SET_NULL(r->pixColorsFocus);

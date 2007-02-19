@@ -1155,7 +1155,9 @@ rxvt_adjust_fd_number( rxvt_t* r )
 		LTAB(r), STDERR_FILENO, num_fds ) );
 
     MAX_IT( num_fds, r->Xfd );
+#ifdef USE_FIFO
     MAX_IT( num_fds, r->fifo_fd );
+#endif/*USE_FIFO*/
 #ifdef HAVE_X11_SM_SMLIB_H
     MAX_IT( num_fds, r->TermWin.ice_fd );
 #endif

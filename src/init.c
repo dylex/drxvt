@@ -107,10 +107,10 @@ const char *const def_colorName[] = {
 # ifdef XTERM_COLORS
     /* use the same color cube as xterm. 16-231 is a more or less uniform
      * rgb ramp, and 231-255 is a greyscale ramp */
-    "rgb:00/00/00",	/* default ff6-255 color table	 */
-    "rgb:00/00/5f",	/* consists of 6 6x6 colour cubes */
-    "rgb:00/00/87",	/* and a 24 greyscale ramp w/o	*/
-    "rgb:00/00/af",	/* black or white	    */
+    "rgb:00/00/00",	/* default 16-255 color table	    */
+    "rgb:00/00/5f",	/* consists of 6x6x6 colour cub	    */
+    "rgb:00/00/87",	/* and a 24 greyscale ramp w/o	    */
+    "rgb:00/00/af",	/* black or white		    */
     "rgb:00/00/d7",
     "rgb:00/00/ff",
     "rgb:00/5f/00",
@@ -323,11 +323,11 @@ const char *const def_colorName[] = {
     "rgb:ff/ff/af",
     "rgb:ff/ff/d7",
     "rgb:ff/ff/ff",
-# else	/* XTERM_COLORS */
-    "rgbi:0/0/0",	/* default 16-255 color table	 */
-    "rgbi:0/0/.2",	/* consists of 6 6x6 colour cubes */
-    "rgbi:0/0/.4",	/* and a 24 greyscale ramp w/o	*/
-    "rgbi:0/0/.6",	/* black or white	    */
+# else	/* !XTERM_COLORS */
+    "rgbi:0/0/0",	/* default 16-255 color table	    */
+    "rgbi:0/0/.2",	/* consists of 6x6x6 colour cubes   */
+    "rgbi:0/0/.4",	/* and a 24 greyscale ramp w/o	    */
+    "rgbi:0/0/.6",	/* black or white		    */
     "rgbi:0/0/.8",
     "rgbi:0/0/1",
     "rgbi:0/.2/0",
@@ -759,7 +759,9 @@ rxvt_init_vars(rxvt_t *r)
     h->want_resize = 0;
     h->ttygid = -1;
     r->Xfd = -1;
+#ifdef USE_FIFO
     r->fifo_fd = -1;
+#endif
     r->ndead_childs = 0;
 
     r->nAsyncChilds = 0;
@@ -824,7 +826,7 @@ rxvt_init_vars(rxvt_t *r)
     SET_NULL(r->TermWin.sm_client_id);
 #endif
 
-    /* Fifo related init */
+#ifdef USE_FIFO
     {
 	char fifo_name[NAME_MAX];
 
@@ -832,6 +834,7 @@ rxvt_init_vars(rxvt_t *r)
 	r->fbuf_ptr = r->fifo_buf;
 	r->fifo_name = STRDUP( fifo_name );
     }
+#endif/*USE_FIFO*/
 
     r->tabClicked = -1; /* No tab has been clicked by user */
 
@@ -1643,6 +1646,7 @@ rxvt_init_xlocale(rxvt_t *r)
 /*----------------------------------------------------------------------*/
 
 /* EXTPROTO */
+#ifdef USE_FIFO
 void
 rxvt_init_fifo( rxvt_t *r )
 {
@@ -1662,6 +1666,7 @@ rxvt_init_fifo( rxvt_t *r )
     /* Reset the fifo buffer */
     r->fbuf_ptr = r->fifo_buf;
 }
+#endif
 
 /* EXTPROTO */
 void
@@ -1694,10 +1699,12 @@ rxvt_init_command(rxvt_t* r)
 #endif
 
     r->Xfd = XConnectionNumber(r->Xdisplay);
+#ifdef USE_FIFO
     if( ISSET_OPTION( r, Opt_useFifo ) )
 	rxvt_init_fifo( r );
     else
 	r->fifo_fd = -1;
+#endif
 
 #ifdef CURSOR_BLINK
     if (ISSET_OPTION(r, Opt_cursorBlink))

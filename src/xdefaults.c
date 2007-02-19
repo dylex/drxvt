@@ -568,7 +568,9 @@ static const struct {
     STRG( Rs_initProfiles, "initProfileList", "ip", "profile list",
 	"List of profiles to load on startup", 0 ),
 
+#ifdef USE_FIFO
     BOOL( "useFifo", NULL, Opt_useFifo, NULL ),
+#endif/*USE_FIFO*/
     INFO("e", "command arg ...", "command to execute")
 };
 

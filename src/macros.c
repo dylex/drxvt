@@ -1059,7 +1059,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    rxvt_scr_touch (r, ATAB(r), True);
 	    break;
 
-	case MacroFnToggleBrightColor:
+	case MacroFnToggleBoldColors:
 	    TOGGLE_OPTION( r, Opt2_boldColors );
 
 	    rxvt_scr_touch (r, ATAB(r), True);
@@ -1161,6 +1161,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		retval = -1;
 	    break;
 
+#ifdef USE_FIFO
 	case MacroFnUseFifo:
 	    if( NOT_NULL( astr ) )
 	    {
@@ -1190,6 +1191,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		}
 	    }
 	    break;
+#endif/*USE_FIFO*/
 
 	case MacroFnPrintScreen:
 	{
@@ -1261,7 +1263,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	default:
 	    assert( action->type < sizeof( macroNames ) / sizeof( char ** ) );
 
-	    rxvt_print_error( "Macro type '%s' not implemented yet",
+	    rxvt_print_error( "Support for macro type '%s' not compiled.",
 		    macroNames[action->type]);
 	    retval = -1;
     }

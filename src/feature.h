@@ -64,6 +64,12 @@
 /* #define NO_BRIGHTCOLOR */
 
 /*
+ * Try and brighten colors in the 16--255 range (if possible) instead of using
+ * the bold attribute.
+ */
+/* #define BOLD_BRIGHTENS_256_COLORS */
+
+/*
  * Make colours match xterm colours instead of `traditional' rxvt colours
  */
 #define XTERM_COLORS

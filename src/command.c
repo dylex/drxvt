@@ -2400,8 +2400,10 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    FD_SET(r->TermWin.ice_fd, &readfds);
 #endif
 
+#ifdef USE_FIFO
 	if( r->fifo_fd != -1 )
 	    FD_SET( r->fifo_fd, &readfds );
+#endif
 
 	select_res = select( r->num_fds, &readfds, NULL, NULL,
 			(quick_timeout ? &value : NULL) );
@@ -2428,7 +2430,8 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	      )
 		rxvt_process_ice_msgs (r);
 #endif
-	    /* {{{ Execute commands on the fifo */
+
+#ifdef USE_FIFO /* {{{ Execute macros read from the fifo */
 	    if( -1 != r->fifo_fd  && FD_ISSET(r->fifo_fd, &readfds))
 	    {
 		ssize_t	len;
@@ -2502,7 +2505,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		    rxvt_free( action.str );
 		}
 	    }
-	    /*}}}*/
+#endif/*USE_FIFO}}}*/
 
 	    /*
 	     * Now figure out if we have something to return.

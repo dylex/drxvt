@@ -4159,14 +4159,44 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
 #ifndef NO_BRIGHTCOLOR
 	    /* Use bright colors for bold primary colors */
-	    if(
-		 (rend & RS_Bold) && NOTSET_OPTION( r, Opt2_boldColors ) &&
-		 fore >= minCOLOR && fore < minBrightCOLOR
-	      )
+	    if( (rend & RS_Bold) && NOTSET_OPTION( r, Opt2_boldColors ) )
 	    {
-		fore += minBrightCOLOR - minCOLOR;
-		if( NOTSET_OPTION( r, Opt_veryBright ) )
-		    rend &= ~RS_Bold;
+		if( fore >= minCOLOR && fore < minBrightCOLOR )
+		{
+		    fore += minBrightCOLOR - minCOLOR;
+		    if( NOTSET_OPTION( r, Opt_veryBright ) )
+			rend &= ~RS_Bold;
+		}
+#if defined(TTY_256COLOR) && defined(BOLD_BRIGHTENS_256_COLORS)
+		/* If fore is in the 6x6x6 color cube, try and brighten it */
+		else if(
+			 fore >= min256COLOR			    &&
+			 fore <= min256COLOR + 4*36 + 4*6 + 4	    &&
+			 (fore - min256COLOR) % 6 < 5		    &&
+			 ((fore - min256COLOR)/6) % 6 < 5
+		       )
+		{
+		    fore += 36 + 6 + 1;
+
+		    if( NOTSET_OPTION( r, Opt_veryBright ) )
+			rend &= ~RS_Bold;
+		}
+
+		/* Brighten up colors in the grey-scale ramp. */
+		else if(
+			fore >= min256COLOR + 6*6*6		    &&
+			fore <= max256COLOR - 3
+		       )
+		{
+		    if( fore == max256COLOR -3 )
+			fore = min256COLOR + 6*6*6 - 1;
+		    else
+			fore += 4;
+
+		    if( NOTSET_OPTION( r, Opt_veryBright ) )
+			rend &= ~RS_Bold;
+		}
+#endif /*TTY_256COLOR && BOLD_BRIGHTENS_256_COLORS*/
 	    }
 #endif /*NO_BRIGHTCOLOR*/
 
