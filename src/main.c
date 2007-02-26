@@ -778,8 +778,11 @@ rxvt_tt_winsize(int fd, unsigned short col, unsigned short row, pid_t pid)
 {
     struct winsize  ws;
 
+    DBG_MSG( 2, (stderr, "%s( fd=%d, col=%hu, row=%hu, pid=%d )\n",
+		__func__, fd, col, row, pid ) );
     if (fd < 0)
-    return;
+	return;
+
     ws.ws_col = col;
     ws.ws_row = row;
     ws.ws_xpixel = ws.ws_ypixel = 0;
