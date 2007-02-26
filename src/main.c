@@ -778,26 +778,34 @@ rxvt_tt_winsize(int fd, unsigned short col, unsigned short row, pid_t pid)
 {
     struct winsize  ws;
 
-    DBG_MSG( 2, (stderr, "%s( fd=%d, col=%hu, row=%hu, pid=%d )\n",
-		__func__, fd, col, row, pid ) );
+#ifdef DEBUG
+    if( pid && fd > STDERR_FILENO )
+    {
+	DBG_MSG( 2, (stderr, "%s( fd=%d, col=%hu, row=%hu, pid=%d )\n",
+		    __func__, fd, col, row, pid ) );
+    }
+#endif
+
     if (fd < 0)
 	return;
 
     ws.ws_col = col;
     ws.ws_row = row;
     ws.ws_xpixel = ws.ws_ypixel = 0;
-#ifndef DEBUG
-    (void)ioctl(fd, TIOCSWINSZ, &ws);
-#else
+
     if (ioctl(fd, TIOCSWINSZ, &ws) < 0)
     {
-	DBG_MSG(1,(stderr, "Failed to send TIOCSWINSZ to fd %d\n", fd));
+#ifdef DEBUG
+	if( pid && fd > STDERR_FILENO )
+	{
+	    DBG_MSG(1, (stderr, "Failed to send TIOCSWINSZ to fd %d\n", fd));
+	}
+#endif
     }
-# ifdef SIGWINCH
-    else if (pid)	/* force through to the command */
+#ifdef SIGWINCH
+    else if( pid )	/* force through to the command */
 	kill(pid, SIGWINCH);
-# endif
-#endif	/* DEBUG */
+#endif
 }
 
 
