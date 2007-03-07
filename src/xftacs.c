@@ -60,18 +60,6 @@
 #include <xftacs.h>
 
 
-#ifdef DEBUG_VERBOSE
-# define DEBUG_LEVEL 1
-#else 
-# define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-# define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-# define DBG_MSG(d,x)
-#endif
-
 /*
  * Maximum number of glyphs to be drawn per call to XftDrawGlyphs.
  */
@@ -114,7 +102,7 @@ acsXErrorHandler( __attribute__((unused)) Display *dpy,
 
     sPmap = 0;
 
-    DBG_MSG( 1, (stderr, "Could not create pixmap\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "Could not create pixmap\n");
     return 0;
 }
 
@@ -130,7 +118,7 @@ xftInitACS( Display *dpy, Drawable d, unsigned depth)
 {
     int (*oldXerrorHandler)( Display *, XErrorEvent *);
 
-    DBG_MSG(3, ( stderr, "Initing sPmap\n"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "Initing sPmap\n");
 
     if(d == 0)		d = DefaultRootWindow( dpy);
     if(depth == 0)	depth=DefaultDepth( dpy, DefaultScreen( dpy));
@@ -158,7 +146,7 @@ xftCloseACS( Display *dpy)
 {
     if( sPmap )
     {
-	DBG_MSG(3, ( stderr, "freeing sPmap\n"));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "freeing sPmap\n");
 
 	XFreePixmap( dpy, sPmap);
 	sPmap = 0;
@@ -389,7 +377,7 @@ xftDrawACSChars(
 		n++, str++);
 	if( n )
 	{
-	    DBG_MSG(1, (stderr, "(%d glyphs) ", n));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d glyphs) ", n);
 
 	    XftDrawGlyphs( draw, color, pub, x, y, glyphs, n);
 
@@ -405,7 +393,7 @@ xftDrawACSChars(
 	{
 	    XGCValues values;
 
-	    DBG_MSG(1, (stderr, "(%d boxes) ", n));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d boxes) ", n);
 
 	    XGetGCValues( dpy, acsGc, GCForeground | GCBackground, &values);
 
@@ -436,7 +424,7 @@ xftDrawACSChars(
 
 	    for( n=0; ++n < len && *(++str) == c; );
 
-	    DBG_MSG( 1, (stderr, "(%d hln)", n));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d hln)", n);
 	    x += n * font_width;
 
 	    XSetFillStyle( dpy, acsGc, FillSolid);
@@ -453,7 +441,7 @@ xftDrawACSChars(
 	    XPoint points[4];
 	    int npoints = 4, n;
 
-	    DBG_MSG(1, (stderr, "(1 dmd) "));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(1 dmd) ");
 
 	    points[0].x = CHR_WIDE/2 + (BOX_WIDE - CHR_WIDE) / 2;
 	    points[0].y = 0;
@@ -491,7 +479,7 @@ xftDrawACSChars(
 	    int coord[4];
 	    int n = 0;
 
-	    DBG_MSG( 1, (stderr, "(1 ldc) "));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(1 ldc) ");
 
 	    XSetFillStyle( dpy, acsGc, FillSolid);
 	    while (*p >= 0)
@@ -536,8 +524,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
     const unsigned char *t = str;
     int chars;
 
-    DBG_MSG(1, ( stderr, "Drawing %d(%d) %sACS characters.", len, strlen( str),
-	( xftdraw_string == XftDrawString8) ? "Utf8 " : ""));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "Drawing %d(%d) %sACS characters.", len, STRLEN( str), ( xftdraw_string == XftDrawString8) ? "Utf8 " : "");
 
     while(len > 0)
     {
@@ -547,7 +534,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	for( chars=0; *t >= 32 && chars < len; chars++, t++);
 	if( chars)
 	{
-	    DBG_MSG(1, ( stderr, " [%d chars]", chars));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, " [%d chars]", chars);
 	    xftdraw_string( draw, color, pub, x, y, str, chars);
 
 	    x += chars * pub->max_advance_width;
@@ -561,7 +548,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	for( chars=0; *t < 32 && chars < len; chars++, t++);
 	if( chars)
 	{
-	    DBG_MSG( 1, (stderr, " (%d glyphs)", chars));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, " (%d glyphs)", chars);
 	    xftDrawACSChars( dpy, d, gc, draw, color, pub, x, y, str, chars);
 
 	    x += chars * pub->max_advance_width;

@@ -37,40 +37,8 @@
 #endif
 
 
-/*
- * If we haven't pulled in typedef's like  RINT16T  then do them ourself
- * type of (normal and unsigned) basic sizes
- */
-#if (SIZEOF_INT_P == 8)
-/* we have 8 byte pointers on 64bit systems */
-# if (SIZEOF_INT == 8)
-typedef int		intp_t;
-typedef unsigned int	u_intp_t;
-# elif (SIZEOF_LONG == 8)
-typedef long		intp_t;
-typedef unsigned long	u_intp_t;
-# else
-#  error No 8 byte integer type available
-# endif
-#else
-/*
- * If we have <inttypes.h>, use *intptr_t instead of *INT32T. This eliminates
- * some problems on 64-bit systems. Reported by David Mosberger
- * (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=312710). Patch is applied
- * after slight modification. :-)
- */
-# ifdef HAVE_INTTYPES_H
-typedef intptr_t	intp_t;
-typedef uintptr_t	u_intp_t;
-# else
-/* whatever normal size corresponds to a integer pointer */
-typedef RINT32T		intp_t;
-/* whatever normal size corresponds to a unsigned integer pointer */
-typedef RUINT32T	u_intp_t;
-# endif	/* HAVE_INTTYPES_H */
-#endif
 /* type of unicode_t */
-typedef RUINT32T	unicode_t;
+typedef uint32_t	unicode_t;
 
 
 /*****************************************************************************
@@ -82,15 +50,15 @@ struct rxvt_vars;	/* defined later on */
 struct rxvt_hidden;	/* not defined here */
 
 typedef struct {
-    RINT32T         row;
-    RINT32T         col;
+    int32_t         row;
+    int32_t         col;
 } row_col_t;
 
 typedef unsigned char text_t;
 #if defined(TTY_256COLOR) || defined(MULTICHAR_SET)
-# define rend_t	    RUINT32T
+# define rend_t	    uint32_t
 #else
-# define rend_t	    RUINT16T
+# define rend_t	    uint16_t
 #endif
 
 /* Size of the FIFO buffer */
@@ -98,35 +66,35 @@ typedef unsigned char text_t;
 
 /*
  * TermWin elements limits
- *  ncol      : 1 <= ncol       <= MAX(RINT16T)
- *  nrow      : 1 <= nrow       <= MAX(RINT16T)
- *  saveLines : 0 <= saveLines  <= MAX(RINT16T)
+ *  ncol      : 1 <= ncol       <= MAX(int16_t)
+ *  nrow      : 1 <= nrow       <= MAX(int16_t)
+ *  saveLines : 0 <= saveLines  <= MAX(int16_t)
  *  nscrolled : 0 <= nscrolled  <= saveLines
  *  view_start: 0 <= view_start <= nscrolled
  */
 
 typedef struct {
-    RUINT16T	    fwidth,	/* font width  [pixels] */
+    uint16_t	    fwidth,	/* font width  [pixels] */
 		    fheight;	/* font height [pixels] */
 #ifdef XFT_SUPPORT
-    RUINT16T	    pwidth,	/* propotionally spaced font width / height */
+    uint16_t	    pwidth,	/* propotionally spaced font width / height */
 		    pheight;
 #endif
-    RUINT16T	    propfont;	/* font proportional flags */
-    RUINT16T	    ncol;	/* window columns [characters] */
-    RUINT16T	    nrow;	/* window rows [characters] */
-    RUINT16T	    mapped; 	/* TermWin is mapped? */
-    RUINT16T	    int_bwidth; /* internal border width */
-    RUINT16T	    ext_bwidth; /* external border width */
+    uint16_t	    propfont;	/* font proportional flags */
+    uint16_t	    ncol;	/* window columns [characters] */
+    uint16_t	    nrow;	/* window rows [characters] */
+    uint16_t	    mapped; 	/* TermWin is mapped? */
+    uint16_t	    int_bwidth; /* internal border width */
+    uint16_t	    ext_bwidth; /* external border width */
 
-    RUINT16T	    maxTabWidth,    /* max width of tab title to display */
+    uint16_t	    maxTabWidth,    /* max width of tab title to display */
 		    minVisibleTabs; /* Minimum number of tabs to try and keep
 				       visible */
 
     char	    *winTitleFormat;	/* Format of the window title (used when
 					   syncing the tab title */
 #ifndef NO_LINESPACE
-    RUINT16T	    lineSpace;	/* space between rows */
+    uint16_t	    lineSpace;	/* space between rows */
 #endif
 
     char	    BOOLVAR(focus,1);	/* window is focused? */
@@ -238,15 +206,15 @@ typedef struct {
  */
 typedef struct {
     text_t**	    text;	/* _all_ the text */
-    RINT16T*	    tlen;	/* length of each text line */
+    int16_t*	    tlen;	/* length of each text line */
     rend_t**	    rend;	/* rendition, uses RS_ flags */
     row_col_t       cur;	/* cursor position on the screen */
-    RUINT16T	    tscroll;	/* top of settable scroll region */
-    RUINT16T	    bscroll;	/* bottom of settable scroll region */
-    RUINT16T	    charset;	/* character set number [0..3] */
+    uint16_t	    tscroll;	/* top of settable scroll region */
+    uint16_t	    bscroll;	/* bottom of settable scroll region */
+    uint16_t	    charset;	/* character set number [0..3] */
     unsigned int    flags;	/* see below */
     row_col_t	    s_cur;	/* saved cursor position */
-    RUINT16T	    s_charset;	/* saved character set number [0..3] */
+    uint16_t	    s_charset;	/* saved character set number [0..3] */
     char	    s_charset_char;
     rend_t	    s_rstyle;	/* saved rendition style */
 } screen_t;
@@ -254,7 +222,7 @@ typedef struct {
 
 typedef struct {
     unsigned char*  text;   /* selected text */
-    RUINT32T	    len;    /* length of selected text */
+    uint32_t	    len;    /* length of selected text */
     enum {
 	SELECTION_CLEAR = 0,/* nothing selected */
 	SELECTION_INIT,	    /* marked a point */
@@ -614,11 +582,11 @@ typedef struct {
 				       during this processes lifetime */
 
     /* moved from TermWin_t */
-    RUINT16T	    saveLines;	/* number of lines to save */
-    RUINT16T	    num_scr;	/* number of lines scrolled */
-    RUINT16T	    nscrolled;	/* number of line actually scrolled */
-    RUINT16T	    view_start;	/* scrollback view starts here */
-    RUINT16T	    mapped;	/* window state mapped? */
+    uint16_t	    saveLines;	/* number of lines to save */
+    uint16_t	    num_scr;	/* number of lines scrolled */
+    uint16_t	    nscrolled;	/* number of line actually scrolled */
+    uint16_t	    view_start;	/* scrollback view starts here */
+    uint16_t	    mapped;	/* window state mapped? */
 
     /* screen structure initialized? */
     unsigned char   BOOLVAR(init_screen, 1);
@@ -657,8 +625,8 @@ typedef struct {
     /* move from hidden */
     rend_t	    rstyle;
 
-    RUINT16T	    prev_ncol; /* previous columns */
-    RUINT16T	    prev_nrow; /* previous rows */
+    uint16_t	    prev_ncol; /* previous columns */
+    uint16_t	    prev_nrow; /* previous rows */
     /* moved from tab_t */
     short		tab_width;	/* tab width */
     char UNTAINTED *	tab_title;  	/* tab title */
@@ -684,8 +652,8 @@ typedef struct {
 #endif
 
     /* moved from hidden */
-    RUINT32T	    PrivateModes;
-    RUINT32T	    SavedModes;
+    uint32_t	    PrivateModes;
+    uint32_t	    SavedModes;
 
 #ifdef UTMP_SUPPORT
 #ifndef UTEMPTER_SUPPORT
@@ -900,7 +868,7 @@ typedef struct rxvt_vars {
 #endif
     tabBar_t	    tabBar;
     Display*	    Xdisplay;
-    RUINT32T	    Options[MAX_OPTION_ARRAY];
+    uint32_t	    Options[MAX_OPTION_ARRAY];
     XSizeHints      szHint;
 
     /* macros */

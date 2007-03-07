@@ -27,19 +27,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-
 #ifdef HAVE_WCHAR_H
 # if !defined (OS_FREEBSD) || _FreeBSD_version >= 500000
 /* EXTPROTO */
@@ -407,26 +394,26 @@ ma_memcpy(void *s1, const void *s2, size_t len)
 void*
 ma_memmove(void *d, const void *s, size_t len)
 {
-    u_intp_t        i;
-    u_intp_t*	    pdst;
-    u_intp_t*	    psrc;
+    unsigned int    i;
+    unsigned int*   pdst;
+    unsigned int*   psrc;
     unsigned char*  dst = (unsigned char *)d;
     unsigned char*  src = (unsigned char *)s;
 
     if (len && d != s) {
-	if ((u_intp_t)d < (u_intp_t)s) {
+	if ((unsigned int)d < (unsigned int)s) {
 	    /* forwards */
-	    i = (-(u_intp_t)dst) & (SIZEOF_INT_P - 1);
+	    i = (-(unsigned int)dst) & (sizeof (unsigned int*) - 1);
 	    if (len >= 16 &&
-		i == ((-(u_intp_t)src) & (SIZEOF_INT_P - 1))) {
+		i == ((-(unsigned int)src) & (SIZEOF_INT_P - 1))) {
 	        /* speed up since src & dst are offset correctly */
 		len -= (size_t)i;
 		for ( ; i--; )
 		    *dst++ = *src++;
 		/* assign the src/dst to psrc/pdst */
-		pdst = (u_intp_t*) dst;
-		psrc = (u_intp_t*) src;
-		for (i = (u_intp_t)(len / SIZEOF_INT_P); i--; )
+		pdst = (unsigned int*) dst;
+		psrc = (unsigned int*) src;
+		for (i = (unsigned int)(len / sizeof (unsigned int*)); i--; )
 		    *pdst++ = *psrc++;
 		len &= (SIZEOF_INT_P - 1);
 		/* assign back the src/dst */
@@ -441,17 +428,17 @@ ma_memmove(void *d, const void *s, size_t len)
 	    /* backwards */
 	    dst += len;
 	    src += len;
-	    i = ((u_intp_t)dst) & (SIZEOF_INT_P - 1);
+	    i = ((unsigned int)dst) & (sizeof (unsigned int*) - 1);
 	    if (len >= 16 &&
-		i == (((u_intp_t)src) & (SIZEOF_INT_P - 1))) {
+		i == (((unsigned int)src) & (SIZEOF_INT_P - 1))) {
 	        /* speed up since src & dst are offset correctly */
 		len -= (size_t)i;
 		for ( ; i--; )
 		    *--dst = *--src;
 		/* assign the src/dst to psrc/pdst */
-		pdst = (u_intp_t*) dst;
-		psrc = (u_intp_t*) src;
-		for (i = (u_intp_t)(len / SIZEOF_INT_P); i--; )
+		pdst = (unsigned int*) dst;
+		psrc = (unsigned int*) src;
+		for (i = (unsigned int)(len / sizeof (unsigned int*)); i--; )
 		    *--pdst = *--psrc;
 		len &= (SIZEOF_INT_P - 1);
 		/* assign back the src/dst */
@@ -484,8 +471,8 @@ ma_bzero(void* buf, size_t len)
 void*
 ma_memset(void *p, int c1, size_t len)
 {
-    u_intp_t        i, val;
-    u_intp_t*	    pdst;
+    unsigned int        i, val;
+    unsigned int*	    pdst;
     unsigned char   c = (unsigned char) c1;
     unsigned char  *lp = (unsigned char *) p;
 
@@ -496,7 +483,7 @@ ma_memset(void *p, int c1, size_t len)
 	    ** write out preceding characters so we align on an
 	    ** integer boundary
 	    */
-	    if ((i = ((-(u_intp_t)p) & (SIZEOF_INT_P - 1)))) {
+	    if ((i = ((-(unsigned int)p) & (SIZEOF_INT_P - 1)))) {
 		len -= (size_t)i;
 		for (; i--;)
 		    *lp++ = c;
@@ -514,8 +501,8 @@ ma_memset(void *p, int c1, size_t len)
 	    val |= (val << 64);
 #endif
 	    /* assign the lp to pdst */
-	    pdst = (u_intp_t*) lp;
-	    for (i = (u_intp_t)(len / SIZEOF_INT_P); i--;)
+	    pdst = (unsigned int*) lp;
+	    for (i = (unsigned int)(len / SIZEOF_INT_P); i--;)
 		*pdst++ = val;
 	    len &= (SIZEOF_INT_P - 1);
 	    /* assign back the pdst to lp */

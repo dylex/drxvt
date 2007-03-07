@@ -33,6 +33,9 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:
 	1. Check locale for encoding method if it is not specified by -km
 	   option or multichar_encoding resource.
+	2. Add new debugging facility such that a user can specify the
+	   message type and verbose level by command line options. Run
+	   `mrxvt -dmask whatever -dlevel something' for details. 
 
 
 0.5.1 to 0.5.2

@@ -36,20 +36,6 @@
 #endif
 
 
-#ifdef DEBUG_VERBOSE
-# define DEBUG_LEVEL	1
-# define DEBUG_X
-#else
-# define DEBUG_LEVEL	0
-# undef DEBUG_X
-#endif
-
-#if DEBUG_LEVEL
-# define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-# define DBG_MSG(d,x)
-#endif
-
 /* #define XTERM_REVERSE_VIDEO 1 */
 
 
@@ -1064,7 +1050,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	STRCPY(val, "unix");
 	STRNCAT(val, rs[Rs_display_name], l-5);
 	val[l-1] = (char) 0;
-	DBG_MSG(1, (stderr, "Open X display %s\n", val));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Open X display %s\n", val);
 	r->Xdisplay = XOpenDisplay(val);
 	rxvt_free(val);
     }
@@ -1072,8 +1058,8 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
     if (IS_NULL(r->Xdisplay))
     {
-	DBG_MSG( 1, ( stderr, "Open X display %s\n",
-		    rs[Rs_display_name] ? rs[Rs_display_name] : "nil"));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Open X display %s\n",
+		    rs[Rs_display_name] ? rs[Rs_display_name] : "nil");
 	r->Xdisplay = XOpenDisplay( rs[Rs_display_name] );
 	if (IS_NULL(r->Xdisplay))
 	{
@@ -1678,7 +1664,7 @@ rxvt_init_command(rxvt_t* r)
      */
     struct sigaction	act;
 
-    DBG_MSG( 1, ( stderr, "rxvt_init_command()\n" ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_init_command()\n");
 
 
     /*
@@ -1786,9 +1772,9 @@ rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 int
 rxvt_set_fgbg_colors( rxvt_t *r, int page )
 {
-    DBG_MSG( 2, ( stderr, "%s(r, page=%d)"
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s(r, page=%d)"
 		": fgbg_tabnum=%d, globalTabNum=%d\n",
-		__func__, page, r->fgbg_tabnum, PVTS(r, page)->globalTabNum ) );
+		__func__, page, r->fgbg_tabnum, PVTS(r, page)->globalTabNum);
 
     if(
 	 r->fgbg_tabnum == PVTS(r, page)->globalTabNum &&
@@ -1927,7 +1913,7 @@ rxvt_init_colors( rxvt_t *r )
 {
     register int    i;
 
-    DBG_MSG( 2, ( stderr, "rxvt_init_colors()\n" ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_init_colors()\n");
 
     /* Initialize fg/bg colors for each profile */
     for (i = 0; i < MAX_PROFILES; i++)
@@ -2474,7 +2460,7 @@ rxvt_string_to_argv( const char *string, int *argc )
      */
     pret = (char**) rxvt_calloc (MAX_ARGV, sizeof (char*));
 
-    DBG_MSG(1, (stderr, "fetch command argv for the tab\n"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "fetch command argv for the tab\n");
 #ifdef INTERNAL_ARGV_SPLIT
     /*{{{*/
     /*
@@ -2541,7 +2527,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 	if (!*pcur)	/* end of string */
 	{
 	    pret[i] = STRDUP (pbeg);
-	    DBG_MSG(1, (stderr, "   argv[%d] = %s\n", i, pret[i]));
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "   argv[%d] = %s\n", i, pret[i]);
 	    break;	/* ready to return */
 	}
 
@@ -2557,7 +2543,7 @@ rxvt_string_to_argv( const char *string, int *argc )
 	    pret[i] = (char*) rxvt_malloc (len * sizeof(char));
 	    MEMCPY (pret[i], pbeg, len-1);
 	    pret[i][len-1] = (char) 0;
-	    DBG_MSG(1, (stderr, "   argv[%d] = %s\n", i, pret[i]));
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "   argv[%d] = %s\n", i, pret[i]);
 
 	    /* forward to next character */
 	    pcur ++;
@@ -2703,7 +2689,7 @@ rxvt_set_vt_colors( rxvt_t *r, int page )
     int		    useFocusColors;
     unsigned long   *pix_colors;
 
-    DBG_MSG( 2, ( stderr, "%s(r, page=%d)\n", __func__, page ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s(r, page=%d)\n", __func__, page);
 
     useFocusColors = ( r->TermWin.focus || !r->TermWin.fade );
     pix_colors = (useFocusColors ? r->pixColorsFocus : r->pixColorsUnfocus);
@@ -2787,7 +2773,7 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	if( -1 == r->vterm[i].vts_idx )
 	    break;
     assert( i != MAX_PAGES );
-    DBG_MSG( 1, (stderr, "Find vterm[%d] for pointer vts[%d]\n", i, page) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Find vterm[%d] for pointer vts[%d]\n", i, page);
 
     /* clear the term_t structure */
     r->vts[page] = &(r->vterm[i]);
@@ -3010,10 +2996,10 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
     rxvt_set_vt_colors( r, page );
 
     /* create the terminal window */
-    DBG_MSG( 2, (stderr, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n",
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n",
 		page, r->h->window_vt_x, r->h->window_vt_y,
 		VT_WIDTH(r), VT_HEIGHT(r),
-		r->pixColors[Color_fg], r->pixColors[Color_bg] ));
+		r->pixColors[Color_fg], r->pixColors[Color_bg]);
 
     PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
 				r->h->window_vt_x, r->h->window_vt_y,
@@ -3301,8 +3287,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     {
 	if (!rxvt_init_font_xft (r))
 	{
-	    DBG_MSG (1, (stderr,
-		    "Failed to load FreeType font, fallback to X11 font\n"));
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT,
+		    "Failed to load FreeType font, fallback to X11 font\n");
 	    /* disable xft */
 	    UNSET_OPTION(r, Opt_xft);
 	}
@@ -3586,7 +3572,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
      */
     if (IS_NULL(r->h->popupMenu[0]))
     {
-	DBG_MSG( 3, ( stderr, "Setting popup menu 1 to a tab list\n" ) );
+	rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Setting popup menu 1 to a tab list\n");
 	r->h->popupMenu[0] = (menu_t *) rxvt_calloc( 1, sizeof(menu_t) );
 
 	r->h->popupMenu[0]->len	    = sizeof( "Switch to tab" );
@@ -3662,7 +3648,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 	    /* NOT REACHED */
 
 	default:
-	    DBG_MSG( 5, ( stderr, "Forked %s", cmd ) );
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Forked %s", cmd);
 	    r->asyncChilds[ r->nAsyncChilds++ ] = pid;
 	    return 1;
     }
@@ -3680,7 +3666,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 {
     int		cfd, er;
 
-    DBG_MSG( 1, ( stderr, "rxvt_run_command(r, %d, argv)", page ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_run_command(r, %d, argv)", page);
 
     /* get master (pty) */
     if ((cfd = rxvt_get_pty(&(PVTS(r, page)->tty_fd),
@@ -3724,7 +3710,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
     rxvt_get_ttymode(&(PVTS(r, page)->tio), er);
 
 
-    DBG_MSG(1,(stderr, "argv = 0x%x\n", (unsigned int) argv));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "argv = 0x%x\n", (unsigned int) argv);
 #ifndef __QNX__
     /*
      * Spin off the command interpreter
@@ -3907,7 +3893,7 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
     char*		login;
 
 
-    /* DBG_MSG(1,(stderr, "argv = %x\n", argv)); */
+    /* rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "argv = %x\n", argv); */
 
     /* init terminal attributes */
     SET_TTYMODE( STDIN_FILENO, &(PVTS(r, page)->tio) );
@@ -3936,11 +3922,9 @@ rxvt_run_child(rxvt_t* r, int page, const char **argv)
     /* command interpreter path */
     if (NOT_NULL(argv))
     {
-# ifdef DEBUG_VERBOSE
 	int	    i;
 	for (i = 0; argv[i]; i++)
-	    DBG_MSG(2,(stderr, "argv [%d] = \"%s\"\n", i, argv[i]));
-# endif
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "argv [%d] = \"%s\"\n", i, argv[i]);
 	execvp(argv[0], (char *const *)argv);
 	/* no error message: STDERR is closed! */
     }

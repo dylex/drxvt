@@ -27,19 +27,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-
 #ifdef HAVE_SCROLLBARS
 
 /*
@@ -236,7 +223,7 @@ rxvt_scrollbar_create (rxvt_t* r)
     unsigned int    sb_w, sb_h;
 
 
-    DBG_MSG(1,(stderr,"Create scrollbar\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCROLLBAR, "Create scrollbar\n");
     assert (IS_WIN(r->TermWin.parent));
 
     sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;

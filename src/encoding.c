@@ -25,19 +25,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-
 struct KNOWN_ENCODINGS {
     char*	    name;
     enum enc_label  method;
@@ -319,7 +306,7 @@ rxvt_decode_euc2jis (unsigned char* str, int len)
 {
     register int    i;
 
-    DBG_MSG(2, (stderr, "rxvt_decode_euc2jis (%s : %d)\n", str, len));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_euc2jis (%s : %d)\n", str, len);
 
     for (i = 0; i < len; i++)
 	str[i] &= 0x7F;
@@ -333,7 +320,7 @@ rxvt_decode_sjis2jis (unsigned char* str, int len)
     register int    i;
     unsigned char  *high, *low;
 
-    DBG_MSG(1, (stderr, "rxvt_decode_sjis2jis\n"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_sjis2jis\n");
 
     for (i = 0; i < len; i += 2, str += 2) {
 	high = str;
@@ -359,7 +346,7 @@ rxvt_decode_gb180302jis (unsigned char* str, int len)
 {
     register int    i;
 
-    DBG_MSG(2, (stderr, "rxvt_decode_gb180302jis\n"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_gb180302jis\n");
 
     for (i = 0; i < len; i++)
 	str[i] &= 0x7F;
@@ -373,7 +360,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     struct KNOWN_ENCODINGS* a;
 
     assert (NOT_NULL(str));
-    DBG_MSG(1,(stderr,"set multichar encoding to %s\n", str));
+    rxvt_dbgmsg (DBG_INFO, DBG_ENCODING, "set multichar encoding to %s\n", str);
 
     a = (struct KNOWN_ENCODINGS*) known_encodings;
     for (; a->name; a++) {
@@ -414,7 +401,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
 void
 rxvt_decode_dummy (unsigned char* str, int len)
 {
-    DBG_MSG(2, (stderr, "rxvt_decode_dummy\n"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_dummy\n");
 }
 
 
@@ -439,8 +426,7 @@ rxvt_set_default_locale (rxvt_t* r)
 	locale = lc;
 #endif
 
-    DBG_MSG(1,(stderr,"set default locale to %s\n",
-	locale ? locale : "none"));
+    rxvt_dbgmsg (DBG_INFO, DBG_ENCODING, "set default locale to %s\n", locale ? locale : "none");
     r->h->locale = locale;
 }
 
@@ -528,7 +514,7 @@ rxvt_set_default_font_x11 (rxvt_t* r)
     register int    i;
 
 
-    DBG_MSG(1,(stderr,"rxvt_set_default_font_x11\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_ENCODING, "rxvt_set_default_font_x11\n");
 
     /* Set default fonts */
     def_fontName = (char**) nfont_list[r->encoding_method].font;

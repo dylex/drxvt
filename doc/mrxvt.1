@@ -985,6 +985,17 @@ Visual bell
 .It Fl C
 Intercept console messages
 .
+.It Fl dmask Ar namelist
+Print out debug message defined by a coma separated name list. Available
+names include: command, screen, ptytty, init, main, logging, macros,
+menubar, tabbar, scrollbar, images, pixmap, transparent, encoding, 
+gkrelot, memory, session, string, resource, xftacs, misc, and all.
+.
+.It Fl dlevel Ar verboselevel
+Print out debug message defined by verboselevel. Available verboselevel
+are: fatal, error, warn, info, verbose, and debug. The latter, the more
+information is printed
+.
 .It Fl cf Ar filename
 X resource configuration file
 .It Fl cfs Ar filename

@@ -55,6 +55,7 @@
 
 
 #include <stdio.h>
+#include <stdint.h>
 #include <ctype.h>
 #include <errno.h>
 #include <signal.h>
@@ -81,10 +82,6 @@
 
 #if defined(HAVE_STRING_H) && !defined(OUR_STRINGS)
 # include <string.h>
-#endif
-
-#ifdef HAVE_INTTYPES_H
-# include <inttypes.h>
 #endif
 
 #ifdef HAVE_LIMITS_H
@@ -504,6 +501,7 @@ typedef char*	    XPointer;
 ** The following are internal includes
 *********************************************************
 */
+#include "debug.h"
 #include "encoding.h"
 #include "rxvtlib.h"
 
@@ -616,7 +614,7 @@ struct mouse_event {
     }
 
 #define BOUND_POSITIVE_INT16(val)				    \
-    (RINT16T)( (val) <= 0 ? 0 : min( (val), (((RUINT16T)-1)>>1) )  )
+    (int16_t)( (val) <= 0 ? 0 : min( (val), (((uint16_t)-1)>>1) )  )
 
 /*
  *****************************************************************************
@@ -1088,6 +1086,8 @@ enum colour_list {
  */
 enum {
     Rs_display_name = 0,
+    Rs_debug_masks,
+    Rs_debug_level,
     Rs_container_window,
     Rs_term_name,
     Rs_iconName,
@@ -1365,19 +1365,19 @@ enum {
  *****************************************************************************
  */
 
-/* convert pixel dimensions to row/column values.  Everything as RINT32T */
-#define Pixel2Width(x)	    ((RINT32T)(x) / (RINT32T)r->TermWin.fwidth)
-#define Pixel2Height(y)	    ((RINT32T)(y) / (RINT32T)r->TermWin.fheight)
-#define Width2Pixel(n)	    ((RINT32T)(n) * (RINT32T)r->TermWin.fwidth)
-#define Height2Pixel(n)	    ((RINT32T)(n) * (RINT32T)r->TermWin.fheight)
-#define Pixel2Col(x)	    Pixel2Width((RINT32T)(x) - (RINT32T)r->TermWin.int_bwidth)
-#define Pixel2Row(y)	    Pixel2Height((RINT32T)(y) - (RINT32T)r->TermWin.int_bwidth)
-#define Col2Pixel(col)	    ((RINT32T)Width2Pixel(col) + (RINT32T)r->TermWin.int_bwidth)
-#define Row2Pixel(row)	    ((RINT32T)Height2Pixel(row) + (RINT32T)r->TermWin.int_bwidth)
+/* convert pixel dimensions to row/column values.  Everything as int32_t */
+#define Pixel2Width(x)	    ((int32_t)(x) / (int32_t)r->TermWin.fwidth)
+#define Pixel2Height(y)	    ((int32_t)(y) / (int32_t)r->TermWin.fheight)
+#define Width2Pixel(n)	    ((int32_t)(n) * (int32_t)r->TermWin.fwidth)
+#define Height2Pixel(n)	    ((int32_t)(n) * (int32_t)r->TermWin.fheight)
+#define Pixel2Col(x)	    Pixel2Width((int32_t)(x) - (int32_t)r->TermWin.int_bwidth)
+#define Pixel2Row(y)	    Pixel2Height((int32_t)(y) - (int32_t)r->TermWin.int_bwidth)
+#define Col2Pixel(col)	    ((int32_t)Width2Pixel(col) + (int32_t)r->TermWin.int_bwidth)
+#define Row2Pixel(row)	    ((int32_t)Height2Pixel(row) + (int32_t)r->TermWin.int_bwidth)
 
 /*
-#define TermWin_TotalWidth()	((RINT32T)r->TermWin.width  + 2 * (RINT32T)r->TermWin.int_bwidth)
-#define TermWin_TotalHeight()	((RINT32T)r->TermWin.height + 2 * (RINT32T)r->TermWin.int_bwidth)
+#define TermWin_TotalWidth()	((int32_t)r->TermWin.width  + 2 * (int32_t)r->TermWin.int_bwidth)
+#define TermWin_TotalHeight()	((int32_t)r->TermWin.height + 2 * (int32_t)r->TermWin.int_bwidth)
 */
 
 /* how to build & extract colors and attributes */
@@ -1542,11 +1542,11 @@ struct rxvt_hidden {
     KeySym	    ks_greekmodeswith;
 #endif
 
-    RUINT16T	    prev_ncol,
+    uint16_t	    prev_ncol,
 		    prev_nrow;				/* screen: previous
 							   number of columns and
 							   rows */
-    RUINT32T	    pixcolor_set[NPIXCLR_SETS];
+    uint32_t	    pixcolor_set[NPIXCLR_SETS];
 
 #ifdef SELECTION_SCROLLING
     int		    scroll_selection_delay,
@@ -1826,18 +1826,6 @@ struct rxvt_hidden {
 #ifdef DEBUG_malloc
 # include "dmalloc.h"	    /* This comes last */
 #endif
-
-#ifdef DEBUG
-# define DEBUG_VERBOSE
-#endif
-
-/*
- * Macro that always prints the debug messages. Useful if you want to just print
- * a few debug messages temporarily while hacking.
- */
-#define DBG_TMSG( d, x)					\
-    fprintf( stderr, "%s:%d ", __FILE__, __LINE__ );	\
-    fprintf x
 
 #endif		    /* __RXVT_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

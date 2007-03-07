@@ -39,20 +39,6 @@
 
 
 
-#ifdef DEBUG_VERBOSE
-# define DEBUG_LEVEL 1
-# define DEBUG_X
-#else 
-# define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-# define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-# define DBG_MSG(d,x)
-#endif
-
-
 /*--------------------------------------------------------------------*
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
@@ -130,7 +116,7 @@ rxvt_pre_show_init( rxvt_t *r )
 
     if( r->TermWin.fade )
     {
-	DBG_MSG( 5, ( stderr, "Allocating space for fade colors\n" ) );
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "Allocating space for fade colors\n");
 	r->pixColorsUnfocus =
 	    rxvt_malloc( sizeof(unsigned long) * (TOTAL_COLORS) );
 
@@ -270,12 +256,12 @@ rxvt_Child_signal(int sig __attribute__((unused)))
      */
     rxvt_t  *r;
 
-    DBG_MSG( 1, ( stderr, "\e[31mrxvt_Child_signal()\e[0m\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "\e[31mrxvt_Child_signal()\e[0m\n");
 
     r = rxvt_get_r();
     r->ndead_childs++;
 
-    DBG_MSG( 1, ( stderr, "done rxvt_Child_signal()\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "done rxvt_Child_signal()\n");
 }
 
 
@@ -291,7 +277,7 @@ rxvt_Exit_signal(int sig)
 #endif
     rxvt_t*	    r;
 
-    DBG_MSG( 1, ( stderr, "Received signal %d\n", (int) sig));
+    rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "Received signal %d\n", (int) sig);
 
     r = rxvt_get_r();
 
@@ -684,7 +670,7 @@ rxvt_privileges(int mode)
 void
 rxvt_privileged_utmp(rxvt_t* r, int page, char action)
 {
-    DBG_MSG(1,(stderr, "rxvt_privileged_utmp %d (%c); waiting for: %c (pid: %d)\n", page, action, PVTS(r, page)->next_utmp_action, (int) getpid()));
+    rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "rxvt_privileged_utmp %d (%c); waiting for: %c (pid: %d)\n", page, action, PVTS(r, page)->next_utmp_action, (int) getpid());
 
     if (PVTS(r, page)->next_utmp_action != action ||
 	(action != SAVE && action != RESTORE) ||
@@ -715,7 +701,7 @@ rxvt_privileged_utmp(rxvt_t* r, int page, char action)
 void
 rxvt_privileged_ttydev(rxvt_t* r, int page, char action)
 {
-    DBG_MSG(1,(stderr, "rxvt_privileged_ttydev %d (r, %c); waiting for: %c (pid: %d)\n", page, action, PVTS(r, page)->next_tty_action, getpid()));
+    rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "rxvt_privileged_ttydev %d (r, %c); waiting for: %c (pid: %d)\n", page, action, PVTS(r, page)->next_tty_action, getpid());
     if (PVTS(r, page)->next_tty_action != action ||
 	(action != SAVE && action != RESTORE) ||
 	IS_NULL(PVTS(r, page)->ttydev) ||
@@ -761,7 +747,7 @@ rxvt_privileged_ttydev(rxvt_t* r, int page, char action)
     rxvt_privileges(IGNORE);
 
 # ifndef RESET_TTY_TO_COMMON_DEFAULTS
-    DBG_MSG(1,(stderr, "%s \"%s\": mode %03o, uid %d, gid %d\n", action == RESTORE ? "Restoring" : (action == SAVE ? "Saving" : "UNKNOWN ERROR for"), PVTS(r, page)->ttydev, PVTS(r, page)->ttyfd_stat.st_mode, PVTS(r, page)->ttyfd_stat.st_uid, PVTS(r, page)->ttyfd_stat.st_gid));
+    rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "%s \"%s\": mode %03o, uid %d, gid %d\n", action == RESTORE ? "Restoring" : (action == SAVE ? "Saving" : "UNKNOWN ERROR for"), PVTS(r, page)->ttydev, PVTS(r, page)->ttyfd_stat.st_mode, PVTS(r, page)->ttyfd_stat.st_uid, PVTS(r, page)->ttyfd_stat.st_gid);
 # endif
 }
 #endif
@@ -781,8 +767,7 @@ rxvt_tt_winsize(int fd, unsigned short col, unsigned short row, pid_t pid)
 #ifdef DEBUG
     if( pid && fd > STDERR_FILENO )
     {
-	DBG_MSG( 2, (stderr, "%s( fd=%d, col=%hu, row=%hu, pid=%d )\n",
-		    __func__, fd, col, row, pid ) );
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "%s( fd=%d, col=%hu, row=%hu, pid=%d )\n", __func__, fd, col, row, pid);
     }
 #endif
 
@@ -798,7 +783,7 @@ rxvt_tt_winsize(int fd, unsigned short col, unsigned short row, pid_t pid)
 #ifdef DEBUG
 	if( pid && fd > STDERR_FILENO )
 	{
-	    DBG_MSG(1, (stderr, "Failed to send TIOCSWINSZ to fd %d\n", fd));
+	    rxvt_dbgmsg (DBG_WARN, DBG_MAIN, "Failed to send TIOCSWINSZ to fd %d\n", fd);
 	}
 #endif
     }
@@ -826,7 +811,7 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 # endif
 
 
-    DBG_MSG( 2, ( stderr, "rxvt_init_bfont_xft()" ) );
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_init_bfont_xft()");
 
     xp = XftPatternDuplicate (xpold);
     if (IS_NULL(xp))
@@ -852,12 +837,12 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 
 	else
 	{
-	    DBG_MSG( 3, ( stderr, "Opened bold font: h=%d(%d), w=%d(%d)",
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "Opened bold font: h=%d(%d), w=%d(%d)",
 			r->TermWin.xftbfont->height,
 			r->TermWin.xftfont->height,
 			r->TermWin.xftbfont->max_advance_width,
-			r->TermWin.xftfont->max_advance_width) );
-#ifdef DEBUG_VERBOSE
+			r->TermWin.xftfont->max_advance_width);
+#ifdef DEBUG
 	    FcPatternPrint( xftbpattern );
 #endif
 	    /*
@@ -922,7 +907,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
     /*
     ** Now try to open freetype mfont
     */
-    DBG_MSG(2,(stderr, "load freetype mfont\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "load freetype mfont\n");
 
     /* font family */
     mfname = (char*) r->h->rs[Rs_xftmfont];
@@ -1014,9 +999,9 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	rxvt_print_error ("Cannot open mfont '%s'. Using mfont '%s' instead.",
 	    mfname, omfname);
 
-    DBG_MSG(1, (stderr, "create xftmpattern = 0x%x on mfont %d\n",
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "create xftmpattern = 0x%x on mfont %d\n",
 	(unsigned int) r->TermWin.xftmpattern, r->h->rs[Rs_xftmsz] ?
-	r->TermWin.xftmsize : r->TermWin.xftfont->height-1));
+	r->TermWin.xftmsize : r->TermWin.xftfont->height-1);
 
     /*
      * Actually open the mfont.
@@ -1045,7 +1030,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
     else if (ISSET_OPTION(r, Opt2_xftSlowOutput))
 	r->TermWin.xftmono = 0;
 
-    DBG_MSG(1, (stderr, "xftmono is %d\n", r->TermWin.xftmono));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "xftmono is %d\n", r->TermWin.xftmono);
 
     MAX_IT (r->TermWin.fwidth, (width >> 1));
     if( !r->TermWin.xftpfont )
@@ -1123,10 +1108,10 @@ rxvt_init_font_xft (rxvt_t* r)
 # endif
 
 
-    DBG_MSG(2,(stderr, "rxvt_init_font_xft\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_init_font_xft\n");
 
 
-    DBG_MSG(2,(stderr, "load freetype font\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "load freetype font\n");
     xp = XftPatternCreate ();
     if (IS_NULL(xp))
 	return 0;
@@ -1267,8 +1252,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	rxvt_print_error ("Cannot open font '%s'. Using font '%s' instead.",
 	    fname, ofname);
 
-    DBG_MSG(1, (stderr, "create xftpattern = 0x%x on font %d\n",
-	(unsigned int) r->TermWin.xftpattern, r->TermWin.xftsize));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "create xftpattern = 0x%x on font %d\n", (unsigned int) r->TermWin.xftpattern, r->TermWin.xftsize);
 
     /*
      * Actually open the font.
@@ -1344,8 +1328,7 @@ rxvt_init_font_xft (rxvt_t* r)
 
 	XftPatternDestroy( ppat);
 
-	DBG_MSG( 1, ( stderr, "Opened prop fonts %p, %p\n",
-		    r->TermWin.xftpfont, r->TermWin.xftPfont));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "Opened prop fonts %p, %p\n", r->TermWin.xftpfont, r->TermWin.xftPfont);
     }
     
     if (IS_NULL(r->TermWin.xftfont))
@@ -1377,7 +1360,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	 * This will however make the font spacing in tab titles incorrect for
 	 * double width fonts.
 	 */
-	DBG_MSG( 1, ( stderr, "Warning: Double width font, with no pfont\n") );
+	rxvt_dbgmsg (DBG_WARN, DBG_MAIN, "Warning: Double width font, with no pfont\n");
 	r->TermWin.xftpfont = r->TermWin.xftfont;
 	r->TermWin.xftPfont = r->TermWin.xftfont;
     }
@@ -1406,7 +1389,7 @@ rxvt_init_font_xft (rxvt_t* r)
 #ifdef MULTICHAR_SET
     if( isDoubleWidthFont( r->Xdisplay, r->TermWin.xftfont ) )
     {
-	DBG_MSG( 1, ( stderr, "Got double width font. Halving width\n" ) );
+	rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "Got double width font. Halving width\n");
 	r->TermWin.xftmono = 0;
 	r->TermWin.fwidth >>= 1;
     }
@@ -1423,7 +1406,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	else
 	    r->TermWin.xftfnmono = r->TermWin.xftmono = 0;
     }
-    DBG_MSG(1, (stderr, "xftfnmono is %d\n", r->TermWin.xftfnmono));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "xftfnmono is %d\n", r->TermWin.xftfnmono);
 
 
 # ifndef NO_BOLDFONT
@@ -1463,7 +1446,7 @@ rxvt_init_font_fixed (rxvt_t* r)
     XFontStruct*    xfont;
 
 
-    DBG_MSG(1,(stderr, " load font (fixed)\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load font (fixed)\n");
     xfont = XLoadQueryFont (r->Xdisplay, "fixed");
     if (IS_NULL(xfont))
     {
@@ -1500,7 +1483,7 @@ rxvt_init_font_x11 (rxvt_t *r)
     int		    idx = 0;		/* index into rs_font[] */
 
 
-    DBG_MSG(1,(stderr, "rxvt_init_font_x11 \n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_init_font_x11 \n");
 
 
 #ifdef XFT_SUPPORT
@@ -1517,7 +1500,7 @@ rxvt_init_font_x11 (rxvt_t *r)
     idx = FNUM2IDX(r->h->fnum);
 
     /* OK, now it's time to load the default font */
-    DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load font (%s)\n", r->h->rs[Rs_font+idx]);
     xfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_font+idx]);
     if (IS_NULL(xfont))
     {
@@ -1526,7 +1509,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 
 	/* try to load fixed font */
 	r->h->rs[Rs_font+idx] = "fixed";
-	DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load font (%s)\n", r->h->rs[Rs_font+idx]);
 	xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_font+idx]);
 	if (IS_NULL(xfont))
 	{
@@ -1577,7 +1560,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	/* try to load boldFont, fail silently */
 	if (NOT_NULL(r->h->rs[Rs_boldFont+idx]))
 	{
-	    DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]);
 	    bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
 	}
 
@@ -1607,7 +1590,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 
 #ifdef MULTICHAR_SET
     /* load font or substitute */
-    DBG_MSG(1,(stderr, " load mfont (%s)\n", r->h->rs[Rs_mfont+idx]));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load mfont (%s)\n", r->h->rs[Rs_mfont+idx]);
     xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_mfont+idx]);
     if (IS_NULL(xfont))
     {
@@ -1617,7 +1600,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	rxvt_print_error(msg, r->h->rs[Rs_mfont+idx]);
 
 	ptr = rxvt_fallback_mfont_x11 (r);
-	DBG_MSG(1,(stderr, " load mfont (%s)\n", ptr));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load mfont (%s)\n", ptr);
 	xfont = XLoadQueryFont(r->Xdisplay, ptr);
 	if (NOT_NULL(xfont))
 	    r->h->rs[Rs_mfont+idx] = ptr;
@@ -1745,7 +1728,7 @@ rxvt_change_font_xft (rxvt_t* r, const char* fontname)
 
 
     assert (fontname);
-    DBG_MSG(2,(stderr, "rxvt_change_font_xft (%s)\n", fontname));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_change_font_xft (%s)\n", fontname);
 
     /* we only accept FONT_CMD now for XFT font ;-) */
     if (FONT_CMD != fontname[0])
@@ -1847,7 +1830,7 @@ rxvt_change_font_xft (rxvt_t* r, const char* fontname)
      */
 
 #if 0
-    DBG_MSG(1, (stderr, "Destroy %p, (xftpattern %p, xftmpattern %p)\n",
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "Destroy %p, (xftpattern %p, xftmpattern %p)\n",
 		xp, r->TermWin.xftpattern, r->TermWin.xftmpattern));
     /* FcPatternPrint (xp);
     FcPatternPrint (r->TermWin.xftpattern); */
@@ -1886,7 +1869,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 
 
     assert (fontname);
-    DBG_MSG(1,(stderr, "rxvt_change_font_x11 (%s)\n", fontname));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_change_font_x11 (%s)\n", fontname);
 
 
     switch (fontname[0])
@@ -1972,7 +1955,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
     /*
     ** OK, now it's time to load font or substitute
     */
-    DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load font (%s)\n", r->h->rs[Rs_font+idx]);
     xfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_font+idx]);
     if (!xfont)
     {
@@ -1981,7 +1964,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 
 	/* try to load fixed font */
 	r->h->rs[Rs_font+idx] = "fixed";
-	DBG_MSG(1,(stderr, " load font (%s)\n", r->h->rs[Rs_font+idx]));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load font (%s)\n", r->h->rs[Rs_font+idx]);
 	xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_font+idx]);
 	if (!xfont)
 	{
@@ -2048,7 +2031,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	if (IS_NULL(r->TermWin.bfont) &&
 	    NOT_NULL(r->h->rs[Rs_boldFont+idx]))
 	{
-	    DBG_MSG(1,(stderr, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]));
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load bfont (%s)\n", r->h->rs[Rs_boldFont+idx]);
 	    bfont = XLoadQueryFont (r->Xdisplay, r->h->rs[Rs_boldFont+idx]);
 	}
 
@@ -2089,14 +2072,14 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 #endif
 	IS_WIN(r->menuBar.win))
     {
-	DBG_MSG( 3, ( stderr, "Resized menubar font\n"));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "Resized menubar font\n");
 	XSetFont( r->Xdisplay, r->menuBar.gc, r->TermWin.font->fid);
     }
 #endif
 
 #ifdef MULTICHAR_SET
     /* load font or substitute */
-    DBG_MSG(1,(stderr, " load mfont (%s)\n", r->h->rs[Rs_mfont+idx]));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load mfont (%s)\n", r->h->rs[Rs_mfont+idx]);
     xfont = XLoadQueryFont(r->Xdisplay, r->h->rs[Rs_mfont+idx]);
     if (!xfont)
     {
@@ -2107,7 +2090,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 
 	/* try to load default font */
 	ptr = rxvt_fallback_mfont_x11 (r);
-	DBG_MSG(1,(stderr, " load mfont (%s)\n", ptr));
+	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load mfont (%s)\n", ptr);
 	xfont = XLoadQueryFont(r->Xdisplay, ptr);
 	if (xfont)
 	    r->h->rs[Rs_mfont+idx] = ptr;
@@ -2273,8 +2256,7 @@ rxvt_set_window_color(rxvt_t* r, int page, int idx, const char *color)
     register int    i;
 
 
-    DBG_MSG( 2, ( stderr, "%s( r, %d, %d, %s), ATAB=%d\n",
-		__func__, page, idx, color, ATAB(r) ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "%s( r, %d, %d, %s), ATAB=%d\n", __func__, page, idx, color, ATAB(r));
 
     if (IS_NULL(color) || (char) 0 == *color)
 	return;
@@ -2440,8 +2422,7 @@ rxvt_recolour_cursor(rxvt_t *r)
     XQueryColors(r->Xdisplay, XCMAP, xcol, 2);
     XRecolorCursor(r->Xdisplay, r->term_pointer, &(xcol[0]), &(xcol[1]));
 
-    DBG_MSG( 3, ( stderr, "%s(r): fg=%06lx, bg=%06lx\n",
-		__func__, xcol[0].pixel, xcol[1].pixel ) );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "%s(r): fg=%06lx, bg=%06lx\n", __func__, xcol[0].pixel, xcol[1].pixel);
 }
 
 
@@ -2663,7 +2644,7 @@ rxvt_IM_is_running(rxvt_t *r)
     char	    server[IMBUFSIZ];
 
     /* get current locale modifier */
-    DBG_MSG(2, (stderr, "rxvt_IM_is_running ()\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_IM_is_running ()\n");
     if (NOT_NULL(p = XSetLocaleModifiers(NULL)))
     {
 	STRCPY(server, "@server=");
@@ -2718,7 +2699,7 @@ rxvt_IM_set_fontset (rxvt_t* r, int idx)
 
     if (idx < 0 || idx >= MAX_NFONTS)
 	return;
-    DBG_MSG(1,(stderr, "rxvt_setTermFontSet()\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_setTermFontSet()\n");
     prev_fontset = r->TermWin.fontset;
     SET_NULL(r->TermWin.fontset);
 
@@ -2844,7 +2825,7 @@ rxvt_IM_init_callback (Display *unused __attribute__((unused)), XPointer client_
     rxvt_t	    *r = rxvt_get_r();
     char	    buf[IMBUFSIZ];
 
-    DBG_MSG(1,(stderr, "rxvt_IM_init_callback()\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_IM_init_callback()\n");
     if (r->h->Input_Context)
 	return;
 
@@ -2913,11 +2894,11 @@ rxvt_IM_get_IC(rxvt_t *r)
     struct rxvt_hidden *h = r->h;
     long	    im_event_mask = 0;
 
-    DBG_MSG(1,(stderr, "rxvt_IM_get_IC()\n"));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, "rxvt_IM_get_IC()\n");
     xim = XOpenIM(r->Xdisplay, NULL, NULL, NULL);
     if (IS_NULL(xim))
     {
-	DBG_MSG(1,(stderr, "Unalbe to open IM\n"));
+	rxvt_dbgmsg (DBG_WARN, DBG_MAIN, "Unalbe to open IM\n");
 	return False;
     }
 
@@ -3039,7 +3020,7 @@ rxvt_IM_get_IC(rxvt_t *r)
     XSelectInput(r->Xdisplay, r->TermWin.parent, im_event_mask);
 
 
-    DBG_MSG(1,(stderr, "rxvt_IM_get_IC() - successful connection\n"));
+    rxvt_dbgmsg (DBG_INFO, DBG_MAIN, "rxvt_IM_get_IC() - successful connection\n");
     return True;
 }
 

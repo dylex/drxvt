@@ -32,19 +32,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-
 #ifdef UTMP_SUPPORT
 
 # if defined(HAVE_UPDWTMP) && defined(OS_SOLARIS)

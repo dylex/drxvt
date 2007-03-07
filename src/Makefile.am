@@ -22,6 +22,7 @@ DEFS = -DPKG_CONF_DIR=\"$(sysconfdir)/$(PACKAGE_NAME)\"
 
 bin_PROGRAMS = mrxvt
 mrxvt_SOURCES =	    command.h		\
+	       	    debug.h		\
 	       	    encoding.h		\
 	       	    feature.h		\
 	       	    init.h		\
@@ -33,6 +34,7 @@ mrxvt_SOURCES =	    command.h		\
 
 
 mrxvt_SOURCES +=    command.c		\
+		    debug.c		\
 		    encoding.c		\
 		    init.c		\
 		    macros.c		\
@@ -153,6 +155,7 @@ mrxvt_SOURCES +=    $(SCROLLBAR_PLAIN_SRC)	\
 
 MRXVT_H =	    ../config.h			\
 		    command.h			\
+		    debug.h			\
 		    feature.h			\
 		    menubar.h			\
 		    protos.h			\

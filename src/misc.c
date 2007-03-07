@@ -27,18 +27,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
 
 /* EXTPROTO */
 char*
@@ -260,8 +248,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
     int	i=0,	/* Unexpanded string index */
 	j=0;	/* Expanded string index */
 
-    DBG_MSG( 2, (stderr, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n",
-	    page, src, len, "dst", maxLen ));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n", page, src, len, "dst", maxLen);
 
     /* Must only get here for a valid tab */
     assert( page >=0 && page <= LTAB(r) );
@@ -521,8 +508,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	 * Failed to get the file from arg path. Try getting it from the env
 	 * variable PATH_ENV.
 	 */
-	DBG_MSG( 2, ( stderr, "Searching for %s from env %s...\n",
-		    file, PATH_ENV));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s from env %s...\n", file, PATH_ENV);
 
 	envpath = getenv( PATH_ENV);
 	if( envpath)
@@ -531,7 +517,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	/*
 	 * Check in ~/.mrxvt
 	 */
-	DBG_MSG( 2, ( stderr, "Searching for %s in ~/.mrxvt\n", file));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s in ~/.mrxvt\n", file);
 	envpath = getenv("HOME");
 	if( envpath )
 	{
@@ -549,14 +535,13 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	/*
 	 * Last resort: Try a compiled in default.
 	 */
-	DBG_MSG( 2, ( stderr, "Searching for %s in %s\n",
-		    file, PKG_CONF_DIR));
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s in %s\n", file, PKG_CONF_DIR);
 	f = rxvt_File_search_path( PKG_CONF_DIR, file, ext);
      }
     while(0);
 
 
-    DBG_MSG( 2, ( stderr, "Got file %s\n", f ? f : "(nil)"));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Got file %s\n", f ? f : "(nil)");
     return f;
 }
 #endif		    /* defined (BACKGROUND_IMAGE) || (HAVE_MENUBAR) */

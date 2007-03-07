@@ -25,18 +25,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
 
 /*----------------------------------------------------------------------*/
 /* main() */
@@ -44,7 +32,7 @@
 int
 main(int argc, const char *const *argv)
 {
-    rxvt_t	 *rxvt_vars;
+    rxvt_t*	rxvt_vars;
 
     /*
      * Save and then give up any super-user privileges immediately after program
@@ -59,8 +47,14 @@ main(int argc, const char *const *argv)
     rxvt_privileges(SAVE);
     rxvt_privileges(IGNORE);
 
+    /*
+     * Initialize debug level and debug mask. Must do it first in order
+     * to debug memory management system.
+     */
+    rxvt_parse_dbg_arguments (argc, argv);
+
 #ifdef OUR_MALLOC
-    /* initialize our memory systemm */
+    /* initialize our memory management system */
     rxvt_mem_init ();
 #endif
 

@@ -467,5 +467,10 @@ void            rxvt_session_exit              __PROTO((rxvt_t* r));
 #endif	/* HAVE_X11_SM_SMLIB_H */
 /* End prototypes of session.c */
 
+/* Begin prototypes of debug.c */
+int             rxvt_dbgmsg                    __PROTO((uint32_t, uint32_t, const char*, ...));
+void            rxvt_parse_dbg_arguments       __PROTO((int argc, const char* const*));
+/* End prototypes of debug.c */
+
 #endif  /* __PROTOS_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

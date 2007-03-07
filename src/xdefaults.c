@@ -29,20 +29,6 @@
 #include "rxvt.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-
-
 /*--------------------------------------------------------------------*
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
@@ -102,7 +88,7 @@ static const char *const xnames[3] = {
     (sizeof(optList) / sizeof(optList[0]))
 
 static const struct {
-    const RUINT32T  flag;	/* Option flag */
+    const uint32_t  flag;	/* Option flag */
     const int	    doff;	/* data offset */
     const char*	    kw;		/* keyword */
     const char*	    opt;	/* option */
@@ -568,6 +554,11 @@ static const struct {
     STRG( Rs_initProfiles, "initProfileList", "ip", "profile list",
 	"List of profiles to load on startup", 0 ),
 
+    STRG(Rs_debug_masks, "dbgMasks", "dmask", "string", 
+	"List of debug masks separated by coma", 0),
+    STRG(Rs_debug_level, "dbgLevel", "dlevel", "string", 
+	"Name of number of the debug level", 0),
+
 #ifdef USE_FIFO
     BOOL( "useFifo", NULL, Opt_useFifo, NULL ),
 #endif/*USE_FIFO*/
@@ -575,7 +566,7 @@ static const struct {
 };
 
 /* Previously set options */
-static RUINT32T	pSetOpts[ MAX_OPTION_ARRAY ] = { 0u, 0u, 0u, 0u };
+static uint32_t	pSetOpts[ MAX_OPTION_ARRAY ] = { 0u, 0u, 0u, 0u };
 
 #undef INFO
 #undef STRG
@@ -778,7 +769,7 @@ rxvt_usage(int type)
 		" [options] [-e command args]\n\n"
 		"where resources (long-options) include:\n");
 
-#ifdef DEBUG_VERBOSE
+#ifdef DEBUG
 	    /*
 	     * Print short options, long options and descriptions so we can
 	     * generate man page.
@@ -896,7 +887,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
     static const char On[3] = "ON", Off[4] = "OFF";
 
 
-    DBG_MSG( 2, (stderr, "rxvt_get_options()\n") );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "rxvt_get_options()\n");
 
     for (i = 1; i < argc; i++)
     {
@@ -907,7 +898,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	opt = argv[i];
 	profileNum = 0;	/* initialize profileNum to 0 by default */
 
-	DBG_MSG(1, (stderr, "argv[%d] = %s: ", i, opt));
+	rxvt_dbgmsg (DBG_INFO, DBG_RESOURCE, "argv[%d] = %s: \n", i, opt);
 	if (*opt == '-')
 	{
 	    flag = On;
@@ -978,9 +969,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 			    offset, opt, profileNum, optList[entry].opt );
 		    bufshort[sizeof(bufshort)-1] = '\0';
 
-		    DBG_MSG( 3, ( stderr,
-				"Matched profile=%d buflong=%s bufshort=%s\n",
-				profileNum, buflong, bufshort ) );
+		    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "Matched profile=%d buflong=%s bufshort=%s\n", profileNum, buflong, bufshort );
 		}
 
 		/* If no profile number is specified, use 0 by default */
@@ -994,9 +983,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 		    profileNum = 0;
 
-		    DBG_MSG( 3, ( stderr,
-				"Matched default buflong=%s bufshort=%s\n",
-				buflong, bufshort ) );
+		    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "Matched default buflong=%s bufshort=%s\n", buflong, bufshort );
 		}
 	    }
 	    else if (optList[entry].kw)
@@ -1041,13 +1028,13 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	    {
 		const char   *str = argv[++i];
 
-		DBG_MSG(2, (stderr, "string (%s,%s) = ",
+		rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "string (%s,%s) = ",
 		    optList[entry].opt ? optList[entry].opt : "nil",
-		    optList[entry].kw ? optList[entry].kw : "nil"));
+		    optList[entry].kw ? optList[entry].kw : "nil");
 
 		if (flag == On && str && (optList[entry].doff != -1))
 		{
-		    DBG_MSG(2, (stderr, "\"%s\"\n", str));
+		    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "\"%s\"\n", str);
 		    r->h->rs[optList[entry].doff + profileNum] = str;
 		    /*
 		     * special cases are handled in main.c:main() to allow X
@@ -1057,15 +1044,14 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 		}
 #ifdef DEBUG_VERBOSE
 		else
-		    DBG_MSG(2, (stderr, "???\n"));
+		    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "???\n");
 #endif
 	    }
 
 	    /* boolean value */
 	    else
 	    {
-		DBG_MSG( 2, ( stderr, "boolean (%s,%s) = %s\n",
-		    optList[entry].opt, optList[entry].kw, flag ) );
+		rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "boolean (%s,%s) = %s\n", optList[entry].opt, optList[entry].kw, flag );
 
 		if( flag == On )
 		    SET_OPTION( r, optList[entry].flag );
@@ -1131,7 +1117,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	exit( EXIT_FAILURE );
     }
 
-    DBG_MSG( 2, (stderr, "rxvt_get_options() done.\n") );
+    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "rxvt_get_options() done.\n");
 }
 
 
@@ -1154,7 +1140,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
     Bool    noReplace = !STRCMP( name, APL_CLASS )
 			    || !STRCMP( name, APL_SUBCLASS);
 
-    DBG_MSG(1, (stderr, "rxvt_get_xdefaults (%s)\n", name));
+    rxvt_dbgmsg (DBG_INFO, DBG_RESOURCE, "rxvt_get_xdefaults (%s)\n", name);
 
     if (IS_NULL(stream))
 	return;
@@ -1231,8 +1217,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 			STRNCPY (kw, buf, sizeof(kw)-1);
 			kw[sizeof(kw)-1] = '\0';
 
-			DBG_MSG( 3, ( stderr, "Matched profile=%d kw=%s\n",
-				profileNum, kw) );
+			rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "Matched profile=%d kw=%s\n", profileNum, kw);
 		    }
 
 		    /*
@@ -1243,9 +1228,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 		    {
 			profileNum = 0;
 
-			DBG_MSG( 3, ( stderr,
-				    "Matched default kw=%s for option %s",
-				    kw, str) );
+			rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "Matched default kw=%s for option %s", kw, str);
 		    }
 		}
 
@@ -1457,7 +1440,7 @@ rxvt_extract_resources (
 	{
 	    if( r->h->rs[i] == emptyResource )
 	    {
-		DBG_TMSG( 3, ( stderr, "Setting resource #%d to NULL\n", i ) );
+		rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "Setting resource #%d to NULL\n", i);
 		r->h->rs[i] = NULL;
 	    }
 	}

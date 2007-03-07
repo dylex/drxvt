@@ -53,7 +53,7 @@ struct trunk_list_t;
 struct block_head_t
 {
 #ifdef DEBUG
-    RUINT32T	magic_f;	/* magic number */
+    uint32_t	magic_f;	/* magic number */
     size_t	bbyte;		/* allocated bytes */
 #endif
     union
@@ -62,7 +62,7 @@ struct block_head_t
 	struct trunk_head_t*	trunk;	/* address of trunk_head */
     } u;
 #ifdef DEBUG
-    RUINT32T    magic_e;	/* magic number */
+    uint32_t    magic_e;	/* magic number */
 #endif
 };
 
@@ -73,7 +73,7 @@ struct block_head_t
 struct trunk_head_t
 {
 #ifdef DEBUG
-    RUINT32T	magic_f;  /* magic number */
+    uint32_t	magic_f;  /* magic number */
     size_t	tbyte;  /* total allocated bytes in this trunk */
 #endif
     struct block_head_t*    begin;/* begin address of the trunk. this is
@@ -85,11 +85,11 @@ struct trunk_head_t
     struct trunk_head_t*    next; /* next trunk with the same block size */
     struct trunk_list_t*    list; /* entry in the trunk list of this trunk*/
     struct block_head_t*    fblock; /* first free block in this trunk */
-    RUINT16T	bmax;   /* max # of free blocks in this trunk */
-    RUINT16T	fcount; /* # of free blocks in this trunk */
-    RUINT16T	bsize;  /* block size to allocate (exclude head) */
+    uint16_t	bmax;   /* max # of free blocks in this trunk */
+    uint16_t	fcount; /* # of free blocks in this trunk */
+    uint16_t	bsize;  /* block size to allocate (exclude head) */
 #ifdef DEBUG
-    RUINT32T	magic_e;  /* magic number */
+    uint32_t	magic_e;  /* magic number */
 #endif
 };
 
@@ -99,8 +99,8 @@ struct trunk_head_t
  */
 struct trunk_list_t
 {
-    RUINT16T	    block_size;	/* block size for this trunk list */
-    RUINT16T	    trunk_count;/* how many trunks allocated */
+    uint16_t	    block_size;	/* block size for this trunk list */
+    uint16_t	    trunk_count;/* how many trunks allocated */
     union
     {
 	size_t	    bnum;	/* number of blocks to allocate, used

@@ -1,5 +1,5 @@
 /*--------------------------------*-C-*---------------------------------*
- * File:	rxvt.c
+ * File:	rxvtmem.c
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
@@ -27,22 +27,7 @@
 #include "rxvtmem.h"
 
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
-#ifdef DEBUG
-# define DEBUG_MEMORY
-#endif
-
+static const char*  abort_msg = APL_NAME ": memory allocation failure.  Aborting";
 
 /* -------------------------------------------------------------------- *
  *                      MEMORY ALLOCATION WRAPPERS						*
@@ -91,11 +76,11 @@ get_trunk(size_t trunk_size)
 
     if (IS_NULL(ptr = malloc (trunk_size + THEAD_OFFSET)))    
     {
-	fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+	rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	exit(EXIT_FAILURE);
     }
 
-    DBG_MSG(1, (stderr, "--Trunk allocated %d bytes\n", (int) trunk_size));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk allocated %d bytes\n", (int) trunk_size);
     tk_head = (struct trunk_head_t*) ((char*) ptr + trunk_size);
     /* set the real beginning of trunk. this should only be used by
      * init_trunk and free_trunk
@@ -107,10 +92,10 @@ get_trunk(size_t trunk_size)
 
 /* INTPROTO */
 void
-init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
+init_trunk(struct trunk_head_t* tk_head, uint16_t block_size)
 {
     struct block_head_t*    block;
-    RUINT16T		    i;
+    uint16_t		    i;
     size_t		    bmax;
 
 
@@ -125,7 +110,7 @@ init_trunk(struct trunk_head_t* tk_head, RUINT16T block_size)
     bmax = ((char*) tk_head - (char*) tk_head->begin) /
 	    ((size_t) block_size + BHEAD_OFFSET);
     assert (bmax <= 0x0000ffff); /* in case of overflow */
-    tk_head->bmax = (RUINT16T) bmax;
+    tk_head->bmax = (uint16_t) bmax;
     block = tk_head->begin;
     tk_head->fblock = block;
     tk_head->fcount = tk_head->bmax;
@@ -157,8 +142,7 @@ free_trunk(struct trunk_head_t* tk_head)
     assert (TRUNK_MAGIC == tk_head->magic_e);
 #endif
 
-    DBG_MSG(1, (stderr, "--Trunk freed %d bytes\n",
-	(int) ((char*) tk_head - (char*) tk_head->begin)));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk freed %d bytes\n", (int) ((char*) tk_head - (char*) tk_head->begin));
     free ((void*) tk_head->begin);
 }
 
@@ -336,7 +320,7 @@ rxvt_malloc(size_t size)
 #ifdef DEBUG
     assert (memory_initialized);
 # ifdef DEBUG_MEMORY
-    DBG_MSG(2, (stderr, "DBGMEM: %d\n", (int) size));
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "DBGMEM: %d\n", (int) size));
 # endif
 #endif
 
@@ -347,7 +331,7 @@ rxvt_malloc(size_t size)
 	    size = 1;
 
 	if (IS_NULL(block = malloc (size + BHEAD_OFFSET)))   {
-	    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+	    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	    exit(EXIT_FAILURE);
 	}
 
@@ -400,10 +384,10 @@ rxvt_malloc(size_t size)
 	{
 #ifdef DEBUG
 	    /* print out statistics for the trunk */
-	    DBG_MSG(1, (stderr, "--Trunk of block size %d: %d bytes used (%d%%)\n",
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk of block size %d: %d bytes used (%d%%)\n",
 		tklist->block_size, (int) tklist->first_trunk->tbyte,
 		(int) (tklist->first_trunk->tbyte * 100 /
-		      (tklist->block_size * tklist->first_trunk->bmax))));
+		      (tklist->block_size * tklist->first_trunk->bmax)));
 #endif
 
 
@@ -511,7 +495,7 @@ rxvt_realloc(void* ptr, size_t size)
 
 	if (IS_NULL(block))   
 	{
-	    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+	    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	    exit(EXIT_FAILURE);
 	}
 #ifdef DEBUG
@@ -696,7 +680,7 @@ rxvt_malloc(size_t size)
     if (p)
 	return p;
 
-    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOTREACHED */
 }
@@ -712,7 +696,7 @@ rxvt_calloc(size_t number, size_t size)
     if (p)
 	return p;
 
-    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOTREACHED */
 }
@@ -731,7 +715,7 @@ rxvt_realloc(void *ptr, size_t size)
     if (p)
 	return p;
 
-    fprintf(stderr, APL_NAME ": memory allocation failure.  Aborting");
+    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOT REACHED */
 }

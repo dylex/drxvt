@@ -1092,7 +1092,6 @@ AC_CHECK_HEADERS( \
     assert.h \
     fcntl.h \
     iconv.h \
-    inttypes.h \
     lastlog.h \
     limits.h \
     locale.h \

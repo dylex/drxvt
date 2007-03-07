@@ -24,19 +24,6 @@
 #include "../config.h"
 #include "rxvt.h"
 
-#ifdef DEBUG_VERBOSE
-#define DEBUG_LEVEL 1
-#else 
-#define DEBUG_LEVEL 0
-#endif
-
-
-#if DEBUG_LEVEL
-#define DBG_MSG(d,x) if(d <= DEBUG_LEVEL) fprintf x
-#else
-#define DBG_MSG(d,x)
-#endif
-
 
 /*
  * Must sync these to macroFnNames in rxvtlib.h.
@@ -307,7 +294,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
     newarg[NEWARGLIM - 1] = '\0';
     rxvt_str_trim( newarg );
 
-    DBG_MSG( 1, ( stderr, "Got macro '%s' -- '%s'\n", keyname, newarg ) );
+    rxvt_dbgmsg (DBG_INFO, DBG_MACROS, "Got macro '%s' -- '%s'\n", keyname, newarg );
 
     /*
      * Breakup keyname into a keysym and modifier flags.
@@ -385,8 +372,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     action_t	    action;
 
 
-    DBG_MSG( 2, ( stderr, "rxvt_add_macro(%08lx, %2hhx, %s)\n",
-		keysym, modFlags, astring));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "rxvt_add_macro(%08lx, %2hhx, %s)\n", keysym, modFlags, astring);
 
     /*
      * Check to see if macro already exists.
@@ -544,13 +530,13 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     r->macros[replaceIndex].modFlags	= modFlags;
     r->macros[replaceIndex].action	= action;
 
-    DBG_MSG( 2, ( stderr, "Added macro %hu of %hu. "
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "Added macro %hu of %hu. "
 		    "Type %s, len %hu, args '%s'.\n",
 		replaceIndex, r->maxMacros,
 		macroNames[ action.type ], action.len,
 		(action.type == MacroFnStr || action.type == MacroFnEsc) ?
 		    "(escaped string)" :
-		    (IS_NULL(action.str) ? "(nil)" : (char*) action.str)));
+		    (IS_NULL(action.str) ? "(nil)" : (char*) action.str));
 
     return 1;	/* Success */
 }
@@ -615,8 +601,8 @@ rxvt_cleanup_macros( rxvt_t *r )
 	r->maxMacros = r->nmacros;
     }
 
-    DBG_MSG( 3, ( stderr, "Read %d macros. (Have space for %d macros)\n",
-		r->nmacros, r->maxMacros));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "Read %d macros. (Have space for %d macros)\n",
+		r->nmacros, r->maxMacros);
 
 #if 0	/* {{{ Debug info */
     for( i=0; i < r->nmacros; i++)
@@ -646,7 +632,7 @@ rxvt_set_action	    (action_t *action, char *astring)
 {
     unsigned short type, len;
 
-    DBG_MSG( 2, ( stderr, "Setting action '%s'\n", astring));
+    rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "Setting action '%s'\n", astring);
     /*
      * Match head of "astring" to a name in macroNames to figure out the macro
      * type.
@@ -768,8 +754,7 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
 
     do
       {
-	DBG_MSG( 3, ( stderr, "Processing macro #%d mods %02hhx\n",
-		    macro - r->macros, macro->modFlags ) );
+	rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "Processing macro #%d mods %02hhx\n", macro - r->macros, macro->modFlags);
 	status = rxvt_dispatch_action( r, &(macro->action), (XEvent*) ev );
       }
     while(
@@ -1002,7 +987,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		int		amount	    = abs( atoi( (char*) astr ));
 		enum page_dirn	direction   = (*(astr) == '-' ? UP : DN);
 
-		DBG_MSG( 2, ( stderr, "astr: '%s', alen: %d\n", astr, alen ) );
+		rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "astr: '%s', alen: %d\n", astr, alen);
 
 		if( tolower( astr[ alen - 2] ) == 'p' )
 		    /* scroll pages */
