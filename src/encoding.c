@@ -306,7 +306,7 @@ rxvt_decode_euc2jis (unsigned char* str, int len)
 {
     register int    i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_euc2jis (%s : %d)\n", str, len);
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "%s (%s : %d)\n", __func__, str, len);
 
     for (i = 0; i < len; i++)
 	str[i] &= 0x7F;
@@ -320,7 +320,7 @@ rxvt_decode_sjis2jis (unsigned char* str, int len)
     register int    i;
     unsigned char  *high, *low;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_sjis2jis\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "%s\n", __func__);
 
     for (i = 0; i < len; i += 2, str += 2) {
 	high = str;
@@ -346,7 +346,7 @@ rxvt_decode_gb180302jis (unsigned char* str, int len)
 {
     register int    i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_gb180302jis\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "%s\n", __func__);
 
     for (i = 0; i < len; i++)
 	str[i] &= 0x7F;
@@ -401,7 +401,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
 void
 rxvt_decode_dummy (unsigned char* str, int len)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "rxvt_decode_dummy\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_ENCODING, "%s\n", __func__);
 }
 
 
@@ -514,7 +514,7 @@ rxvt_set_default_font_x11 (rxvt_t* r)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_ENCODING, "rxvt_set_default_font_x11\n");
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_ENCODING, "%s\n", __func__);
 
     /* Set default fonts */
     def_fontName = (char**) nfont_list[r->encoding_method].font;

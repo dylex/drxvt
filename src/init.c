@@ -1050,7 +1050,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	STRCPY(val, "unix");
 	STRNCAT(val, rs[Rs_display_name], l-5);
 	val[l-1] = (char) 0;
-	rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Open X display %s\n", val);
+	rxvt_dbgmsg (DBG_INFO, DBG_INIT, "Open X display %s\n", val);
 	r->Xdisplay = XOpenDisplay(val);
 	rxvt_free(val);
     }
@@ -1058,7 +1058,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 
     if (IS_NULL(r->Xdisplay))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Open X display %s\n",
+	rxvt_dbgmsg (DBG_INFO, DBG_INIT, "Open X display %s\n",
 		    rs[Rs_display_name] ? rs[Rs_display_name] : "nil");
 	r->Xdisplay = XOpenDisplay( rs[Rs_display_name] );
 	if (IS_NULL(r->Xdisplay))
@@ -1664,7 +1664,7 @@ rxvt_init_command(rxvt_t* r)
      */
     struct sigaction	act;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_init_command()\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s()\n", __func__);
 
 
     /*
@@ -1913,7 +1913,7 @@ rxvt_init_colors( rxvt_t *r )
 {
     register int    i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_init_colors()\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s()\n", __func__);
 
     /* Initialize fg/bg colors for each profile */
     for (i = 0; i < MAX_PROFILES; i++)
@@ -2997,9 +2997,9 @@ rxvt_create_termwin( rxvt_t *r, int page, int profile,
 
     /* create the terminal window */
     rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n",
-		page, r->h->window_vt_x, r->h->window_vt_y,
-		VT_WIDTH(r), VT_HEIGHT(r),
-		r->pixColors[Color_fg], r->pixColors[Color_bg]);
+	page, r->h->window_vt_x, r->h->window_vt_y,
+	VT_WIDTH(r), VT_HEIGHT(r),
+	r->pixColors[Color_fg], r->pixColors[Color_bg]);
 
     PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
 				r->h->window_vt_x, r->h->window_vt_y,
@@ -3287,7 +3287,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     {
 	if (!rxvt_init_font_xft (r))
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT,
+	    rxvt_dbgmsg (DBG_INFO, DBG_INIT,
 		    "Failed to load FreeType font, fallback to X11 font\n");
 	    /* disable xft */
 	    UNSET_OPTION(r, Opt_xft);
@@ -3648,7 +3648,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 	    /* NOT REACHED */
 
 	default:
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Forked %s", cmd);
+	    rxvt_dbgmsg (DBG_VERBOSE, DBG_INIT, "Forked %s", cmd);
 	    r->asyncChilds[ r->nAsyncChilds++ ] = pid;
 	    return 1;
     }
@@ -3666,7 +3666,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 {
     int		cfd, er;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "rxvt_run_command(r, %d, argv)", page);
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s(%d, argv)", __func__, page);
 
     /* get master (pty) */
     if ((cfd = rxvt_get_pty(&(PVTS(r, page)->tty_fd),
