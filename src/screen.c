@@ -263,7 +263,7 @@ rxvt_init_screen (rxvt_t* r)
     int	    ncol = r->TermWin.ncol;
 
     /* first time, we don't have r->tabstop yet */
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "allocate r->tabstop as %d\n", ncol);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "allocate r->tabstop as %d\n", ncol));
     assert (ncol > 0);	/* possible integer overflow? */
     r->tabstop = rxvt_malloc(ncol * sizeof(char));
     for (p = 0; p < ncol; p++)
@@ -278,7 +278,7 @@ rxvt_scr_alloc (rxvt_t* r, int page)
     unsigned int    p, q;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_alloc %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_alloc %d ()\n", page));
     ncol = r->TermWin.ncol;
     nrow = r->TermWin.nrow;
     total_rows = nrow + SVLINES;
@@ -359,7 +359,7 @@ rxvt_scr_reset_realloc(rxvt_t* r, int page)
     unsigned int   total_rows, nrow;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset_realloc %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset_realloc %d ()\n", page));
     nrow = r->TermWin.nrow;
     total_rows = nrow + SVLINES;
 
@@ -400,7 +400,7 @@ rxvt_scr_delete_row (rxvt_t* r, int page)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_delete_row %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_delete_row %d ()\n", page));
     nrow = r->TermWin.nrow;
     prev_nrow = PVTS(r, page)->prev_nrow;
 
@@ -456,7 +456,7 @@ rxvt_scr_add_row (rxvt_t* r, int page, unsigned int total_rows, unsigned int pre
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "%s( page=%d, total_rows=%u, prev_total_rows=%u )\n", __func__, page, total_rows, prev_total_rows );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s( page=%d, total_rows=%u, prev_total_rows=%u )\n", __func__, page, total_rows, prev_total_rows ));
 
     nrow = r->TermWin.nrow;
     prev_nrow = PVTS(r, page)->prev_nrow;
@@ -522,7 +522,7 @@ rxvt_scr_adjust_col (rxvt_t* r, int page, unsigned int total_rows)
     ncol = r->TermWin.ncol;
     prev_ncol = PVTS(r, page)->prev_ncol;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "%s( r, page=%d, total_rows=%u ):" "ncol=%d, prev_ncol=%d, nrow=%d\n", __func__, page, total_rows, ncol, prev_ncol, nrow );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s( r, page=%d, total_rows=%u ):" "ncol=%d, prev_ncol=%d, nrow=%d\n", __func__, page, total_rows, ncol, prev_ncol, nrow ));
 
 
     for (p = 0; p < total_rows; p++)
@@ -581,7 +581,7 @@ rxvt_scr_adjust_col (rxvt_t* r, int page, unsigned int total_rows)
     */
     if (r->tabstop && ncol > prev_ncol)
     {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "expand r->tabstop to %d\n", ncol);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "expand r->tabstop to %d\n", ncol));
 	r->tabstop = rxvt_realloc(r->tabstop, ncol * sizeof(char));
 	for (p = prev_ncol; p < ncol; p++)
 	    r->tabstop[p] = (p % TABSTOP_SIZE == 0) ? 1 : 0;
@@ -598,7 +598,7 @@ rxvt_scr_reset(rxvt_t* r, int page)
 		    total_rows, prev_total_rows;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset %d ()\n", page));
 
     PVTS(r, page)->view_start = 0;
     RESET_CHSTAT(r, page);
@@ -616,7 +616,7 @@ rxvt_scr_reset(rxvt_t* r, int page)
 	ncol == prev_ncol && nrow == prev_nrow)
 	return;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset %d () refresh screen\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset %d () refresh screen\n", page));
     PVTS(r, page)->want_refresh = 1;
 
     total_rows = nrow + SVLINES;
@@ -669,7 +669,7 @@ rxvt_scr_release(rxvt_t* r, int page)
     int		    i;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_release %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_release %d ()\n", page));
     total_rows = r->TermWin.nrow + SVLINES;
 
     for (i = 0; i < total_rows; i++)
@@ -734,7 +734,7 @@ rxvt_scr_release(rxvt_t* r, int page)
 void
 rxvt_scr_poweron(rxvt_t* r, int page)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_poweron %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_poweron %d ()\n", page));
 
     rxvt_scr_release(r, page);
     PVTS(r, page)->prev_nrow = PVTS(r, page)->prev_ncol = 0;
@@ -759,7 +759,7 @@ rxvt_scr_cursor(rxvt_t* r, int page, int mode)
 {
     screen_t	   *s;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_cursor %d (%c)\n", page, mode);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_cursor %d (%c)\n", page, mode));
 
 #if NSCREENS && !defined(NO_SECONDARY_SCREEN_CURSOR)
     if (PVTS(r, page)->current_screen == SECONDARY)
@@ -812,7 +812,7 @@ rxvt_scr_change_screen(rxvt_t* r, int page, int scrn)
 
     PVTS(r, page)->want_refresh = 1;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_change_screen %d (%d)\n", page, scrn);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_change_screen %d (%d)\n", page, scrn));
 
     VSTART = 0;
     RESET_CHSTAT(r, page);
@@ -920,7 +920,7 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	return 0;
 
     PVTS(r, page)->want_refresh = 1;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scroll_text %d (%d,%d,%d,%d): %s\n", page, row1, row2, count, spec, (PVTS(r, page)->current_screen == PRIMARY) ?  "Primary" : "Secondary");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scroll_text %d (%d,%d,%d,%d): %s\n", page, row1, row2, count, spec, (PVTS(r, page)->current_screen == PRIMARY) ?  "Primary" : "Secondary"));
 
     if (
 	  (count > 0)
@@ -1068,7 +1068,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
     text_t	 *stp;
     rend_t	 *srp;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_add_lines( r, %d, %.*s, %d, %d)\n", page, min(len, 36), str, nlines, len );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_add_lines( r, %d, %.*s, %d, %d)\n", page, min(len, 36), str, nlines, len ));
 
     if (len <= 0)	/* sanity */
 	return;
@@ -1098,7 +1098,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 
 	    CURROW -= nlines;
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "\e[32mScrolling %d lines. CURROW=%d\e[0m\n", nlines, CURROW );
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "\e[32mScrolling %d lines. CURROW=%d\e[0m\n", nlines, CURROW ));
 	}
     }
 
@@ -1154,7 +1154,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 		PSCR(r, page).flags &= ~Screen_WrapNext;
 		if (CURROW == PSCR(r, page).bscroll)
 		{
-		    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "%s:%d ", __FILE__, __LINE__ ); rxvt_scroll_text(r, page, PSCR(r, page).tscroll, PSCR(r, page).bscroll, 1, 0);
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s:%d ", __FILE__, __LINE__ ); rxvt_scroll_text(r, page, PSCR(r, page).tscroll, PSCR(r, page).bscroll, 1, 0));
 		}
 		else if (CURROW < (r->TermWin.nrow - 1))
 		    row = (++CURROW) + SVLINES;
@@ -1364,7 +1364,7 @@ rxvt_scr_tab(rxvt_t* r, int page, int count)
 {
     int		 i, x;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_tab %d (%d)\n", page, count);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_tab %d (%d)\n", page, count));
     PVTS(r, page)->want_refresh = 1;
     RESET_CHSTAT(r, page);
     i = x = CURCOL;
@@ -1474,7 +1474,7 @@ rxvt_scr_gotorc(rxvt_t* r, int page, int row, int col, int relative)
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_gotorc %d (r:%s%d,c:%s%d): from (r:%d,c:%d)\n", page, (relative & R_RELATIVE ? "+" : ""), row, (relative & C_RELATIVE ? "+" : ""), col, CURROW, CURCOL);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_gotorc %d (r:%s%d,c:%s%d): from (r:%d,c:%d)\n", page, (relative & R_RELATIVE ? "+" : ""), row, (relative & C_RELATIVE ? "+" : ""), col, CURROW, CURCOL));
 
     CURCOL = ((relative & C_RELATIVE) ? (CURCOL + col)
 			 : col);
@@ -1529,7 +1529,7 @@ rxvt_scr_index(rxvt_t* r, int page, enum page_dirn direction)
 
     PVTS(r, page)->want_refresh = 1;
     dirn = ((direction == UP) ? 1 : -1);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_index %d (%d)\n", page, dirn);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_index %d (%d)\n", page, dirn));
 
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
@@ -1559,7 +1559,7 @@ rxvt_scr_erase_line(rxvt_t* r, int page, int mode)
     unsigned int    row, col, num;
 
     PVTS(r, page)->want_refresh = 1;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_erase_line %d (%d) at screen row: %d\n", page, mode, CURROW);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_erase_line %d (%d) at screen row: %d\n", page, mode, CURROW));
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
     rxvt_selection_check(r, page, 1);
@@ -1624,7 +1624,7 @@ rxvt_scr_erase_screen(rxvt_t* r, int page, int mode)
     XGCValues	gcvalue;
 
     PVTS(r, page)->want_refresh = 1;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_erase_screen %d (%d) at screen row: %d\n", page, mode, CURROW);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_erase_screen %d (%d) at screen row: %d\n", page, mode, CURROW));
     ZERO_SCROLLBACK(r, page);
     RESET_CHSTAT(r, page);
     row_offset = (int32_t)SVLINES;
@@ -1677,7 +1677,7 @@ rxvt_scr_erase_screen(rxvt_t* r, int page, int mode)
 		}
 
 		sr -=  SVLINES /* - 1 */;   /* Dump last non-empty line */
-		rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "Saving %d lines\n", sr);
+		rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "Saving %d lines\n", sr));
 
 		if( sr > 0)
 		    rxvt_scroll_text(r, page,
@@ -1939,7 +1939,7 @@ rxvt_scr_insdel_chars(rxvt_t* r, int page, int count, int insdel)
 void
 rxvt_scr_scroll_region(rxvt_t* r, int page, int top, int bot)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_scroll_region( %d, %d, %d)\n", page, top, bot);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_scroll_region( %d, %d, %d)\n", page, top, bot));
 
     MAX_IT(top, 0);
     MIN_IT(bot, (int)r->TermWin.nrow - 1);
@@ -2047,7 +2047,7 @@ rxvt_scr_set_tab(rxvt_t* r, int page, int mode)
 void
 rxvt_scr_rvideo_mode(rxvt_t* r, int page, int mode)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "%s(r, page=%d, mode=%d)\n", __func__, page, mode );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s(r, page=%d, mode=%d)\n", __func__, page, mode ));
 
     if (PVTS(r, page)->rvideo != mode)
     {
@@ -2209,19 +2209,19 @@ rxvt_scr_expose(rxvt_t* r, int page,
 	MIN_IT(rc[i].row, r->TermWin.nrow - 1);
     }
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_expose %d (x:%d, y:%d, w:%d, h:%d) area (c:%d,r:%d)-(c:%d,r:%d)\n", page, x, y, width, height, rc[PART_BEG].col, rc[PART_BEG].row, rc[PART_END].col, rc[PART_END].row);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_expose %d (x:%d, y:%d, w:%d, h:%d) area (c:%d,r:%d)-(c:%d,r:%d)\n", page, x, y, width, height, rc[PART_BEG].col, rc[PART_BEG].row, rc[PART_END].col, rc[PART_END].row));
 
     for (i = rc[PART_BEG].row; i <= rc[PART_END].row; i++)
     {
 	register int	j = rc[PART_BEG].col;
 	register int	k = rc[PART_END].col - rc[PART_BEG].col + 1;
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, " memset drawn_text[%d][%d], len=%d\n", i, j, k);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, " memset drawn_text[%d][%d], len=%d\n", i, j, k));
 	MEMSET(&(PVTS(r, page)->drawn_text[i][j]), 0, k);
     }
 
     if (refresh)
     {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "Forcing immediate screen refresh");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "Forcing immediate screen refresh"));
 	rxvt_scr_refresh(r, page, SLOW_REFRESH | REFRESH_BOUNDS);
     }
 }
@@ -2235,7 +2235,7 @@ rxvt_scr_expose(rxvt_t* r, int page,
 void
 rxvt_scr_touch(rxvt_t* r, int page, Bool refresh)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_touch\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_touch\n"));
     rxvt_scr_expose(r, page, 0, 0, VT_WIDTH(r), VT_HEIGHT(r), refresh);
 }
 
@@ -2259,7 +2259,7 @@ rxvt_scr_move_to(rxvt_t* r, int page, int y, int len)
 	p = max(p, 0);
     }
     VSTART = (uint16_t)min(p, PVTS(r, page)->nscrolled);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_move_to %d (%d, %d) view_start:%d\n", page, y, len, VSTART);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_move_to %d (%d, %d) view_start:%d\n", page, y, len, VSTART));
 
     return rxvt_scr_change_view(r, page, oldviewstart);
 }
@@ -2276,7 +2276,7 @@ rxvt_scr_page(rxvt_t* r, int page, enum page_dirn direction, int nlines)
     int		n;
     uint16_t	oldviewstart;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_page %d (%s, %d) view_start:%d\n", page, ((direction == UP) ? "UP" : "DN"), nlines, VSTART);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_page %d (%s, %d) view_start:%d\n", page, ((direction == UP) ? "UP" : "DN"), nlines, VSTART));
 
     oldviewstart = VSTART;
     if (direction == UP)
@@ -2466,7 +2466,7 @@ rxvt_scr_printscreen(rxvt_t* r, int page, int fullhist, int pretty,
     FILE*	fd;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_printscreen( r, %d, %d, %d, %s )\n", page, fullhist, pretty, pipeName );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_printscreen( r, %d, %d, %d, %s )\n", page, fullhist, pretty, pipeName ));
 
     if ( ( fd = rxvt_popen_printer( r, pipeName ) ) == NULL )
 	return;
@@ -2713,7 +2713,7 @@ rxvt_free_clipping (rxvt_t* r, void* xftdraw, GC gc, Region refreshRegion)
 void inline
 rxvt_clear_area (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int h)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "clear area (%d, %d, %d, %d)\n", x,y,w,h);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "clear area (%d, %d, %d, %d)\n", x,y,w,h));
 
     XClearArea (r->Xdisplay, drawBuffer, x, y, w, h, False);
 }
@@ -2722,7 +2722,7 @@ rxvt_clear_area (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int
 void inline
 rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned int h)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "fill rectangle (%d, %d, %d, %d)\n", x,y,w,h);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "fill rectangle (%d, %d, %d, %d)\n", x,y,w,h));
     XFillRectangle (r->Xdisplay, drawBuffer, r->TermWin.gc, x, y, w, h);
 }
 
@@ -2790,7 +2790,7 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 #endif
     else font = r->TermWin.xftfont;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Draw: 0x%8x %p: '%.40s'\n", rend, font, str );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Draw: 0x%8x %p: '%.40s'\n", rend, font, str ));
 
 #ifdef MULTICHAR_SET
     if( xftdraw_string == XftDrawStringUtf8 )
@@ -2808,7 +2808,7 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 
 	int	sx, sy;	/* Shadow offsets */
 
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "handling text shadow for %s (%d)\n", str, len);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "handling text shadow for %s (%d)\n", str, len));
 
 	if( xftdraw_string == XftDrawString8 )
 	    xftTextExtents = XftTextExtents8;
@@ -2870,7 +2870,7 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 	XFontStruct *font = XQueryFont( r->Xdisplay, gid);
 
 	if( font == NULL ) break;
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "handling text shadow for %s (%d)\n", str, len);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "handling text shadow for %s (%d)\n", str, len));
 
 	/*
 	 * Save the old GC values foreground.
@@ -2943,7 +2943,7 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
     }
 # endif	/* TEXT_SHADOW */
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "output entire string: %s\n", str);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "output entire string: %s\n", str));
     draw_string (r->Xdisplay, win, gc, x, y, str, len);
 }
 
@@ -3072,7 +3072,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    */
 	    if (XftDrawStringUtf8 == xftdraw_string)
 		loopitem <<= 1;
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "output entire mono string\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire mono string\n"));
 	}
 	/*
 	** Non monospace font, but still we can improve the performance
@@ -3098,7 +3098,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    ** length as parameter, not character number.
 	    */
 	    loopitem = (len << 1);
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "output entire UTF-8 string\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire UTF-8 string\n"));
 	}
 	else
 	if (
@@ -3113,7 +3113,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    /* print string once for 16-bits string */
 	    loop = 1;
 	    loopitem = len;
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "output entire 16-bits string\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire 16-bits string\n"));
 	}
 # endif	/* MULTICHAR_SET */
 	else
@@ -3125,14 +3125,14 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    /* print string once for 8-bits string */
 	    loop = 1;
 	    loopitem = len;
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "output entire 8-bits string\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire 8-bits string\n"));
 	}
 	else
 	{
 	    /* print string one by one character */
 	    loop = len;
 	    loopitem = 1 + adjust;
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "output characters one by one\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output characters one by one\n"));
 	}
 
 
@@ -3313,12 +3313,12 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 
     if (refresh_type == NO_REFRESH || !PVTS(r, page)->mapped)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Skipping refresh (%d, %d)\n", refresh_type, PVTS(r, page)->mapped);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Skipping refresh (%d, %d)\n", refresh_type, PVTS(r, page)->mapped));
 
 	return;
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_refresh %d ()\n", page);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_refresh %d ()\n", page));
 
     /*
     ** A: set up vars
@@ -3399,7 +3399,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
      */
     if( (refresh_type & CLIPPED_REFRESH) && IS_REGION(h->refreshRegion))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Doing clipped refresh (Region %p)\n", h->refreshRegion);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Doing clipped refresh (Region %p)\n", h->refreshRegion));
 
 	/*
 	 * We must wait till refresh is complete before destroying the
@@ -3438,7 +3438,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    int	    currow = CURROW + SVLINES;
 	    srp = &(PSCR(r, page).rend[currow][CURCOL]);
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Setting solid cursor\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Setting solid cursor\n"));
 
 	    *srp ^= RS_RVid;
 
@@ -3571,7 +3571,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	rend_t	     *drp2;
 	text_t	     *dtp2;
 
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "Trying slowlink copyarea pass\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "Trying slowlink copyarea pass\n"));
 
 	j = r->TermWin.nrow;
 	wlen = len = -1;
@@ -3613,7 +3613,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		if (wlen < len)
 		    SWAP_IT(wlen, len, int);
 
-		rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_scr_refresh %d (): " "XCopyArea: %d -> %d (height: %d)\n", page, len + i, len, wlen - len + 1);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_refresh %d (): " "XCopyArea: %d -> %d (height: %d)\n", page, len + i, len, wlen - len + 1));
 		XCopyArea(r->Xdisplay, PVTS(r, page)->vt,
 		    PVTS(r, page)->vt, r->TermWin.gc,
 		    0, Row2Pixel(len + i),
@@ -3981,7 +3981,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		    col--;	/* went one too far.  move back */
 		    len -= i;	/* dump any matching trailing chars */
 
-		    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Drawing %d(%d) chars: %.*s\n", len, echars-i, (len > 55) ? 55 : len, buffer);
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Drawing %d(%d) chars: %.*s\n", len, echars-i, (len > 55) ? 55 : len, buffer));
 		} /* if (!fprop) */
 		wlen = len;
 	    }
@@ -4296,7 +4296,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		    /* don't draw empty strings */
 		    if (buffer[i] != ' ')
 		    {
-			rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "CL Drawing '%.60s' (%d)\n", buffer, len);
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "CL Drawing '%.60s' (%d)\n", buffer, len));
 
 			rxvt_scr_draw_string (r, page, xpixel, ypixelc,
 				buffer, wlen, drawfunc,
@@ -4321,7 +4321,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		gcvalue.foreground = pixel;
 		XChangeGC(r->Xdisplay, r->TermWin.gc, GCForeground, &gcvalue);
 
-		rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "PF Drawing '%.60s' (%d)\n", buffer, len);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "PF Drawing '%.60s' (%d)\n", buffer, len));
 		rxvt_scr_draw_string (r, page,
 			xpixel, ypixelc, buffer, wlen, drawfunc,
 			fore, back, rend,
@@ -4330,7 +4330,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	    }
 	    else
 	    {
-		rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "NC Drawing '%.60s' (%d)\n", buffer, len);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "NC Drawing '%.60s' (%d)\n", buffer, len));
 		rxvt_scr_draw_string (r, page,
 			xpixel, ypixelc, buffer, wlen, image_drawfunc,
 			fore, back, rend,
@@ -4348,7 +4348,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		 * If we still need to draw a bold chars, then all else has
 		 * failed. Fall back to overstriking.
 		 */
-		rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "Overstriking %s\n", buffer );
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Overstriking %s\n", buffer ));
 		rxvt_scr_draw_string (r, page,
 			xpixel + 1, ypixelc, buffer, wlen, drawfunc,
 			fore, back, rend,
@@ -4502,7 +4502,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 	/*
 	 * A clipped refresh is complete. Don't restrict future refreshes.
 	 */
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "Completed clipped refresh\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "Completed clipped refresh\n"));
 
 	/*
 	 * XSetRegion( r->Xdisplay, r->TermWin.gc, None) causes a segfault.
@@ -4553,7 +4553,7 @@ rxvt_scr_clear(rxvt_t* r, int page)
     if (!PVTS(r, page)->mapped)
 	return;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_clear()\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_clear()\n"));
 
     r->h->num_scr_allow = 0;
     PVTS(r, page)->want_refresh = 1;
@@ -4736,7 +4736,7 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
     char**	    cl;
 #endif
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_paste (%08lx, %lu, %d), wait=%2x\n", win, (unsigned long)prop, (int)delete_prop, r->h->selection_wait);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_paste (%08lx, %lu, %d), wait=%2x\n", win, (unsigned long)prop, (int)delete_prop, r->h->selection_wait));
 
     if (NOT_ATOM(prop))	    /* check for failed XConvertSelection */
     {
@@ -4765,19 +4765,19 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 	    break;
 	if( ct.encoding == None )
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property didn't exist!\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property didn't exist!\n"));
 	    break;
 	}
 
 	if (ct.value == NULL)
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property shooting blanks!\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property shooting blanks!\n"));
 	    continue;
 	}
 
 	if (ct.nitems == 0)
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property empty - also INCR end\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_paste: property empty - also INCR end\n"));
 
 	    if( r->h->selection_wait == Sel_normal && nread == 0 )
 	    {
@@ -4785,7 +4785,7 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
 		 * pass through again trying CUT_BUFFER0 if we've come from
 		 * XConvertSelection() but nothing was presented
 		 */
-		rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request: pasting CUT_BUFFER0\n");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request: pasting CUT_BUFFER0\n"));
 		rxvt_selection_paste(r, XROOT, XA_CUT_BUFFER0, False);
 	    }
 	    nread = -1;	    /* discount any previous stuff */
@@ -4821,7 +4821,7 @@ rxvt_selection_paste(rxvt_t* r, Window win, Atom prop, Bool delete_prop)
     if (r->h->selection_wait == Sel_normal)
 	r->h->selection_wait = Sel_none;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_paste: bytes written: %ld\n", nread);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_paste: bytes written: %ld\n", nread));
     return (int)nread;
 }
 
@@ -4838,7 +4838,7 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
     if (NOT_ATOM(prop))
 	return;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_property(%08lx, %lu)\n", win, (unsigned long)prop);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_property(%08lx, %lu)\n", win, (unsigned long)prop));
     if (r->h->selection_wait == Sel_normal)
     {
 	int	     a, afmt;
@@ -4856,7 +4856,7 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
 #ifndef OS_CYGWIN
 	if (atype == r->h->xa[XA_INCR])	    /* start an INCR transfer */
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_property: INCR: starting transfer\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_property: INCR: starting transfer\n"));
 	    XDeleteProperty(r->Xdisplay, win, prop);
 	    XFlush(r->Xdisplay);
 	    reget_time = 1;
@@ -4869,7 +4869,7 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
 	reget_time = 1;
 	if (rxvt_selection_paste(r, win, prop, True) == -1)
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_property: INCR: clean end\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_property: INCR: clean end\n"));
 	    r->h->selection_wait = Sel_none;
 	    r->h->timeout[TIMEOUT_INCR].tv_sec = 0; /* turn off timer */
 	}
@@ -4897,14 +4897,14 @@ rxvt_selection_property(rxvt_t* r, Window win, Atom prop)
 void
 rxvt_selection_request(rxvt_t* r, int page, Time tm, int x, int y)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d (%lu, %d, %d)\n", page, tm, x, y );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d (%lu, %d, %d)\n", page, tm, x, y ));
 
     if (x < 0 || x >= VT_WIDTH(r) || y < 0 || y >= VT_HEIGHT(r))
 	return;		/* outside window */
 
     if( SEL(r).text != NULL )	    /* internal selection */
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d: pasting internal\n", page );
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d: pasting internal\n", page ));
 	rxvt_paste_str( r, page, SEL(r).text, SEL(r).len );
 	return;
     }
@@ -4935,7 +4935,7 @@ rxvt_selection_request(rxvt_t* r, int page, Time tm, int x, int y)
 
     /* don't loop in rxvt_selection_paste() */
     r->h->selection_wait = Sel_none;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d: pasting CUT_BUFFER0\n", page );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request %d: pasting CUT_BUFFER0\n", page ));
     rxvt_selection_paste(r, XROOT, XA_CUT_BUFFER0, False);
 }
 
@@ -4956,7 +4956,7 @@ rxvt_selection_request_other(rxvt_t* r, int page, Atom target, int selnum)
 	sel = r->h->xa[XA_CLIPBOARD];
     if (XGetSelectionOwner(r->Xdisplay, sel) != None)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request_other %d: pasting %s\n", page, debug_xa_names[selnum]);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request_other %d: pasting %s\n", page, debug_xa_names[selnum]));
 
 	XConvertSelection(r->Xdisplay, sel, target,
 	    r->h->xa[XA_VT_SELECTION], PVTS(r, page)->vt,
@@ -4976,7 +4976,7 @@ rxvt_selection_request_other(rxvt_t* r, int page, Atom target, int selnum)
 void
 rxvt_process_selectionclear(rxvt_t* r, int page)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_process_selectionclear %d ()\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_process_selectionclear %d ()\n", page));
 
     PVTS(r, page)->want_refresh = 1;
     if (SEL(r).text)
@@ -5012,7 +5012,7 @@ rxvt_selection_make(rxvt_t* r, int page, Time tm)
     rend_t*	    re;
 #endif
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_make %d (): sel.op=%d, sel.clicks=%d\n", page, SEL(r).op, SEL(r).clicks);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_make %d (): sel.op=%d, sel.clicks=%d\n", page, SEL(r).op, SEL(r).clicks));
     switch (SEL(r).op)
     {
 	case SELECTION_CONT:
@@ -5173,12 +5173,12 @@ rxvt_selection_make(rxvt_t* r, int page, Time tm)
 
     XSetSelectionOwner(r->Xdisplay, XA_PRIMARY, PVTS(r, page)->vt, tm);
     if (XGetSelectionOwner(r->Xdisplay, XA_PRIMARY) != PVTS(r, page)->vt)
-	rxvt_dbgmsg (DBG_ERROR, DBG_SCREEN, "can't get primary selection");
+	rxvt_msg (DBG_ERROR, DBG_SCREEN, "can't get primary selection");
     XChangeProperty(r->Xdisplay, XROOT, XA_CUT_BUFFER0, XA_STRING, 8,
 	PropModeReplace, SEL(r).text, (int)SEL(r).len);
     r->h->selection_time = tm;
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_make %d (): sel.len=%d\n", page, SEL(r).len);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "sel.text=%s\n", SEL(r).text);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_make %d (): sel.len=%d\n", page, SEL(r).len));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "sel.text=%s\n", SEL(r).text));
 }
 
 
@@ -5191,7 +5191,7 @@ rxvt_selection_make(rxvt_t* r, int page, Time tm)
 void
 rxvt_selection_click(rxvt_t* r, int page, int clicks, int x, int y)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_click %d (%d, %d, %d)\n", page, clicks, x, y);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_click %d (%d, %d, %d)\n", page, clicks, x, y));
 
     SEL(r).vt = page;
     clicks = ((clicks - 1) % 3) + 1;
@@ -5329,7 +5329,7 @@ rxvt_selection_delimit_word(rxvt_t* r, int page, enum page_dirn dirn, const row_
     }
 
 Old_Word_Selection_You_Die:
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_delimit_word %d (%s,...) @ (r:%3d, c:%3d) has boundary (r:%3d, c:%3d)\n", page, (dirn == UP ? "up    " : "down"), mark->row, mark->col, row - SVLINES, col);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_delimit_word %d (%s,...) @ (r:%3d, c:%3d) has boundary (r:%3d, c:%3d)\n", page, (dirn == UP ? "up    " : "down"), mark->row, mark->col, row - SVLINES, col));
 
     if (dirn == DN)
 	col++;		/* put us on one past the end */
@@ -5383,7 +5383,7 @@ rxvt_selection_extend(rxvt_t* r, int page, int x, int y, int flag)
 	    SEL(r).beg.col = SEL(r).end.col = 0;
 	    SEL(r).clicks = 4;
 	    PVTS(r, page)->want_refresh = 1;
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_SCREEN, "rxvt_selection_extend %d () sel.clicks = 4\n", page);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_extend %d () sel.clicks = 4\n", page));
 	    return;
 	}
     }
@@ -5442,8 +5442,8 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, int32_t col, int32_t row, int 
 #endif
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d (c:%d, r:%d, %d, %d) clicks:%d, op:%d\n", page, col, row, button3, buttonpress, SEL(r).clicks, SEL(r).op);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () ENT  b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d (c:%d, r:%d, %d, %d) clicks:%d, op:%d\n", page, col, row, button3, buttonpress, SEL(r).clicks, SEL(r).op));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () ENT  b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col));
 
     PVTS(r, page)->want_refresh = 1;
     switch (SEL(r).op)
@@ -5479,10 +5479,11 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, int32_t col, int32_t row, int 
     {
 	SEL(r).beg.col = SEL(r).end.col = SEL(r).mark.col;
 	SEL(r).beg.row = SEL(r).end.row = SEL(r).mark.row;
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () "
-		    "ENT2 b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n",
-		    page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row,
-		    SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN,
+	    "rxvt_selection_extend_colrow %d () "
+	    "ENT2 b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n",
+	    page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row,
+	    SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col));
     }
 
     pos.col = col;
@@ -5554,7 +5555,7 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, int32_t col, int32_t row, int 
 	    r->h->hate_those_clicks = 1;
 	}
 
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () EXIT b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () EXIT b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col));
 	return;
     }
 #endif		    /* ! NO_OLD_SELECTION */
@@ -5716,7 +5717,7 @@ rxvt_selection_extend_colrow(rxvt_t* r, int page, int32_t col, int32_t row, int 
 	}
     }
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () EXIT b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_selection_extend_colrow %d () EXIT b:(r:%d,c:%d) m:(r:%d,c:%d), e:(r:%d,c:%d)\n", page, SEL(r).beg.row, SEL(r).beg.col, SEL(r).mark.row, SEL(r).mark.col, SEL(r).end.row, SEL(r).end.col));
 
 #endif		    /* ! NO_NEW_SELECTION */
 }

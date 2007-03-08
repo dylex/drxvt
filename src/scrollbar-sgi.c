@@ -494,7 +494,7 @@ rxvt_scrollbar_show_sgi (rxvt_t* r, int update, int last_top, int last_bot, int 
     }
     else    {
 	/* (AVTS(r)->nscrolled > 0) */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_SCROLLBAR, "top=%d, bot=%d, last_top=%d, last_bot=%d\n", r->scrollBar.top, r->scrollBar.bot, last_top, last_bot);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCROLLBAR, "top=%d, bot=%d, last_top=%d, last_bot=%d\n", r->scrollBar.top, r->scrollBar.bot, last_top, last_bot));
 	if (last_top < r->scrollBar.top)
 	    XClearArea (r->Xdisplay, r->scrollBar.win,
 	    0, last_top,

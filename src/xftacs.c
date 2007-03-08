@@ -102,7 +102,7 @@ acsXErrorHandler( __attribute__((unused)) Display *dpy,
 
     sPmap = 0;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "Could not create pixmap\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "Could not create pixmap\n"));
     return 0;
 }
 
@@ -118,14 +118,14 @@ xftInitACS( Display *dpy, Drawable d, unsigned depth)
 {
     int (*oldXerrorHandler)( Display *, XErrorEvent *);
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "Initing sPmap\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "Initing sPmap\n"));
 
     if(d == 0)		d = DefaultRootWindow( dpy);
     if(depth == 0)	depth=DefaultDepth( dpy, DefaultScreen( dpy));
 
 #ifdef DEBUG
     if( sPmap != 0)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "sPmap not null in xftInitACS");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "sPmap not null in xftInitACS"));
 #endif
 
     acsGc = XCreateGC( dpy, d, 0, NULL);
@@ -146,14 +146,14 @@ xftCloseACS( Display *dpy)
 {
     if( sPmap )
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "freeing sPmap\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "freeing sPmap\n"));
 
 	XFreePixmap( dpy, sPmap);
 	sPmap = 0;
     }
 #ifdef DEBUG
     else
-	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "sPmap already null in xftCloseACS");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "sPmap already null in xftCloseACS"));
 #endif
 
     XFreeGC( dpy, acsGc);
@@ -378,7 +378,7 @@ xftDrawACSChars(
 		n++, str++);
 	if( n )
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d glyphs) ", n);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "(%d glyphs) ", n));
 
 	    XftDrawGlyphs( draw, color, pub, x, y, glyphs, n);
 
@@ -394,7 +394,7 @@ xftDrawACSChars(
 	{
 	    XGCValues values;
 
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d boxes) ", n);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "(%d boxes) ", n));
 
 	    XGetGCValues( dpy, acsGc, GCForeground | GCBackground, &values);
 
@@ -425,7 +425,7 @@ xftDrawACSChars(
 
 	    for( n=0; ++n < len && *(++str) == c; );
 
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(%d hln)", n);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "(%d hln)", n));
 	    x += n * font_width;
 
 	    XSetFillStyle( dpy, acsGc, FillSolid);
@@ -442,7 +442,7 @@ xftDrawACSChars(
 	    XPoint points[4];
 	    int npoints = 4, n;
 
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(1 dmd) ");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "(1 dmd) "));
 
 	    points[0].x = CHR_WIDE/2 + (BOX_WIDE - CHR_WIDE) / 2;
 	    points[0].y = 0;
@@ -480,7 +480,7 @@ xftDrawACSChars(
 	    int coord[4];
 	    int n = 0;
 
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "(1 ldc) ");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "(1 ldc) "));
 
 	    XSetFillStyle( dpy, acsGc, FillSolid);
 	    while (*p >= 0)
@@ -505,7 +505,7 @@ xftDrawACSChars(
 	}
     }
 #ifdef DEBUG
-    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "\n"));
 #endif
 }
 
@@ -525,7 +525,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
     const unsigned char *t = str;
     int chars;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, "Drawing %d(%d) %sACS characters.", len, STRLEN( str), ( xftdraw_string == XftDrawString8) ? "Utf8 " : "");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, "Drawing %d(%d) %sACS characters.", len, STRLEN( str), ( xftdraw_string == XftDrawString8) ? "Utf8 " : ""));
 
     while(len > 0)
     {
@@ -535,7 +535,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	for( chars=0; *t >= 32 && chars < len; chars++, t++);
 	if( chars)
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, " [%d chars]", chars);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, " [%d chars]", chars));
 	    xftdraw_string( draw, color, pub, x, y, str, chars);
 
 	    x += chars * pub->max_advance_width;
@@ -549,7 +549,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	for( chars=0; *t < 32 && chars < len; chars++, t++);
 	if( chars)
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_XFTACS, " (%d glyphs)", chars);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_XFTACS, " (%d glyphs)", chars));
 	    xftDrawACSChars( dpy, d, gc, draw, color, pub, x, y, str, chars);
 
 	    x += chars * pub->max_advance_width;
@@ -558,7 +558,7 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	}
     }
 #ifdef DEBUG
-    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_XFTACS, "\n"));
 #endif
 }
 /*-------------------------- end-of-file (C source) --------------------------*/

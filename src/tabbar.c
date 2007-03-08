@@ -384,7 +384,7 @@ draw_string (rxvt_t* r, Region clipRegion,
 	    else
 #  endif
 	    {
-		rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR, "XFT non-iconv tab title\n");
+		rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR, "XFT non-iconv tab title\n"));
 		rxvt_draw_string_xft (r, r->tabBar.win, r->tabBar.gc,
 			clipRegion, RS_None,
 			active ? USE_BOLD_PFONT : USE_PFONT,
@@ -654,7 +654,7 @@ refresh_tabbar_tab( rxvt_t *r, int page)
     int		i;
     XRectangle	rect;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Refreshing tabbar title of page %d\n", page);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Refreshing tabbar title of page %d\n", page));
 
     if( page < FVTAB(r) || page > LVTAB(r) ) return;
 
@@ -1139,7 +1139,7 @@ rxvt_adjust_fd_number( rxvt_t* r )
 
     for( i=0; i <= LTAB(r); i++ )
 	MAX_IT( num_fds, PVTS(r, i)->cmd_fd );
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "LTAB=%d, stderr_fd=%d, num_fds=%d. ", LTAB(r), STDERR_FILENO, num_fds);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "LTAB=%d, stderr_fd=%d, num_fds=%d. ", LTAB(r), STDERR_FILENO, num_fds));
 
     MAX_IT( num_fds, r->Xfd );
 #ifdef USE_FIFO
@@ -1157,7 +1157,7 @@ rxvt_adjust_fd_number( rxvt_t* r )
     MAX_IT( num_fds, 7 );
 #endif
     r->num_fds = num_fds + 1;	/* counts from 0 */
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR, "Adjust num_fds to %d\n", r->num_fds);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR, "Adjust num_fds to %d\n", r->num_fds));
 }
 
 
@@ -1174,26 +1174,26 @@ rxvt_append_page( rxvt_t* r, int profile,
     char**  argv;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "rxvt_append_page( r, %d, %s, %s )\n", profile, title ? title : "(nil)", command ? command : "(nil)" );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "rxvt_append_page( r, %d, %s, %s )\n", profile, title ? title : "(nil)", command ? command : "(nil)" ));
 
     /* Sanitization */
     assert( LTAB(r) < MAX_PAGES );
 
     if (LTAB(r) == MAX_PAGES-1)
     {
-	rxvt_dbgmsg (DBG_ERROR, DBG_TABBAR,  "Too many tabs" );
+	rxvt_msg (DBG_ERROR, DBG_TABBAR,  "Too many tabs" );
 	return ;
     }
 
     if( profile < 0 || profile >= MAX_PROFILES )
     {
-	rxvt_dbgmsg (DBG_WARN, DBG_TABBAR,  "Warning: Profile %d out of range", profile );
+	rxvt_msg (DBG_WARN, DBG_TABBAR,  "Warning: Profile %d out of range", profile );
 	profile = 0;
     }
 
     /* indicate that we add a new tab */
     LTAB(r)++;
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR, "last page is %d\n", LTAB(r));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR, "last page is %d\n", LTAB(r)));
 
     /*
      * Use command specified with -e only if we're opening the first tab, or the
@@ -1229,7 +1229,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	else
 	    argv = NULL;
     }
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Forking command=%s, argv[0]=%s\n", command ? command : "(nil)", ( argv && argv[0] ) ? argv[0] : "(nil)" );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Forking command=%s, argv[0]=%s\n", command ? command : "(nil)", ( argv && argv[0] ) ? argv[0] : "(nil)" ));
 
     /*
      * Set the tab title.
@@ -1292,7 +1292,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	if( len > 0 && chdir( child_cwd ) == 0 )
 	{
 	    /* Now in working directory of ATAB */
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Running child in directory: %s\n", child_cwd );
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Running child in directory: %s\n", child_cwd ));
 
 	    /* Run command in this new directory. */
 	    LVTS(r)->cmd_fd =
@@ -1305,7 +1305,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	else
 	{
 	    /* Exec command in original directory. */
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Running child in original directory\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Running child in original directory\n"));
 
 	    LVTS(r)->cmd_fd =
 		rxvt_run_command( r, LTAB(r), (const char**) argv );
@@ -1337,7 +1337,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	LTAB(r) --;
 	return;
     }
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR,"page %d's cmd_fd is %d\n", LTAB(r), LVTS(r)->cmd_fd);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR,"page %d's cmd_fd is %d\n", LTAB(r), LVTS(r)->cmd_fd));
 
 
     /* adjust number of file descriptors to listen */
@@ -1410,7 +1410,7 @@ rxvt_remove_page (rxvt_t* r, short page)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR,"remove_page(%d)\n", page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"remove_page(%d)\n", page));
 
 
     /* clean utmp/wtmp entry */
@@ -1614,7 +1614,7 @@ rxvt_activate_page (rxvt_t* r, short index)
      * under slow connections).
      */
     /* rxvt_scr_touch (r, ATAB(r), True); */
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR, "active page is %d\n",ATAB(r));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR, "active page is %d\n",ATAB(r)));
 
     /* synchronize terminal title with tab title */
     if (ISSET_OPTION(r, Opt2_syncTabTitle))
@@ -1672,7 +1672,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
     x = ev->x;
     y = ev->y;
     but = -1;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "click in (%d,%d)\n", x, y);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "click in (%d,%d)\n", x, y));
 
     /* Button4/Button5 of wheel mouse activate the left/right tab as
        Mozilla firefox */
@@ -1733,11 +1733,11 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	/* we should only handle left-mouse-button clicks */
 	if ( ev->button != Button1 )
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR,"skip non-left-mouse-button click\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"skip non-left-mouse-button click\n"));
 	    return;
 	}
 
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR,"click on button %d\n",but);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"click on button %d\n",but));
 	switch(but)
 	{
 	    case 0 : /* right shift */
@@ -1787,7 +1787,7 @@ rxvt_tabbar_dispatcher (rxvt_t* r, XButtonEvent* ev)
 	{
 	    but = i - 1;
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR,"click on tab %d\n", but);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR,"click on tab %d\n", but));
 	    switch( ev->button )
 	    {
 		case Button1:
@@ -1847,7 +1847,7 @@ rxvt_tabbar_button_release( rxvt_t *r, XButtonEvent *ev)
 	    )
 	    w += TAB_WIDTH( droppedTab );
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Dragged tab %d to %d (%d, %d)\n", r->tabClicked, droppedTab - 1, ev->x, ev->y);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Dragged tab %d to %d (%d, %d)\n", r->tabClicked, droppedTab - 1, ev->x, ev->y));
 
 	/* Move active tab there */
 	rxvt_tabbar_move_tab( r, droppedTab - 1 );
@@ -1968,7 +1968,7 @@ rxvt_tabbar_create (rxvt_t* r)
 
 
     init_tabbar (r);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TABBAR,"Creating tabbar\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"Creating tabbar\n"));
 
 
     /* initialize the colors */
@@ -2085,7 +2085,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	else
 	    r->tabBar.delimit = VTFG(r,0);
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "Delimit color: %hx, %hx, %hx (#%lx)\n", color.red, color.green, color.blue, r->tabBar.delimit);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Delimit color: %hx, %hx, %hx (#%lx)\n", color.red, color.green, color.blue, r->tabBar.delimit));
     }
 
 
@@ -2232,7 +2232,7 @@ rxvt_tabbar_create (rxvt_t* r)
 #endif
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TABBAR, "TXT_XOFF=%d, TXT_YOFF=%d, ATAB_EXTRA=%d, TAB_RADIUS=%d\n", TXT_XOFF, TXT_YOFF, ATAB_EXTRA, TAB_RADIUS);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "TXT_XOFF=%d, TXT_YOFF=%d, ATAB_EXTRA=%d, TAB_RADIUS=%d\n", TXT_XOFF, TXT_YOFF, ATAB_EXTRA, TAB_RADIUS));
 }
 
 

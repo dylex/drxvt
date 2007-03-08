@@ -202,7 +202,7 @@ rxvt_control_tty(int fd_tty, const char *ttydev)
 #ifndef __QNX__
     int             fd;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): pid: %d, tty fd: %d, dev: %s\n", (int) getpid(), fd_tty, ttydev);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): pid: %d, tty fd: %d, dev: %s\n", (int) getpid(), fd_tty, ttydev));
 /* ---------------------------------------- */
 # ifdef HAVE_SETSID
     setsid();
@@ -215,7 +215,7 @@ rxvt_control_tty(int fd_tty, const char *ttydev)
 /* ---------------------------------------- */
 # ifdef TIOCNOTTY
     fd = open("/dev/tty", O_RDWR | O_NOCTTY);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): Voiding tty associations: previous=%s\n", fd < 0 ? "no" : "yes");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): Voiding tty associations: previous=%s\n", fd < 0 ? "no" : "yes"));
     if (fd >= 0) {
 	ioctl(fd, TIOCNOTTY, NULL); /* void tty associations */
 	close(fd);
@@ -223,7 +223,7 @@ rxvt_control_tty(int fd_tty, const char *ttydev)
 # endif
 /* ---------------------------------------- */
     fd = open("/dev/tty", O_RDWR | O_NOCTTY);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): /dev/tty has controlling tty? %s\n", fd < 0 ? "no (good)" : "yes (bad)");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): /dev/tty has controlling tty? %s\n", fd < 0 ? "no (good)" : "yes (bad)"));
     if (fd >= 0)
 	close(fd);	/* ouch: still have controlling tty */
 /* ---------------------------------------- */
@@ -249,7 +249,7 @@ rxvt_control_tty(int fd_tty, const char *ttydev)
     if (isastream(fd_tty) == 1)
 # endif
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): Pushing STREAMS modules\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): Pushing STREAMS modules\n"));
 	ioctl(fd_tty, I_PUSH, "ptem");
 	ioctl(fd_tty, I_PUSH, "ldterm");
 	ioctl(fd_tty, I_PUSH, "ttcompat");
@@ -258,24 +258,24 @@ rxvt_control_tty(int fd_tty, const char *ttydev)
 /* ---------------------------------------- */
 # if defined(TIOCSCTTY)
     fd = ioctl(fd_tty, TIOCSCTTY, NULL);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): ioctl(..,TIOCSCTTY): %d\n", fd);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): ioctl(..,TIOCSCTTY): %d\n", fd));
 # elif defined(TIOCSETCTTY)
     fd = ioctl(fd_tty, TIOCSETCTTY, NULL);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): ioctl(..,TIOCSETCTTY): %d\n", fd);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): ioctl(..,TIOCSETCTTY): %d\n", fd));
 # else
     fd = open(ttydev, O_RDWR);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): tty open%s\n", fd < 0 ? " failure" : "ed OK");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): tty open%s\n", fd < 0 ? " failure" : "ed OK"));
     if (fd >= 0)
     close(fd);
 # endif
 /* ---------------------------------------- */
     fd = open("/dev/tty", O_WRONLY);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): do we have controlling tty now: %s\n", fd < 0 ? "no (fatal)" : "yes (good)");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): do we have controlling tty now: %s\n", fd < 0 ? "no (fatal)" : "yes (good)"));
     if (fd < 0)
 	return -1;	/* fatal */
     close(fd);
 /* ---------------------------------------- */
-    rxvt_dbgmsg (DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): tcgetpgrp(): %d  getpgrp(): %d\n", (int) tcgetpgrp(fd_tty), (int) getpgrp());
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_PTYTTY, "rxvt_control_tty(): tcgetpgrp(): %d  getpgrp(): %d\n", (int) tcgetpgrp(fd_tty), (int) getpgrp()));
 /* ---------------------------------------- */
 #endif		    /* ! __QNX__ */
     return 0;

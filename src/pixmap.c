@@ -421,7 +421,7 @@ rxvt_load_pixmap(rxvt_t *r, const char *file, long* pwidth, long* pheight)
 	/* semi-colon delimited */
 	if (NULL == (p = STRCHR(file, ';')))
 	    p = STRCHR(file, '\0');
-	rxvt_dbgmsg (DBG_ERROR, DBG_PIXMAP, "couldn't load image file \"%.*s\"", (p - file), file);
+	rxvt_msg (DBG_ERROR, DBG_PIXMAP, "couldn't load image file \"%.*s\"", (p - file), file);
 	return None;
     }
 
@@ -466,7 +466,7 @@ rxvt_load_pixmap(rxvt_t *r, const char *file, long* pwidth, long* pheight)
 	/* semi-colon delimited */
 	if ((p = STRCHR(file, ';')) == NULL)
 	p = STRCHR(file, '\0');
-	rxvt_dbgmsg (DBG_ERROR, DBG_PIXMAP, "couldn't load image file \"%.*s\"", (p - file), file);
+	rxvt_msg (DBG_ERROR, DBG_PIXMAP, "couldn't load image file \"%.*s\"", (p - file), file);
     }
 
     return  (pixmap);

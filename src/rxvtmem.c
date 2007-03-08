@@ -76,11 +76,11 @@ get_trunk(size_t trunk_size)
 
     if (IS_NULL(ptr = malloc (trunk_size + THEAD_OFFSET)))    
     {
-	rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+	rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	exit(EXIT_FAILURE);
     }
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk allocated %d bytes\n", (int) trunk_size);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MEMORY, "--Trunk allocated %d bytes\n", (int) trunk_size));
     tk_head = (struct trunk_head_t*) ((char*) ptr + trunk_size);
     /* set the real beginning of trunk. this should only be used by
      * init_trunk and free_trunk
@@ -142,7 +142,7 @@ free_trunk(struct trunk_head_t* tk_head)
     assert (TRUNK_MAGIC == tk_head->magic_e);
 #endif
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk freed %d bytes\n", (int) ((char*) tk_head - (char*) tk_head->begin));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MEMORY, "--Trunk freed %d bytes\n", (int) ((char*) tk_head - (char*) tk_head->begin)));
     free ((void*) tk_head->begin);
 }
 
@@ -319,7 +319,7 @@ rxvt_malloc(size_t size)
 
 #ifdef DEBUG
     assert (memory_initialized);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "rxvt_malloc (%d)\n", (int) size));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MEMORY, "rxvt_malloc (%d)\n", (int) size)));
 #endif
 
     if (!use_our_malloc || /* use system malloc, or request size is big */
@@ -329,7 +329,7 @@ rxvt_malloc(size_t size)
 	    size = 1;
 
 	if (IS_NULL(block = malloc (size + BHEAD_OFFSET)))   {
-	    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+	    rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	    exit(EXIT_FAILURE);
 	}
 
@@ -382,10 +382,10 @@ rxvt_malloc(size_t size)
 	{
 #ifdef DEBUG
 	    /* print out statistics for the trunk */
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "--Trunk of block size %d: %d bytes used (%d%%)\n",
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MEMORY, "--Trunk of block size %d: %d bytes used (%d%%)\n",
 		tklist->block_size, (int) tklist->first_trunk->tbyte,
 		(int) (tklist->first_trunk->tbyte * 100 /
-		      (tklist->block_size * tklist->first_trunk->bmax)));
+		      (tklist->block_size * tklist->first_trunk->bmax))));
 #endif
 
 
@@ -493,7 +493,7 @@ rxvt_realloc(void* ptr, size_t size)
 
 	if (IS_NULL(block))   
 	{
-	    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+	    rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
 	    exit(EXIT_FAILURE);
 	}
 #ifdef DEBUG
@@ -678,7 +678,7 @@ rxvt_malloc(size_t size)
     if (p)
 	return p;
 
-    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+    rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOTREACHED */
 }
@@ -694,7 +694,7 @@ rxvt_calloc(size_t number, size_t size)
     if (p)
 	return p;
 
-    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+    rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOTREACHED */
 }
@@ -713,7 +713,7 @@ rxvt_realloc(void *ptr, size_t size)
     if (p)
 	return p;
 
-    rxvt_dbgmsg (DBG_FATAL, DBG_MEMORY, abort_msg);
+    rxvt_msg (DBG_FATAL, DBG_MEMORY, abort_msg);
     exit(EXIT_FAILURE);
     /* NOT REACHED */
 }

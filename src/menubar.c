@@ -128,12 +128,12 @@ rxvt_menuitem_find(const menu_t *menu, const unsigned char *name)
     assert(NOT_NULL(menu));
 #endif
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_find(%s) ... ", name);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_find(%s) ... ", name));
 
     /* find the last item in the menu, this is good for separators */
     for (item = menu->tail; NOT_NULL(item); item = item->prev)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "%d", item->entry.itemType);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "%d", item->entry.itemType));
 
 	if (item->entry.itemType == MenuSubMenu)
 	{
@@ -144,10 +144,10 @@ rxvt_menuitem_find(const menu_t *menu, const unsigned char *name)
 	       || !STRCMP(name, item->name))
 	    break;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, ",");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, ","));
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Returning %p\n", item);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Returning %p\n", item));
     return item;
 }
 
@@ -164,7 +164,7 @@ rxvt_menuitem_free(rxvt_t *r, menu_t *menu, menuitem_t *item)
 #ifdef DEBUG
     assert(NOT_NULL(menu));
 #endif
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_free()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_free()\n"));
 
     prev = item->prev;
     next = item->next;
@@ -201,7 +201,7 @@ rxvt_menuarrow_find(char name)
 {
     int		 i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_find()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_find()\n"));
 
     for (i = 0; i < NARROWS; i++)
     if (name == Arrows[i].name)
@@ -215,7 +215,7 @@ void
 rxvt_menuarrow_free(rxvt_t *r, unsigned char name)
 {
     int		 i;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_free()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_free()\n"));
 
     if (name)
     {
@@ -265,7 +265,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 	    *cur,
 	    parse[NARROWS];
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_add()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuarrow_add()\n"));
     MEMSET(parse, 0, sizeof(parse));
 
     for (p = string; NOT_NULL(p) && *p; string = p)
@@ -327,18 +327,14 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 
 #ifdef DEBUG
     cur = &beg;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "<b>(len %d) = %.*s\n",
-	cur->len, (cur->str ? (char*) cur->str : ""));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "<b>(len %d) = %.*s\n", cur->len, (cur->str ? (char*) cur->str : "")));
     for (i = 0; i < NARROWS; i++)
     {
 	cur = &(parse[i]);
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "<%c>(len %d) = %.*s\n",
-	    Arrows[i].name,
-	    cur->len, (cur->str ? (char*) cur->str : ""));
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "<%c>(len %d) = %.*s\n", Arrows[i].name, cur->len, (cur->str ? (char*) cur->str : "")));
     }
     cur = &end;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "<e>(len %d) = %.*s\n",
-	cur->len, (cur->str ? (char*) cur->str : ""));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "<e>(len %d) = %.*s\n", cur->len, (cur->str ? (char*) cur->str : "")));
 #endif
 
     xtra_len = (beg.len + end.len);
@@ -377,7 +373,7 @@ rxvt_menuarrow_add(rxvt_t *r, unsigned char *string)
 	str[len] = '\0';
 
 #ifdef DEBUG
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "<%c>(len %d) = %s\n", Arrows[i].name, len, str);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "<%c>(len %d) = %s\n", Arrows[i].name, len, str));
 #endif
 	rxvt_set_action( &(r->h->MenuBar.arrows[i]), str);
     }
@@ -391,7 +387,7 @@ rxvt_menuitem_add(rxvt_t *r, menu_t *menu,
 {
     menuitem_t	 *item;
     unsigned int    len;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_add()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menuitem_add()\n"));
 
 #ifdef DEBUG
     assert(NOT_NULL(name));
@@ -526,7 +522,7 @@ rxvt_menu_find_base(rxvt_t *r, menu_t **menu, unsigned char *path)
 {
     menu_t	 *m = NULL;
     menuitem_t	 *item;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_find_base()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_find_base()\n"));
 
 #ifdef DEBUG
     assert(NOT_NULL(menu));
@@ -628,7 +624,7 @@ rxvt_menu_delete(rxvt_t *r, menu_t *menu)
     menu_t	 *parent = NULL, *prev, *next;
     menuitem_t	 *item;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_delete()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_delete()\n"));
     assert( menu != r->h->ActiveMenu ); /* Shouldn't delete current menu */
 
     /* delete the entire menu */
@@ -701,7 +697,7 @@ rxvt_menu_add(rxvt_t *r, menu_t *parent, unsigned char *path)
 {
     menu_t	 *menu;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_add(): Adding menu %s to parent %s\n", path, NOT_NULL(parent) ? (char *)parent->name : "(nil)");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_add(): Adding menu %s to parent %s\n", path, NOT_NULL(parent) ? (char *)parent->name : "(nil)"));
 
     if (NOT_NULL(STRCHR(path, '/')))
     {
@@ -817,7 +813,7 @@ rxvt_drawbox_menubar(rxvt_t *r, int x, int len, int state)
 {
     unsigned long   top, bot;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_drawbox_menubar()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_drawbox_menubar()\n"));
 
     /* XXXMENU */
     len += HSPACE_PIXEL + SHADOW;
@@ -857,7 +853,7 @@ rxvt_menubar_draw_triangle(rxvt_t *r, int x, int y, int state)
     unsigned long   top, bot;
     int		    w;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_draw_triangle()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_draw_triangle()\n"));
 
 #ifdef MENU_SHADOW_IN
     state = -state;
@@ -892,7 +888,7 @@ rxvt_drawbox_menuitem(rxvt_t *r, int y, int state)
 {
     unsigned long   top, bot;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_drawbox_menuitem()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_drawbox_menuitem()\n"));
 
 #ifdef MENU_SHADOW_IN
     state = -state;
@@ -925,14 +921,14 @@ rxvt_drawbox_menuitem(rxvt_t *r, int y, int state)
 void
 rxvt_print_menu_ancestors(menu_t *menu)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_print_menu_ancestors()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_print_menu_ancestors()\n"));
 
     if (IS_NULL(menu))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Top Level menu\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Top Level menu\n"));
 	return;
     }
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "menu %s ", menu->name);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "menu %s ", menu->name));
     if (NOT_NULL(menu->parent))
     {
 	menuitem_t   *item;
@@ -947,11 +943,11 @@ rxvt_print_menu_ancestors(menu_t *menu)
 	}
 	if (IS_NULL(item))
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "is an orphan!\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "is an orphan!\n"));
 	    return;
 	}
     }
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "\n"));
     rxvt_print_menu_ancestors(menu->parent);
 }
 
@@ -959,7 +955,7 @@ rxvt_print_menu_ancestors(menu_t *menu)
 void
 rxvt_print_menu_descendants(menu_t *menu)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_print_menu_descendants()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_print_menu_descendants()\n"));
 
     menuitem_t	 *item;
     menu_t	 *parent;
@@ -974,31 +970,31 @@ rxvt_print_menu_descendants(menu_t *menu)
     while (NOT_NULL(parent));
 
     for (i = 0; i < level; i++)
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, ">");
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "%s\n", menu->name);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, ">"));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "%s\n", menu->name));
 
     for (item = menu->head; NOT_NULL(item); item = item->next)
     {
 	if (item->entry.itemType == MenuSubMenu)
 	{
 	    if (IS_NULL(item->entry.submenu.menu))
-		rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "> %s == NULL\n", item->name);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "> %s == NULL\n", item->name));
 	    else
 		rxvt_print_menu_descendants(item->entry.submenu.menu);
 	}
 	else
 	{
 	    for (i = 0; i < level; i++)
-		rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "+");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "+"));
 	    if (item->entry.itemType == MenuLabel)
-		rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "label: ");
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "%s\n", item->name);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "label: "));
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "%s\n", item->name));
 	}
     }
 
     for (i = 0; i < level; i++)
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "<");
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "<"));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "\n"));
 }
 #endif	/* DEBUG */
 
@@ -1014,14 +1010,14 @@ rxvt_build_tablist(rxvt_t *r, menu_t *menu)
 		    title[MAX_DISPLAY_TAB_TXT + 4];
 
     assert( menu);
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_build_tablist()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_build_tablist()\n"));
 
     /*
      * Empty menus should get renamed to "Switch to tab".
      */
     if( !menu->head && STRCMP( menu->name, "Switch to tab"))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Renaming menu to Switch to tab\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Renaming menu to Switch to tab\n"));
 
 	menu->name = rxvt_realloc( menu->name, 14);
 	STRCPY( menu->name, "Switch to tab");
@@ -1037,7 +1033,7 @@ rxvt_build_tablist(rxvt_t *r, menu_t *menu)
 
 	rxvt_menuitem_add( r, menu, title, NULL, action);
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Added menuentry for %s\n", PVTS(r, i)->tab_title);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Added menuentry for %s\n", PVTS(r, i)->tab_title));
     }
 }
 
@@ -1053,7 +1049,7 @@ rxvt_menu_show(rxvt_t *r)
     unsigned short amenu_width;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_show()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_show()\n"));
 
     if (IS_NULL(ActiveMenu))
 	return;
@@ -1362,7 +1358,7 @@ rxvt_menu_display(rxvt_t *r, void (*update)(rxvt_t *))
 {
     menu_t	 *ActiveMenu = r->h->ActiveMenu;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_display()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_display()\n"));
 
     if (IS_NULL(ActiveMenu))
 	return;
@@ -1393,7 +1389,7 @@ rxvt_menu_display(rxvt_t *r, void (*update)(rxvt_t *))
 void
 rxvt_menu_hide_all(rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_hide_all()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_hide_all()\n"));
 
     rxvt_menu_display(r, rxvt_menu_hide_all);
     /* r->h->showingMenu &= ~PULLDOWN_MENU; */
@@ -1406,7 +1402,7 @@ rxvt_menu_hide_all(rxvt_t *r)
 void
 rxvt_menu_hide(rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_hide()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_hide()\n"));
 
     /*
      * rxvt_menu_display just destroys the current menu window, and reshow's the
@@ -1419,7 +1415,7 @@ rxvt_menu_hide(rxvt_t *r)
 void
 rxvt_menu_clear(rxvt_t *r, menu_t *menu)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_clear()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_clear()\n"));
 
     if (NOT_NULL(menu))
     {
@@ -1442,7 +1438,7 @@ void
 rxvt_menubar_clear(rxvt_t *r)
 {
     menu_t	 *menu = r->h->MenuBar.tail;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_clear()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_clear()\n"));
 
     while (NOT_NULL(menu))
     {
@@ -1471,7 +1467,7 @@ rxvt_draw_arrows(rxvt_t *r, int name, int state)
 
     int		 i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_draw_arrows()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_draw_arrows()\n"));
 
 #ifdef MENU_SHADOW_IN
     state = -state;
@@ -1525,7 +1521,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
     int		    unused_root_x, unused_root_y;
     unsigned int    unused_mask;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_select() (%d)\n", ev->type);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menu_select() (%d)\n", ev->type));
 
     if (IS_NULL(ActiveMenu)) return 0;
 
@@ -1598,7 +1594,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 	    switch (ev->type)
 	    {
 		case ButtonRelease:
-		    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Got button release\n");
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Got button release\n"));
 		    switch (item->entry.itemType)
 		    {
 			case MenuLabel:
@@ -1630,7 +1626,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 			    rxvt_dispatch_action(r, &(item->entry.action),
 				    (XEvent *) ev );
 #else		    /* DEBUG */
-			    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "%s: %s\n", item->name, item->entry.action.str);
+			    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "%s: %s\n", item->name, item->entry.action.str));
 #endif		    /* DEBUG */
 			    break;
 		    }
@@ -1678,7 +1674,7 @@ rxvt_menubar_select(rxvt_t *r, XButtonEvent *ev)
 {
     menu_t	 *menu = NULL;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_select()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_select()\n"));
 
     /* determine the pulldown menu corresponding to the X index */
     if ( ev->y >= 0 && ev->y <= (rxvt_menubar_height(r)-MENUBAR_MARGIN) )
@@ -1757,7 +1753,7 @@ rxvt_menubar_create (rxvt_t* r)
     XGCValues	    gcvalue;
     unsigned long   gcmask;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR,"rxvt_menubar_create\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR,"rxvt_menubar_create\n"));
     /*
      * Only create a menubar if it's non-empty.
      */
@@ -1887,7 +1883,7 @@ rxvt_menubar_create (rxvt_t* r)
 void
 rxvt_menubar_clean_exit (rxvt_t* r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_clean_exit()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_clean_exit()\n"));
 
 #  ifdef XFT_SUPPORT
     /*
@@ -1925,7 +1921,7 @@ rxvt_menubar_clean_exit (rxvt_t* r)
 int
 rxvt_menubar_visible (rxvt_t* r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_visible()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_visible()\n"));
 
     return (IS_WIN(r->menuBar.win) && r->menuBar.state);
 }
@@ -1940,7 +1936,7 @@ rxvt_menubar_hide (rxvt_t* r)
 {
     int	    changed = 0;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_hide()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_hide()\n"));
 
     assert (IS_WIN(r->menuBar.win));
     changed = r->menuBar.state;
@@ -1960,7 +1956,7 @@ rxvt_menubar_show (rxvt_t* r)
 {
     int	    changed = 0;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_show()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_show()\n"));
     assert (IS_WIN(r->menuBar.win));
 
     changed = !r->menuBar.state;
@@ -1978,7 +1974,7 @@ rxvt_menubar_show (rxvt_t* r)
 void
 rxvt_menubar_expose(rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_expose()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_expose()\n"));
 
     if (!r->menuBar.state || NOT_WIN(r->menuBar.win))
 	return;
@@ -2163,7 +2159,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
     int		    n, cmd;
     unsigned char   *path, *name, *name2;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_dispatcher()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_dispatcher()\n"));
 
 #if 0
     if (rxvt_menubar_visible(r) && NOT_NULL(r->h->ActiveMenu))
@@ -2319,7 +2315,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 			(name > path && name[-1] != '/')
 		       )
 		    {
-			rxvt_dbgmsg (DBG_ERROR, DBG_MENUBAR, "menu error <%s>\n", path);
+			rxvt_msg (DBG_ERROR, DBG_MENUBAR, "menu error <%s>\n", path);
 			break;
 		    }
 		    if (str[1] == MENUITEM_BEG)
@@ -2329,7 +2325,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 
 			if (IS_NULL(str))
 			{
-			    rxvt_dbgmsg (DBG_ERROR, DBG_MENUBAR, "menu error <%s>\n", path);
+			    rxvt_msg (DBG_ERROR, DBG_MENUBAR, "menu error <%s>\n", path);
 			    break;
 			}
 			name2[-2] = '\0';   /* remove prev MENUITEM_END */
@@ -2344,12 +2340,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 			str++;	/* skip space */
 		}
 
-		rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR,
-		    "`%c' path = <%s>, name = <%s>, name2 = <%s>, action = <%s>\n",
-		    cmd, (path ? (char*) path : "(nil)"),
-		    (name ? (char*) name : "(nil)"),
-		    (name2 ? (char*) name2 : "(nil)"),
-		    (str ? (char*) str : "(nil)"));
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "`%c' path = <%s>, name = <%s>, name2 = <%s>, action = <%s>\n", cmd, (path ? (char*) path : "(nil)"), (name ? (char*) name : "(nil)"), (name2 ? (char*) name2 : "(nil)"), (str ? (char*) str : "(nil)")));
 	    }
 
 	    /* process the different commands */
@@ -2360,7 +2351,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 		    {
 			int	     len;
 
-			rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "Current menu %s\n", NOT_NULL(r->h->BuildMenu) ? (char *)r->h->BuildMenu->name : "(nil)");
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Current menu %s\n", NOT_NULL(r->h->BuildMenu) ? (char *)r->h->BuildMenu->name : "(nil)"));
 
 			path = rxvt_menu_find_base(r, &(r->h->BuildMenu), path);
 			len = STRLEN(path);
@@ -2477,7 +2468,7 @@ rxvt_menubar_dispatcher(rxvt_t *r, unsigned char *str)
 void
 rxvt_menubar_control(rxvt_t *r, XButtonEvent *ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_control()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_control()\n"));
 
     switch (ev->type)
     {
@@ -2541,13 +2532,13 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
     unsigned char   buffer[256];
     unsigned char  *p, *file, *tag = NULL;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_load_file()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_load_file()\n"));
 
     file = (unsigned char*) rxvt_File_find( (char*) filename,
 	    ".menu", r->h->rs[Rs_path]);
     if (IS_NULL(file))
     {
-	rxvt_dbgmsg (DBG_ERROR, DBG_MENUBAR,  "Could not open file %s", filename);
+	rxvt_msg (DBG_ERROR, DBG_MENUBAR,  "Could not open file %s", filename);
 	return;
     }
 
@@ -2564,9 +2555,9 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 	    SET_NULL(tag);
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "[read:%s]\n", filename);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "[read:%s]\n", filename));
     if (tag)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "looking for [menu:%s]\n", tag);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "looking for [menu:%s]\n", tag));
 
     while (NOT_NULL(p = (unsigned char*) fgets( (char*) buffer, sizeof(buffer), fp)))
     {
@@ -2583,7 +2574,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 		    n += rxvt_str_match( (char*) p + n, (char*) tag);
 		    if (p[n] == ']')
 		    {
-			rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "[menu:%s]\n", tag);
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "[menu:%s]\n", tag));
 			break;
 		    }
 		}
@@ -2599,7 +2590,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
     {
 	int	     n;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "read line = %s\n", p);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "read line = %s\n", p));
 
 	/* looking for [done:tag] or [done:] */
 	if ((n = rxvt_str_match( (char*) p, "[done")) != 0)
@@ -2620,7 +2611,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 		    n += rxvt_str_match( (char*) p + n, (char*) tag);
 		    if (p[n] == ']')
 		    {
-			rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "[done:%s]\n", tag);
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "[done:%s]\n", tag));
 			break;
 		    }
 		}
@@ -2652,7 +2643,7 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 unsigned short
 rxvt_menubar_height(rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_height()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_height()\n"));
 
     /* If menubar is not created or not mapped, return 0 */
     return  (NOT_WIN(r->menuBar.win) || !r->menuBar.state) ?
@@ -2664,7 +2655,7 @@ rxvt_menubar_height(rxvt_t *r)
 unsigned short
 rxvt_menubar_rheight(rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_rheight()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_rheight()\n"));
 
 # ifdef XFT_SUPPORT
     if (ISSET_OPTION(r, Opt_xft))
@@ -2679,7 +2670,7 @@ rxvt_menubar_rheight(rxvt_t *r)
 int
 rxvt_is_menubar_win(rxvt_t *r, Window w)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_is_menubar_win()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_is_menubar_win()\n"));
 
     return (w == r->menuBar.win);
 }
@@ -2691,7 +2682,7 @@ rxvt_menubar_resize(rxvt_t *r)
     menu_t  *menu;
     int	    i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_resize()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "rxvt_menubar_resize()\n"));
 
     if (IS_WIN(r->menuBar.win) && r->menuBar.state)
 	XMoveResizeWindow(r->Xdisplay, r->menuBar.win,

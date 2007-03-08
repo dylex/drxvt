@@ -302,7 +302,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
      */
     unsigned int	newlen = 1;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "0xffxx_keypress: (C%d, M%d, S%d) %lx ...", ctrl, meta, shft, keysym);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "0xffxx_keypress: (C%d, M%d, S%d) %lx ...", ctrl, meta, shft, keysym));
 
     switch (keysym)
     {
@@ -848,8 +848,7 @@ rxvt_0xffxx_keypress (rxvt_t* r, KeySym keysym,
     }	/* switch (keysym) */
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Returning %d\n",
-	newlen ? (int) STRLEN(kbuf) : -1 );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Returning %d\n", newlen ? (int) STRLEN(kbuf) : -1 ));
 
     return newlen ? STRLEN(kbuf) : -1;
     /*
@@ -884,7 +883,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
     static unsigned char kbuf[KBUFSZ];	/* was r->h->kbuf */
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "KeyPress event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "KeyPress event\n"));
     shft = (ev->state & ShiftMask);
     ctrl = (ev->state & ControlMask);
     meta = (ev->state & r->h->ModMetaMask);
@@ -1079,7 +1078,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
     if (valid_keysym)
 #endif	/* USE_XIM */
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ctrl-meta-shft-keysym: %d-%d-%d-%x\n", ctrl, meta, shft, (int) keysym);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ctrl-meta-shft-keysym: %d-%d-%d-%x\n", ctrl, meta, shft, (int) keysym));
 
 	/*
 	 * 2006-02-24 gi1242: Allow macros with no modifier pressed so that the
@@ -1096,7 +1095,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	    if( rxvt_process_macros( r, keysym, ev ) )
 		return;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "bypass rxvt_process_macros\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "bypass rxvt_process_macros\n"));
 
 	/*
 	 * 2006-02-24 gi1242: If you want to "hard code" a few macros into
@@ -1133,7 +1132,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	 */
 	if (AVTS(r)->hold > 1)
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "exit after hold\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "exit after hold\n"));
 	    if (keysym && len)
 		rxvt_remove_page (r, ATAB(r));
 	    return;
@@ -1235,7 +1234,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		{
 		    const unsigned char ch = C0_ESC;
 
-		    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Sending meta for keysym %lx\n", keysym);
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Sending meta for keysym %lx\n", keysym));
 		    rxvt_tt_write(r, ATAB(r), &ch, 1);
 		}
 	    } /* if(meta) */
@@ -1256,7 +1255,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 
     if (len <= 0)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Returning on unmpapped keysym %lx\n", keysym);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Returning on unmpapped keysym %lx\n", keysym));
 	return;		/* not mapped */
     }
 
@@ -1275,16 +1274,16 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	unsigned char*	p;
 	int	        i;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "key 0x%04X [%d]: `", (unsigned int) keysym, len);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "key 0x%04X [%d]: `", (unsigned int) keysym, len));
 	for (i = 0, p = kbuf; i < len; i++, p++)
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, (*p >= ' ' && *p < '\177' ? "%c" : "\\%03o"), *p);
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "'\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, (*p >= ' ' && *p < '\177' ? "%c" : "\\%03o"), *p));
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "'\n"));
     }
 #endif	/* DEBUG */
 
     if (0 == STRCMP ("UTF-8", r->h->locale))
     {
-	rxvt_dbgmsg (DBG_INFO, DBG_COMMAND, "UTF-8 string?");
+	rxvt_msg (DBG_INFO, DBG_COMMAND, "UTF-8 string?");
     }
 
     rxvt_tt_write(r, ATAB(r), kbuf, (unsigned int)len);
@@ -1332,7 +1331,7 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
 
     if (count > s)
     {
-	rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "data loss: cmd_write too large");
+	rxvt_msg (DBG_ERROR, DBG_COMMAND, "data loss: cmd_write too large");
 	count = s;
     }
 
@@ -1355,7 +1354,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
     int	    i, j;
     short   ndead_childs = r->ndead_childs;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_COMMAND,  "rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs));
 
 
     /*
@@ -1378,7 +1377,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
 		 * happen is if we lost an SIGCHLD signal (e.g. if we receive a
 		 * SIGCHLD when it is blocked, say by our own SIGCHLD handler).
 		 */
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ECHILD error on waitpid(%d)\n", i );
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ECHILD error on waitpid(%d)\n", i ));
 
 		/* We have no way of getting the child's exit status now */
 		PVTS( r, i )->status = 0;
@@ -1435,7 +1434,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	 * NOTE: It is OK for ndead_childs < 0. r->ndead_childs is updated for
 	 * processes that die when we are in this function. ndead_childs is not.
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,   "Lost child signal." );
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,   "Lost child signal." ));
 	r->ndead_childs = 0;
     }
 
@@ -1454,7 +1453,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	 * "PrintPipe" macro. If we get here for any other reason, we're in deep
 	 * trouble.
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Spurious dead child signal received\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Spurious dead child signal received\n"));
 
 	/*
 	 * We should reset r->ndead_childs to 0. But there is a possible race
@@ -1469,7 +1468,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
 	r->ndead_childs -= ndead_childs;
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Exit rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Exit rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs));
 }
 
 
@@ -1486,7 +1485,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 {
     int		i;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_clean_cmd_page()\n" );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_clean_cmd_page()\n" ));
     if( r->ndead_childs )
 	rxvt_mark_dead_childs( r );
 
@@ -1511,7 +1510,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
     {
 	if( PVTS(r, i)->dead && PVTS(r, i)->hold == 1 )
 	{
-	    rxvt_dbgmsg (DBG_INFO, DBG_COMMAND, 
+	    rxvt_msg (DBG_INFO, DBG_COMMAND, 
 			"Tab %d exit %s (status %d). holdOption: %d\n",
 			i, WIFEXITED(PVTS(r,i)->status) ? "success" : "failure",
 			PVTS(r,i)->status,
@@ -1524,7 +1523,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		const int	maxLen = 1024;
 		const char	*msg;
 
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Hold child %d after it died\n", i);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Hold child %d after it died\n", i));
 
 		/* increase hold number, so next iteration will skip it */
 		PVTS(r, i)->hold++;
@@ -1556,12 +1555,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 			    else
 			    {
 				/* Really incomplete escape sequence */
-				rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
-					"Incomplete escape sequence '%.*s'\n",
-					PVTS(r, i)->cmdbuf_escfail - 
-					    PVTS(r, i)->cmdbuf_escstart + 1,
-					PVTS(r, i)->cmdbuf_escstart+1
-					);
+				rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Incomplete escape sequence '%.*s'\n", PVTS(r, i)->cmdbuf_escfail - PVTS(r, i)->cmdbuf_escstart + 1, PVTS(r, i)->cmdbuf_escstart+1));
 
 				SET_NULL( last_escfail );
 				SET_NULL( PVTS(r, i)->cmdbuf_escstart );
@@ -1659,7 +1653,7 @@ rxvt_find_cmd_child (rxvt_t* r)
     register int    k;
     static int	    lastProcessed = 0;  /* tab we processed last time */
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_find_cmd_child()\n" );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_find_cmd_child()\n" ));
 
     /*
      * See if the active tab has input before anything else.
@@ -1769,7 +1763,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
     {
 	int readErrno;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "read maximal %u bytes\n", count);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "read maximal %u bytes\n", count));
 
 	/*
 	 * 2006-08-23 gi1242: O_NDELAY is set here, so we need not worry about
@@ -1779,7 +1773,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp, count );
 	readErrno = errno;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "read %d bytes\n", n);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "read %d bytes\n", n));
 
 	if (n > 0)
 	{
@@ -1791,7 +1785,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 
 	else if (0 == n)
 	{
-	    /* rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Should not happen?\n"); */
+	    /* rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Should not happen?\n")); */
 	    /* 2006-08-23 gi1242: Could happen if we have no more data. */
 	    break;
 	}
@@ -1802,7 +1796,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	     * We do not update count and buffer pointer and continue
 	     * trying read more data in the next loop iteration.
 	     */
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s\n", strerror(readErrno));
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "%s\n", strerror(readErrno)));
 
 	    assert( readErrno != EBADF && readErrno != EFAULT &&
 		    readErrno != EISDIR );
@@ -1855,7 +1849,7 @@ rxvt_process_children_cmdfd( rxvt_t* r, fd_set* p_readfds )
 	    continue;
 	}
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "reading from shell %d\n", i);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "reading from shell %d\n", i));
 
 	/* check our command buffer before reading data */
 	rxvt_check_cmdbuf( r, i );
@@ -2037,9 +2031,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	    else
 		bsdiff = h->bgRefreshInterval - bsdiff;
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
-		"Waiting %ld.%06ld seconds longer for bg refresh\n",
-		bsdiff / 1000000L, bsdiff % 1000000L);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Waiting %ld.%06ld seconds longer for bg refresh\n", bsdiff / 1000000L, bsdiff % 1000000L));
 
 	    set_quick_timeout = 1;
 	}
@@ -2051,7 +2043,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	 */
 	if (ISSET_OPTION(r, Opt_cursorBlink) && r->TermWin.focus)
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "** get cursor time on select\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "** get cursor time on select\n"));
 	    (void)gettimeofday(&tp, NULL);
 
 	    csdiff = (tp.tv_sec - h->lastcursorchange.tv_sec) * 1000000L
@@ -2062,8 +2054,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 		h->lastcursorchange.tv_sec = tp.tv_sec;
 		h->lastcursorchange.tv_usec = tp.tv_usec;
 		h->hidden_cursor = !h->hidden_cursor;
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s\n", h->hidden_cursor ?
-		    "** hide cursor" : "** show cursor");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "%s\n", h->hidden_cursor ?  "** hide cursor" : "** show cursor"));
 
 		AVTS(r)->want_refresh = 1;
 		csdiff = 0;
@@ -2084,7 +2075,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 	{
 	    int32_t	pdelay;
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "** get pointer time on select\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "** get pointer time on select\n"));
 	    (void) gettimeofday(&tp, NULL);
 	    psdiff = (tp.tv_sec - h->lastmotion.tv_sec) * 1000000L
 		 + tp.tv_usec - h->lastmotion.tv_usec;
@@ -2126,7 +2117,7 @@ rxvt_refresh_vtscr_if_needed( rxvt_t *r )
 #ifdef TRANSPARENT
     if( r->h->want_full_refresh )
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "full refresh\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "full refresh\n"));
 	r->h->want_full_refresh = 0;
 
 	/* only work for active tab */
@@ -2147,10 +2138,7 @@ rxvt_refresh_vtscr_if_needed( rxvt_t *r )
 	 && AVTS(r)->mapped && r->h->refresh_type != NO_REFRESH
       )
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
-		    "%lu: ATAB(%d) produced %d bytes (%d in buffer)\n",
-		    time(NULL), ATAB(r), AVTS(r)->nbytes_last_read,
-		    AVTS(r)->cmdbuf_endp - AVTS(r)->cmdbuf_base );
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%lu: ATAB(%d) produced %d bytes (%d in buffer)\n", time(NULL), ATAB(r), AVTS(r)->nbytes_last_read, AVTS(r)->cmdbuf_endp - AVTS(r)->cmdbuf_base ));
 
 	rxvt_scr_refresh(r, ATAB(r), r->h->refresh_type);
 
@@ -2201,7 +2189,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_cmd_getc on page %d\n", *p_page);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_cmd_getc on page %d\n", *p_page));
 
 
     /* loop until we can return something */
@@ -2237,7 +2225,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		{
 		    if (h->hidden_cursor)
 		    {
-			rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "** hide cursor on keypress\n");
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "** hide cursor on keypress\n"));
 			h->hidden_cursor = 0;
 			AVTS(r)->want_refresh = 1;
 		    }
@@ -2308,7 +2296,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	     * choose. Note, that rxvt_find_cmd_child() will favor returning the
 	     * active tab.
 	     */
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_find_cmd_child: find %d\n", retpage);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_find_cmd_child: find %d\n", retpage));
 
 	    *p_page = retpage;
 	    return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
@@ -2324,7 +2312,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	{
 	    /* reset last cursor change time on keypress event */
 	    (void) gettimeofday (&tp, NULL);
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "** init cursor time on keypress\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "** init cursor time on keypress\n"));
 	    h->lastcursorchange.tv_sec = tp.tv_sec;
 	    h->lastcursorchange.tv_usec = tp.tv_usec;
 	}
@@ -2343,9 +2331,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	quick_timeout = rxvt_adjust_quick_timeout (r, quick_timeout, &value);
 
 	/* Now begin to read in from children's file descriptors */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Waiting for %lumu for child\n",
-	    quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec :
-	    ULONG_MAX);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Waiting for %lumu for child\n", quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec : ULONG_MAX));
 
 
 	/* Prepare to read in from children's file descriptors */
@@ -2356,7 +2342,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    /* remember to skip held childrens */
 	    if ( PVTS(r, i)->hold > 1 )
 	    {
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, " not listen on vt[%d].cmd_fd\n",i);
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, " not listen on vt[%d].cmd_fd\n",i));
 		continue;
 	    }
 	    else if ( PVTS(r, i)->gotEIO )
@@ -2365,7 +2351,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		continue;
 	    }
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  " listen on vt[%d].cmd_fd = %d\n", i, PVTS(r, i)->cmd_fd);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  " listen on vt[%d].cmd_fd = %d\n", i, PVTS(r, i)->cmd_fd));
 	    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
 
 	    /* Write out any pending output to child */
@@ -2423,12 +2409,12 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		
 		if( errno )
 		{
-		    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "Error: reading fifo %s", strerror (errno));
+		    rxvt_msg (DBG_ERROR, DBG_COMMAND, "Error: reading fifo %s", strerror (errno));
 		}
 
 		if( len == 0 )
 		{
-		    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Reopening fifo %s\n", r->fifo_name );
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Reopening fifo %s\n", r->fifo_name ));
 		    close( r->fifo_fd );
 		    r->fifo_fd = open( r->fifo_name, O_RDONLY|O_NDELAY );
 		    rxvt_adjust_fd_number( r );
@@ -2542,7 +2528,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 void
 rxvt_pointer_unblank(rxvt_t* r, int page)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s(r, page=%d)\n", __func__, page );
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "%s(r, page=%d)\n", __func__, page ));
     XDefineCursor(r->Xdisplay, PVTS(r, page)->vt, r->term_pointer);
     rxvt_recolour_cursor(r);
 #ifdef POINTER_BLANK
@@ -2568,7 +2554,7 @@ rxvt_pointer_unblank(rxvt_t* r, int page)
 void
 rxvt_pointer_blank(rxvt_t* r, int page)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Blanking pointer\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Blanking pointer\n"));
     if (ISSET_OPTION(r, Opt_pointerBlank) &&
 	IS_CURSOR(r->h->blank_pointer))
     {
@@ -2632,16 +2618,16 @@ rxvt_mouse_report(rxvt_t* r, const XButtonEvent *ev)
     }
 
 #ifdef DEBUG
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "Mouse [");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Mouse ["));
     if (key_state & 16)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'C');
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%c", 'C'));
     if (key_state & 4)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'S');
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%c", 'S'));
     if (key_state & 8)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'A');
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%c", 'A'));
     if (key_state & 32)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", '2');
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "]: <%d>, %d/%d\n", button_number, x + 1, y + 1);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%c", '2'));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "]: <%d>, %d/%d\n", button_number, x + 1, y + 1));
 #else
     rxvt_tt_printf(r, ATAB(r), "\033[M%c%c%c",
 	  (32 + button_number + key_state),
@@ -2659,7 +2645,7 @@ rxvt_mouse_report(rxvt_t* r, const XButtonEvent *ev)
 void
 rxvt_process_keyrelease(rxvt_t* r, XKeyEvent *ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "KeyRelease event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "KeyRelease event\n"));
     if (!(ev->state & ControlMask))
 	r->h->mouse_slip_wheel_speed = 0;
     else
@@ -2864,7 +2850,7 @@ rxvt_process_buttonpress(rxvt_t* r, int page, XButtonEvent *ev)
     struct rxvt_hidden*	h = r->h;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ButtonPress event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ButtonPress event\n"));
     h->bypass_keystate = ev->state & (h->ModMetaMask | ShiftMask);
     if (!h->bypass_keystate)
 	reportmode = !!ISSET_PMODE(r, page, PrivMode_mouse_report);
@@ -3078,7 +3064,7 @@ rxvt_process_buttonrelease(rxvt_t* r, int page, XButtonEvent *ev)
 	    r->tabClicked = -1;
     }
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ButtonRelease event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ButtonRelease event\n"));
     r->h->csrO = 0;	/* reset csr Offset */
     if (!r->h->bypass_keystate)
 	reportmode = !!ISSET_PMODE(r, page, PrivMode_mouse_report);
@@ -3179,7 +3165,7 @@ rxvt_process_buttonrelease(rxvt_t* r, int page, XButtonEvent *ev)
 void
 rxvt_process_clientmessage(rxvt_t* r, XClientMessageEvent* ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ClientMessage event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ClientMessage event\n"));
     if (
 	  ev->format == 32
 	  && (Atom) ev->data.l[0] == r->h->xa[XA_WMDELETEWINDOW]
@@ -3222,7 +3208,7 @@ rxvt_process_clientmessage(rxvt_t* r, XClientMessageEvent* ev)
 void
 rxvt_process_visibilitynotify(rxvt_t* r, XVisibilityEvent* ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "VisibilityNotify event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "VisibilityNotify event\n"));
     switch (ev->state)
     {
 	case VisibilityUnobscured:
@@ -3246,7 +3232,7 @@ rxvt_process_enter (rxvt_t* r, XCrossingEvent* ev)
 {
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Enter event\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Enter event\n"));
 	r->TermWin.enter = 1;
     }
 }
@@ -3258,7 +3244,7 @@ rxvt_process_leave (rxvt_t* r, XCrossingEvent* ev)
 {
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Leave event\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Leave event\n"));
 	r->TermWin.enter = 0;
     }
 }
@@ -3286,7 +3272,7 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 {
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "FocusIn event\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "FocusIn event\n"));
 	r->TermWin.focus = 1;
 	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
@@ -3309,7 +3295,7 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 {
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "FocusOut event\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "FocusOut event\n"));
 	r->TermWin.focus = 0;
 	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
@@ -3501,9 +3487,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 	 * Now the position of the window with decorations is in wx, wy,
 	 * wwidth, wheight.
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Strut: (%lu, %lu %lu, %lu), "
-			    "Geometry: %ux%u+%d+%d, Change: (%d, %d)\n",
-	    left, right, top, bottom, wwidth, wheight, wx, wy, dx, dy );
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Strut: (%lu, %lu %lu, %lu), " "Geometry: %ux%u+%d+%d, Change: (%d, %d)\n", left, right, top, bottom, wwidth, wheight, wx, wy, dx, dy ));
 
 	/*
 	 * Try and move us back on screen, if we resized off it.
@@ -3528,7 +3512,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 		&& newy - (int) top + (int) wheight <= dsph
 	  )
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Smart move to %ux%u+%d+%d\n", r->szHint.width, r->szHint.height, newx, newy);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Smart move to %ux%u+%d+%d\n", r->szHint.width, r->szHint.height, newx, newy));
 	    XMoveWindow( r->Xdisplay, r->TermWin.parent,
 		    newx, newy);
 	}
@@ -3551,7 +3535,7 @@ rxvt_resize_on_subwin (rxvt_t* r, resize_reason_t reason)
 void
 rxvt_resize_on_font (rxvt_t* r, char* fontname)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_resize_on_font\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_resize_on_font\n"));
 
 #ifdef XFT_SUPPORT
     /* if use freetype font, disallow resize by now ;-) */
@@ -3587,7 +3571,7 @@ rxvt_calc_colrow (rxvt_t* r, unsigned int width, unsigned int height)
 	    r->szHint.width == width && r->szHint.height == height)
 	return 0;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Recalc row/col of (%d, %d)\n", width, height);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Recalc row/col of (%d, %d)\n", width, height));
     ncol = Pixel2Width (width - r->szHint.base_width);
     nrow = Pixel2Height (height - r->szHint.base_height);
     MAX_IT(ncol, 1);
@@ -3618,7 +3602,7 @@ rxvt_resize_sub_windows (rxvt_t* r)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_resize_sub_windows\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_resize_sub_windows\n"));
 
 #ifdef HAVE_SCROLLBARS
     rxvt_scrollbar_resize(r);
@@ -3648,8 +3632,7 @@ rxvt_resize_on_configure (rxvt_t* r, unsigned int width, unsigned int height)
     int		    fix_screen;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "%s(r, width=%u, height=%u)\n",
-		__func__, width, height );
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_COMMAND,  "%s(r, width=%u, height=%u)\n", __func__, width, height));
     /* update ncol/nrow of new window */
     fix_screen = rxvt_calc_colrow (r, width, height);
 
@@ -3754,8 +3737,7 @@ Bool getWMStruts( Display *dpy, Window w,
 	    *top    = struts[2];
 	    *bottom = struts[3];
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Got struts %lu, %lu, %lu, %lu from %s\n",
-		    *left, *right, *top, *bottom, atomName[i]);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Got struts %lu, %lu, %lu, %lu from %s\n", *left, *right, *top, *bottom, atomName[i]));
 	    /*
 	     * Don't check future atomName's
 	     */
@@ -3777,7 +3759,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
     if (ev->window != r->TermWin.parent)
 	return;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "ConfigureNotify event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "ConfigureNotify event\n"));
     do		    /* Wrap lots of configures into one */
       {
 	width = ev->width;
@@ -3794,8 +3776,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
     XTranslateCoordinates(r->Xdisplay, r->TermWin.parent, XROOT,
 	0, 0, &r->szHint.x, &r->szHint.y, &ev->window);
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Geometry: %ux%u+%d+%d\n",
-	width, height, r->szHint.x, r->szHint.y);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Geometry: %ux%u+%d+%d\n", width, height, r->szHint.x, r->szHint.y));
 
     if (
 	    r->h->want_resize
@@ -3808,7 +3789,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 #ifdef DEBUG
     else
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Size: Not resizing\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Size: Not resizing\n"));
     }
 #endif
 
@@ -3816,7 +3797,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
     {
 	r->h->want_resize = 0;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Forcing refresh (from want_resize)\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Forcing refresh (from want_resize)\n"));
 
 #if defined(HAVE_LIBXRENDER) && (defined(BACKGROUND_IMAGE) || defined(TRANSPARENT))
 	/*
@@ -3858,7 +3839,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 	     */
 	    if( !r->h->bgRefreshInterval)
 	    {
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "refreshing parents...\n");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "refreshing parents...\n"));
 		if( rxvt_check_our_parents(r) )
 		{
 		    r->h->want_resize = 0;
@@ -3867,8 +3848,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 	    }
 	    else
 	    {
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
-			    "Setting timeout for parent refresh.\n");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Setting timeout for parent refresh.\n"));
 		gettimeofday( &r->h->lastCNotify, NULL);
 	    }
 	}
@@ -3881,7 +3861,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 void
 rxvt_process_selectionnotify (rxvt_t* r, XSelectionEvent* ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "SelectionNotify event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "SelectionNotify event\n"));
     if (r->h->selection_wait == Sel_normal)
 	rxvt_selection_paste(r, ev->requestor, ev->property, True);
 }
@@ -3897,7 +3877,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
 
 #ifdef DEBUG
     char *name;
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Property notify event:");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Property notify event:"));
 #endif
 
     assert( ev->type == PropertyNotify );
@@ -3910,7 +3890,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
       {
 #ifdef DEBUG
 	name = XGetAtomName( r->Xdisplay, ev->xproperty.atom);
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s(%08lx) ", name, ev->xproperty.atom );
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "%s(%08lx) ", name, ev->xproperty.atom ));
 	XFree( name);
 #endif
 
@@ -3949,7 +3929,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
 		 * delay here (eliminates flicker). Notice that this will NOT
 		 * introduce a delay when listening for other properties.
 		 */
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "(sleeping ... ");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "(sleeping ... "));
 #ifdef HAVE_NANOSLEEP
 		struct timespec rqt;
 		rqt.tv_sec = 0;
@@ -3958,7 +3938,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
 #else
 		sleep( 1);
 #endif
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "done) ");
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "done) "));
 	    }
 	    wantRefresh = 1;
 	}
@@ -3968,7 +3948,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
     while( XCheckTypedEvent( r->Xdisplay, PropertyNotify, ev) );
 
 #ifdef DEBUG
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "\n"));
 #endif
 #ifdef TRANSPARENT
     if( wantRefresh)
@@ -4002,8 +3982,7 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
     Window	win = (ev->type == Expose ?
 			ev->xexpose.window : ev->xgraphicsexpose.drawable );
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Got %s event.\n",
-		ev->type == Expose ? "Expose" : "GraphicsExpose");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Got %s event.\n", ev->type == Expose ? "Expose" : "GraphicsExpose"));
     if (win == PVTS(r, page)->vt)
     {
 	/*
@@ -4014,7 +3993,7 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 	if (NOT_REGION(r->h->refreshRegion))
 	{
 	    r->h->refreshRegion = XCreateRegion();
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Created clip region %p\n", r->h->refreshRegion);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Created clip region %p\n", r->h->refreshRegion));
 	    /* Will be freed when rxvt_scr_refresh completes */
 	}
 
@@ -4061,7 +4040,7 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 		    False); /* Don't generate a screen refresh */
 
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Adding [%ux%u+%d+%d] to expose region\n", rect.width, rect.height, rect.x, rect.y);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Adding [%ux%u+%d+%d] to expose region\n", rect.width, rect.height, rect.x, rect.y));
 	  }
 	while(
 		XCheckTypedWindowEvent( r->Xdisplay, win, Expose, ev)
@@ -4079,18 +4058,18 @@ rxvt_process_expose (rxvt_t* r, XEvent* ev)
 	/* Debug message */
 	if (rxvt_is_tabbar_win (r, win))
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Expose event on tabbar\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Expose event on tabbar\n"));
 	}
 # ifdef HAVE_SCROLLBARS
 	else if (rxvt_is_scrollbar_win (r, win))
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Expose event on scrollbar\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Expose event on scrollbar\n"));
 	}
 # endif
 # ifdef HAVE_MENUBAR
 	else if (rxvt_is_menubar_win (r, win))
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Expose event on menubar\n");
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Expose event on menubar\n"));
 	}
 # endif
 #endif	/* DEBUG */
@@ -4138,7 +4117,7 @@ rxvt_process_motionnotify (rxvt_t* r, XEvent* ev)
     unsigned int    unused_mask;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "MotionNotify event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "MotionNotify event\n"));
 #ifdef POINTER_BLANK
     if (ISSET_OPTION(r, Opt_pointerBlank) && PVTS(r, page)->hidden_pointer)
 	rxvt_pointer_unblank (r, page);
@@ -4333,7 +4312,7 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 
 #ifdef DEBUG_X
     ltt = localtime(&(tp.tv_sec));
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Event: %-16s %-7s %08lx (%4d-%02d-%02d %02d:%02d:%02d.%.6ld) %s %lu\n", eventnames[ev->type], (ev->xany.window == r->TermWin.parent ? "parent" : (ev->xany.window == PVTS(r, page)->vt ? "vt" : (ev->xany.window == r->scrollBar.win ? "scroll" : (ev->xany.window == r->menuBar.win ? "menubar" : "UNKNOWN")))), (ev->xany.window == r->TermWin.parent ? r->TermWin.parent : (ev->xany.window == PVTS(r, page)->vt ? PVTS(r, page)->vt : (ev->xany.window == r->scrollBar.win ? r->scrollBar.win : (ev->xany.window == r->menuBar.win ? r->menuBar.win : 0)))), ltt->tm_year + 1900, ltt->tm_mon + 1, ltt->tm_mday, ltt->tm_hour, ltt->tm_min, ltt->tm_sec, tp.tv_usec, ev->xany.send_event ? "S" : " ", ev->xany.serial);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Event: %-16s %-7s %08lx (%4d-%02d-%02d %02d:%02d:%02d.%.6ld) %s %lu\n", eventnames[ev->type], (ev->xany.window == r->TermWin.parent ? "parent" : (ev->xany.window == PVTS(r, page)->vt ? "vt" : (ev->xany.window == r->scrollBar.win ? "scroll" : (ev->xany.window == r->menuBar.win ? "menubar" : "UNKNOWN")))), (ev->xany.window == r->TermWin.parent ? r->TermWin.parent : (ev->xany.window == PVTS(r, page)->vt ? PVTS(r, page)->vt : (ev->xany.window == r->scrollBar.win ? r->scrollBar.win : (ev->xany.window == r->menuBar.win ? r->menuBar.win : 0)))), ltt->tm_year + 1900, ltt->tm_mon + 1, ltt->tm_mday, ltt->tm_hour, ltt->tm_min, ltt->tm_sec, tp.tv_usec, ev->xany.send_event ? "S" : " ", ev->xany.serial));
 #endif
 
     /* X event timeouts */
@@ -4356,7 +4335,7 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 	    switch(i)
 	    {
 		case TIMEOUT_INCR:
-		    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND,
+		    rxvt_msg (DBG_ERROR, DBG_COMMAND,
 			"data loss: timeout on INCR selection paste");
 		    h->selection_wait = Sel_none;
 		    break;
@@ -4485,7 +4464,7 @@ rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 
     assert( pipeName || r->h->rs[Rs_print_pipe] );
     if (IS_NULL(stream))
-	rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "Can't open printer pipe %s",
+	rxvt_msg (DBG_ERROR, DBG_COMMAND, "Can't open printer pipe %s",
 		r->h->rs[Rs_print_pipe] ?: pipeName );
 
     return stream;
@@ -4511,7 +4490,7 @@ rxvt_pclose_printer(FILE *stream)
 void
 rxvt_process_print_pipe( rxvt_t* r, int page )
 {
-    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND,  "Print pipe not implemented in this version" );
+    rxvt_msg (DBG_ERROR, DBG_COMMAND,  "Print pipe not implemented in this version" );
 #if 0 /* {{{ Disabled because failures of rxvt_cmd_getc() can't be handled */
     int		readpage = page;
     int		done;
@@ -5072,10 +5051,10 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 	    arg[p] = ndef;
 
 #ifdef DEBUG
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "CSI ");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "CSI "));
     for (p = 0; p < nargs; p++)
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%d%s", arg[p], p < nargs - 1 ? ";" : "");
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c\n", ch);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%d%s", arg[p], p < nargs - 1 ? ";" : ""));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%c\n", ch));
 #endif
 
 
@@ -5505,7 +5484,7 @@ rxvt_process_osc_seq (rxvt_t* r, int page)
     int		    arg;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_process_osc_seq( r, %d). Active page %d\n", page, ATAB(r));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_process_osc_seq( r, %d). Active page %d\n", page, ATAB(r)));
 
     arg = 0;
     for(;;)
@@ -6652,10 +6631,7 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 		}
 	    }
 
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
-			"\e[31mAdding %d chars %d lines in tab %d\e[0m\n%.*s\n",
-			PVTS(r, page)->cmdbuf_ptr - str, nlines, page,
-			PVTS(r, page)->cmdbuf_ptr - str, str);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "\e[31mAdding %d chars %d lines in tab %d\e[0m\n%.*s\n", PVTS(r, page)->cmdbuf_ptr - str, nlines, page, PVTS(r, page)->cmdbuf_ptr - str, str));
 
 	    /*
 	     * NOTE: nlines can not be MORE than the number of lines we will
@@ -6680,9 +6656,7 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 		 * returns immediately. Also rxvt_scr_refresh resets
 		 * scrolled_lines.
 		 */
-		rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Requesting refresh."
-			    " Active tab (%d) scrolled %d lines\n",
-			    ATAB(r), AVTS(r)->scrolled_lines );
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Requesting refresh." " Active tab (%d) scrolled %d lines\n", ATAB(r), AVTS(r)->scrolled_lines ));
 		rxvt_scr_refresh(r, page,
 			(r->h->refresh_type & ~CLIPPED_REFRESH) );
 
@@ -6751,7 +6725,7 @@ rxvt_main_loop(rxvt_t *r)
     int			page;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_main_loop()\n" );
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_main_loop()\n" ));
 
     /* Send the screen size. */
     for (i = 0; i <= LTAB(r); i ++)
@@ -6869,8 +6843,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	/* end of physical buffer	  */
 	unsigned char*	v_bufend;
 
-	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_tt_write %d (%s)\n", k,
-	    d ? (char*) d: "nil");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_tt_write %d (%s)\n", k, d ? (char*) d: "nil"));
 
 	if (IS_NULL(PVTS(r, k)->v_bufstr) && len > 0)
 	{
@@ -6926,7 +6899,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 		    else
 		    {
 			/* no memory: ignore entire write request */
-			rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, 
+			rxvt_msg (DBG_ERROR, DBG_COMMAND, 
 				"data loss: cannot allocate buffer space");
 			/* restore clobbered pointer */
 			v_buffer = v_bufstr;
@@ -6958,7 +6931,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	if ((p = v_bufptr - v_bufstr) > 0)
 	{
 	    riten = write(PVTS(r, k)->cmd_fd, v_bufstr, min(p, MAX_PTY_WRITE));
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "tt_write %d chars to vts[%d].cmd_fd = %d\n", riten, k, PVTS(r, k)->cmd_fd);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "tt_write %d chars to vts[%d].cmd_fd = %d\n", riten, k, PVTS(r, k)->cmd_fd));
 	    if (riten < 0)
 		riten = 0;
 	    v_bufstr += riten;

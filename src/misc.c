@@ -231,7 +231,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
     int	i=0,	/* Unexpanded string index */
 	j=0;	/* Expanded string index */
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n", page, src, len, "dst", maxLen);
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MISC, "rxvt_percent_interpolate( r, %d, %s, %d, %s, %d )\n", page, src, len, "dst", maxLen));
 
     /* Must only get here for a valid tab */
     assert( page >=0 && page <= LTAB(r) );
@@ -323,7 +323,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 		    break;
 
 		default:
-		    rxvt_dbgmsg (DBG_ERROR, DBG_MISC, "Unrecognized flag %%%c in '%s'", src[i++], src );
+		    rxvt_msg (DBG_ERROR, DBG_MISC, "Unrecognized flag %%%c in '%s'", src[i++], src );
 		    break;
 	    }
 	}
@@ -414,8 +414,8 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
 
 #ifdef DEBUG
     getcwd(name, sizeof(name));
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MISC, "pwd: \"%s\"\n", name);
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MISC, "find: \"%.*s\"\n", len, file);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MISC, "pwd: \"%s\"\n", name));
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MISC, "find: \"%.*s\"\n", len, file));
 #endif
 
     /* leave room for an extra '/' and trailing '\0' */
@@ -488,7 +488,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	 * Failed to get the file from arg path. Try getting it from the env
 	 * variable PATH_ENV.
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s from env %s...\n", file, PATH_ENV);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MISC, "Searching for %s from env %s...\n", file, PATH_ENV));
 
 	envpath = getenv( PATH_ENV);
 	if( envpath)
@@ -497,7 +497,7 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	/*
 	 * Check in ~/.mrxvt
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s in ~/.mrxvt\n", file);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MISC, "Searching for %s in ~/.mrxvt\n", file));
 	envpath = getenv("HOME");
 	if( envpath )
 	{
@@ -515,13 +515,13 @@ rxvt_File_find(const char *file, const char *ext, const char *path)
 	/*
 	 * Last resort: Try a compiled in default.
 	 */
-	rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Searching for %s in %s\n", file, PKG_CONF_DIR);
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_MISC, "Searching for %s in %s\n", file, PKG_CONF_DIR));
 	f = rxvt_File_search_path( PKG_CONF_DIR, file, ext);
      }
     while(0);
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_MISC, "Got file %s\n", f ? f : "(nil)");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_MISC, "Got file %s\n", f ? f : "(nil)"));
     return f;
 }
 #endif		    /* defined (BACKGROUND_IMAGE) || (HAVE_MENUBAR) */

@@ -28,16 +28,16 @@
  *   error  : serious error, mrxvt should gracefully exit
  *   warn   : some problems cause certain function of mrxvt not working
  *   info   : informative messages about mrxvt execution
- *   verbose: verbose information about mrxvt that is useful for users
- *   debug  : verbose information about mrxvt that is useful for developers
+ *   verbose: verbose information about mrxvt that is useful for developers
+ *   debug  : more information about mrxvt that is useful for developers
  */
 typedef enum {
     DBG_FATAL = 0,
     DBG_ERROR,
     DBG_WARN,
     DBG_INFO,
-    DBG_VERBOSE,
-    DBG_DEBUG,
+    DBG_VERBOSE,    /* used by rxvt_dbgmsg macro */
+    DBG_DEBUG,	    /* used by rxvt_dbgmsg macro */
     DBG_LEVEL_MAX,
 } dbglevel_t;
 
@@ -91,6 +91,20 @@ typedef enum {
     DBG_IDX_MAX,
 } dbgmask_index_t;
 
+
+/*
+ * rxvt_dbgmsg macro is used for DBG_DEBUG and DBG_VERBOSE level only.
+ * for other level of information, you should call rxvt_msg directly.
+ *
+ * Note: the call of rxvt_dbgmsg is different to the call of rxvt_msg!
+ *     rxvt_dbgmsg ((argument list));
+ *     rxvt_msg (argument list);
+ */
+#ifdef DEBUG
+# define rxvt_dbgmsg(x)	rxvt_msg x
+#else
+# define rxvt_dbgmsg(x)
+#endif
 
 #endif	/* __DEBUG_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

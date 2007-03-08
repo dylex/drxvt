@@ -106,7 +106,7 @@ rxvt_set_opacity (rxvt_t* r)
 void
 rxvt_process_reparentnotify (rxvt_t* r, XEvent* ev)
 {
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "ReparentNotify event\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "ReparentNotify event\n"));
     
     rxvt_set_opacity (r);
 
@@ -131,7 +131,7 @@ rxvt_process_reparentnotify (rxvt_t* r, XEvent* ev)
 int
 tempDisableTransparent( rxvt_t *r)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Disabling XROOT pseudo-transparency\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Disabling XROOT pseudo-transparency\n"));
     if( r->h->am_transparent )
     {
 	/*
@@ -166,7 +166,7 @@ expose_transparent_subwin( rxvt_t *r)
 # ifdef HAVE_SCROLLBARS
     if (ISSET_OPTION(r, Opt_transparent_scrollbar))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "reset background image for scrollbar\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "reset background image for scrollbar\n"));
 	XClearWindow (r->Xdisplay, r->scrollBar.win);
 	r->scrollBar.update (r, 1, r->scrollBar.top, r->scrollBar.bot,
 	    r->h->scroller_len);
@@ -175,13 +175,13 @@ expose_transparent_subwin( rxvt_t *r)
 # ifdef HAVE_MENUBAR
     if (ISSET_OPTION(r, Opt_transparent_menubar))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "reset background image for menubar\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "reset background image for menubar\n"));
 	rxvt_menubar_expose (r);
     }
 # endif
     if (ISSET_OPTION(r, Opt_transparent_tabbar))
     {
-	rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "reset background image for tabbar\n");
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "reset background image for tabbar\n"));
 	rxvt_tabbar_expose (r, NULL);
     }
 }
@@ -214,7 +214,7 @@ resetParentPixmap( rxvt_t *r,
 # ifdef DEBUG
     if( sx + nw <= 0 || sx >= (int) rootw || sy + nh <= 0 || sy >= (int) rooth)
     {
-        rxvt_dbgmsg (DBG_WARN, DBG_TRANSPARENT, "Possible error: grabbing offscreen (%d, %d, %u, %u)\n", sx, sy, nw, nh);
+        rxvt_msg (DBG_WARN, DBG_TRANSPARENT, "Possible error: grabbing offscreen (%d, %d, %u, %u)\n", sx, sy, nw, nh);
     }
 # endif
 
@@ -241,7 +241,7 @@ resetParentPixmap( rxvt_t *r,
     MIN_IT(nh, (unsigned int) (rooth - sy));
 
 # if defined(HAVE_LIBXRENDER) || !defined(TINTING_SUPPORT)
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "XRender: Grab root pmap at %ux%u+%d+%d\n", nw, nh, sx, sy);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "XRender: Grab root pmap at %ux%u+%d+%d\n", nw, nh, sx, sy));
     if( r->h->rpWidth < rootw || r->h->rpHeight < rooth )
     {
 	/* Tile the root background on the window. */
@@ -276,7 +276,7 @@ resetParentPixmap( rxvt_t *r,
 	 */
 	XImage *image;
 
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Fast transparency -- XGetImage (%d, %d, %d, %d)\n", sx, sy, nw, nh);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Fast transparency -- XGetImage (%d, %d, %d, %d)\n", sx, sy, nw, nh));
 	if( r->h->rpWidth < rootw || r->h->rpHeight < rooth )
 	{
 	    XGCValues values;
@@ -322,7 +322,7 @@ resetParentPixmap( rxvt_t *r,
 	     * If image == NULL, there must have been an XError. So if we got
 	     * here we have a bug :)
 	     */
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparency messed up in function resetParentPixmap");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparency messed up in function resetParentPixmap"));
 	    r->h->xerror_return = LastExtensionError;
 	}
     }
@@ -369,7 +369,7 @@ rxvt_toggle_transparency (rxvt_t* r)
 
     if (ISSET_OPTION(r, Opt_transparent))
     {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "unset background transparency\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "unset background transparency\n"));
 	UNSET_OPTION(r, Opt_transparent);
 	r->h->am_transparent = 0;
 	r->h->am_pixmap_trans = 0;
@@ -450,7 +450,7 @@ rxvt_toggle_transparency (rxvt_t* r)
     }
     else
     {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "set background transparency\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "set background transparency\n"));
 	SET_OPTION(r, Opt_transparent);
 	XSetWindowBackgroundPixmap (r->Xdisplay, r->TermWin.parent,
 	    ParentRelative);
@@ -542,7 +542,7 @@ refreshRootBGVars(rxvt_t *r )
     if( r->h->xerror_return != Success ) /* Set by xerror handler */
 	UNSET_PIXMAP(r->h->rootPixmap);
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Got %snull root pixmap %lx\n", NOT_PIXMAP(r->h->rootPixmap) ? "" : "non-", r->h->rootPixmap);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Got %snull root pixmap %lx\n", NOT_PIXMAP(r->h->rootPixmap) ? "" : "non-", r->h->rootPixmap));
 }
 
 /* {{{2 rxvt_check_our_parents(r)
@@ -566,7 +566,7 @@ rxvt_check_our_parents(rxvt_t *r)
     if (NOTSET_OPTION(r, Opt_transparent))
 	return have_changed;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "rxvt_check_our_parent ()\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "rxvt_check_our_parent ()\n"));
 
     /*
      * Don't try transparency if window depth is not the same as the root depth.
@@ -581,9 +581,9 @@ rxvt_check_our_parents(rxvt_t *r)
 	 * Oops. We can't be transparent (or pixmap_transparent).
 	 */
 	assert (-1 != LTAB(r)); /* should't happen */
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Bad depth, transparency failed: (%u, %u)\n", rootdepth, wattr.depth);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Bad depth, transparency failed: (%u, %u)\n", rootdepth, wattr.depth));
 
-	rxvt_dbgmsg (DBG_ERROR, DBG_TRANSPARENT, 
+	rxvt_msg (DBG_ERROR, DBG_TRANSPARENT, 
 	    "Root window has different depth. Disabling transparency");
 
 	r->h->am_pixmap_trans = 0;
@@ -648,7 +648,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	    r->h->am_pixmap_trans = 0;
 
 	    expose_transparent_subwin( r );
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Enabled XROOT pseudo-transparency\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Enabled XROOT pseudo-transparency\n"));
 	}
 	else have_changed = tempDisableTransparent( r);
     } while( 0 );
@@ -682,7 +682,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	 * background. Some window managers put multiple nested frame windows for
 	 * each client, so we have to take care about that.
 	 */
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Seeking to  %08lx\n", XROOT);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Seeking to  %08lx\n", XROOT));
 	for (i = 1; i < PARENT_NUMBER; i++)
 	{
 	    /*
@@ -693,7 +693,7 @@ rxvt_check_our_parents(rxvt_t *r)
 		&root, &r->TermWin.parenttree[i], &list, &n);
 	    XFree(list);
 
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Parent[%d] = %08lx\n", i, r->TermWin.parenttree[i] );
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Parent[%d] = %08lx\n", i, r->TermWin.parenttree[i] ));
 
 	    if (r->TermWin.parenttree[i] == XROOT)
 	    {
@@ -717,7 +717,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	     */
 	    XGetWindowAttributes(r->Xdisplay,
 		r->TermWin.parenttree[n], &wattr);
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Checking Parent[%d]: %s\n", n, (wattr.depth == rootdepth && wattr.class != InputOnly) ?  "OK" : "FAIL");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Checking Parent[%d]: %s\n", n, (wattr.depth == rootdepth && wattr.class != InputOnly) ?  "OK" : "FAIL"));
 	    if (wattr.depth != rootdepth ||
 		wattr.class == InputOnly)
 	    {
@@ -731,7 +731,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	    /*
 	     * Bummer. We got an inputonly (or bad depth) window. Fail.
 	     */
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Turning off\n");
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Turning off\n"));
 	    if( r->h->am_pixmap_trans )
 	    {
 		r->h->am_pixmap_trans = 0;
@@ -746,7 +746,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	}
 	else
 	{
-	    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Turning on (%d parents). Geometry %ux%u+%d+%d\n", i - 1, r->szHint.width, r->szHint.height, r->szHint.x, r->szHint.y);
+	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "Transparent Turning on (%d parents). Geometry %ux%u+%d+%d\n", i - 1, r->szHint.width, r->szHint.height, r->szHint.x, r->szHint.y));
 	    for (n = 0; n < i; n ++)
 		XSetWindowBackgroundPixmap(r->Xdisplay,
 		    r->TermWin.parenttree[n], ParentRelative);
@@ -763,7 +763,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	    UNSET_WIN(r->TermWin.parenttree[i]);
     }
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "am_transparent: %hhu am_pixmap_trans: %hhu have_changed %d\n", r->h->am_transparent, r->h->am_pixmap_trans, have_changed);
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "am_transparent: %hhu am_pixmap_trans: %hhu have_changed %d\n", r->h->am_transparent, r->h->am_pixmap_trans, have_changed));
 
     return have_changed;
 }
@@ -777,7 +777,7 @@ rxvt_check_our_parents(rxvt_t *r)
 void
 rxvt_refresh_bg_image (rxvt_t* r, int page, Bool imediate)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "rxvt_refresh_bg_image\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TRANSPARENT, "rxvt_refresh_bg_image\n"));
 
 # ifdef TRANSPARENT
     if (ISSET_OPTION(r, Opt_transparent))
@@ -1040,7 +1040,7 @@ shade_ximage (rxvt_t* r, XImage* srcImage)
     if( visual->class != TrueColor || srcImage->format != ZPixmap )
 	return ;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_TRANSPARENT, "shade background image\n");
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TRANSPARENT, "shade background image\n"));
 
     /* for convenience */
     mask_r = visual->red_mask;

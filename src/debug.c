@@ -92,7 +92,7 @@ static dbgmask_t dbg_mask_map[DBG_IDX_MAX] = {
 /*----------------------------------------------------------------------*/
 /* EXTPROTO */
 int
-rxvt_dbgmsg (uint32_t level, uint32_t mask, const char* fmt, ...)
+rxvt_msg (uint32_t level, uint32_t mask, const char* fmt, ...)
 {
 
     /* print fatal/error message regardless of its category */

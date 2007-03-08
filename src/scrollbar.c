@@ -223,7 +223,7 @@ rxvt_scrollbar_create (rxvt_t* r)
     unsigned int    sb_w, sb_h;
 
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SCROLLBAR, "Create scrollbar\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCROLLBAR, "Create scrollbar\n"));
     assert (IS_WIN(r->TermWin.parent));
 
     sb_x = ISSET_OPTION(r, Opt_scrollBar_right) ? VT_WIDTH(r) : 0;

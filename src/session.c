@@ -50,7 +50,7 @@ callback_die (SmcConn smc_conn, SmPointer client_data)
 {
     rxvt_t*	r = rxvt_get_r ();
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received die\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received die\n"));
 
     if (NULL != smc_conn)   {
 	SmcCloseConnection (smc_conn, 0, NULL);
@@ -104,7 +104,7 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 {
     rxvt_t*	r = rxvt_get_r ();
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received save_yourself\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received save_yourself\n"));
 
     if (NULL != smc_conn)   {
 	struct {
@@ -210,7 +210,7 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 static void 
 callback_shutdown_cancelled (SmcConn smc_conn, SmPointer client_data)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received shutdown_cancelled\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received shutdown_cancelled\n"));
     /* We are not really interested in this message. */
 }
 
@@ -219,7 +219,7 @@ callback_shutdown_cancelled (SmcConn smc_conn, SmPointer client_data)
 static void 
 callback_save_complete (SmcConn smc_conn, SmPointer client_data)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received save_complete\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received save_complete\n"));
     /* We are not really interested in this message. */
 }
 
@@ -228,7 +228,7 @@ callback_save_complete (SmcConn smc_conn, SmPointer client_data)
 static void 
 ice_io_error_handler (IceConn connection)
 {
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received ice io_error\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received ice io_error\n"));
     /* The less we do here the better - the default handler does an
 	exit(1) instead of closing the losing connection. */
 }    
@@ -241,7 +241,7 @@ ice_connection_watch (IceConn connection, IcePointer client_data, Bool opening, 
     rxvt_t*	r = rxvt_get_r ();
 
     if (opening)    {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: new ice connection\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: new ice connection\n"));
 	r->TermWin.ice_conn = connection;
 	r->TermWin.ice_fd = IceConnectionNumber(connection);
 
@@ -250,7 +250,7 @@ ice_connection_watch (IceConn connection, IcePointer client_data, Bool opening, 
 	    fcntl(r->TermWin.ice_fd, F_SETFD, FD_CLOEXEC);
     }
     else    {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: close ice connection\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: close ice connection\n"));
 	r->TermWin.ice_conn = NULL;
 	r->TermWin.ice_fd = -1;
     }
@@ -263,13 +263,13 @@ rxvt_process_ice_msgs (rxvt_t* r)
 {
     IceProcessMessagesStatus status;
 
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: received ice msgs\n");
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: received ice msgs\n"));
     assert (NULL != r->TermWin.ice_conn);
     assert (NULL != r->TermWin.sm_conn);
     status = IceProcessMessages(r->TermWin.ice_conn, NULL, NULL);
 
     if (status == IceProcessMessagesIOError) {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: ICE IO error\n");
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: ICE IO error\n"));
 
 	IceSetShutdownNegotiation (r->TermWin.ice_conn, False);
 	IceCloseConnection (r->TermWin.ice_conn);
@@ -287,15 +287,15 @@ rxvt_session_init (rxvt_t* r)
     char*		prev_client_id; 
 
 
-    rxvt_dbgmsg (DBG_INFO, DBG_SESSION, "SessionMgr: init\n");
+    rxvt_msg (DBG_INFO, DBG_SESSION, "SessionMgr: init\n");
 
     if (NULL != r->TermWin.sm_conn) {
-	rxvt_dbgmsg (DBG_INFO, DBG_SESSION, "SessionMgr: duplicate session init\n");
+	rxvt_msg (DBG_INFO, DBG_SESSION, "SessionMgr: duplicate session init\n");
 	return ;
     }
 
     if (NULL == getenv("SESSION_MANAGER")) {
-	rxvt_dbgmsg (DBG_INFO, DBG_SESSION, "SessionMgr: session manager is not running\n");
+	rxvt_msg (DBG_INFO, DBG_SESSION, "SessionMgr: session manager is not running\n");
 	return ;
     }
 
@@ -324,7 +324,7 @@ rxvt_session_init (rxvt_t* r)
 		    sizeof(error_string_ret), error_string_ret);
 
     if (NULL == r->TermWin.sm_conn) {
-	rxvt_dbgmsg (DBG_VERBOSE, DBG_SESSION, "SessionMgr: connection failed with error %s\n", error_string_ret);
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SESSION, "SessionMgr: connection failed with error %s\n", error_string_ret));
 	return ;
     }
 
@@ -343,7 +343,7 @@ rxvt_session_init (rxvt_t* r)
 void 
 rxvt_session_exit (rxvt_t* r)
 {
-    rxvt_dbgmsg (DBG_INFO, DBG_SESSION, "SessionMgr: exit\n");
+    rxvt_msg (DBG_INFO, DBG_SESSION, "SessionMgr: exit\n");
 
     if (NULL == r->TermWin.sm_conn)
 	return ;
