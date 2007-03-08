@@ -211,10 +211,10 @@ resetParentPixmap( rxvt_t *r,
     unsigned int    nw = r->szHint.width,   /* dims of root image to grab */
 		    nh = r->szHint.height;
 
-# if DEBUG_LEVEL
+# ifdef DEBUG
     if( sx + nw <= 0 || sx >= (int) rootw || sy + nh <= 0 || sy >= (int) rooth)
     {
-        rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Possible error: grabbing offscreen (%d, %d, %u, %u)\n", sx, sy, nw, nh);
+        rxvt_dbgmsg (DBG_WARN, DBG_TRANSPARENT, "Possible error: grabbing offscreen (%d, %d, %u, %u)\n", sx, sy, nw, nh);
     }
 # endif
 
@@ -583,7 +583,7 @@ rxvt_check_our_parents(rxvt_t *r)
 	assert (-1 != LTAB(r)); /* should't happen */
 	rxvt_dbgmsg (DBG_VERBOSE, DBG_TRANSPARENT, "Bad depth, transparency failed: (%u, %u)\n", rootdepth, wattr.depth);
 
-	rxvt_print_error(
+	rxvt_dbgmsg (DBG_ERROR, DBG_TRANSPARENT, 
 	    "Root window has different depth. Disabling transparency");
 
 	r->h->am_pixmap_trans = 0;

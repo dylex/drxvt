@@ -156,7 +156,7 @@ rxvt_init(int argc, const char *const *argv)
     /* Initialize vars in "r" */
     if (rxvt_init_vars(r) < 0)
     {
-	rxvt_print_error( "Could not initialize." );
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN,  "Could not initialize." );
 	rxvt_free(r);
 	return NULL;
     }
@@ -214,7 +214,7 @@ rxvt_init(int argc, const char *const *argv)
     /* Backward compatibility: Open profiles 0 .. n-1 if tnum=n. */
     else if( r->h->rs[Rs_init_term_num] )
     {
-	rxvt_print_error( "Option tnum is obsolete."
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN,  "Option tnum is obsolete."
 		" Use --initProfileList instead" );
 
 	itnum = atoi( r->h->rs[Rs_init_term_num] );
@@ -304,13 +304,14 @@ rxvt_alarm_signal( __attribute__((unused)) int sig )
 
     if( LTAB(r) >= 0 )
     {
-	fprintf( stderr, APL_NAME ": WARNING Processes ");
+	rxvt_dbgmsg (DBG_WARN, DBG_MAIN, APL_NAME ": WARNING Processes ");
 	for( i=0; i <= LTAB(r); i ++ )
-	    fprintf( stderr, "%d%c", PVTS(r, i)->cmd_pid,
+	    rxvt_dbgmsg (DBG_WARN, DBG_MAIN, "%d%c", PVTS(r, i)->cmd_pid,
 		    i == LTAB(r) ? ' ' : ',' );
-	fprintf( stderr, " have not responded to SIGHUP, and are still "
-		"running. Either 'kill -9' these processes or close the "
-		APL_NAME " window again within 3 seconds.\n" );
+	rxvt_dbgmsg (DBG_WARN, DBG_MAIN,
+	    " have not responded to SIGHUP, and are still "
+	    "running. Either 'kill -9' these processes or close the "
+	    APL_NAME " window again within 3 seconds.\n");
     }
 }
 
@@ -856,7 +857,7 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 	    {
 		if (r->TermWin.xftbfont->max_advance_width > r->TermWin.fwidth)
 		{
-		    rxvt_print_error( "Bold font too wide. Using overstrike" );
+		    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN,  "Bold font too wide. Using overstrike" );
 		    XftFontClose( r->Xdisplay, r->TermWin.xftbfont );
 		    SET_NULL( r->TermWin.xftbfont );
 		}
@@ -978,7 +979,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	XftPatternAddBool (r->TermWin.xftmpattern, FC_GLOBAL_ADVANCE, FcTrue);
     }
 
-#  ifdef DEBUG_VERBOSE
+#  ifdef DEBUG
     FcPatternPrint (r->TermWin.xftmpattern);
 #  endif
 
@@ -996,7 +997,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	    /* Not opened font */
 	    && (len != olen || STRNCASECMP(omfname, mfname, len))
     )
-	rxvt_print_error ("Cannot open mfont '%s'. Using mfont '%s' instead.",
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "Cannot open mfont '%s'. Using mfont '%s' instead.",
 	    mfname, omfname);
 
     rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "create xftmpattern = 0x%x on mfont %d\n",
@@ -1232,7 +1233,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	XftPatternAddBool (r->TermWin.xftpattern, FC_GLOBAL_ADVANCE, FcTrue);
     }
 
-# ifdef DEBUG_VERBOSE
+# ifdef DEBUG
     FcPatternPrint (r->TermWin.xftpattern);
 # endif
 
@@ -1249,7 +1250,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	    /* Not opened font */
 	    && (len != olen || STRNCASECMP(ofname, fname, len))
     )
-	rxvt_print_error ("Cannot open font '%s'. Using font '%s' instead.",
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "Cannot open font '%s'. Using font '%s' instead.",
 	    fname, ofname);
 
     rxvt_dbgmsg (DBG_DEBUG, DBG_MAIN, "create xftpattern = 0x%x on font %d\n", (unsigned int) r->TermWin.xftpattern, r->TermWin.xftsize);
@@ -1450,7 +1451,7 @@ rxvt_init_font_fixed (rxvt_t* r)
     xfont = XLoadQueryFont (r->Xdisplay, "fixed");
     if (IS_NULL(xfont))
     {
-	rxvt_print_error("fatal error, aborting...");
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "fatal error, aborting...");
 	exit(EXIT_FAILURE);
     }
 
@@ -1505,7 +1506,7 @@ rxvt_init_font_x11 (rxvt_t *r)
     if (IS_NULL(xfont))
     {
 	/* failed to load font */
-	rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
 
 	/* try to load fixed font */
 	r->h->rs[Rs_font+idx] = "fixed";
@@ -1514,7 +1515,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	if (IS_NULL(xfont))
 	{
 	    /* still failed to load font */
-	    rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
 
 	    /* cannot load any font, fatal error, abort the program */
 	    goto Abort;
@@ -1597,7 +1598,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	char*	ptr;
 
 	/* failed to load font */
-	rxvt_print_error(msg, r->h->rs[Rs_mfont+idx]);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_mfont+idx]);
 
 	ptr = rxvt_fallback_mfont_x11 (r);
 	rxvt_dbgmsg (DBG_VERBOSE, DBG_MAIN, " load mfont (%s)\n", ptr);
@@ -1607,7 +1608,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	else
 	{
 	    /* still failed to load font */
-	    rxvt_print_error(msg, ptr);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, ptr);
 	    /* cannot load any mfont, fatal error, abort the program */
 	    goto Abort;
 	}
@@ -1622,7 +1623,7 @@ rxvt_init_font_x11 (rxvt_t *r)
     return ;
 
 Abort:
-    rxvt_print_error("fatal error, aborting...");
+    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "fatal error, aborting...");
     exit(EXIT_FAILURE);
 }
 
@@ -1960,7 +1961,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
     if (!xfont)
     {
 	/* failed to load font */
-	rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
 
 	/* try to load fixed font */
 	r->h->rs[Rs_font+idx] = "fixed";
@@ -1969,7 +1970,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	if (!xfont)
 	{
 	    /* still failed to load font */
-	    rxvt_print_error(msg, r->h->rs[Rs_font+idx]);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
 	    return 0;
 	}
     }
@@ -2086,7 +2087,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	char*	ptr;
 
 	/* failed to load font */
-	rxvt_print_error(msg, r->h->rs[Rs_mfont+idx]);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_mfont+idx]);
 
 	/* try to load default font */
 	ptr = rxvt_fallback_mfont_x11 (r);
@@ -2097,7 +2098,7 @@ rxvt_change_font_x11 (rxvt_t* r, const char *fontname)
 	else
 	{
 	    /* still failed to load font */
-	    rxvt_print_error(msg, ptr);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, msg, ptr);
 	    return 0;
 	}
     }
@@ -2529,7 +2530,7 @@ rxvt_parse_alloc_color(rxvt_t* r, XColor *screen_in_out, const char *colour)
     int		    res = 0;
 
     if (!XParseColor(r->Xdisplay, XCMAP, colour, screen_in_out))
-	rxvt_print_error("can't determine colour: %s", colour);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "can't determine colour: %s", colour);
     else
 	res = rxvt_alloc_color(r, screen_in_out, colour);
     return res;
@@ -2589,7 +2590,7 @@ rxvt_alloc_color( rxvt_t* r, XColor *screen_in_out, const char *colour )
     }
 
     if (res == 0)
-	rxvt_print_error("can't allocate color: %s", colour);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "can't allocate color: %s", colour);
 
     return res;
 #endif
@@ -3000,7 +3001,7 @@ rxvt_IM_get_IC(rxvt_t *r)
 	XFree(status_attr);
     if (IS_NULL(h->Input_Context))
     {
-	rxvt_print_error("failed to create input context");
+	rxvt_dbgmsg (DBG_ERROR, DBG_MAIN, "failed to create input context");
 	XCloseIM(xim);
 	return False;
     }

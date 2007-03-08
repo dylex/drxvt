@@ -39,23 +39,6 @@ rxvt_r_basename(const char *str)
 
 
 /*
- * Print an error message
- */
-/* EXTPROTO */
-void
-rxvt_print_error(const char *fmt,...)
-{
-    va_list         arg_ptr;
-
-    va_start(arg_ptr, fmt);
-    fprintf(stderr, APL_NAME ": ");
-    vfprintf(stderr, fmt, arg_ptr);
-    fprintf(stderr, "\n");
-    va_end(arg_ptr);
-}
-
-
-/*
  * check that the first characters of S1 match S2
  *
  * No Match
@@ -340,8 +323,7 @@ rxvt_percent_interpolate( rxvt_t *r, int page,
 		    break;
 
 		default:
-		    rxvt_print_error( "Unrecognized flag %%%c in '%s'",
-			    src[i++], src );
+		    rxvt_dbgmsg (DBG_ERROR, DBG_MISC, "Unrecognized flag %%%c in '%s'", src[i++], src );
 		    break;
 	    }
 	}
@@ -408,8 +390,6 @@ rxvt_splitcommastring(const char *cs)
  * file searching
  */
 
-/* #define DEBUG_SEARCH_PATH */
-
 #if defined (BACKGROUND_IMAGE) || defined (HAVE_MENUBAR)
 /*
  * search for FILE in the current working directory, and within the
@@ -432,10 +412,10 @@ rxvt_File_search_path(const char *pathlist, const char *file, const char *ext)
     if ((p = STRCHR(file, ';'))) len = (p - file);
     else len = STRLEN(file);
 
-#ifdef DEBUG_SEARCH_PATH
+#ifdef DEBUG
     getcwd(name, sizeof(name));
-    fprintf(stderr, "pwd: \"%s\"\n", name);
-    fprintf(stderr, "find: \"%.*s\"\n", len, file);
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MISC, "pwd: \"%s\"\n", name);
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MISC, "find: \"%.*s\"\n", len, file);
 #endif
 
     /* leave room for an extra '/' and trailing '\0' */

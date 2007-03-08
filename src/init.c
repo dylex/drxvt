@@ -903,7 +903,7 @@ rxvt_xerror_handler(const Display *display __attribute__((unused)), const XError
 
     if( !r->h->allowedxerror )
     {
-	rxvt_print_error("%s", error_msg);
+	rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "%s", error_msg);
 
 #ifdef DEBUG_X
 	abort();
@@ -1063,7 +1063,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->Xdisplay = XOpenDisplay( rs[Rs_display_name] );
 	if (IS_NULL(r->Xdisplay))
 	{
-	    rxvt_print_error( "can't open display %s", rs[Rs_display_name] );
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "can't open display %s", rs[Rs_display_name] );
 	    exit( EXIT_FAILURE );
 	}
     }
@@ -1604,7 +1604,7 @@ rxvt_init_xlocale(rxvt_t *r)
 {
 #ifdef USE_XIM
     if (IS_NULL(r->h->locale))
-	rxvt_print_error("Setting locale failed.");
+	rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "Setting locale failed.");
     else
     {
 	XChangeProperty(r->Xdisplay, r->TermWin.parent,
@@ -1613,7 +1613,7 @@ rxvt_init_xlocale(rxvt_t *r)
 
 	if (XSupportsLocale() != True)
 	{
-	    rxvt_print_error("The locale is not supported by Xlib");
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "The locale is not supported by Xlib");
 	    return;
 	}
 	rxvt_IM_set_fontset (r, 0);
@@ -1944,7 +1944,7 @@ rxvt_init_colors( rxvt_t *r )
 
 	else
 	{
-	    rxvt_print_error( "Could not alloc foreground color of profile %d",
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Could not alloc foreground color of profile %d",
 		    i );
 	    if( i == 0 )
 		/* Need default fg/bg */
@@ -1975,7 +1975,7 @@ rxvt_init_colors( rxvt_t *r )
 
 	else
 	{
-	    rxvt_print_error( "Could not alloc background color of profile %d",
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Could not alloc background color of profile %d",
 		    i );
 	    if( i == 0 )
 		/* Need default fg/bg */
@@ -2034,7 +2034,7 @@ rxvt_init_colors( rxvt_t *r )
 	{
 	    if( r->h->rs[Rs_color+i] != def_colorName[i] )
 	    {
-		rxvt_print_error( "Could not allocate color '%s'\n",
+		rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Could not allocate color '%s'\n",
 			r->h->rs[Rs_color + i] );
 
 		/* Try again with default color */
@@ -3326,7 +3326,7 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	/* Check if we have valid attributes */
 	if( r->h->xerror_return != Success || attrs.class == InputOnly )
 	{
-	    rxvt_print_error( "Unable to embed into Win 0x%lx", parent );
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Unable to embed into Win 0x%lx", parent );
 	    parent = XROOT;
 	}
 
@@ -3619,7 +3619,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 
     if( r->nAsyncChilds >= MAX_CHILDS )
     {
-	rxvt_print_error( "Too many childs."
+	rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Too many childs."
 		" Increase MAX_CHILDS in src/feature.h" );
 	return 0;
     }
@@ -3628,7 +3628,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
     switch( pid )
     {
 	case -1:
-	    rxvt_print_error( "Unable to fork" );
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Unable to fork" );
 	    return 0;	/* Failure */
 	    /* NOT REACHED */
 
@@ -3643,7 +3643,7 @@ rxvt_async_exec( rxvt_t *r, const char *cmd)
 
 	    execvp( argv[0], argv );
 
-	    rxvt_print_error( "Failed to exec %s", argv[0] );
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT,  "Failed to exec %s", argv[0] );
 	    exit(1);
 	    /* NOT REACHED */
 
@@ -3672,13 +3672,13 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
     if ((cfd = rxvt_get_pty(&(PVTS(r, page)->tty_fd),
 	(char**) &(PVTS(r, page)->ttydev))) < 0)
     {
-	rxvt_print_error("can't open pseudo-tty");
+	rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "can't open pseudo-tty");
 	return -1;
     }
 #ifdef FD_SETSIZE
     if (r->Xfd > FD_SETSIZE || cfd > FD_SETSIZE)
     {
-	rxvt_print_error("fd too high: %d max", FD_SETSIZE);
+	rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "fd too high: %d max", FD_SETSIZE);
 	return -1;
     }
 #endif
@@ -3693,7 +3693,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 	if ((PVTS(r, page)->tty_fd = rxvt_get_tty(PVTS(r, page)->ttydev)) < 0)
 	{
 	    close(cfd);
-	    rxvt_print_error("can't open slave tty %s", PVTS(r, page)->ttydev);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "can't open slave tty %s", PVTS(r, page)->ttydev);
 	    return -1;
 	}
     }
@@ -3718,7 +3718,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
     switch (PVTS(r, page)->cmd_pid = fork())
     {
 	case -1:
-	    rxvt_print_error("can't fork");
+	    rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "can't fork");
 	    close (cfd);
 	    return -1;
 
@@ -3743,7 +3743,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 				    PVTS(r, page)->ttydev ) < 0
 	      )
 	    {
-		rxvt_print_error("Could not obtain control of tty");
+		rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "Could not obtain control of tty");
 	    }
 	    else
 	    {
@@ -3765,8 +3765,7 @@ rxvt_run_command(rxvt_t *r, int page, const char **argv)
 		/*
 		 * If we got here, then we failed to exec the child process.
 		 */
-		fprintf( stderr, "Could not execute %s.\n",
-			(argv && argv[0]) ? argv[0] : "shell");
+		rxvt_dbgmsg (DBG_ERROR, DBG_INIT, "Could not execute %s.\n", (argv && argv[0]) ? argv[0] : "shell");
 	    }
 
 	    /* Something went wrong. Kill the child. */
@@ -4146,15 +4145,15 @@ rxvt_get_ttymode(ttymode_t *tio, int erase)
 /*
  * Debugging
  */
-#ifdef DEBUG_TTYMODE
+#ifdef DEBUG
 #ifdef HAVE_TERMIOS_H
 /* c_iflag bits */
-    fprintf(stderr, "Input flags\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "Input flags\n");
 
 /* cpp token stringize doesn't work on all machines <sigh> */
-# define FOO(flag,name)		\
+# define FOO(flag,name)		    \
     if ((tio->c_iflag) & flag)	    \
-    fprintf (stderr, "%s ", name)
+        rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%s ", name)
 
 /* c_iflag bits */
     FOO(IGNBRK, "IGNBRK");
@@ -4177,11 +4176,11 @@ rxvt_get_ttymode(ttymode_t *tio, int erase)
 # ifdef IMAXBEL
     FOO(IMAXBEL, "IMAXBEL");
 # endif
-    fprintf(stderr, "\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "\n");
 
 # undef FOO
 # define FOO(entry, name)		    \
-    fprintf(stderr, "%-8s = %#04o\n", name, tio->c_cc [entry])
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "%-8s = %#04o\n", name, tio->c_cc [entry])
 
     FOO(VINTR, "VINTR");
     FOO(VQUIT, "VQUIT");
@@ -4216,10 +4215,10 @@ rxvt_get_ttymode(ttymode_t *tio, int erase)
 # ifdef VLNEXT
     FOO(VLNEXT, "VLNEXT");
 # endif
-    fprintf(stderr, "\n");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_INIT, "\n");
 # undef FOO
 # endif		    /* HAVE_TERMIOS_H */
-#endif		    /* DEBUG_TTYMODE */
+#endif		    /* DEBUG */
 }
 
 /*----------------------- end-of-file (C source) -----------------------*/

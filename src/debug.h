@@ -3,7 +3,7 @@
  *----------------------------------------------------------------------*
  *
  * All portions of code are copyright by their respective author/s.
- * Copyright (c) 2004        Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+ * Copyright (c) 2007        Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

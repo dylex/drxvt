@@ -319,9 +319,7 @@ rxvt_malloc(size_t size)
 
 #ifdef DEBUG
     assert (memory_initialized);
-# ifdef DEBUG_MEMORY
-    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "DBGMEM: %d\n", (int) size));
-# endif
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_MEMORY, "rxvt_malloc (%d)\n", (int) size));
 #endif
 
     if (!use_our_malloc || /* use system malloc, or request size is big */

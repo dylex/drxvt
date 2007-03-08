@@ -75,9 +75,6 @@ typedef struct bar_t {
     action_t        arrows[NARROWS];
 } bar_t;
 
-/* #define DEBUG_MENU */
-/* #define DEBUG_MENU_LAYOUT */
-/* #define DEBUG_MENUBAR_STACKING */
 
 #define HSPACE	    1	/* one space */
 #define isSeparator(name)   ((name)[0] == '\0')

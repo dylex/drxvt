@@ -123,9 +123,9 @@ xftInitACS( Display *dpy, Drawable d, unsigned depth)
     if(d == 0)		d = DefaultRootWindow( dpy);
     if(depth == 0)	depth=DefaultDepth( dpy, DefaultScreen( dpy));
 
-#if DEBUG_LEVEL
+#ifdef DEBUG
     if( sPmap != 0)
-	fputs( "sPmap not null in xftInitACS", stderr);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "sPmap not null in xftInitACS");
 #endif
 
     acsGc = XCreateGC( dpy, d, 0, NULL);
@@ -151,8 +151,9 @@ xftCloseACS( Display *dpy)
 	XFreePixmap( dpy, sPmap);
 	sPmap = 0;
     }
-#if DEBUG_LEVEL
-    else fputs( "sPmap already null in xftCloseACS", stderr);
+#ifdef DEBUG
+    else
+	rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "sPmap already null in xftCloseACS");
 #endif
 
     XFreeGC( dpy, acsGc);
@@ -503,8 +504,8 @@ xftDrawACSChars(
 	    x += font_width;
 	}
     }
-#if DEBUG_LEVEL
-    fputc( '\n', stderr);
+#ifdef DEBUG
+    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "\n");
 #endif
 }
 
@@ -556,8 +557,8 @@ xftDrawACSString ( Display *dpy, Drawable d, GC gc,
 	    len -= chars;
 	}
     }
-#if DEBUG_LEVEL
-    fputc( '\n', stderr);
+#ifdef DEBUG
+    rxvt_dbgmsg (DBG_DEBUG, DBG_XFTACS, "\n");
 #endif
 }
 /*-------------------------- end-of-file (C source) --------------------------*/

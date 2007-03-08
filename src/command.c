@@ -869,9 +869,9 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 #ifdef USE_DEADKEY
     static KeySym   accent = 0;
 #endif	/* USE_DEADKEY */
-#ifdef DEBUG_CMD
+#ifdef DEBUG
     static int	    debug_key = 1;  /* accessible by a debugger only */
-#endif	/* DEBUG_CMD */
+#endif	/* DEBUG */
 #ifdef USE_XIM
     int		    valid_keysym = 0;
 #endif	/* USE_XIM */
@@ -1269,24 +1269,22 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	}
     }
 
-#ifdef DEBUG_CMD
+#ifdef DEBUG
     if (debug_key)	    /* Display keyboard buffer contents */
     {
-	char	       *p;
-	int	     i;
+	unsigned char*	p;
+	int	        i;
 
-	fprintf(stderr, "key 0x%04X [%d]: `", (unsigned int) keysym,
-	    len);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "key 0x%04X [%d]: `", (unsigned int) keysym, len);
 	for (i = 0, p = kbuf; i < len; i++, p++)
-	    fprintf(stderr, (*p >= ' ' && *p < '\177' ? "%c" :
-		"\\%03o"), *p);
-	fprintf(stderr, "'\n");
+	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, (*p >= ' ' && *p < '\177' ? "%c" : "\\%03o"), *p);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "'\n");
     }
-#endif	/* DEBUG_CMD */
+#endif	/* DEBUG */
 
     if (0 == STRCMP ("UTF-8", r->h->locale))
     {
-	fprintf(stderr, "UTF-8 string?");
+	rxvt_dbgmsg (DBG_INFO, DBG_COMMAND, "UTF-8 string?");
     }
 
     rxvt_tt_write(r, ATAB(r), kbuf, (unsigned int)len);
@@ -1334,7 +1332,7 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
 
     if (count > s)
     {
-	rxvt_print_error("data loss: cmd_write too large");
+	rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "data loss: cmd_write too large");
 	count = s;
     }
 
@@ -1357,7 +1355,7 @@ rxvt_mark_dead_childs( rxvt_t *r )
     int	    i, j;
     short   ndead_childs = r->ndead_childs;
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs);
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "rxvt_mark_dead_childs(): %d children are dead\n", r->ndead_childs);
 
 
     /*
@@ -1513,7 +1511,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
     {
 	if( PVTS(r, i)->dead && PVTS(r, i)->hold == 1 )
 	{
-	    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, 
+	    rxvt_dbgmsg (DBG_INFO, DBG_COMMAND, 
 			"Tab %d exit %s (status %d). holdOption: %d\n",
 			i, WIFEXITED(PVTS(r,i)->status) ? "success" : "failure",
 			PVTS(r,i)->status,
@@ -2203,7 +2201,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
     register int    i;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Entering rxvt_cmd_getc on page %d\n", *p_page);
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_cmd_getc on page %d\n", *p_page);
 
 
     /* loop until we can return something */
@@ -2425,9 +2423,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		
 		if( errno )
 		{
-#if 1 /*DEBUG_LEVEL*/
-		    perror( "Error reading fifo" );
-#endif
+		    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "Error: reading fifo %s", strerror (errno));
 		}
 
 		if( len == 0 )
@@ -2635,20 +2631,17 @@ rxvt_mouse_report(rxvt_t* r, const XButtonEvent *ev)
 #endif
     }
 
-#ifdef DEBUG_MOUSEREPORT
-    fprintf(stderr, "Mouse [");
+#ifdef DEBUG
+    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "Mouse [");
     if (key_state & 16)
-	fputc('C', stderr);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'C');
     if (key_state & 4)
-	fputc('S', stderr);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'S');
     if (key_state & 8)
-	fputc('A', stderr);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", 'A');
     if (key_state & 32)
-	fputc('2', stderr);
-    fprintf(stderr, "]: <%d>, %d/%d\n",
-	button_number,
-	x + 1,
-	y + 1);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c", '2');
+    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "]: <%d>, %d/%d\n", button_number, x + 1, y + 1);
 #else
     rxvt_tt_printf(r, ATAB(r), "\033[M%c%c%c",
 	  (32 + button_number + key_state),
@@ -3655,7 +3648,7 @@ rxvt_resize_on_configure (rxvt_t* r, unsigned int width, unsigned int height)
     int		    fix_screen;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s(r, width=%u, height=%u)\n",
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "%s(r, width=%u, height=%u)\n",
 		__func__, width, height );
     /* update ncol/nrow of new window */
     fix_screen = rxvt_calc_colrow (r, width, height);
@@ -3812,7 +3805,7 @@ rxvt_process_configurenotify (rxvt_t* r, XConfigureEvent* ev)
 
 	rxvt_resize_on_configure (r, width, height);
     }
-#if DEBUG_LEVEL
+#ifdef DEBUG
     else
     {
 	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Size: Not resizing\n");
@@ -3902,7 +3895,7 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
     int wantRefresh = 0;    /* Want transparency refresh */
 #endif
 
-#if DEBUG_LEVEL
+#ifdef DEBUG
     char *name;
     rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Property notify event:");
 #endif
@@ -3915,10 +3908,9 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
      */
     do
       {
-#if DEBUG_LEVEL
+#ifdef DEBUG
 	name = XGetAtomName( r->Xdisplay, ev->xproperty.atom);
 	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "%s(%08lx) ", name, ev->xproperty.atom );
-
 	XFree( name);
 #endif
 
@@ -3975,8 +3967,8 @@ rxvt_process_propertynotify (rxvt_t* r, XEvent* ev)
       }
     while( XCheckTypedEvent( r->Xdisplay, PropertyNotify, ev) );
 
-#if DEBUG_LEVEL
-    fputc( '\n', stderr);
+#ifdef DEBUG
+    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "\n");
 #endif
 #ifdef TRANSPARENT
     if( wantRefresh)
@@ -4364,8 +4356,8 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 	    switch(i)
 	    {
 		case TIMEOUT_INCR:
-		    rxvt_print_error
-			("data loss: timeout on INCR selection paste");
+		    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND,
+			"data loss: timeout on INCR selection paste");
 		    h->selection_wait = Sel_none;
 		    break;
 
@@ -4493,7 +4485,7 @@ rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 
     assert( pipeName || r->h->rs[Rs_print_pipe] );
     if (IS_NULL(stream))
-	rxvt_print_error("Can't open printer pipe %s",
+	rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, "Can't open printer pipe %s",
 		r->h->rs[Rs_print_pipe] ?: pipeName );
 
     return stream;
@@ -4519,7 +4511,7 @@ rxvt_pclose_printer(FILE *stream)
 void
 rxvt_process_print_pipe( rxvt_t* r, int page )
 {
-    rxvt_print_error( "Print pipe not implemented in this version" );
+    rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND,  "Print pipe not implemented in this version" );
 #if 0 /* {{{ Disabled because failures of rxvt_cmd_getc() can't be handled */
     int		readpage = page;
     int		done;
@@ -5079,11 +5071,11 @@ rxvt_process_csi_seq(rxvt_t* r, int page)
 	if (arg[p] == -1)
 	    arg[p] = ndef;
 
-#ifdef DEBUG_CMD
-    fprintf(stderr, "CSI ");
+#ifdef DEBUG
+    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "CSI ");
     for (p = 0; p < nargs; p++)
-	fprintf(stderr, "%d%s", arg[p], p < nargs - 1 ? ";" : "");
-    fprintf(stderr, "%c\n", ch);
+	rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%d%s", arg[p], p < nargs - 1 ? ";" : "");
+    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND, "%c\n", ch);
 #endif
 
 
@@ -6759,7 +6751,7 @@ rxvt_main_loop(rxvt_t *r)
     int			page;
 
 
-    rxvt_dbgmsg (DBG_DEBUG, DBG_COMMAND,  "Entering rxvt_main_loop()\n" );
+    rxvt_dbgmsg (DBG_VERBOSE, DBG_COMMAND,  "Entering rxvt_main_loop()\n" );
 
     /* Send the screen size. */
     for (i = 0; i <= LTAB(r); i ++)
@@ -6934,7 +6926,7 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 		    else
 		    {
 			/* no memory: ignore entire write request */
-			rxvt_print_error(
+			rxvt_dbgmsg (DBG_ERROR, DBG_COMMAND, 
 				"data loss: cannot allocate buffer space");
 			/* restore clobbered pointer */
 			v_buffer = v_bufstr;

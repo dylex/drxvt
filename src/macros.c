@@ -337,7 +337,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 
     if (NOT_KEYSYM(keysym))
     {
-	rxvt_print_error( "Invalid keysym %s. Skipping macro.",
+	rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Invalid keysym %s. Skipping macro.",
 		keyname_nomods);
 	return -1;
     }
@@ -399,7 +399,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 
 		if( macroNum == MACRO_MAX_CHAINLEN )
 		{
-		    rxvt_print_error( "Macro chain too long" );
+		    rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Macro chain too long" );
 		    return 0;
 		}
 
@@ -453,7 +453,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     {
 	if( replaceIndex == r->nmacros )
 	{
-	    rxvt_print_error( "No previous macro to add to (key %s%s%s%s)",
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "No previous macro to add to (key %s%s%s%s)",
 		    (modFlags & MACRO_CTRL) ? "Ctrl+" : "",
 		    (modFlags & MACRO_META) ? "Meta+" : "",
 		    (modFlags & MACRO_SHIFT) ? "Shift+" : "",
@@ -463,7 +463,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	else if( r->macros[replaceIndex].action.type == MacroFnDummy )
 	{
 	    /* Do not add to a dummy macro */
-	    rxvt_print_error( "Can not add actions to a Dummy macro" );
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Can not add actions to a Dummy macro" );
 	    return 0;	/* Failure */
 	}
 
@@ -603,19 +603,6 @@ rxvt_cleanup_macros( rxvt_t *r )
 
     rxvt_dbgmsg (DBG_DEBUG, DBG_MACROS, "Read %d macros. (Have space for %d macros)\n",
 		r->nmacros, r->maxMacros);
-
-#if 0	/* {{{ Debug info */
-    for( i=0; i < r->nmacros; i++)
-    {
-	fprintf( stderr, "%2d. Key 0x%08lx, Mods 0x%1hhx, Chain# 0x%1hhx,"
-		" Type %s %s\n",
-		i, r->macros[i].keysym, r->macros[i].modFlags & MACRO_MODMASK,
-		MACRO_GET_NUMBER( r->macros[i].modFlags ),
-		macroNames[r->macros[i].action.type],
-		r->macros[i].action.str && *r->macros[i].action.str != '\e' ?
-		    r->macros[i].action.str : NULL );
-    }
-#endif	/* }}} */
 }
 
 /* {{{1 rxvt_set_action( action, astring)
@@ -657,7 +644,7 @@ rxvt_set_action	    (action_t *action, char *astring)
 
     if( type == NMACRO_FUNCS )
     {
-	rxvt_print_error( "Action %s is not of known type", astring);
+	rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Action %s is not of known type", astring);
 	return False; /* Failure: No matching macro name */
     }
 
@@ -803,7 +790,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		rxvt_cmd_write( r, ATAB(r), (unsigned char*) astr, alen - 1);
 	    else
 	    {
-		rxvt_print_error( "Macro %s requires argument.",
+		rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Macro %s requires argument.",
 			macroNames[action->type] );
 		retval = -1;
 	    }
@@ -815,7 +802,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 		rxvt_tt_write( r, ATAB(r), (unsigned char*) astr, alen - 1);
 	    else
 	    {
-		rxvt_print_error( "Macro %s requires argument.",
+		rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Macro %s requires argument.",
 			macroNames[action->type] );
 		retval = -1;
 	    }
@@ -889,7 +876,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 
 	    else
 	    {
-		rxvt_print_error( "Macro %s requires argument.",
+		rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Macro %s requires argument.",
 			macroNames[action->type] );
 		retval = -1;
 	    }
@@ -1091,7 +1078,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			break;
 
 		    default:
-			rxvt_print_error( "Badly formed argument '%s' to %s\n",
+			rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Badly formed argument '%s' to %s\n",
 				astr, macroNames[action->type] );
 			retval = -1;
 			break;
@@ -1205,7 +1192,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 			case 'p': pretty	= 1; break;
 			case 'n': linecont	= 0; break;
 			default:
-			    rxvt_print_error( "Bad option %c to macro %s",
+			    rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Bad option %c to macro %s",
 				    *s, macroNames[action->type] );
 			    retval = -1;
 		    }
@@ -1248,7 +1235,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	default:
 	    assert( action->type < sizeof( macroNames ) / sizeof( char ** ) );
 
-	    rxvt_print_error( "Support for macro type '%s' not compiled.",
+	    rxvt_dbgmsg (DBG_ERROR, DBG_MACROS,  "Support for macro type '%s' not compiled.",
 		    macroNames[action->type]);
 	    retval = -1;
     }

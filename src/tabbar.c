@@ -1181,13 +1181,13 @@ rxvt_append_page( rxvt_t* r, int profile,
 
     if (LTAB(r) == MAX_PAGES-1)
     {
-	rxvt_print_error( "Too many tabs" );
+	rxvt_dbgmsg (DBG_ERROR, DBG_TABBAR,  "Too many tabs" );
 	return ;
     }
 
     if( profile < 0 || profile >= MAX_PROFILES )
     {
-	rxvt_print_error( "Warning: Profile %d out of range", profile );
+	rxvt_dbgmsg (DBG_WARN, DBG_TABBAR,  "Warning: Profile %d out of range", profile );
 	profile = 0;
     }
 

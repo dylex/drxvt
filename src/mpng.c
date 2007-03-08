@@ -31,7 +31,7 @@ static void
 png_cexcept_error (png_structp png_ptr, png_const_charp msg)
 {
     if(png_ptr){
-	fprintf(stderr, "png file read error: %s\n", msg);
+	rxvt_dbgmsg (DBG_ERROR, DBG_IMAGES, "png file read error: %s\n", msg);
     }
 }
 
@@ -148,7 +148,7 @@ png_uint_32 png_row_bytes;
     assert (((int)png_row_bytes) * ((int)png_height) * sizeof(png_byte) > 0);
     buf = rxvt_malloc(png_row_bytes * png_height * sizeof(png_byte));
     if (buf == NULL){
-fprintf(stderr,"png read error: out of memory..\n");
+      rxvt_dbgmsg (DBG_ERROR, DBG_IMAGES, "png read error: out of memory..\n");
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       fclose(ifile);
       return -1;
@@ -158,7 +158,7 @@ fprintf(stderr,"png read error: out of memory..\n");
     assert (sizeof(png_bytep) * ((int)png_height) > 0);
     png_row_ptrs = rxvt_malloc (sizeof(png_bytep)*png_height);
     if (png_row_ptrs == NULL){
-fprintf(stderr,"png read error: out of memory..\n");
+      rxvt_dbgmsg (DBG_ERROR, DBG_IMAGES, "png read error: out of memory..\n");
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       fclose(ifile);
       return -1;

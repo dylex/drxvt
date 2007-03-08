@@ -1823,9 +1823,12 @@ struct rxvt_hidden {
 # define rxvt_set_window_color(r, page, idx, color) ()
 #endif
 
+/* This comes last */
+/*
 #ifdef DEBUG_malloc
-# include "dmalloc.h"	    /* This comes last */
+# include "dmalloc.h"
 #endif
+*/
 
 #endif		    /* __RXVT_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

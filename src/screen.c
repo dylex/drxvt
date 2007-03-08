@@ -5173,7 +5173,7 @@ rxvt_selection_make(rxvt_t* r, int page, Time tm)
 
     XSetSelectionOwner(r->Xdisplay, XA_PRIMARY, PVTS(r, page)->vt, tm);
     if (XGetSelectionOwner(r->Xdisplay, XA_PRIMARY) != PVTS(r, page)->vt)
-	rxvt_print_error("can't get primary selection");
+	rxvt_dbgmsg (DBG_ERROR, DBG_SCREEN, "can't get primary selection");
     XChangeProperty(r->Xdisplay, XROOT, XA_CUT_BUFFER0, XA_STRING, 8,
 	PropModeReplace, SEL(r).text, (int)SEL(r).len);
     r->h->selection_time = tm;
@@ -5905,53 +5905,5 @@ rxvt_pixel_position(rxvt_t* r, int *x, int *y)
     *y = Pixel2Row(*y);
 /* MAX_IT(*y, 0); MIN_IT(*y, (int)r->TermWin.nrow - 1); */
 }
-/* ------------------------------------------------------------------------- */
-
-/* ------------------------------------------------------------------------- *
- *			      DEBUG ROUTINES				   *
- * ------------------------------------------------------------------------- */
-#if 0
-/* INTPROTO */
-void
-rxvt_debug_colors(void)
-{
-    int		 color;
-    const char	 *name[] =
-    {
-	"fg", "bg",
-	"black", "red", "green", "yellow", "blue", "magenta", "cyan", "white"
-    };
 
-    fprintf(stderr, "Color ( ");
-    if (PVTS(r, page)->rstyle & RS_RVid)
-    fprintf(stderr, "rvid ");
-    if (PVTS(r, page)->rstyle & RS_Bold)
-    fprintf(stderr, "bold ");
-    if (PVTS(r, page)->rstyle & RS_Blink)
-    fprintf(stderr, "blink ");
-    if (PVTS(r, page)->rstyle & RS_Uline)
-    fprintf(stderr, "uline ");
-    fprintf(stderr, "): ");
-
-    color = GET_FGCOLOR(PVTS(r, page)->rstyle);
-#ifndef NO_BRIGHTCOLOR
-    if (color >= minBrightCOLOR && color <= maxBrightCOLOR)
-    {
-	color -= (minBrightCOLOR - minCOLOR);
-	fprintf(stderr, "bright ");
-    }
-#endif
-    fprintf(stderr, "%s on ", name[color]);
-
-    color = GET_BGCOLOR(PVTS(r, page)->rstyle);
-#ifndef NO_BRIGHTCOLOR
-    if (color >= minBrightCOLOR && color <= maxBrightCOLOR)
-    {
-	color -= (minBrightCOLOR - minCOLOR);
-	fprintf(stderr, "bright ");
-    }
-#endif
-    fprintf(stderr, "%s\n", name[color]);
-}
-#endif
 /*----------------------- end-of-file (C source) -----------------------*/

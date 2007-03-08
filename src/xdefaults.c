@@ -914,7 +914,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	else
 	{
 	    bad_option = 1;
-	    rxvt_print_error("bad option \"%s\"", opt);
+	    rxvt_dbgmsg (DBG_ERROR, DBG_RESOURCE, "bad option \"%s\"", opt);
 	    continue;
 	}
 
@@ -1042,10 +1042,8 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 		     * default values
 		     */
 		}
-#ifdef DEBUG_VERBOSE
 		else
 		    rxvt_dbgmsg (DBG_DEBUG, DBG_RESOURCE, "???\n");
-#endif
 	    }
 
 	    /* boolean value */
@@ -1101,7 +1099,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 		else
 		    bad_option = 1;
 
-		rxvt_print_error("%s option \"%s\"", msg, --opt);
+		rxvt_dbgmsg (DBG_ERROR, DBG_RESOURCE, "%s option \"%s\"", msg, --opt);
 	    }
 	}
     }
@@ -1113,7 +1111,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	rxvt_usage(0);
 #endif
 
-	rxvt_print_error( "Use -h, -help or --help to get help" );
+	rxvt_dbgmsg (DBG_ERROR, DBG_RESOURCE,  "Use -h, -help or --help to get help" );
 	exit( EXIT_FAILURE );
     }
 

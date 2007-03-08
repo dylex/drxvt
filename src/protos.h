@@ -191,7 +191,6 @@ int		 rxvt_menu_select		  __PROTO((rxvt_t*, XButtonEvent*));
 
 /* Begin prototypes of misc.c */
 char           * rxvt_r_basename                  __PROTO((const char* str));
-void             rxvt_print_error                 __PROTO((const char* fmt,...));
 int              rxvt_str_match                   __PROTO((const char* s1, const char* s2));
 const char*      rxvt_str_skip_space              __PROTO((const char* str));
 char*            rxvt_str_trim                    __PROTO((char* str));

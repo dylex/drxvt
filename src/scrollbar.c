@@ -272,7 +272,7 @@ rxvt_scrollbar_create (rxvt_t* r)
 			r->pixColorsFocus[Color_bg]);
     assert (IS_WIN(r->scrollBar.win));
 
-# ifdef DEBUG_X
+# ifdef DEBUG
     rxvt_set_win_title (r, r->scrollBar.win, "scrollbar");
 # endif
 

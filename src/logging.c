@@ -106,7 +106,7 @@ rxvt_makeutent(rxvt_t *r, int page, const char *pty, const char *hostname)
 	sprintf(ut_id, "vt%02x", (i & 0xff));	/* sysv naming */
 #endif
     else if (STRNCMP(pty, "pty", 3) && STRNCMP(pty, "tty", 3)) {
-	rxvt_print_error("can't parse tty name \"%s\"", pty);
+	rxvt_dbgmsg (DBG_ERROR, DBG_LOGGING, "can't parse tty name \"%s\"", pty);
 	return;
     }
 
@@ -442,7 +442,7 @@ rxvt_update_lastlog(const char *fname, const char *pty, const char *host)
 # ifdef HAVE_STRUCT_LASTLOG
     pwent = getpwuid(getuid());
     if (!pwent) {
-	rxvt_print_error("no entry in password file");
+	rxvt_dbgmsg (DBG_ERROR, DBG_LOGGING, "no entry in password file");
 	return;
     }
     MEMSET(&ll, 0, sizeof(ll));
