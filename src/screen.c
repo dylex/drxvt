@@ -920,7 +920,10 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	return 0;
 
     PVTS(r, page)->want_refresh = 1;
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scroll_text %d (%d,%d,%d,%d): %s\n", page, row1, row2, count, spec, (PVTS(r, page)->current_screen == PRIMARY) ?  "Primary" : "Secondary"));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN,
+		"rxvt_scroll_text %d (%d,%d,%d,%d): %s\n", page, row1, row2,
+		count, spec, (PVTS(r, page)->current_screen == PRIMARY) ?
+		    "Primary" : "Secondary" ));
 
     if (
 	  (count > 0)
@@ -1154,7 +1157,10 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 		PSCR(r, page).flags &= ~Screen_WrapNext;
 		if (CURROW == PSCR(r, page).bscroll)
 		{
-		    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s:%d ", __FILE__, __LINE__ ); rxvt_scroll_text(r, page, PSCR(r, page).tscroll, PSCR(r, page).bscroll, 1, 0));
+		    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "%s:%d ",
+				__FILE__, __LINE__ ));
+		    rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
+			    PSCR(r, page).bscroll, 1, 0);
 		}
 		else if (CURROW < (r->TermWin.nrow - 1))
 		    row = (++CURROW) + SVLINES;
@@ -1537,7 +1543,8 @@ rxvt_scr_index(rxvt_t* r, int page, enum page_dirn direction)
     PSCR(r, page).flags &= ~Screen_WrapNext;
     if ((CURROW == PSCR(r, page).bscroll && direction == UP) ||
 	(CURROW == PSCR(r, page).tscroll && direction == DN))
-	rxvt_scroll_text(r, page, PSCR(r, page).tscroll, PSCR(r, page).bscroll, dirn, 0);
+	rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
+		PSCR(r, page).bscroll, dirn, 0);
     else
 	CURROW += dirn;
     MAX_IT(CURROW, 0);
@@ -1939,7 +1946,8 @@ rxvt_scr_insdel_chars(rxvt_t* r, int page, int count, int insdel)
 void
 rxvt_scr_scroll_region(rxvt_t* r, int page, int top, int bot)
 {
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_scr_scroll_region( %d, %d, %d)\n", page, top, bot));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN,
+		"rxvt_scr_scroll_region( %d, %d, %d)\n", page, top, bot));
 
     MAX_IT(top, 0);
     MIN_IT(bot, (int)r->TermWin.nrow - 1);
@@ -4945,7 +4953,9 @@ int
 rxvt_selection_request_other(rxvt_t* r, int page, Atom target, int selnum)
 {
     Atom	    sel;
+#ifdef DEBUG
     char	   *debug_xa_names[] = { "PRIMARY", "SECONDARY", "CLIPBOARD" };
+#endif
 
     r->h->selection_type |= selnum;
     if (selnum == Sel_Primary)
