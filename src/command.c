@@ -1510,11 +1510,11 @@ rxvt_clean_cmd_page (rxvt_t* r)
     {
 	if( PVTS(r, i)->dead && PVTS(r, i)->hold == 1 )
 	{
-	    rxvt_msg (DBG_INFO, DBG_COMMAND, 
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, 
 			"Tab %d exit %s (status %d). holdOption: %d\n",
 			i, WIFEXITED(PVTS(r,i)->status) ? "success" : "failure",
 			PVTS(r,i)->status,
-			PVTS(r,i)->holdOption);
+			PVTS(r,i)->holdOption));
 	    /*
 	     * Process in tab i has died, and needs to be cleaned up.
 	     */
@@ -1523,7 +1523,8 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		const int	maxLen = 1024;
 		const char	*msg;
 
-		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Hold child %d after it died\n", i));
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,
+			    "Hold child %d after it died\n", i));
 
 		/* increase hold number, so next iteration will skip it */
 		PVTS(r, i)->hold++;
@@ -1974,28 +1975,6 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
 #ifdef TRANSPARENT
 	quick_timeout |= h->want_full_refresh;
 #endif	/* TRANSPARENT */
-    }
-
-    if( h->focusDelay && r->h->lastFocusChange.tv_sec )
-    {
-	/*
-	 * Focus change time out.
-	 */
-	gettimeofday( &tp, NULL );
-	fsdiff = (tp.tv_sec - h->lastFocusChange.tv_sec) * 1000000L
-		    + tp.tv_usec - h->lastFocusChange.tv_usec;
-
-	if( fsdiff > h->focusDelay )
-	{
-	    fsdiff = 0;
-	    h->lastFocusChange.tv_sec = 0;
-
-	    rxvt_change_colors_on_focus(r);
-	}
-	else
-	    fsdiff = h->focusDelay - fsdiff;
-
-	set_quick_timeout = 1;
     }
 
 #if defined(POINTER_BLANK) || defined(CURSOR_BLINK) || defined(TRANSPARENT)
@@ -3270,9 +3249,14 @@ rxvt_change_colors_on_focus( rxvt_t *r )
 void
 rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 {
+    if( ev->mode == NotifyGrab || ev->mode == NotifyUngrab )
+	return;
+
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "FocusIn event\n"));
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND, "%s( r, ev). ev->mode=%d\n",
+		    __func__, ev->mode ));
+
 	r->TermWin.focus = 1;
 	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
@@ -3281,10 +3265,7 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 	    XSetICFocus(r->h->Input_Context);
 #endif
 
-	if (r->h->focusDelay)
-	    gettimeofday( &r->h->lastFocusChange, NULL);
-	else
-	    rxvt_change_colors_on_focus (r);
+	rxvt_change_colors_on_focus (r);
     }
 }
 
@@ -3293,9 +3274,14 @@ rxvt_process_focusin (rxvt_t* r, XFocusChangeEvent* ev)
 void
 rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 {
+    if( ev->mode == NotifyGrab || ev->mode == NotifyUngrab )
+	return;
+
     if (ev->window == r->TermWin.parent)
     {
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "FocusOut event\n"));
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND, "%s( r, ev). ev->mode=%d\n",
+		    __func__, ev->mode ));
+
 	r->TermWin.focus = 0;
 	AVTS(r)->want_refresh = 1; /* Cursor needs to be refreshed */
 
@@ -3308,10 +3294,7 @@ rxvt_process_focusout (rxvt_t* r, XFocusChangeEvent* ev)
 	    XUnsetICFocus(r->h->Input_Context);
 #endif
 
-	if (r->h->focusDelay)
-	    gettimeofday( &r->h->lastFocusChange, NULL);
-	else
-	    rxvt_change_colors_on_focus (r);
+	rxvt_change_colors_on_focus (r);
     }
 }
 

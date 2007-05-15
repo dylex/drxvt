@@ -11,6 +11,11 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	5. Bold colored text is rendered in BOTH bold font, and bright color.
 	   Use only bold font.
 	6. r->num_fds is properly reduced when tabs are closed
+	7. Ignore focus events of type NotifyGrab and NotifyUngrab. This
+	   caused an annoying blinking when focussing other windows via the
+	   keyboard. (Thanks to Roman Po??ízka for pointing this out).
+	8. Removed the --focusDelay option (no longer necessary with above
+	   bugfix).
 
     * Enhancements:
 	1. Added --titleFormat and --winTitleFormat options to control display

@@ -1659,10 +1659,6 @@ struct rxvt_hidden {
 #endif
     struct timeval  timeout[NUM_TIMEOUTS];
 
-    unsigned long   focusDelay;
-    struct timeval  lastFocusChange;			/* Time of the last
-							   FocusChange XEvent */
-
     /*
      * These three don't need to be kept but do so to placate some memory
      * checkers

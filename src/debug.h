@@ -106,5 +106,10 @@ typedef enum {
 # define rxvt_dbgmsg(x)
 #endif
 
+/*
+ * For temporary debugging (so that only certain messages can be enabled).
+ */
+#define rxvt_dbgtmsg(x)	rxvt_msg x
+
 #endif	/* __DEBUG_H__ */
 /*----------------------- end-of-file (H source) -----------------------*/

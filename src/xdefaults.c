@@ -181,8 +181,6 @@ static const struct {
     RSTRG(Rs_bgRefreshInterval, "bgRefreshInterval", "ms", 0),
 #endif
 
-    RSTRG(Rs_focusDelay, "focusDelay", "ms", 0 ),
-
     STRG(Rs_fade, "fading", "fade", "%", "make colors x% darker when losing focus", 0),
 
 #ifdef HAVE_SCROLLBARS

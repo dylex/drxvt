@@ -522,15 +522,6 @@
 #define DEFAULT_BG_REFRESH_INTERVAL 100000L
 
 /*
- * Default interval (micro secs) to wait before fading colors due to a focus
- * change. This is there mainly to work around bugs of some WM's which send
- * numerous focus change events over a short event (e.g. when fvwm-2.5.16
- * changes the miniicon of a window, it sends a FocusOut immediately followed by
- * a FocusIn).
- */
-#define DEFAULT_FOCUS_DELAY_INTERVAL 100000L
-
-/*
  * Default number of pages to skip when jump scrolling.
  */
 #define DEFAULT_SKIP_PAGES	(25)
