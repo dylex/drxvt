@@ -3237,6 +3237,7 @@ rxvt_process_leave (rxvt_t* r, XCrossingEvent* ev)
 void
 rxvt_change_colors_on_focus( rxvt_t *r )
 {
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND, "%s(r)\n", __func__ ));
     if( rxvt_set_vt_colors( r, ATAB(r) ) )
     {
 	rxvt_scr_clear(r, ATAB(r) );

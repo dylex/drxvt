@@ -1752,6 +1752,10 @@ rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 }
 
 
+#define setChanged( a, b )  \
+    if( (a) != (b) ) {(a) = (b); changed = 1;}
+#define setChangedXft( a, b ) \
+    if( (a).pixel != (b).pixel ) { (a) = (b); changed = 1;}
 /*
  * Sets r->pixColors[Color_fg] / etc to the correct color (depending on the ufbg
  * color, off focus fading and weather we have focus or not).
@@ -1760,7 +1764,11 @@ rxvt_fade_color( rxvt_t* r, const XColor *xcol,
 int
 rxvt_set_fgbg_colors( rxvt_t *r, int page )
 {
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "%s(r, page=%d)" ": fgbg_tabnum=%d, globalTabNum=%d\n", __func__, page, r->fgbg_tabnum, PVTS(r, page)->globalTabNum));
+    int changed = 0;
+
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, "%s(r, page=%d)"
+		": fgbg_tabnum=%d, globalTabNum=%d\n", __func__, page,
+		r->fgbg_tabnum, PVTS(r, page)->globalTabNum));
 
     if(
 	 r->fgbg_tabnum == PVTS(r, page)->globalTabNum &&
@@ -1780,27 +1788,30 @@ rxvt_set_fgbg_colors( rxvt_t *r, int page )
       )
 	return 0;   /* No change */
 
-    r->pixColorsFocus[Color_fg] = PVTS( r, page)->p_fg;
+    setChanged( r->pixColorsFocus[Color_fg], PVTS( r, page)->p_fg );
 #ifdef XFT_SUPPORT
     if( ISSET_OPTION( r, Opt_xft ) )
-	r->xftColorsFocus[Color_fg] = PVTS(r, page)->p_xftfg;
+	setChangedXft( r->xftColorsFocus[Color_fg], PVTS(r, page)->p_xftfg );
 #endif
 
     if( r->TermWin.fade )
     {
 	/* Ignore ufbg, and use faded colors */
-	r->pixColorsFocus[Color_bg] = PVTS(r, page)->p_bg;
+	setChanged( r->pixColorsFocus[Color_bg], PVTS(r, page)->p_bg );
 
-	r->pixColorsUnfocus[Color_fg] = PVTS(r, page)->p_fgfade;
-	r->pixColorsUnfocus[Color_bg] = PVTS(r, page)->p_bgfade;
+	setChanged( r->pixColorsUnfocus[Color_fg], PVTS(r, page)->p_fgfade );
+	setChanged( r->pixColorsUnfocus[Color_bg], PVTS(r, page)->p_bgfade );
 
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
 	{
-	    r->xftColorsFocus[Color_bg] = PVTS(r, page)->p_xftbg;
+	    setChangedXft( r->xftColorsFocus[Color_bg],
+		    PVTS(r, page)->p_xftbg );
 
-	    r->xftColorsUnfocus[Color_fg] = PVTS(r, page)->p_xftfgfade;
-	    r->xftColorsUnfocus[Color_bg] = PVTS(r, page)->p_xftbgfade;
+	    setChangedXft( r->xftColorsUnfocus[Color_fg],
+		    PVTS(r, page)->p_xftfgfade );
+	    setChangedXft( r->xftColorsUnfocus[Color_bg],
+		    PVTS(r, page)->p_xftbgfade );
 	}
 #endif
     }
@@ -1808,26 +1819,35 @@ rxvt_set_fgbg_colors( rxvt_t *r, int page )
     else if( ISSET_PIXCOLOR( r->h, Color_ufbg ) && !r->TermWin.focus )
     {
 	/* No fading. But use Color_ufbg */
-	r->pixColorsFocus[Color_bg] = r->pixColorsFocus[Color_ufbg];
+	setChanged( r->pixColorsFocus[Color_bg],
+		r->pixColorsFocus[Color_ufbg] );
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
-	    r->xftColorsFocus[Color_bg] = r->xftColorsFocus[Color_ufbg];
+	    setChangedXft( r->xftColorsFocus[Color_bg],
+		    r->xftColorsFocus[Color_ufbg] );
 #endif
     }
 
     else
     {
 	/* Use fgbg from profile */
-	r->pixColorsFocus[Color_bg] = PVTS(r, page)->p_bg;
+	setChanged( r->pixColorsFocus[Color_bg],
+		PVTS(r, page)->p_bg );
 #ifdef XFT_SUPPORT
 	if( ISSET_OPTION( r, Opt_xft ) )
-	    r->xftColorsFocus[Color_bg] = PVTS(r, page)->p_xftbg;
+	    setChangedXft( r->xftColorsFocus[Color_bg],
+		    PVTS(r, page)->p_xftbg );
 #endif
     }
 
     r->fgbg_tabnum = PVTS( r, page )->globalTabNum;
-    return 1; /* Changed */
+
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, "%s(r, page=%d) returning %d\n",
+	    __func__, page, changed ));
+    return changed; /* Changed */
 }
+#undef setChanged
+#undef setChangedXft
 
 
 void
@@ -2675,7 +2695,7 @@ rxvt_set_vt_colors( rxvt_t *r, int page )
     int		    useFocusColors;
     unsigned long   *pix_colors;
 
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "%s(r, page=%d)\n", __func__, page));
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, "%s(r, page=%d). ", __func__, page ));
 
     useFocusColors = ( r->TermWin.focus || !r->TermWin.fade );
     pix_colors = (useFocusColors ? r->pixColorsFocus : r->pixColorsUnfocus);
@@ -2715,6 +2735,7 @@ rxvt_set_vt_colors( rxvt_t *r, int page )
 			r->pixColors[Color_bg]);
     }
 
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, "Returning %d\n", changed ));
     return changed;
 }
 
