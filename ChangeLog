@@ -41,6 +41,8 @@ Jimmy Zhou <jimmyzhou@users.sourceforge.net>
 	2. Add new debugging facility such that a user can specify the
 	   message type and verbose level by command line options. Run
 	   `mrxvt -dmask whatever -dlevel something' for details. 
+	3. Fix compile error when use Sun Studio 10. Thanks to Quintin
+	   Beukes for the patch.
 
 
 0.5.1 to 0.5.2

@@ -363,8 +363,8 @@ draw_string (rxvt_t* r, Region clipRegion,
 		char*		ostr = str;
 
 		/* convert to UTF-8 */
-		iconv (r->TermWin.xfticonv, &ostr, (size_t*) &olen,
-		    &pstr, (size_t*) &plen);
+		iconv (r->TermWin.xfticonv, (char**) &ostr,
+		    (size_t*) &olen, &pstr, (size_t*) &plen);
 		*pstr = (char) 0;   /* set end of string */
 
 		rxvt_draw_string_xft (r, r->tabBar.win, r->tabBar.gc,

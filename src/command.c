@@ -145,7 +145,7 @@ static DeadKeyChar  dkc_tab[] = {
  *--------------------------------------------------------------------*/
 void           rxvt_process_keypress         (rxvt_t*, XKeyEvent*);
 void           rxvt_clean_cmd_page           (rxvt_t*);
-inline int     rxvt_cmdbuf_has_input	     ( rxvt_t *r, int page );
+int static inline rxvt_cmdbuf_has_input	     ( rxvt_t *r, int page );
 int            rxvt_find_cmd_child           (rxvt_t*);
 void           rxvt_check_cmdbuf             (rxvt_t*, int);
 int            rxvt_read_child_cmdfd         (rxvt_t*, int, unsigned int);
@@ -1633,7 +1633,7 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 /* Returns true if there is input pending in PVTS(r, page)->cmdbuf */
 /* INTPROTO */
-inline int
+int static inline
 rxvt_cmdbuf_has_input( rxvt_t *r, int page )
 {
     return PVTS(r, page)->cmdbuf_escfail ?
