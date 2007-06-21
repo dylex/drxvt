@@ -1105,7 +1105,6 @@ enum {
     Rs_title,
     Rs_maxTabWidth,
     Rs_minVisibleTabs,
-    Rs_winTitleFormat,
 #if defined (BACKGROUND_IMAGE) || defined(HAVE_MENUBAR)
     Rs_path,
 #endif
@@ -1235,6 +1234,7 @@ enum {
     Rs_holdExitTxt,	_Rs_holdExitTxt = MAX_PROFILES - 1 + Rs_holdExitTxt,
     Rs_holdExitTtl,	_Rs_holdExitTtl = MAX_PROFILES - 1 + Rs_holdExitTtl,
     Rs_titleFormat,	_Rs_titleFormat = MAX_PROFILES - 1 + Rs_titleFormat,
+    Rs_winTitleFormat,	_Rs_winTitleFormat = MAX_NFONTS - 1 + Rs_winTitleFormat,
 
     NUM_RESOURCES
 } ;

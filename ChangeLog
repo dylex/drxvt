@@ -33,6 +33,7 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	6. Added BOLD_BRIGHTENS_256_COLORS option in feature.h which attempts
 	   to brighten even non-primary colors instead of drawing them in
 	   bold. (Respects boldColors and veryBright).
+	7. Made winTitleFormat a profile option.
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

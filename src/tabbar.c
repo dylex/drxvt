@@ -2573,9 +2573,9 @@ sync_tab_title( rxvt_t *r, int page )
     char wintitle[MAX_TAB_TXT];
 
     if(
-	 IS_NULL( r->TermWin.winTitleFormat )	||
+	 IS_NULL( PVTS(r,page)->winTitleFormat )	||
 	 rxvt_percent_interpolate( r, page,
-	     r->TermWin.winTitleFormat, STRLEN(r->TermWin.winTitleFormat),
+	     PVTS(r,page)->winTitleFormat, STRLEN(PVTS(r,page)->winTitleFormat),
 	     wintitle, MAX_TAB_TXT ) <= 1
       )
     {

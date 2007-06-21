@@ -121,6 +121,8 @@ static const struct {
 	"string", "Tab title of exited tabs", 1),
     STRG(Rs_titleFormat, "titleFormat", "tf",
 	"string", "Displayed tab title format", 1),
+    STRG( Rs_winTitleFormat, "winTitleFormat", "wtf", "string",
+	    "format of window title (when syncing to tab title)", 1 ),
 
     /* Global options */
     STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
@@ -130,8 +132,6 @@ static const struct {
 	    "highlighting inactive tabs only when bell sounds" ),
     BOOL( "syncTabTitle", "stt", Opt2_syncTabTitle,
 	    "synchronizing terminal title with tab title" ),
-    STRG( Rs_winTitleFormat, "winTitleFormat", "wtf", "string",
-	    "format of window title (when syncing to tab title)", 0 ),
     BOOL( "hideTabbar", "ht", Opt2_hideTabbar,
 	    "hiding tabbar on initialization" ),
     BOOL( "autohideTabbar", "aht", Opt2_autohideTabbar,

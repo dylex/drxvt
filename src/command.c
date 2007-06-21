@@ -5853,15 +5853,15 @@ rxvt_xterm_seq(rxvt_t* r, int page, int op, const char *str, unsigned char resp 
 	    int len = STRLEN(str);
 	    
 	    if(
-		 IS_NULL( r->TermWin.winTitleFormat )		||
-		 len != STRLEN( r->TermWin.winTitleFormat )
+		 IS_NULL( PVTS(r, page)->winTitleFormat )	||
+		 len != STRLEN( PVTS(r,page)->winTitleFormat )
 	      )
 	    {
-		rxvt_free( r->TermWin.winTitleFormat );
-		r->TermWin.winTitleFormat = STRDUP(str);
+		rxvt_free( PVTS(r,page)->winTitleFormat );
+		PVTS(r,page)->winTitleFormat = STRDUP(str);
 	    }
 	    else
-		STRCPY( r->TermWin.winTitleFormat, str );
+		STRCPY( PVTS(r,page)->winTitleFormat, str );
 
 	    if( ISSET_OPTION( r, Opt2_syncTabTitle ) )
 		sync_tab_title( r, ATAB(r) );
