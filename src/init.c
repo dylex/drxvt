@@ -3440,11 +3440,13 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 	&win_prop, &icon_prop, (char**)argv, argc,
 	&r->szHint, &wm_hint, &class_hint);
 
+#if 0 /* If the pixmap's are free'ed, then the WM will not display them. */
     if( wm_hint.flags & IconPixmapHint )
     {
 	XFreePixmap( r->Xdisplay, wm_hint.icon_pixmap );
 	XFreePixmap( r->Xdisplay, wm_hint.icon_mask );
     }
+#endif
 
     /* set terminal title */
     rxvt_set_term_title (r, win_prop.value);

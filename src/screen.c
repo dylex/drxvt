@@ -1066,7 +1066,7 @@ adjust_view_start( rxvt_t *r, int page, int nlines)
 {
     if(
 	 ISSET_OPTION( r, Opt_scrollTtyOutputInhibit) &&
-	 VSTART != 0 && VSTART + nlines < PVTS( r, page)->nscrolled
+	 VSTART != 0 && VSTART + nlines <= PVTS( r, page)->nscrolled
       )
 	VSTART += nlines;
 }
