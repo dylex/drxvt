@@ -3442,8 +3442,8 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
 
     if( wm_hint.flags & IconPixmapHint )
     {
-	XFreePixmap( wm_hint.icon_pixmap );
-	XFreePixmap( wm_hint.icon_mask );
+	XFreePixmap( r->Xdisplay, wm_hint.icon_pixmap );
+	XFreePixmap( r->Xdisplay, wm_hint.icon_mask );
     }
 
     /* set terminal title */
