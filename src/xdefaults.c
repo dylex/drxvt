@@ -231,9 +231,7 @@ static const struct {
     STRG(Rs_tabbarPixmap, "tabbarPixmap", "tbpixmap", "file[;geom]", "tabbar background image", 0),
     BOOL( "tabUsePixmap", "tupixmap", Opt_tabPixmap,
 	    "use tabbar background image for tabs" ),
-# if 0 /* App icon not yet implemented */
     STRG(Rs_appIcon, "appIcon", "ic", "file[;geom]", "application icon file", 0),
-#endif
 #endif	/* BACKGROUND_IMAGE */
 
     BOOL( "utmpInhibit", "ut", Opt_utmpInhibit,

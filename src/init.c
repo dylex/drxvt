@@ -3417,12 +3417,34 @@ rxvt_create_show_windows( rxvt_t *r, int argc, const char *const *argv )
     wm_hint.initial_state = ISSET_OPTION(r, Opt_iconic) ? IconicState
 			    : NormalState;
     wm_hint.window_group = r->TermWin.parent;
+    /* window icon hint */
+#ifdef HAVE_LIBXPM
+    if( r->h->rs[Rs_appIcon] )
+    {
+	Pixmap appIcon, appIconMask;
+
+        XpmReadFileToPixmap( r->Xdisplay, r->TermWin.parent,
+		(char*) r->h->rs[Rs_appIcon], &appIcon, &appIconMask, 0);
+
+	if( appIcon != None &&  appIconMask != None ) {
+	    wm_hint.icon_pixmap = appIcon;
+	    wm_hint.icon_mask = appIconMask;
+	    wm_hint.flags |= IconPixmapHint | IconMaskHint;
+	}
+    }
+#endif /* HAVE_LIBXPM */
     /* class hints */
     class_hint.res_name = (char*) r->h->rs[Rs_name];
     class_hint.res_class = (char*) APL_CLASS;
     XSetWMProperties (r->Xdisplay, r->TermWin.parent,
 	&win_prop, &icon_prop, (char**)argv, argc,
 	&r->szHint, &wm_hint, &class_hint);
+
+    if( wm_hint.flags & IconPixmapHint )
+    {
+	XFreePixmap( wm_hint.icon_pixmap );
+	XFreePixmap( wm_hint.icon_mask );
+    }
 
     /* set terminal title */
     rxvt_set_term_title (r, win_prop.value);

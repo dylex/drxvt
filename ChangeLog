@@ -34,6 +34,8 @@ Gautam Iyer <gi1242@users.sourceforge.net>
 	   to brighten even non-primary colors instead of drawing them in
 	   bold. (Respects boldColors and veryBright).
 	7. Made winTitleFormat a profile option.
+	8. Added -ic option to set the application icon. (Adapted from patch
+	   #1656294 by Stanislav Mekhanoshin)
 
 Jimmy Zhou <jimmyzhou@users.sourceforge.net>
     * Enhancements:

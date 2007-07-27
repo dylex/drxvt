@@ -1111,9 +1111,7 @@ enum {
 
 #ifdef BACKGROUND_IMAGE
     Rs_tabbarPixmap,	/* tabbar background pixmap */
-# if 0 /* appicon not yet implemented */
     Rs_appIcon,		/* use pixmap as application icon */
-# endif
 #endif
 
 #ifdef HAVE_MENUBAR
