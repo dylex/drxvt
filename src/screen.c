@@ -600,7 +600,7 @@ rxvt_scr_reset(rxvt_t* r, int page)
 
     rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_reset %d ()\n", page));
 
-    PVTS(r, page)->view_start = 0;
+    VSTART = 0;
     RESET_CHSTAT(r, page);
     PVTS(r, page)->num_scr = 0;	/* number of lines scrolled */
 
@@ -1058,6 +1058,20 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 
 /* ------------------------------------------------------------------------- */
 /*
+ * Adjust the PVTS(r, page)->view_start so that the if nlines of text are added,
+ * the view will not change.
+ */
+void inline
+adjust_view_start( rxvt_t *r, int page, int nlines)
+{
+    if(
+	 ISSET_OPTION( r, Opt_scrollTtyOutputInhibit) &&
+	 VSTART != 0 && VSTART + nlines < PVTS( r, page)->nscrolled
+      )
+	VSTART += nlines;
+}
+
+/*
  * Add text given in <str> of length <len> to screen struct
  */
 /* EXTPROTO */
@@ -1098,6 +1112,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 	    /* _at least_ this many lines need to be scrolled */
 	    rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
 		PSCR(r, page).bscroll, nlines, 0);
+	    adjust_view_start(r, page, nlines );
 
 	    CURROW -= nlines;
 
@@ -1161,6 +1176,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 				__FILE__, __LINE__ ));
 		    rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
 			    PSCR(r, page).bscroll, 1, 0);
+		    adjust_view_start( r, page, 1 );
 		}
 		else if (CURROW < (r->TermWin.nrow - 1))
 		    row = (++CURROW) + SVLINES;
@@ -1271,8 +1287,11 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 	{
 	    PSCR(r, page).tlen[row] = -1;
 	    if (CURROW == PSCR(r, page).bscroll)
+	    {
 		rxvt_scroll_text(r, page, PSCR(r, page).tscroll,
 			PSCR(r, page).bscroll, 1, 0);
+		adjust_view_start( r, page, 1 );
+	    }
 	    else if (CURROW < (r->TermWin.nrow - 1))
 		row = (++CURROW) + SVLINES;
 	    stp = PSCR(r, page).text[row];  /* _must_ refresh */
