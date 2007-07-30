@@ -894,7 +894,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
     XftResult	    fr;
     int		    len, olen;	    /* font name length */
     char*	    mfname;	    /* mfont name to open */
-    char*	    omfname = NULL; /* actually opened mfont name */
+    FcChar8*	    omfname = NULL; /* actually opened mfont name */
     int		    width, height;
 # ifdef DEBUG
     FT_Face	    face;
@@ -987,7 +987,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
      * Print a warning if our matched mfont is different from the user supplied
      * font.
      */
-    XftPatternGetString (r->TermWin.xftmpattern, XFT_FAMILY, 0, &omfname);
+    XftPatternGetString( r->TermWin.xftmpattern, XFT_FAMILY, 0, &omfname );
 
     assert (NOT_NULL(omfname));	/* shouldn't be NULL */
     len = STRLEN(mfname);
@@ -995,7 +995,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 
     if( STRCMP( mfname, DEFAULT_XFT_FONT_NAME) 	/* Not the default font */
 	    /* Not opened font */
-	    && (len != olen || STRNCASECMP(omfname, mfname, len))
+	    && (len != olen || STRNCASECMP((char*) omfname, mfname, len))
     )
 	rxvt_msg (DBG_ERROR, DBG_MAIN, "Cannot open mfont '%s'. Using mfont '%s' instead.",
 	    mfname, omfname);
@@ -1021,7 +1021,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	r->TermWin.xftmono = 0;
 
     else if (
-	      STRCASECMP (ofname, omfname)
+	      STRCASECMP (ofname, (char*) omfname)
 	      && (r->TermWin.fwidth != (width >> 1))
 	    )
 	r->TermWin.xftmono = 0;
@@ -1101,7 +1101,7 @@ rxvt_init_font_xft (rxvt_t* r)
     XGlyphInfo	    ext1, ext2;
     int		    len, olen;	    /* font name length */
     char*	    fname;	    /* font name to open */
-    char*	    ofname = NULL;  /* actually opened font name */
+    FcChar8*	    ofname = NULL;  /* actually opened font name */
 # ifdef DEBUG
     FT_Face	    face;
 # endif
@@ -1246,7 +1246,7 @@ rxvt_init_font_xft (rxvt_t* r)
     olen = STRLEN(ofname);
     if( STRCMP( fname, DEFAULT_XFT_FONT_NAME) 	/* Not the default font */
 	    /* Not opened font */
-	    && (len != olen || STRNCASECMP(ofname, fname, len))
+	    && (len != olen || STRNCASECMP((char*) ofname, fname, len))
     )
 	rxvt_msg (DBG_ERROR, DBG_MAIN, "Cannot open font '%s'. Using font '%s' instead.",
 	    fname, ofname);
@@ -1413,7 +1413,7 @@ rxvt_init_font_xft (rxvt_t* r)
 # endif
 
 # ifdef MULTICHAR_SET
-    if (!rxvt_init_mfont_xft (r, xp, ofname))
+    if (!rxvt_init_mfont_xft (r, xp, (char*) ofname))
 	goto Failure;
 # endif	/* MULTICHAR_SET */
 

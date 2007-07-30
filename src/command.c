@@ -973,7 +973,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 	   )
 	{
 	    register int    idx;
-	    KeySym  dk;
+	    KeySym  dk = 0;
 
 	    /* dead key + space -> dead key itself */
 	    switch (accent)
@@ -1000,7 +1000,6 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 
 		default:
 		    assert(0);
-		    dk = 0;
 	    }	/* switch(accent) */
 
 	    for (idx = 0; idx < DEADKEY_CHAR_NUMBER; idx++)
@@ -1021,7 +1020,7 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		    && (XK_space == keysym || accent == keysym)
 		)
 	{
-	    KeySym  dk;
+	    KeySym  dk = 0;
 
 	    /*
 	     * dead key + space -> dead key itself
@@ -1049,6 +1048,9 @@ rxvt_process_keypress (rxvt_t* r, XKeyEvent *ev)
 		case XK_dead_tilde:	    /* ~ */
 		    keysym = dk = XK_asciitilde;
 		    break;
+
+		default:
+		    assert(0);
 
 	    }	/* switch(accent) */
 	    kbuf[0] = (unsigned char) dk;
@@ -3690,7 +3692,7 @@ Bool getWMStruts( Display *dpy, Window w,
     int		    format;
     unsigned long   nitems, bytes_after;
 
-    CARD32  *struts; /* left, right, top and bottom borders */
+    unsigned char  *prop; /* left, right, top and bottom borders */
 
     /*
      * Initialize return values to 0, just incase we can't read the window
@@ -3706,29 +3708,37 @@ Bool getWMStruts( Display *dpy, Window w,
 	    continue;
 
 	if( XGetWindowProperty( dpy, w, atom,
-		0,	/* offset */
-		4,	/* length */
-		False,	/* Delete? */
+		0,		/* offset */
+		4,		/* length */
+		False,		/* Delete? */
 		XA_CARDINAL,	/* Type */
 		&type, &format, &nitems, &bytes_after, /* return values */
-		(unsigned char **) &struts) != Success )
+		&prop) != Success )
 	    continue;
 
-	if( type == XA_CARDINAL && bytes_after == 0)
+	if(
+	    type == XA_CARDINAL && bytes_after == 0 &&
+	    format == 32 && nitems == 4
+	  )
 	{
+	    CARD32  *struts = (CARD32*) prop;
+
 	    *left   = struts[0];
 	    *right  = struts[1];
 	    *top    = struts[2];
 	    *bottom = struts[3];
 
-	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Got struts %lu, %lu, %lu, %lu from %s\n", *left, *right, *top, *bottom, atomName[i]));
+	    rxvt_dbgmsg((DBG_DEBUG, DBG_COMMAND,
+			"%s: %lu, %lu, %lu, %lu (format=%d, nitems=%lu)\n",
+			atomName[i], *left, *right, *top, *bottom,
+			format, nitems ));
 	    /*
 	     * Don't check future atomName's
 	     */
 	    i = natoms;
 	}
 
-	XFree( struts);
+	XFree( prop);
     }
     return i == natoms + 1;
 }
