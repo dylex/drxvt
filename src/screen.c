@@ -2830,7 +2830,7 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 	/*
 	 * Get the bounding box of the rectangle we would draw, and clip to it.
 	 */
-	void	    (*xftTextExtents)();
+	void	    (*xftTextExtents)() = NULL; /* Suppress compile warning */
 	XGlyphInfo  extents;
 
 	int	sx, sy;	/* Shadow offsets */

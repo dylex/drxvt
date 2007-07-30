@@ -122,7 +122,7 @@ static char** xpm_d_name[] =
     left_d_xpm,right_d_xpm
 };
 #else
-static char *xpm_name[] =
+static unsigned char *xbm_name[] =
 {
     term_bits,close_term_bits,
     left_bits,right_bits
@@ -2226,7 +2226,7 @@ rxvt_tabbar_create (rxvt_t* r)
 	assert (IS_PIXMAP(img_d[i]));
 #else
 	img[i] = XCreatePixmapFromBitmapData (r->Xdisplay,
-	    r->tabBar.win, xpm_name[i], BTN_WIDTH, BTN_HEIGHT,
+	    r->tabBar.win, (char *) xbm_name[i], BTN_WIDTH, BTN_HEIGHT,
 	    r->tabBar.fg, r->tabBar.bg, XDEPTH);
 	assert (IS_PIXMAP(img[i]));
 #endif
