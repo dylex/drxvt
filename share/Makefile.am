@@ -39,6 +39,7 @@ pixmapdir = $(datadir)/pixmaps
 # buildsdir = $(pkgdatadir)/builds
 
 dist_etc_DATA  =    etc/XTerm.ad		\
+		    etc/mrxvt.terminfo		\
 		    etc/rxvt.termcap		\
       		    etc/rxvt.terminfo
 etcdir = $(docdir)/etc
