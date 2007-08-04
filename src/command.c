@@ -1950,7 +1950,7 @@ rxvt_check_quick_timeout (rxvt_t* r)
 
 
 #ifndef TIMEOUT_USEC
-#define TIMEOUT_USEC	(5000)
+#define TIMEOUT_USEC	(50000)
 #endif
 
 /* Adjust quick_timeout after select */
@@ -2350,8 +2350,13 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    FD_SET( r->fifo_fd, &readfds );
 #endif
 
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND,
+		    "Calling select (timeout %06luu)...",
+		    quick_timeout ? value.tv_sec * 1000000 + value.tv_usec : 0
+		    ));
 	select_res = select( r->num_fds, &readfds, NULL, NULL,
 			(quick_timeout ? &value : NULL) );
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND, "done. Return %d\n", select_res));
 
 	if( select_res > 0 )
 	{
