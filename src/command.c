@@ -1947,12 +1947,6 @@ rxvt_check_quick_timeout (rxvt_t* r)
     return quick_timeout;
 }
 
-
-
-#ifndef TIMEOUT_USEC
-#define TIMEOUT_USEC	(50000)
-#endif
-
 /* Adjust quick_timeout after select */
 /* INTPROTO */
 int

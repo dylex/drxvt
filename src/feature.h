@@ -322,6 +322,16 @@
  */
 #define MAX_CHILDS  (16)
 
+/*
+ * Quick timeout default. The amount of time (micro seconds) mrxvt should wait
+ * for X events when a screen refresh is pending. Screen refreshes (especially
+ * with Xft and anti-aliasing) is quite expensive. The higher the value, the
+ * fewer screen refreshes are preformed. If you set it too high, you might find
+ * typing text a little jerky. If you set it too low, bye bye CPU. Try something
+ * in the range of 500 -- 50000
+ */
+#define TIMEOUT_USEC (10000)
+
 /*--------------------------------BELL------------------------------{{{1*/
 /*
  * Disable all bell indications
