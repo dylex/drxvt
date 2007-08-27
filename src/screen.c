@@ -938,10 +938,6 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	    PVTS(r, page)->nscrolled = SVLINES;
 	else
 	    PVTS(r, page)->nscrolled = (uint16_t)nscrolled;
-	if (ISSET_OPTION(r, Opt_scrollWithBuffer) &&
-	    VSTART != 0 &&
-	    VSTART != SVLINES)
-	    rxvt_scr_page(r, page, UP, count);
     }
     else if (!spec)
 	row1 += SVLINES;
