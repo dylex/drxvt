@@ -997,7 +997,8 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	    /* Not opened font */
 	    && (len != olen || STRNCASECMP((char*) omfname, mfname, len))
     )
-	rxvt_msg (DBG_ERROR, DBG_MAIN, "Cannot open mfont '%s'. Using mfont '%s' instead.",
+	rxvt_msg( DBG_ERROR, DBG_MAIN,
+		"Cannot open mfont '%s'. Using mfont '%s' instead.\n",
 	    mfname, omfname);
 
     rxvt_dbgmsg ((DBG_DEBUG, DBG_MAIN, "create xftmpattern = 0x%x on mfont %d\n", (unsigned int) r->TermWin.xftmpattern, r->h->rs[Rs_xftmsz] ?  r->TermWin.xftmsize : r->TermWin.xftfont->height-1));
@@ -1248,7 +1249,8 @@ rxvt_init_font_xft (rxvt_t* r)
 	    /* Not opened font */
 	    && (len != olen || STRNCASECMP((char*) ofname, fname, len))
     )
-	rxvt_msg (DBG_ERROR, DBG_MAIN, "Cannot open font '%s'. Using font '%s' instead.",
+	rxvt_msg( DBG_ERROR, DBG_MAIN,
+		"Cannot open font '%s'. Using font '%s' instead.\n",
 	    fname, ofname);
 
     rxvt_dbgmsg ((DBG_DEBUG, DBG_MAIN, "create xftpattern = 0x%x on font %d\n", (unsigned int) r->TermWin.xftpattern, r->TermWin.xftsize));
@@ -1446,10 +1448,10 @@ rxvt_init_font_fixed (rxvt_t* r)
 
 
     rxvt_dbgmsg ((DBG_VERBOSE, DBG_MAIN, " load font (fixed)\n"));
-    xfont = XLoadQueryFont (r->Xdisplay, "fixed");
+    xfont = XLoadQueryFont( r->Xdisplay, "fixed" );
     if (IS_NULL(xfont))
     {
-	rxvt_msg (DBG_ERROR, DBG_MAIN, "fatal error, aborting...");
+	rxvt_msg( DBG_FATAL, DBG_MAIN, "Could not load font 'fixed'.\n" );
 	exit(EXIT_FAILURE);
     }
 
@@ -1472,7 +1474,7 @@ rxvt_init_font_fixed (rxvt_t* r)
 void
 rxvt_init_font_x11 (rxvt_t *r)
 {
-    char*	    msg = "can't load font \"%s\"";
+    char*	    msg = "can't load font \"%s\"\n";
     XFontStruct*    xfont;
 #ifndef NO_BOLDFONT
     XFontStruct*    bfont;
@@ -1504,7 +1506,7 @@ rxvt_init_font_x11 (rxvt_t *r)
     if (IS_NULL(xfont))
     {
 	/* failed to load font */
-	rxvt_msg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
+	rxvt_msg( DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx] );
 
 	/* try to load fixed font */
 	r->h->rs[Rs_font+idx] = "fixed";
@@ -1513,7 +1515,7 @@ rxvt_init_font_x11 (rxvt_t *r)
 	if (IS_NULL(xfont))
 	{
 	    /* still failed to load font */
-	    rxvt_msg (DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx]);
+	    rxvt_msg( DBG_ERROR, DBG_MAIN, msg, r->h->rs[Rs_font+idx] );
 
 	    /* cannot load any font, fatal error, abort the program */
 	    goto Abort;

@@ -908,7 +908,7 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	else
 	{
 	    bad_option = 1;
-	    rxvt_msg (DBG_ERROR, DBG_RESOURCE, "bad option \"%s\"", opt);
+	    rxvt_msg (DBG_ERROR, DBG_RESOURCE, "bad option \"%s\"\n", opt);
 	    continue;
 	}
 
