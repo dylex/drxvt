@@ -1232,7 +1232,7 @@ enum {
     Rs_holdExitTxt,	_Rs_holdExitTxt = MAX_PROFILES - 1 + Rs_holdExitTxt,
     Rs_holdExitTtl,	_Rs_holdExitTtl = MAX_PROFILES - 1 + Rs_holdExitTtl,
     Rs_titleFormat,	_Rs_titleFormat = MAX_PROFILES - 1 + Rs_titleFormat,
-    Rs_winTitleFormat,	_Rs_winTitleFormat = MAX_NFONTS - 1 + Rs_winTitleFormat,
+    Rs_winTitleFormat,	_Rs_winTitleFormat = MAX_PROFILES - 1 + Rs_winTitleFormat,
 
     NUM_RESOURCES
 } ;
