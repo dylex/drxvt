@@ -1713,8 +1713,16 @@ Toggle use of bold font for colored text.
 .It Ic ToggleTransparency
 Toggle pseudo transparency.
 .\" ------------------------------------------------------------
-.It Ic ToggleBroadcast
-Toggle broadcasting of input to all tabs.
+.It Ic ToggleBroadcast Op Ar status
+If
+.Ar status
+is omitted or
+.Sq -1 ,
+then input broadcasting to all tabs is toggled. If it is
+.Sq 1 ,
+input broadcasting is enabled. If it is
+.Sq 0 ,
+it is disabled.
 .\" ------------------------------------------------------------
 .It Ic ToggleHold Op Ar mask
 If

@@ -1045,7 +1045,34 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    break;
 
 	case MacroFnToggleBcst:
-	    TOGGLE_OPTION(r, Opt2_broadcast);
+	    if( NOT_NULL(astr) && *astr )
+	    {
+		long state = strtol( astr, NULL, 0 );
+
+		switch(state)
+		{
+		    case 1:
+			SET_OPTION( r, Opt2_broadcast );
+			break;
+
+		    case 0:
+			UNSET_OPTION( r, Opt2_broadcast );
+			break;
+
+		    case -1:
+			TOGGLE_OPTION( r, Opt2_broadcast );
+			break;
+
+		    default:
+			rxvt_msg( DBG_ERROR, DBG_MACROS,
+				"Badly formed argument '%s' to %s\n",
+				astr, macroNames[action->type] );
+			retval = -1;
+			break;
+		}
+	    }
+	    else
+		TOGGLE_OPTION(r, Opt2_broadcast);
 	    break;
 
 	case MacroFnToggleHold:
