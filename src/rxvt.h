@@ -188,6 +188,10 @@ typedef struct {
 # include <pty.h>
 #endif
 
+#ifdef OS_DARWIN
+# include <util.h>
+#endif
+
 #ifdef OS_QNX
 # include <process.h>
 # include <sys/utsname.h>
