@@ -330,10 +330,13 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
     }
 
     /*
-     * Always store the keysym as lower case. That way we can treat shift
+     * Always store the keysym as upper case. That way we can treat shift
      * correctly even when Caps Lock is pressed.
      */
-    keysym = tolower( XStringToKeysym( keyname_nomods ) );
+    {
+        KeySym upper;
+        XConvertCase(XStringToKeysym(keyname_nomods), &keysym, &upper);
+    }
 
     if (NOT_KEYSYM(keysym))
     {
@@ -703,8 +706,11 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
     if (ev->state & ControlMask)	    ck.modFlags |= MACRO_CTRL;
     if (ev->state & r->h->ModMetaMask)	    ck.modFlags |= MACRO_META;
 
-    /* Use lowercase version so we can ignore caps lock */
-    ck.keysym = tolower( keysym );
+    /* Use uppercase version so we can ignore caps lock */
+    {
+        KeySym upper;
+        XConvertCase(keysym, &ck.keysym, &upper);
+    }
 
     /* Check if macro ck is in our list of macros. */
     macro = bsearch( &ck, r->macros, r->nmacros, sizeof( macros_t ),

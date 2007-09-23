@@ -680,7 +680,7 @@ AC_ARG_ENABLE(
     AC_HELP_STRING([--enable-use-fifo],[Enable listening for macros on a fifo [[yes]]]),
     [use_fifo=$enableval]
 )
-if test "x$use_fifo" == "xyes"; then
+if test "x$use_fifo" = "xyes"; then
     AC_DEFINE(USE_FIFO, [], [Enable listening for macros on a fifo])
 fi
 
