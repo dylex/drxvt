@@ -1247,7 +1247,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	rs[Rs_acs_chars] = ACS_CHARS;
     if( (i = STRLEN(rs[Rs_acs_chars])) < 0x20 )
     {
-	val = rxvt_realloc( (void*) rs[Rs_acs_chars], 0x20 );
+	char *val = rxvt_realloc( (void*) rs[Rs_acs_chars], 0x20 );
 	for( ; i < 0x20; )
 	    val[i++] = ' ';
 	rs[Rs_acs_chars] = val;

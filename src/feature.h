@@ -301,7 +301,7 @@
 /*
  * When pasting ACS characters, convert to similar normal characters
  */
-/* #define ACS_ASCII */
+#define ACS_ASCII
 
 /*
  * Default ascii characters to which ACS symbols are converted
