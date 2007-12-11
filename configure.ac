@@ -1169,6 +1169,12 @@ AC_TYPE_PID_T
 AC_TYPE_SIGNAL
 
 
+AC_CACHE_CHECK(for working nl_langinfo, rxvt_cv_func_nl_langinfo,
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <langinfo.h>]], [[nl_langinfo(CODESET);]])],[rxvt_cv_func_nl_langinfo=yes],[rxvt_cv_func_nl_langinfo=no])])
+if test "x$rxvt_cv_func_nl_langinfo" = "xyes"; then
+  AC_DEFINE(HAVE_NL_LANGINFO, 1, Define if nl_langinfo(CODESET) works)
+fi
+
 AC_CACHE_CHECK([for XPointer], rxvt_cv_xpointer,
 [AC_TRY_COMPILE([#include <X11/Xlib.h>], [XPointer dummy;],
 rxvt_cv_xpointer=yes, rxvt_cv_xpointer=no)])
