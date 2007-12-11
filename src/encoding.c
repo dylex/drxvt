@@ -5,6 +5,7 @@
  * All portions of code are copyright by their respective author/s.
  * Copyright (C) 2001	   Tomohiro KUBOTA <kubota@debian.org>
  * Copyright (C) 2004	   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+ * Copyright (C) 2007		Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,6 +109,21 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"ISO_8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
     {"ISO_8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
     {"ISO_8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
+    {"ISO_8859-1",  ENC_ISO8859_1,  rxvt_decode_dummy},
+    {"ISO-8859-2",  ENC_ISO8859_2,  rxvt_decode_dummy},
+    {"ISO-8859-3",  ENC_ISO8859_3,  rxvt_decode_dummy},
+    {"ISO-8859-4",  ENC_ISO8859_4,  rxvt_decode_dummy},
+    {"ISO-8859-5",  ENC_ISO8859_5,  rxvt_decode_dummy},
+    {"ISO-8859-6",  ENC_ISO8859_6,  rxvt_decode_dummy},
+    {"ISO-8859-7",  ENC_ISO8859_7,  rxvt_decode_dummy},
+    {"ISO-8859-8",  ENC_ISO8859_8,  rxvt_decode_dummy},
+    {"ISO-8859-9",  ENC_ISO8859_9,  rxvt_decode_dummy},
+    {"ISO-8859-10", ENC_ISO8859_10, rxvt_decode_dummy},
+    {"ISO-8859-11", ENC_ISO8859_11, rxvt_decode_dummy},
+    {"ISO-8859-12", ENC_ISO8859_12, rxvt_decode_dummy},
+    {"ISO-8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
+    {"ISO-8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
+    {"ISO-8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
 
     {"NOENC",	    ENC_NOENC,	    rxvt_decode_dummy},
     {"",	    ENC_NOENC,	    rxvt_decode_dummy},
@@ -360,7 +376,7 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     struct KNOWN_ENCODINGS* a;
 
     assert (NOT_NULL(str));
-    rxvt_msg (DBG_INFO, DBG_ENCODING, "set multichar encoding to %s\n", str);
+    rxvt_msg (DBG_INFO, DBG_ENCODING, "trying to set multichar encoding to %s\n", str);
 
     a = (struct KNOWN_ENCODINGS*) known_encodings;
     for (; a->name; a++) {
@@ -372,9 +388,12 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     }
     /* not a known encoding method */
     if (IS_NULL(a->name))   {
+	rxvt_msg (DBG_INFO, DBG_ENCODING, "... effectively set to noenc\n");
 	r->encoding_method = ENC_NOENC;
 	r->h->multichar_decode = rxvt_decode_dummy;
     }
+	 else
+		rxvt_msg (DBG_INFO, DBG_ENCODING, "... effectively set to %s\n", a->name);
 
 #ifdef XFT_SUPPORT
 # ifdef HAVE_ICONV_H

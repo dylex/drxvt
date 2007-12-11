@@ -5,6 +5,7 @@ dnl#  Copyright (c) 2003-2004   Marc Lehmann <pcg@goof.com>
 dnl#  Copyright (c) 2004        Hiramatsu Yoshifumi
 dnl#  Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
 dnl#  Copyright (c) 2006	Gautam Iyer <gi1242@users.sourceforge.net>
+dnl#	Copyright (c) 2007	Jehan Hysseo <hysseo@users.sourceforge.net>
 dnl#
 dnl# This program is free software; you can redistribute it and/or
 dnl# modify it under the terms of the GNU General Public License as
