@@ -12,6 +12,7 @@
  * Copyright (c) 2005        William P. Y. Hadisoeseno <williampoetra@users.sourceforge.net>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
+ * Copyright (c) 2007		  Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2234,13 +2235,16 @@ rxvt_scr_expose(rxvt_t* r, int page,
 
     rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_scr_expose %d (x:%d, y:%d, w:%d, h:%d) area (c:%d,r:%d)-(c:%d,r:%d)\n", page, x, y, width, height, rc[PART_BEG].col, rc[PART_BEG].row, rc[PART_END].col, rc[PART_END].row));
 
-    for (i = rc[PART_BEG].row; i <= rc[PART_END].row; i++)
-    {
-	register int	j = rc[PART_BEG].col;
-	register int	k = rc[PART_END].col - rc[PART_BEG].col + 1;
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, " memset drawn_text[%d][%d], len=%d\n", i, j, k));
-	MEMSET(&(PVTS(r, page)->drawn_text[i][j]), 0, k);
-    }
+	{
+		register int	j = rc[PART_BEG].col;
+		register int	k = rc[PART_END].col - rc[PART_BEG].col + 1;
+
+		for (i = rc[PART_BEG].row; i <= rc[PART_END].row; i++)
+		{
+			rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, " memset drawn_text[%d][%d], len=%d\n", i, j, k));
+			MEMSET(&(PVTS(r, page)->drawn_text[i][j]), 0, k);
+		}
+	 }
 
     if (refresh)
     {
