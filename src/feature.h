@@ -490,7 +490,7 @@
 #define DEFAULT_MIN_VISIBLE_TABS    (6)
 
 /* Minimum Xft font size (pixel) */
-#define MIN_XFT_FONT_SIZE	    (5)
+#define MIN_XFT_FONT_SIZE	    (1)
 
 /* Default Xft font name and size */
 #define DEFAULT_XFT_FONT_SIZE	    (12)
