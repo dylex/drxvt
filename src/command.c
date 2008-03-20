@@ -2355,7 +2355,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	if( select_res > 0 )
 	{
 	    /* Select succeeded. Check if we have new Xevents first. */
-	    if( selpage == -1 && XPending( r->Xdisplay ) )
+	    if( selpage == -1 && XPending( r->Xdisplay ) > 25)
 		continue;
 
 	    /* Read whatever input we can from child fd's*/
