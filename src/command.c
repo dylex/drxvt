@@ -2355,8 +2355,13 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	if( select_res > 0 )
 	{
 	    /* Select succeeded. Check if we have new Xevents first. */
-	    if( selpage == -1 && XPending( r->Xdisplay ) > 25)
+	    if( 0 && selpage == -1 && XPending( r->Xdisplay ) > 25)
+	    {
+		rxvt_dbgtmsg(( DBG_DEBUG, DBG_COMMAND,
+			"%d xevents to processes. Continuing\n",
+			XPending( r->Xdisplay ) ));
 		continue;
+	    }
 
 	    /* Read whatever input we can from child fd's*/
 	    rxvt_process_children_cmdfd (r, &readfds);

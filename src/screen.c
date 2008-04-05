@@ -2347,6 +2347,13 @@ rxvt_scr_bell(rxvt_t *r, int page)
     struct timeval	    tvnow	= {0, 0};
     long		    tminterval;
 
+#ifdef HAVE_NANOSLEEP
+    struct timespec	    rqt;
+
+    rqt.tv_sec = r->TermWin.vBellDuration / 1000000000ul;
+    rqt.tv_nsec = r->TermWin.vBellDuration % 1000000000ul;
+#endif
+
     if (gettimeofday (&tvnow, NULL) >= 0)
     {
 	if (0 == lastBell.tv_sec && 0 == lastBell.tv_usec)
@@ -2372,8 +2379,20 @@ rxvt_scr_bell(rxvt_t *r, int page)
 #  endif
 	XMapWindow(r->Xdisplay, r->TermWin.parent);
 # endif
-    if (ISSET_OPTION(r, Opt_visualBell))
+    if(
+	    ISSET_OPTION(r, Opt_visualBell) ||
+	    (
+	     ISSET_OPTION( r, Opt_currentTabVBell ) && APAGE(r) == page
+	     && r->TermWin.focus
+	    )
+      )
     {
+	/*
+	 * Visual bells don't need to be rung on windows which are not visible.
+	 */
+	if( APAGE(r) != page  || r->h->refresh_type == NO_REFRESH )
+	    return;
+
 #if defined(TRANSPARENT) || defined(BACKGROUND_IMAGE)
 	/*
 	 * Reverse video bell doesn't look so good with transparency or a
@@ -2410,18 +2429,10 @@ rxvt_scr_bell(rxvt_t *r, int page)
 
 	    XSync( r->Xdisplay, False);
 
-#if 0 /* {{{ Don't need to sleep */
-# ifdef HAVE_NANOSLEEP
-	    struct timespec rqt;
-	    rqt.tv_sec = 0;
-	    rqt.tv_nsec = 100000000; /* 100 ms */
-	    nanosleep(&rqt, NULL);
-# else
-	    /*
-	     * Sleeping for 1 whole second seems just wrong, so we do nothing.
-	     */
-# endif
-#endif /*}}}*/
+#ifdef HAVE_NANOSLEEP
+	    if( r->TermWin.vBellDuration )
+		nanosleep(&rqt, NULL);
+#endif
 
 	    XClearArea( r->Xdisplay, PVTS(r, page)->vt, 0, 0, 0, 0, True);
 	}
@@ -2430,6 +2441,13 @@ rxvt_scr_bell(rxvt_t *r, int page)
 	{
 	    /* refresh also done */
 	    rxvt_scr_rvideo_mode(r, page, !PVTS(r, page)->rvideo);
+
+#ifdef HAVE_NANOSLEEP
+	    rxvt_scr_refresh( r, page,  r->h->refresh_type );
+	    XSync( r->Xdisplay, False );
+	    if( r->TermWin.vBellDuration )
+		nanosleep(&rqt, NULL);
+#endif
 	    rxvt_scr_rvideo_mode(r, page, !PVTS(r, page)->rvideo);
 	}
     }

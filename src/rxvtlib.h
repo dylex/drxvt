@@ -166,6 +166,10 @@ typedef struct {
     int		    ice_fd;
     char*	    sm_client_id;
 #endif
+
+#ifndef NO_BELL
+    unsigned long   vBellDuration;
+#endif
 } TermWin_t;
 
 
@@ -267,37 +271,37 @@ typedef enum {
 #define Opt_loginShell		    ((1LU<<3) | IS_OPTION1)
 #define Opt_iconic		    ((1LU<<4) | IS_OPTION1)
 #define Opt_visualBell		    ((1LU<<5) | IS_OPTION1)
-#define Opt_mapAlert		    ((1LU<<6) | IS_OPTION1)
-#define Opt_reverseVideo	    ((1LU<<7) | IS_OPTION1)
-#define Opt_utmpInhibit		    ((1LU<<8) | IS_OPTION1)
-#define Opt_scrollBar		    ((1LU<<9) | IS_OPTION1)
-#define Opt_scrollBar_right	    ((1LU<<10) | IS_OPTION1)
-#define Opt_scrollBar_floating	    ((1LU<<11) | IS_OPTION1)
-#define Opt_meta8		    ((1LU<<12) | IS_OPTION1)
-#define Opt_scrollTtyOutputInhibit  ((1LU<<13) | IS_OPTION1)
-#define Opt_scrollTtyKeypress	    ((1LU<<14) | IS_OPTION1)
-#define Opt_transparent		    ((1LU<<15) | IS_OPTION1)
-#define Opt_forceTransparent	    ((1LU<<16) | IS_OPTION1)
-#define Opt_mc_hack		    ((1LU<<17) | IS_OPTION1)
-#define Opt_tripleclickwords	    ((1LU<<18) | IS_OPTION1)
-/* #define Opt_scrollWithBuffer	    ((1LU<<19) | IS_OPTION1) */
-#define Opt_mouseWheelScrollPage    ((1LU<<21) | IS_OPTION1)
-#define Opt_pointerBlank	    ((1LU<<22) | IS_OPTION1)
-#define Opt_cursorBlink		    ((1LU<<23) | IS_OPTION1)
+#define Opt_currentTabVBell	    ((1LU<<6) | IS_OPTION1)
+#define Opt_mapAlert		    ((1LU<<7) | IS_OPTION1)
+#define Opt_reverseVideo	    ((1LU<<8) | IS_OPTION1)
+#define Opt_utmpInhibit		    ((1LU<<9) | IS_OPTION1)
+#define Opt_scrollBar		    ((1LU<<10) | IS_OPTION1)
+#define Opt_scrollBar_right	    ((1LU<<11) | IS_OPTION1)
+#define Opt_scrollBar_floating	    ((1LU<<12) | IS_OPTION1)
+#define Opt_meta8		    ((1LU<<13) | IS_OPTION1)
+#define Opt_scrollTtyOutputInhibit  ((1LU<<14) | IS_OPTION1)
+#define Opt_scrollTtyKeypress	    ((1LU<<15) | IS_OPTION1)
+#define Opt_transparent		    ((1LU<<16) | IS_OPTION1)
+#define Opt_forceTransparent	    ((1LU<<17) | IS_OPTION1)
+#define Opt_mc_hack		    ((1LU<<18) | IS_OPTION1)
+#define Opt_tripleclickwords	    ((1LU<<19) | IS_OPTION1)
+#define Opt_mouseWheelScrollPage    ((1LU<<20) | IS_OPTION1)
+#define Opt_pointerBlank	    ((1LU<<21) | IS_OPTION1)
+#define Opt_cursorBlink		    ((1LU<<22) | IS_OPTION1)
 #ifdef HAVE_SCROLLBARS
-# define Opt_transparent_scrollbar  ((1LU<<24) | IS_OPTION1)
+# define Opt_transparent_scrollbar  ((1LU<<23) | IS_OPTION1)
 #endif
 #ifdef HAVE_MENUBAR
-# define Opt_transparent_menubar    ((1LU<<25) | IS_OPTION1)
-# define Opt_showMenu		    ((1LU<<26) | IS_OPTION1)
+# define Opt_transparent_menubar    ((1LU<<24) | IS_OPTION1)
+# define Opt_showMenu		    ((1LU<<25) | IS_OPTION1)
 #endif
-#define Opt_transparent_tabbar	    ((1LU<<27) | IS_OPTION1)
-#define Opt_tabPixmap		    ((1LU<<28) | IS_OPTION1)
+#define Opt_transparent_tabbar	    ((1LU<<26) | IS_OPTION1)
+#define Opt_tabPixmap		    ((1LU<<27) | IS_OPTION1)
 #ifdef XFT_SUPPORT
-# define Opt_xft		    ((1LU<<29) | IS_OPTION1)
+# define Opt_xft		    ((1LU<<28) | IS_OPTION1)
 #endif
 #ifdef USE_FIFO
-# define Opt_useFifo		    ((1LU<<30) | IS_OPTION1)
+# define Opt_useFifo		    ((1LU<<29) | IS_OPTION1)
 #endif/*USE_FIFO*/
 #define DEFAULT_OPTIONS	    \
     (Opt_scrollBar)

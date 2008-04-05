@@ -1476,6 +1476,15 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
 	r->h->rs[Rs_cwd] = ".";
 #endif
 
+#ifndef NO_BEEP
+    if( r->h->rs[Rs_vBellDuration] )
+	r->TermWin.vBellDuration =
+	    1000000ul * strtoul( r->h->rs[Rs_vBellDuration], NULL, 0 );
+    else
+	r->TermWin.vBellDuration = 0;
+#endif
+
+
     return cmd_argv;
 }
 

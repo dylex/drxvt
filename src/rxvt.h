@@ -1180,7 +1180,10 @@ enum {
 
     Rs_focusDelay,
 
+#ifndef NO_BELL
     Rs_bellCommand,
+    Rs_vBellDuration,
+#endif
     Rs_desktop,
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,

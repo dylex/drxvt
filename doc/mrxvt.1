@@ -905,6 +905,10 @@ which does not cause a word break.
 external border width
 .Op Cm externalBorder
 .
+.BO ctvb
+Use a visual bell only for the current tab (i.e. the active tab of a currently focused window).
+.Op Cm currentTabVBell
+.
 .It Fl desktop Ar number
 Desktop to place the window (for gnome compatible window manager). The number starts from 0, NOT 1!
 .Op Cm desktop
@@ -1190,6 +1194,9 @@ window with process ID
 .Em %pid .
 .Sy NOTE:
 The meaning and syntax of this option might change in future versions.
+.
+.It Cm vBellDuration Ar ms
+Amount of time (in milliseconds) to flash the screen if using a visual bell.
 .
 .It Cm veryBright Ar True Ns | Ns Ar False
 If true, and if

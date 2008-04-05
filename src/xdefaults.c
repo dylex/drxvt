@@ -238,8 +238,13 @@ static const struct {
 	"Configuration file instead of ~/.mrxvtrc", 0),
 
 #ifndef NO_BELL
-    BOOL( "visualBell", "vb", Opt_visualBell,
-	    "visual bell" ),
+    BOOL( "visualBell", "vb", Opt_visualBell, "visual bell" ),
+    BOOL( "currentTabVBell", "ctvb", Opt_currentTabVBell,
+	    "visual bell only for active tab in focused window" ),
+    RSTRG( Rs_vBellDuration, "vBellDuration",
+	    "Duration (ms) of the visual bell", 0),
+    STRG( Rs_bellCommand, "bellCommand", "blc",
+	"string", "command to execute instead of beeping", 0),
 # if ! defined(NO_MAPALERT) && defined(MAPALERT_OPTION)
     BOOL( "mapAlert", NULL, Opt_mapAlert, NULL ),
 # endif
@@ -462,8 +467,6 @@ static const struct {
 	    "borderless window" ),
     BOOL( "overrideRedirect", "or", Opt2_overrideRedirect,
 	    "override_redirect flag" ),
-    STRG(Rs_bellCommand, "bellCommand", "blc",
-	"string", "command to execute instead of beeping", 0),
     STRG(Rs_desktop, "desktop", "desktop",
 	"number", "desktop to place the program", 0),
     BOOL( "broadcast", "bcst", Opt2_broadcast,
@@ -1103,7 +1106,8 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 	rxvt_usage(0);
 #endif
 
-	rxvt_msg (DBG_ERROR, DBG_RESOURCE,  "Use -h, -help or --help to get help" );
+	rxvt_msg (DBG_ERROR, DBG_RESOURCE,
+		"Use -h, -help or --help to get help\n" );
 	exit( EXIT_FAILURE );
     }
 
