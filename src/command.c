@@ -2357,7 +2357,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    /* Select succeeded. Check if we have new Xevents first. */
 	    if( 0 && selpage == -1 && XPending( r->Xdisplay ) > 25)
 	    {
-		rxvt_dbgtmsg(( DBG_DEBUG, DBG_COMMAND,
+		rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND,
 			"%d xevents to processes. Continuing\n",
 			XPending( r->Xdisplay ) ));
 		continue;

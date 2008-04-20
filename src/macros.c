@@ -379,7 +379,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     action_t	    action;
 
 
-    rxvt_dbgtmsg(( DBG_DEBUG, DBG_MACROS, "%s(%08lx, %2hhx, '%s', %d, %d)\n",
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_MACROS, "%s(%08lx, %2hhx, '%s', %d, %d)\n",
 		__func__, keysym, modFlags, astring, addmacro, priority ));
 
     /*
@@ -559,7 +559,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     r->macros[replaceIndex].action	= action;
     r->macros[replaceIndex].priority	= priority;
 
-    rxvt_dbgtmsg(( DBG_DEBUG, DBG_MACROS,
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_MACROS,
 		"Added macro %hu of %hu. Type %s, len %hu, args '%s'.\n",
 		replaceIndex, r->maxMacros, macroNames[ action.type ],
 		action.len,
