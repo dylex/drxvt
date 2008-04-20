@@ -185,7 +185,7 @@ Mrxvt.macro.Primary+Shift+End:		Scroll +1000000
 # Pasting
 Mrxvt.macro.Ctrl+Shift+v:		Paste
 # A slection buffer can be added as an argument (PRIMARY,SECONDARY, CLIPBOARD)
-Mrxvt.macro.Ctrl+Shift+x:		Paste SECONDARY
+Mrxvt.macro.Ctrl+Shift+c:		Paste CLIPBOARD
 
 Mrxvt.macro.Shift+Delete:		SetTitle
 
@@ -194,9 +194,9 @@ Mrxvt.macro.Shift+Delete:		SetTitle
 # tab. Anything typed there is executed as a macro. When done (on clean exit),
 # disable the useFifo option.
 #
-Mrxvt.macro.Ctrl+Shift+c:		UseFifo 1
-Mrxvt.macro.Add+Ctrl+Shift+c:		NewTab "mrxvt Console" \!cat >> /tmp/.mrxvt-%P && echo "UseFifo 0" >> /tmp/.mrxvt-%P
-Mrxvt.macro.Add+Ctrl+Shift+c:		ToggleHold -7
+Mrxvt.macro.Ctrl+Shift+z:		UseFifo 1
+Mrxvt.macro.Add+Ctrl+Shift+z:		NewTab "mrxvt Console" \!cat >> /tmp/.mrxvt-%P && echo "UseFifo 0" >> /tmp/.mrxvt-%P
+Mrxvt.macro.Add+Ctrl+Shift+z:		ToggleHold -7
 
 # External programs. In keeping with the Unix "minimalist" philosophy, we don't
 # define these shortcuts by default.
