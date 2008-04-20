@@ -71,7 +71,7 @@ int              greek_xlat                       __PROTO((char* s, int num_char
 /* End prototypes of grkelot.c */
 
 /* Begin prototypes of macros.c */
-int		 rxvt_parse_macros		  __PROTO((rxvt_t*, const char *, const char *, Bool noReplace));
+int		 rxvt_parse_macros		  __PROTO((rxvt_t*, const char *, const char *, macro_priority_t priority));
 void		 rxvt_cleanup_macros		  __PROTO((rxvt_t*));
 Bool		 rxvt_set_action		  __PROTO((action_t*, char*));
 int		 rxvt_process_macros		  __PROTO((rxvt_t*, KeySym, XKeyEvent*));

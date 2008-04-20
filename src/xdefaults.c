@@ -33,7 +33,7 @@
  *         BEGIN `INTERNAL' ROUTINE PROTOTYPES                        *
  *--------------------------------------------------------------------*/
 #ifndef NO_RESOURCES
-void  rxvt_get_xdefaults (rxvt_t*, FILE*, const char*);
+void  rxvt_get_xdefaults (rxvt_t*, FILE*, const char*, macro_priority_t);
 #endif
 /*--------------------------------------------------------------------*
  *         END   `INTERNAL' ROUTINE PROTOTYPES                        *
@@ -1068,7 +1068,8 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
 
 		if (NOT_NULL(str))
 		    rxvt_parse_macros( r, opt + sizeof( "macro." ) - 1,
-			    str, False); /* Replace previous macros */
+			    str, 0); /* priority 0 = highest. All previous
+					macros get replaced. */
 	    }
 	    else
 	    {
@@ -1121,18 +1122,12 @@ rxvt_get_options(rxvt_t *r, int argc, const char *const *argv)
  */
 /* INTPROTO */
 void
-rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
+rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name,
+	macro_priority_t priority)
 {
     unsigned int    len, lenstr;
     char TAINTED *  str;
     char	    buffer[256];
-
-    /*
-     * Macros defined with APL_CLASS or APL_SUBCLASS will not replace previous
-     * user defined macros
-     */
-    Bool    noReplace = !STRCMP( name, APL_CLASS )
-			    || !STRCMP( name, APL_SUBCLASS);
 
     rxvt_msg (DBG_INFO, DBG_RESOURCE, "rxvt_get_xdefaults (%s)\n", name);
 
@@ -1169,7 +1164,7 @@ rxvt_get_xdefaults(rxvt_t *r, FILE *stream, const char *name)
 	    }
 	}
 
-	if( !rxvt_parse_macros( r, str, NULL, noReplace) )
+	if( !rxvt_parse_macros( r, str, NULL, priority ) )
 	{
 	    for (entry = 0; entry < optList_size(); entry++)
 	    {
@@ -1311,6 +1306,11 @@ rxvt_extract_resources (
     FILE	   *fd = NULL;
     char	   *home;
 
+    macro_priority_t    priority = 1;   /* As resources get more general, we
+					   increment this value so that
+					   resources with lower priority are not
+					   overwritten */
+
 # if defined XAPPLOADDIR
 #  if defined(HAVE_XSETLOCALE) || defined(HAVE_SETLOCALE)
     /* Compute the path of the possibly available localized Rxvt file */ 
@@ -1376,11 +1376,11 @@ rxvt_extract_resources (
      * "XTerm" and "Rxvt" as class names.
      */
 
-    rxvt_get_xdefaults(r, fd, name);
-    rxvt_get_xdefaults(r, fd, APL_SUBCLASS);
-    rxvt_get_xdefaults(r, fd, APL_CLASS);
+    rxvt_get_xdefaults(r, fd, name, priority++);
+    rxvt_get_xdefaults(r, fd, APL_SUBCLASS, priority++);
+    rxvt_get_xdefaults(r, fd, APL_CLASS, priority++);
 #if 0
-    rxvt_get_xdefaults(r, fd, "");  /* partial match */
+    rxvt_get_xdefaults(r, fd, "", priority++);  /* partial match */
 #endif
     if (NOT_NULL(fd))
 	fclose(fd);
@@ -1395,13 +1395,13 @@ rxvt_extract_resources (
 	    ad = fopen(XAPPLOADDIR "/" APL_SUBCLASS, "r");
 	if (NOT_NULL(ad))
 	{
-	    rxvt_get_xdefaults(r, ad, APL_SUBCLASS);
+	    rxvt_get_xdefaults(r, ad, APL_SUBCLASS, priority++);
 #if 0
 	    /*
 	     * 2006-05-23 gi1242: If we don't use the X resource database, we
 	     * don't have to match the empty class.
 	     */
-	    rxvt_get_xdefaults(r, ad, "");
+	    rxvt_get_xdefaults(r, ad, "", priority++);
 #endif
 	    fclose(ad);
 	}
@@ -1415,7 +1415,7 @@ rxvt_extract_resources (
     if (NOTSET_OPTION(r, Opt2_noSysConfig) &&
         NOT_NULL(fd = fopen( PKG_CONF_DIR "/mrxvtrc", "r")))
     {
-	rxvt_get_xdefaults( r, fd, APL_SUBCLASS );
+	rxvt_get_xdefaults( r, fd, APL_SUBCLASS, priority++ );
 	fclose(fd);
     }
 

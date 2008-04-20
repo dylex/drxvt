@@ -805,11 +805,13 @@ enum {
     NMACRO_FUNCS
 } macroFnNames;
 
+typedef unsigned char macro_priority_t;
 typedef struct {
     KeySym		keysym;
     unsigned char	modFlags;	/* First 4 bits are the action order
 					   number. Last four bits are the
 					   modifiers */
+    macro_priority_t	priority;
     action_t		action;
 } macros_t;
 

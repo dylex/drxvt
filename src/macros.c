@@ -63,7 +63,7 @@ static const char *const macroNames[] =
 * 		       BEGIN INTERNAL ROUTINE PROTOTYPES		       *
 \******************************************************************************/
 int		macro_cmp	    ( const void*, const void*);
-int		rxvt_add_macro	    ( rxvt_t*, KeySym, unsigned char, char*, Bool, Bool);
+int		rxvt_add_macro	    ( rxvt_t*, KeySym, unsigned char, char*, Bool, macro_priority_t);
 unsigned char	macro_set_number    ( unsigned char, unsigned char);
 /******************************************************************************\
 *			END INTERNAL ROUTINE PROTOTYPES			       *
@@ -247,7 +247,8 @@ macro_set_number( unsigned char flag, unsigned char num )
 /* EXTPROTO */
 #define NEWARGLIM   500	/* `reasonable' size */
 int
-rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
+rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg,
+	macro_priority_t priority)
 {
     char	    newarg[NEWARGLIM],
 		    keyname[ NEWARGLIM],
@@ -294,7 +295,8 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
     newarg[NEWARGLIM - 1] = '\0';
     rxvt_str_trim( newarg );
 
-    rxvt_msg (DBG_INFO, DBG_MACROS, "Got macro '%s' -- '%s'\n", keyname, newarg );
+    rxvt_msg( DBG_INFO, DBG_MACROS,
+	    "Got macro '%s' -- '%s'\n", keyname, newarg );
 
     /*
      * Breakup keyname into a keysym and modifier flags.
@@ -345,22 +347,24 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg, Bool noReplace)
 	return -1;
     }
 
-    return rxvt_add_macro( r, keysym, modFlags, newarg, addmacro, noReplace)
+    return rxvt_add_macro( r, keysym, modFlags, newarg, addmacro, priority)
 		? 1 : -1;
 }
 
-/* {{{1 rxvt_add_macro( keysym, modFlags, astring, noreplace)
+/* {{{1 rxvt_add_macro( keysym, modFlags, astring, priority)
  *
  * Add a macro to our list of macros (r->macros) if astring describes a valid
- * macro. If keysym == None, then add the macro to the previous one.
+ * macro.
  *
- * If noReplace is true, don't replace existing macros. Required when reading
- * the system config file so that we don't replace existing user macros.
+ * priority is the priority with which the macro should be added. A macro should
+ * never overwrite a macro with lower priority (yes, I know that's backwards). A
+ * macro should be added to a chain ONLY IF it's priority is the same as the
+ * previous macro's priority.
  */
 /* INTPROTO */
 int
 rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
-	Bool addmacro, Bool noReplace)
+	Bool addmacro, macro_priority_t priority)
 {
     const unsigned nmacros_increment = 64;  /* # extra macros to alloc space for
 					       when we need to enlarge our list
@@ -375,7 +379,8 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     action_t	    action;
 
 
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_MACROS, "rxvt_add_macro(%08lx, %2hhx, %s)\n", keysym, modFlags, astring));
+    rxvt_dbgtmsg(( DBG_DEBUG, DBG_MACROS, "%s(%08lx, %2hhx, '%s', %d, %d)\n",
+		__func__, keysym, modFlags, astring, addmacro, priority ));
 
     /*
      * Check to see if macro already exists.
@@ -388,7 +393,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 		    == (modFlags & MACRO_MODMASK & ~MACRO_PRIMARY)
 	  )
 	{
-	    if( addmacro )
+	    if( addmacro && r->macros[i].priority == priority )
 	    {
 		/*
 		 * Find the last macro in the macro chain (the macro with the
@@ -410,10 +415,10 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
 	    }
 
 	    /*
-	     * Macro for key already exists. If noReplace is set, don't
-	     * touch this macro.
+	     * Macro for key already exists. Only replace it if we have a
+	     * *lower* priority (which in theory should never happen).
 	     */
-	    else if( noReplace )
+	    else if( priority > r->macros[i].priority )
 		return 1; /* Claim to have succeded so that caller will not
 			     complain about "Failing to add a ... macro". */
 	    
@@ -456,17 +461,37 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     {
 	if( replaceIndex == r->nmacros )
 	{
-	    rxvt_msg (DBG_ERROR, DBG_MACROS,  "No previous macro to add to (key %s%s%s%s)",
+	    rxvt_msg( DBG_ERROR, DBG_MACROS,
+		    "No previous macro to add to (key %s%s%s%s)",
 		    (modFlags & MACRO_CTRL) ? "Ctrl+" : "",
 		    (modFlags & MACRO_META) ? "Meta+" : "",
 		    (modFlags & MACRO_SHIFT) ? "Shift+" : "",
 		    XKeysymToString( keysym ) );
 	    return 0;	/* Failure */
 	}
+
+	else if( r->macros[replaceIndex].priority != priority )
+	{
+	    rxvt_msg( DBG_ERROR, DBG_MACROS,
+		    "Can not add to a macro defined at a different location "
+		    "(key %s%s%s%s)",
+		    (modFlags & MACRO_CTRL) ? "Ctrl+" : "",
+		    (modFlags & MACRO_META) ? "Meta+" : "",
+		    (modFlags & MACRO_SHIFT) ? "Shift+" : "",
+		    XKeysymToString( keysym ) );
+	    return 0;	/* Failure */
+	}
+
 	else if( r->macros[replaceIndex].action.type == MacroFnDummy )
 	{
 	    /* Do not add to a dummy macro */
-	    rxvt_msg (DBG_ERROR, DBG_MACROS,  "Can not add actions to a Dummy macro" );
+	    rxvt_msg (DBG_ERROR, DBG_MACROS,
+		    "Can not add actions to a Dummy macro"
+		    "(key %s%s%s%s)",
+		    (modFlags & MACRO_CTRL) ? "Ctrl+" : "",
+		    (modFlags & MACRO_META) ? "Meta+" : "",
+		    (modFlags & MACRO_SHIFT) ? "Shift+" : "",
+		    XKeysymToString( keysym ) );
 	    return 0;	/* Failure */
 	}
 
@@ -522,7 +547,7 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
      */
     assert( astring );
     SET_NULL(action.str);   /* Make sure rxvt_set_action won't free non-existent
-			   memory */
+			       memory */
     if( !rxvt_set_action( &action, astring) )
 	return 0; /* Failure: Probably unrecognized action type */
 
@@ -532,8 +557,16 @@ rxvt_add_macro( rxvt_t *r, KeySym keysym, unsigned char modFlags, char *astring,
     r->macros[replaceIndex].keysym	= keysym;
     r->macros[replaceIndex].modFlags	= modFlags;
     r->macros[replaceIndex].action	= action;
+    r->macros[replaceIndex].priority	= priority;
 
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_MACROS, "Added macro %hu of %hu. Type %s, len %hu, args '%s'.\n", replaceIndex, r->maxMacros, macroNames[ action.type ], action.len, (action.type == MacroFnStr || action.type == MacroFnEsc) ?  "(escaped string)" : (IS_NULL(action.str) ? "(nil)" : (char*) action.str)));
+    rxvt_dbgtmsg(( DBG_DEBUG, DBG_MACROS,
+		"Added macro %hu of %hu. Type %s, len %hu, args '%s'.\n",
+		replaceIndex, r->maxMacros, macroNames[ action.type ],
+		action.len,
+		(action.type == MacroFnStr || action.type == MacroFnEsc) ?
+		    "(escaped string)" :
+		    (IS_NULL(action.str) ?
+			"(nil)" : (char*) action.str)));
 
     return 1;	/* Success */
 }
@@ -598,7 +631,9 @@ rxvt_cleanup_macros( rxvt_t *r )
 	r->maxMacros = r->nmacros;
     }
 
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_MACROS, "Read %d macros. (Have space for %d macros)\n", r->nmacros, r->maxMacros));
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_MACROS,
+		"Read %d macros. (Have space for %d macros)\n",
+		r->nmacros, r->maxMacros));
 }
 
 /* {{{1 rxvt_set_action( action, astring)
