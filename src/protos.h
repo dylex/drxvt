@@ -274,6 +274,7 @@ void             rxvt_selection_check             __PROTO((rxvt_t* r, int page, 
 int              rxvt_selection_paste             __PROTO((rxvt_t* r, Window win, Atom prop, Bool delete_prop));
 void             rxvt_selection_property          __PROTO((rxvt_t* r, Window win, Atom prop));
 void             rxvt_selection_request           __PROTO((rxvt_t* r, int page, Time tm, int x, int y));
+void             rxvt_selection_request_by_sel    __PROTO((rxvt_t* r, int page, Time tm, int x, int y, int sel));
 void             rxvt_process_selectionclear      __PROTO((rxvt_t* r, int page));
 void             rxvt_selection_make              __PROTO((rxvt_t* r, int page, Time tm));
 void             rxvt_selection_click             __PROTO((rxvt_t* r, int page, int clicks, int x, int y));

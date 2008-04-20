@@ -1690,8 +1690,10 @@ pages instead of lines.
 .It Ic Copy
 Copy selection into clipboard (not implemented).
 .\" ------------------------------------------------------------
-.It Ic Paste
-Pasete selection into active tab.
+.It Ic Paste Op Ar selection-buffer
+Paste selection into active tab. The value
+.Ar selection-buffer 
+specifies the name of the buffer to be pasted. If not specified the first used buffer in the order PRIMARY, SECONDARY and CLIPBOARD  will be used.
 .It Ic ToggleSubwin Op Oo Ar + Ns | Ns Ar - Oc Ns Op Ar b Ns | Ns Ar m Ns | Ns Ar s Ns | Ns Ar t
 Toggle visibility of sub-windows. If the argument begins with a
 .Sq +

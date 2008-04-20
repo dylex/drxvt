@@ -996,11 +996,29 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	case MacroFnCopy:
 #endif
 	case MacroFnPaste:
-	    if (NOT_NULL(ev))
-		rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
-	    else
-		retval = -1;
+  {
+      int sel = 1;
+
+	    if (NOT_NULL(ev)){
+        if( NOT_NULL(astr) && *astr ){
+           if(strcmp ("PRIMARY", astr) == 0)
+             sel=XA_PRIMARY;
+           else if (strcmp ("SECONDARY", astr) == 0)
+             sel=XA_SECONDARY;
+           else if (strcmp ("CLIPBOARD", astr) == 0)
+             sel=XA_CLIPBOARD;
+           else
+	           break;
+          rxvt_selection_request_by_sel (r, ATAB(r), ev->xkey.time, 0, 0, sel);
+        }
+        else
+		      rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
+      }
+	    else{
+		    retval = -1;
+      }
 	    break;
+  }
 
 	case MacroFnToggleSubwin:
 	    rxvt_toggle_subwin( r, (unsigned char*) astr);

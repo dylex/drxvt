@@ -182,7 +182,11 @@ Mrxvt.macro.Primary+Shift+Down:		Scroll +1
 Mrxvt.macro.Primary+Shift+Home:		Scroll -1000000
 Mrxvt.macro.Primary+Shift+End:		Scroll +1000000
 
+# Pasting
 Mrxvt.macro.Ctrl+Shift+v:		Paste
+# A slection buffer can be added as an argument (PRIMARY,SECONDARY, CLIPBOARD)
+Mrxvt.macro.Ctrl+Shift+x:		Paste SECONDARY
+
 Mrxvt.macro.Shift+Delete:		SetTitle
 
 #
