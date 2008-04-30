@@ -280,6 +280,7 @@ void             rxvt_selection_make              __PROTO((rxvt_t* r, int page, 
 void             rxvt_selection_click             __PROTO((rxvt_t* r, int page, int clicks, int x, int y));
 void             rxvt_selection_extend            __PROTO((rxvt_t* r, int page, int x, int y, int flag));
 void             rxvt_selection_rotate            __PROTO((rxvt_t* r, int page, int x, int y));
+void             rxvt_paste_file                  __PROTO((rxvt_t* r, int page, Time tm, int x, int y, char* filename));
 void             rxvt_process_selectionrequest    __PROTO((rxvt_t* r, int page, const XSelectionRequestEvent *rq));
 void             rxvt_pixel_position              __PROTO((rxvt_t* r, int *x, int *y));
 /* End prototypes of screen.c */

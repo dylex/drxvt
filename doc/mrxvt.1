@@ -1696,6 +1696,14 @@ Copy selection into clipboard (not implemented).
 Paste selection into active tab. The value
 .Ar selection-buffer 
 specifies the name of the buffer to be pasted. If not specified the first used buffer in the order PRIMARY, SECONDARY and CLIPBOARD  will be used.
+.\" ------------------------------------------------------------
+.It Ic PasteFile Ar filename
+Paste the content of the file specified by 
+.Ar filename
+to the currently active tab. This can be used to input text-snippets to a shell
+or any other terminal based program (i.e. somthing like a bash-profile
+or sequence of administration commands).
+.\" ------------------------------------------------------------
 .It Ic ToggleSubwin Op Oo Ar + Ns | Ns Ar - Oc Ns Op Ar b Ns | Ns Ar m Ns | Ns Ar s Ns | Ns Ar t
 Toggle visibility of sub-windows. If the argument begins with a
 .Sq +

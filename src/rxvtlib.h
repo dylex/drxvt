@@ -787,6 +787,7 @@ enum {
     MacroFnScroll,
     MacroFnCopy,
     MacroFnPaste,
+    MacroFnPasteFile,
     MacroFnToggleSubwin,
     MacroFnFont,
     MacroFnToggleVeryBold,

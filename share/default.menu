@@ -40,8 +40,9 @@
 {Toggle Macros}				ToggleMacros
 {-}
 {Paste}					Paste
-{Paste secondary buffer}					Paste SECONDRAY
-{Paste clipboard buffer}					Paste CLIPBOARD
+{Paste secondary buffer}		Paste SECONDRAY
+{Paste clipboard buffer}		Paste CLIPBOARD
+{Paste file from selection}		PasteFile %s
 [read:submenus;selection]
 {-}
 [read:submenus;tabsmenu]

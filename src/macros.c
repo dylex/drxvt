@@ -41,6 +41,7 @@ static const char *const macroNames[] =
     "Scroll",		    /* Scroll up/down */
     "Copy",		    /* Copy selection */
     "Paste",		    /* Paste selection */
+    "PasteFile",		    /* Paste the content of a file */
     "ToggleSubwin",	    /* Toggle subwindows (scroll / menu / tabbar) */
     "ResizeFont",	    /* Resize terminal font */
     "ToggleVeryBold",	    /* Toggle use of bold font for colored text */
@@ -1054,6 +1055,22 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
       }
 	    break;
   }
+
+	case MacroFnPasteFile:
+  {
+     if (NOT_NULL(ev)){
+        if( NOT_NULL(astr) && *astr ){
+         rxvt_paste_file (r, ATAB(r), ev->xkey.time, 0, 0, astr);
+        }else{
+         break;
+        }
+      }
+     else{
+       retval = -1;
+      }
+     break;
+  }
+
 
 	case MacroFnToggleSubwin:
 	    rxvt_toggle_subwin( r, (unsigned char*) astr);

@@ -184,7 +184,14 @@ Mrxvt.macro.Primary+Shift+End:		Scroll +1000000
 
 # Pasting
 Mrxvt.macro.Ctrl+Shift+v:		Paste
-# A slection buffer can be added as an argument (PRIMARY,SECONDARY, CLIPBOARD)
+
+# Paste contents of a file to active tab (e.g. a collection of shell settings
+# like aliases, environment variables, ...). The file name can also be got from
+# the selection if you use %s.
+#Mrxvt.macro.Ctrl+Shift+w:   PasteFile ~/my-favourite-bash-settings
+#Mrxvt.macro.Ctrl+Shift+w:   PasteFile %s
+
+# A selection buffer can be added as an argument (PRIMARY,SECONDARY, CLIPBOARD)
 Mrxvt.macro.Ctrl+Shift+c:		Paste CLIPBOARD
 
 Mrxvt.macro.Shift+Delete:		SetTitle
