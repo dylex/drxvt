@@ -5068,7 +5068,7 @@ rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
     if (x < 0 || x >= VT_WIDTH(r) || y < 0 || y >= VT_HEIGHT(r))
 	return;		/* outside window */
 
-    char buffer[256];
+    char buffer[BUFSIZ];
     char TAINTED * str;
     FILE * fdpaste;
     wordexp_t p;
@@ -5076,23 +5076,21 @@ rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
 
     /* perform a shell-like expansion of the provided filename */
     wordexp_result = wordexp(filename, &p, 0);
-    if (wordexp_result == 0)
-    {
+    if( wordexp_result == 0 && p.we_wordc == 1 )
 	filename = *p.we_wordv;
-    }
     else
     {
-	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_paste_file : wordexp error"
-		    " code '%i ',problems on shell-like expansion of '%s' \n",
-		    filename, wordexp_result));
+	rxvt_msg( DBG_ERROR, DBG_SCREEN,
+		    "Error expanding %s, or possibly ambiguous expansion\n",
+		    filename );
+	rxvt_msg( DBG_INFO, DBG_SCREEN, "wordexp_result=%i\n", wordexp_result );
     }
 
     if (NOT_NULL(fdpaste = fopen( filename , "r")))
     {
 	while (NOT_NULL(str = fgets(buffer, sizeof(buffer), fdpaste)))
-	{
 	    rxvt_paste_str( r, page, (const unsigned char*) str , STRLEN(str));
-	}
+
 	fclose(fdpaste);
     }
     else
