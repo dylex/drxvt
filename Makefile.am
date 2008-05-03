@@ -19,4 +19,4 @@
 
 SUBDIRS = doc src share
 
-EXTRA_DIST = CREDITS FAQ
+EXTRA_DIST = CREDITS FAQ ChangeLog.old
