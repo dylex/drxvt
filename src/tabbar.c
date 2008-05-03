@@ -27,6 +27,7 @@
 
 #include "../config.h"
 #include "rxvt.h"
+#include <wordexp.h>
 
 
 #ifdef HAVE_LIBXPM
@@ -1281,18 +1282,40 @@ rxvt_append_page( rxvt_t* r, int profile,
 	
 	else
 	{
-	    /* XXX Maybe better to use wordexp and expand ~ & $HOME here */
-	    len  = STRLEN( cwdOption );
+	    wordexp_t p;
+	    int wordexp_result = wordexp(cwdOption, &p, 0);
 
-	    MIN_IT( len, PATH_MAX - 1 );
-	    STRNCPY( child_cwd, cwdOption, len );
-	    child_cwd[len] = 0;
+	    if( wordexp_result == 0 )
+	    {
+		if( p.we_wordc > 1)
+		    rxvt_msg( DBG_ERROR, DBG_TABBAR,
+			    "Too many words when expanding %s\n", cwdOption );
+		else
+		{
+		    char *filename = *p.we_wordv;
+
+		    len  = STRLEN( filename );
+		    MIN_IT( len, PATH_MAX - 1 );
+		    STRNCPY( child_cwd, filename, len );
+		    child_cwd[len] = 0;
+		}
+
+		wordfree( &p );
+	    }
+
+	    else
+	    {
+		rxvt_dbgmsg(( DBG_VERBOSE, DBG_TABBAR,
+			    "wordexp error code '%i', expanding '%s'\n",
+			    wordexp_result, filename ));
+	    }
 	}
 
 	if( len > 0 && chdir( child_cwd ) == 0 )
 	{
 	    /* Now in working directory of ATAB */
-	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Running child in directory: %s\n", child_cwd ));
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR,
+			"Running child in directory: %s\n", child_cwd ));
 
 	    /* Run command in this new directory. */
 	    LVTS(r)->cmd_fd =
@@ -1305,7 +1328,8 @@ rxvt_append_page( rxvt_t* r, int profile,
 	else
 	{
 	    /* Exec command in original directory. */
-	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Running child in original directory\n"));
+	    rxvt_dbgmsg(( DBG_DEBUG, DBG_TABBAR,
+			"Running child in original directory\n"));
 
 	    LVTS(r)->cmd_fd =
 		rxvt_run_command( r, LTAB(r), (const char**) argv );
