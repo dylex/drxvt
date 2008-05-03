@@ -5039,7 +5039,8 @@ rxvt_selection_request_other(rxvt_t* r, int page, Atom target, int selnum)
 	sel = r->h->xa[XA_CLIPBOARD];
     if (XGetSelectionOwner(r->Xdisplay, sel) != None)
     {
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request_other %d: pasting %s\n", page, debug_xa_names[selnum]));
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_SCREEN, "rxvt_selection_request_other %d: "
+		    "pasting %s\n", page, debug_xa_names[selnum] ));
 
 	XConvertSelection(r->Xdisplay, sel, target,
 	    r->h->xa[XA_VT_SELECTION], PVTS(r, page)->vt,
@@ -5060,39 +5061,48 @@ rxvt_selection_request_other(rxvt_t* r, int page, Atom target, int selnum)
 void
 rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
 {
-  rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "rxvt_paste_file %d (%lu, %d, %d) %s\n", page, tm, x, y, filename ));
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_SCREEN,
+		"rxvt_paste_file %d (%lu, %d, %d) %s\n", page, tm, x, y,
+		filename ));
 
     if (x < 0 || x >= VT_WIDTH(r) || y < 0 || y >= VT_HEIGHT(r))
 	return;		/* outside window */
 
-  char buffer[256];
-  char TAINTED * str;
-  FILE * fdpaste;
-  wordexp_t p;
-  int wordexp_result;
+    char buffer[256];
+    char TAINTED * str;
+    FILE * fdpaste;
+    wordexp_t p;
+    int wordexp_result;
 
-  /* perform a shell-like expansion of the provided filename */
-  wordexp_result = wordexp(filename, &p, 0);
-  if (wordexp_result == 0){
-   filename = *p.we_wordv;
-  }else{
-    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, 
-      "rxvt_paste_file : wordexp error code '%i ',problems on shell-like expansion of '%s' \n", 
-      filename, wordexp_result));
-  }
+    /* perform a shell-like expansion of the provided filename */
+    wordexp_result = wordexp(filename, &p, 0);
+    if (wordexp_result == 0)
+    {
+	filename = *p.we_wordv;
+    }
+    else
+    {
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_paste_file : wordexp error"
+		    " code '%i ',problems on shell-like expansion of '%s' \n",
+		    filename, wordexp_result));
+    }
 
-  if (NOT_NULL(fdpaste = fopen( filename , "r"))){
-   while (NOT_NULL(str = fgets(buffer, sizeof(buffer), fdpaste)))
-   {
-	  rxvt_paste_str( r, page, (const unsigned char*) str , STRLEN(str));
-   }
-   fclose(fdpaste);
-  }else{
-    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "rxvt_paste_file : unable to open file '%s'\n", filename));
-  }
+    if (NOT_NULL(fdpaste = fopen( filename , "r")))
+    {
+	while (NOT_NULL(str = fgets(buffer, sizeof(buffer), fdpaste)))
+	{
+	    rxvt_paste_str( r, page, (const unsigned char*) str , STRLEN(str));
+	}
+	fclose(fdpaste);
+    }
+    else
+    {
+	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN,
+		    "rxvt_paste_file : unable to open file '%s'\n", filename));
+    }
 
-  wordfree(&p);
-  return;
+    wordfree(&p);
+    return;
 }
 
 

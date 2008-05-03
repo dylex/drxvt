@@ -1032,44 +1032,48 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	case MacroFnCopy:
 #endif
 	case MacroFnPaste:
-  {
-      int sel = 1;
+	{
+	    int sel = 1;
 
-	    if (NOT_NULL(ev)){
-        if( NOT_NULL(astr) && *astr ){
-           if(strcmp ("PRIMARY", astr) == 0)
-             sel=XA_PRIMARY;
-           else if (strcmp ("SECONDARY", astr) == 0)
-             sel=XA_SECONDARY;
-           else if (strcmp ("CLIPBOARD", astr) == 0)
-             sel=XA_CLIPBOARD;
-           else
-	           break;
-          rxvt_selection_request_by_sel (r, ATAB(r), ev->xkey.time, 0, 0, sel);
-        }
-        else
-		      rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
-      }
-	    else{
-		    retval = -1;
-      }
+	    if (NOT_NULL(ev))
+	    {
+		if( NOT_NULL(astr) && *astr )
+		{
+		    if(strcmp ("PRIMARY", astr) == 0)
+			sel=XA_PRIMARY;
+		    else if (strcmp ("SECONDARY", astr) == 0)
+		      sel=XA_SECONDARY;
+		    else if (strcmp ("CLIPBOARD", astr) == 0)
+		      sel=XA_CLIPBOARD;
+		    else
+		      break;
+		    rxvt_selection_request_by_sel( r, ATAB(r), ev->xkey.time,
+			    0, 0, sel);
+		}
+		else
+		    rxvt_selection_request (r, ATAB(r), ev->xkey.time, 0, 0);
+	    }
+	    else
+	    {
+		retval = -1;
+	    }
 	    break;
-  }
+	}
 
 	case MacroFnPasteFile:
-  {
-     if (NOT_NULL(ev)){
-        if( NOT_NULL(astr) && *astr ){
-         rxvt_paste_file (r, ATAB(r), ev->xkey.time, 0, 0, astr);
-        }else{
-         break;
-        }
-      }
-     else{
-       retval = -1;
-      }
-     break;
-  }
+	{
+	    if (NOT_NULL(ev))
+	    {
+	        if( NOT_NULL(astr) && *astr )
+		    rxvt_paste_file (r, ATAB(r), ev->xkey.time, 0, 0, astr);
+	        else
+		    break;
+	    }
+	    else
+		retval = -1;
+
+	   break;
+	}
 
 
 	case MacroFnToggleSubwin:
