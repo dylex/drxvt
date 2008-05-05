@@ -1284,6 +1284,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	{
 	    wordexp_t p;
 	    int wordexp_result = wordexp(cwdOption, &p, 0);
+	    char *filename;
 
 	    if( wordexp_result == 0 )
 	    {
@@ -1292,7 +1293,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 			    "Too many words when expanding %s\n", cwdOption );
 		else
 		{
-		    char *filename = *p.we_wordv;
+		    filename = *p.we_wordv;
 
 		    len  = STRLEN( filename );
 		    MIN_IT( len, PATH_MAX - 1 );
