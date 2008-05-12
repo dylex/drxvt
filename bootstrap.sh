@@ -17,6 +17,11 @@
 # this program; if not, write to the Free Software Foundation, Inc., 675 Mass
 # Ave, Cambridge, MA 02139, USA.
 
+if [[ ! -f ChangeLog ]]; then
+    echo "The ChangeLog is no longer maintained. See the subversion" \
+	"repository for the current ChangeLog." > ChangeLog
+fi
+
 set -x
 aclocal
 autoheader
