@@ -37,7 +37,9 @@
 # include <xftacs.h>
 #endif
 
-#include <wordexp.h>
+#ifdef HAVE_WORDEXP_H
+# include <wordexp.h>
+#endif
 
 /* ------------------------------------------------------------------------- */
 #ifdef MULTICHAR_SET
@@ -5071,6 +5073,8 @@ rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
     char buffer[BUFSIZ];
     char TAINTED * str;
     FILE * fdpaste;
+
+#ifdef HAVE_WORDEXP_H
     wordexp_t p;
     int wordexp_result;
 
@@ -5085,6 +5089,7 @@ rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
 		    filename );
 	rxvt_msg( DBG_INFO, DBG_SCREEN, "wordexp_result=%i\n", wordexp_result );
     }
+#endif
 
     if (NOT_NULL(fdpaste = fopen( filename , "r")))
     {
@@ -5099,7 +5104,9 @@ rxvt_paste_file(rxvt_t* r, int page, Time tm, int x, int y, char* filename)
 		    "rxvt_paste_file : unable to open file '%s'\n", filename));
     }
 
+#ifdef HAVE_WORDEXP_H
     wordfree(&p);
+#endif
     return;
 }
 

@@ -27,7 +27,9 @@
 
 #include "../config.h"
 #include "rxvt.h"
-#include <wordexp.h>
+#ifdef HAVE_WORDEXP_H
+# include <wordexp.h>
+#endif
 
 
 #ifdef HAVE_LIBXPM
@@ -1282,6 +1284,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 	
 	else
 	{
+#ifdef HAVE_WORDEXP_H
 	    wordexp_t p;
 	    int wordexp_result = wordexp(cwdOption, &p, 0);
 	    char *filename;
@@ -1310,6 +1313,7 @@ rxvt_append_page( rxvt_t* r, int profile,
 			    "wordexp error code '%i', expanding '%s'\n",
 			    wordexp_result, filename ));
 	    }
+#endif /* HAVE_WORDEXP_H */
 	}
 
 	if( len > 0 && chdir( child_cwd ) == 0 )

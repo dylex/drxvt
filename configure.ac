@@ -1119,6 +1119,7 @@ AC_CHECK_HEADERS( \
     unistd.h \
     utmp.h \
     utmpx.h \
+    wordexp.h \
     wchar.h \
 )
 
