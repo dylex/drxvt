@@ -1594,7 +1594,7 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 	    switch (ev->type)
 	    {
 		case ButtonRelease:
-		    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "Got button release\n"));
+		    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MENUBAR, "Menuitem released\n"));
 		    switch (item->entry.itemType)
 		    {
 			case MenuLabel:
@@ -1622,11 +1622,10 @@ rxvt_menu_select(rxvt_t *r, XButtonEvent *ev)
 			    }
 			    /* remove menu before sending keys to the application */
 			    rxvt_menu_hide_all(r);
-#ifndef DEBUG
 			    rxvt_dispatch_action(r, &(item->entry.action),
 				    (XEvent *) ev );
-#else		    /* DEBUG */
-			    rxvt_dbgmsg ((DBG_DEBUG, DBG_MENUBAR, "%s: %s\n", item->name, item->entry.action.str));
+#ifdef DEBUG        /* DEBUG */
+			    rxvt_dbgmsg ((DBG_VERBOSE, DBG_MENUBAR, "%s: %s\n", item->name, item->entry.action.str));
 #endif		    /* DEBUG */
 			    break;
 		    }

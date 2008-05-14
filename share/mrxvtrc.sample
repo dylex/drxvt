@@ -37,7 +37,7 @@
 Mrxvt.bottomTabbar:		True
 
 # Only show the tab bar if there is more than one tab.
-Mrxvt.autohideTabbar:		True
+Mrxvt.autohideTabbar:		False
 
 # The number of tabs to attempt to keep visible. The width of tabs will shrink
 # to keep at least these many tabs visible.
@@ -201,6 +201,9 @@ Mrxvt.highlightColor:		#303060
 #
 # ------------------------------- MISC OPTIONS ------------------------------- #
 #
+
+# Display menu
+Mrxvt.showMenu:     True
 
 # The value of the TERM environment variable. Default is rxvt. If you have
 # trouble, try uncommenting the following line.
