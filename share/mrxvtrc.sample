@@ -37,7 +37,7 @@
 Mrxvt.bottomTabbar:		True
 
 # Only show the tab bar if there is more than one tab.
-Mrxvt.autohideTabbar:		False
+Mrxvt.autohideTabbar:		True
 
 # The number of tabs to attempt to keep visible. The width of tabs will shrink
 # to keep at least these many tabs visible.
