@@ -113,12 +113,12 @@ COMMITTING TO SUBVERSION
 WRITING CODE FOR MRXVT
 
     PLEASE PLEASE follow these guidelines when contributing code to mrxvt.
-    1. The "one true brace/tab style" sucks. Use the style we have in our code. It
-       looks best with Vim7 and syntax folding.
-       We recommend to use the following vim settings:
-       --
-       :set sts=4 ts=8 sw=4 autoindent cindent noet
-       --
+    1. The "one true brace/tab style" sucks. Use the style we have in our code.
+       With Vim 7 and syntax folding (fdm=syntax), it looks quite nice! If you
+       use Vim, and want to edit the code PLEASE USE
+
+	   :set sts=4 ts=8 sw=4 autoindent cindent noet
+
     2. You're probably aware of our design goals: Small, light, and CPU
        friendly. Don't bend this one too much, otherwise you will get flamed
     3. Don't add dependencies unless you ABSOLUTELY have to. Even then, discuss
