@@ -102,11 +102,17 @@ rxvt_msg (uint32_t level, uint32_t mask, const char* fmt, ...)
     {
 	int	len;
 	va_list	ap;
+	char* searchlastnl = strrchr(fmt,'\n');
 
 	va_start (ap, fmt);
 	len = vfprintf (stderr, fmt, ap);
 	va_end (ap);
-
+	
+        /* add a newline if last character of fmt is not a newline */
+        if ((IS_NULL(searchlastnl)) || (searchlastnl++ == '\0')){
+             fprintf(stderr,"\n");
+	     len++;
+	}
         return (len);
     }
     return 0;
