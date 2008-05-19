@@ -2537,7 +2537,8 @@ rxvt_menubar_load_file(rxvt_t *r, const unsigned char *filename)
 	    ".menu", r->h->rs[Rs_path]);
     if (IS_NULL(file))
     {
-	rxvt_msg (DBG_ERROR, DBG_MENUBAR,  "Could not open file %s", filename);
+	rxvt_msg (DBG_ERROR, DBG_MENUBAR,  "Could not open file %s\n",
+		filename);
 	return;
     }
 
