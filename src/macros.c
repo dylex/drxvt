@@ -41,7 +41,7 @@ static const char *const macroNames[] =
     "Scroll",		    /* Scroll up/down */
     "Copy",		    /* Copy selection */
     "Paste",		    /* Paste selection */
-    "PasteFile",		    /* Paste the content of a file */
+    "PasteFile",	    /* Paste the content of a file */
     "ToggleSubwin",	    /* Toggle subwindows (scroll / menu / tabbar) */
     "ResizeFont",	    /* Resize terminal font */
     "ToggleVeryBold",	    /* Toggle use of bold font for colored text */
@@ -1034,7 +1034,7 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 #endif
 	case MacroFnPaste:
 	{
-	    int sel = 1;
+	    int sel = XA_PRIMARY;
 
 	    if (NOT_NULL(ev))
 	    {

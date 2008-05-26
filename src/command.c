@@ -17,7 +17,7 @@
  * Copyright (c) 2003        Rob McMullen <robm@flipturn.org>
  * Copyright (c) 2004        Terry Griffin <griffint@pobox.com>
  * Copyright (c) 2005        Johann 'Mykraverk' Oskarsson
- * 						<johann@myrkraverk.com>
+ *				<johann@myrkraverk.com>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
  *
@@ -1558,7 +1558,9 @@ rxvt_clean_cmd_page (rxvt_t* r)
 			    else
 			    {
 				/* Really incomplete escape sequence */
-				rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Incomplete escape sequence '%.*s'\n", PVTS(r, i)->cmdbuf_escfail - PVTS(r, i)->cmdbuf_escstart + 1, PVTS(r, i)->cmdbuf_escstart+1));
+				rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Incomplete escape sequence '%.*s'\n", 
+					      PVTS(r, i)->cmdbuf_escfail - PVTS(r, i)->cmdbuf_escstart + 1, 
+					      PVTS(r, i)->cmdbuf_escstart+1));
 
 				SET_NULL( last_escfail );
 				SET_NULL( PVTS(r, i)->cmdbuf_escstart );
