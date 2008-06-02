@@ -460,7 +460,6 @@ char*
 rxvt_get_encoding_from_locale (rxvt_t* r)
 {
     char*   enc;
-	 char* end;
 
     if (IS_NULL(r->h->locale))
 	return NULL;

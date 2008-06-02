@@ -3221,7 +3221,7 @@ rxvt_get_desktop( rxvt_t* r )
 
     XFree( prop);
 
-    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, stderr, "Desktop: %lu\n", desktop ));
+    rxvt_dbgmsg(( DBG_DEBUG, DBG_INIT, "Desktop: %lu\n", desktop ));
     return desktop;
 }
 
