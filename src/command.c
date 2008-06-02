@@ -2308,12 +2308,14 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	quick_timeout = rxvt_adjust_quick_timeout (r, quick_timeout, &value);
 
 	/* Now begin to read in from children's file descriptors */
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Waiting for %lumu for child\n", quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec : ULONG_MAX));
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "Waiting for %lumu for child\n", 
+		      quick_timeout ? value.tv_sec * 1000000LU + value.tv_usec : ULONG_MAX));
 
 
 	/* Prepare to read in from children's file descriptors */
 	FD_ZERO(&readfds);
 	FD_SET(r->Xfd, &readfds);
+
 	for (i = 0; i <= LTAB(r); i ++)
 	{
 	    /* remember to skip held childrens */
