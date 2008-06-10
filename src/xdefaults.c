@@ -811,7 +811,7 @@ rxvt_save_options (rxvt_t* r, const char* filename)
     int		i;
     FILE*	pf = fopen (filename, "w");
 
-    const char	*name = r->h->rs[Rs_name] ?: APL_NAME;
+    const char	*name = r->h->rs[Rs_name] ? NULL : APL_NAME;
 
     char	*tabs="\t\t\t\t\t";
 
