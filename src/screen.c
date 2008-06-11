@@ -1061,7 +1061,7 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
  * Adjust the PVTS(r, page)->view_start so that the if nlines of text are added,
  * the view will not change.
  */
-void inline
+void static inline
 adjust_view_start( rxvt_t *r, int page, int nlines)
 {
     if(
