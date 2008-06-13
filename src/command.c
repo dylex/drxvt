@@ -1735,7 +1735,7 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 	unsigned int	n, len;
 
 	start = PVTS(r, page)->cmdbuf_escstart ?
-	    NULL : PVTS(r, page)->cmdbuf_ptr;
+	    PVTS(r, page)->cmdbuf_escstart : PVTS(r, page)->cmdbuf_ptr;
 
 
 	n   = start - PVTS(r, page)->cmdbuf_base;
@@ -4462,13 +4462,14 @@ rxvt_process_x_event(rxvt_t* r, XEvent *ev)
 FILE*
 rxvt_popen_printer( rxvt_t *r, const char *pipeName )
 {
-    FILE*   stream = popen( pipeName ? NULL : r->h->rs[Rs_print_pipe], "w" );
+    FILE*   stream = popen( pipeName ? pipeName : r->h->rs[Rs_print_pipe],
+			    "w" );
 
 
     assert( pipeName || r->h->rs[Rs_print_pipe] );
     if (IS_NULL(stream))
 	rxvt_msg (DBG_ERROR, DBG_COMMAND, "Can't open printer pipe %s",
-		r->h->rs[Rs_print_pipe] ? NULL : pipeName );
+		r->h->rs[Rs_print_pipe] ? r->h->rs[Rs_print_pipe] : pipeName );
 
     return stream;
 }
