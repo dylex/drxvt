@@ -810,7 +810,7 @@ rxvt_init_vars(rxvt_t *r)
 
 #ifdef USE_FIFO
     {
-	char fifo_name[NAME_MAX];
+	char fifo_name[FILENAME_MAX];
 
 	sprintf( fifo_name, "/tmp/.mrxvt-%d", getpid() );
 	r->fbuf_ptr = r->fifo_buf;
