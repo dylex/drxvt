@@ -1966,7 +1966,7 @@ rxvt_adjust_quick_timeout (rxvt_t* r, int quick_timeout, struct timeval* value)
     value->tv_sec = 0;
 
 
-    if (!r->TermWin.mapped)
+    if( !r->TermWin.mapped || r->h->refresh_type == NO_REFRESH )
 	quick_timeout = 0;
     else
     {
@@ -2322,16 +2322,21 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    /* remember to skip held childrens */
 	    if ( PVTS(r, i)->hold > 1 )
 	    {
-		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, " not listen on vt[%d].cmd_fd\n",i));
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,
+			    " not listening on vt[%d].cmd_fd (dead)\n", i));
 		continue;
 	    }
 	    else if ( PVTS(r, i)->gotEIO )
 	    {
+		rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,
+			    " not listening on vt[%d].cmd_fd (EIO)\n", i));
 		PVTS(r, i)->gotEIO = 0;
 		continue;
 	    }
 
-	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  " listen on vt[%d].cmd_fd = %d\n", i, PVTS(r, i)->cmd_fd));
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,
+			" listening on vt[%d].cmd_fd = %d\n",
+			i, PVTS(r, i)->cmd_fd));
 	    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
 
 	    /* Write out any pending output to child */
@@ -2350,12 +2355,16 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 #endif
 
 	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND,
-		    "Calling select (timeout %06luu)...",
-		    quick_timeout ? value.tv_sec * 1000000 + value.tv_usec : 0
+		    "Calling select( num_fds=%d, timeout=%06du, &readfds)",
+		    r->num_fds,
+		    quick_timeout ? value.tv_sec * 1000000 + value.tv_usec : -1
 		    ));
 	select_res = select( r->num_fds, &readfds, NULL, NULL,
 			(quick_timeout ? &value : NULL) );
-	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND, "done. Return %d\n", select_res));
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_COMMAND,
+		    "done (timeout %06du). Return %d\n",
+		    quick_timeout ? value.tv_sec * 1000000 + value.tv_usec : -1,
+		    select_res ));
 
 	if( select_res > 0 )
 	{
