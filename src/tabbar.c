@@ -778,12 +778,18 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 #ifdef BACKGROUND_IMAGE
 	    if( r->tabBar.hasPixmap  && ISSET_OPTION(r, Opt_tabPixmap))
+	    {
+                rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Disabling background filling of active tab, background image is enabled"));
 		clear = 1;  /* use background image */
+	    }
 #endif
 #ifdef TRANSPARENT
 	    if ( ( r->h->am_transparent || r->h->am_pixmap_trans ) &&
 		ISSET_OPTION(r, Opt_transparent_tabbar))
+	    {
+                rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Disabling background filling of active tab, transparentTabbar is enabled"));
 		clear = 1;  /* transparent override background image */
+	    }
 #endif
 
 	    if( !clear )
