@@ -16,6 +16,61 @@
 #
 # ---------------------------------------------------------------------------- #
 
+# ---------------------------------------------------------------------------- #
+#
+#			       GENERAL SETTINGS
+#
+# ---------------------------------------------------------------------------- #
+
+Mrxvt.showMenu: true
+
+# Tab bar colors
+Mrxvt.itabBackground:	    #101010
+Mrxvt.tabBackground:	    #900000
+Mrxvt.itabForeground:	    #909090
+Mrxvt.tabForeground:	    #9a9a9a
+
+# Scroll bar colors
+Mrxvt.scrollColor:      #808080
+Mrxvt.troughColor:      #202020
+
+# Cursor
+Mrxvt.cursorBlink:      true
+Mrxvt.cursorColor:      #00ff00
+Mrxvt.cursorColor2:     #000000
+
+# Setup colors for a black background.
+Mrxvt.background:    #000000
+Mrxvt.foreground:    #ffffff
+
+Mrxvt.color0:        #000000
+Mrxvt.color1:        #af0000
+Mrxvt.color2:        #00af00
+Mrxvt.color3:        #afaf00
+Mrxvt.color4:        #0000af
+Mrxvt.color5:        #af00af
+Mrxvt.color6:        #00afaf
+Mrxvt.color7:        #9a9a9a
+Mrxvt.color8:        #5f5f5f
+Mrxvt.color9:        #d70000
+Mrxvt.color10:       #00d700
+Mrxvt.color11:       #d7d700
+Mrxvt.color12:       #0000d7
+Mrxvt.color13:       #d700d7
+Mrxvt.color14:       #00d7d7
+Mrxvt.color15:       #d7d7d7
+
+# Display bold and underlined text in color, rather than using the terminal
+# attributes. This makes reading man pages a little easier.
+Mrxvt.colorBD:       #00afaf
+Mrxvt.colorUL:       #00af00
+
+# Display the X selection as highlighted instead of using reverse video.
+Mrxvt.highlightColor:   #303060
+
+Mrxvt.bottomTabbar:     True
+Mrxvt.scrollbarRight:   True
+
 # NOTE: Macros defined with class Mrxvt or XTerm will NOT replace existing
 # macros. So user macros will not be replaced.
 
