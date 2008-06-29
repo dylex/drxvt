@@ -73,7 +73,7 @@ Mrxvt.tabForeground:		#9a9a9a
 
 # Monitor tabs for activity or inactivity
 # (alternate arguments for MonitorTab macro : "INACTIVITY" / "ACTIVITY")
-Mrxvt.macro.Ctrl+Shift+w:   MonitorTab AUTO
+#Mrxvt.macro.Ctrl+Shift+w:   MonitorTab AUTO
 #Mrxvt.monitorTimeout:          2000
 #Mrxvt.monitorCommand:          play ~/.ding_sound.wav
 

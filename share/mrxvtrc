@@ -253,7 +253,7 @@ Mrxvt.macro.Shift+Delete:		SetTitle
 
 # Monitor tabs for activity or inactivity
 # (valid arguments for MonitorTab macro : "INACTIVITY", "ACTIVITY" and "AUTO")
-Mrxvt.macro.Ctrl+Shift+w:	MonitorTab AUTO
+#Mrxvt.macro.Ctrl+Shift+w:	MonitorTab AUTO
 #Mrxvt.monitorTimeout:          2000
 #Mrxvt.monitorCommand:          play ~/.ding_sound.wav
 
