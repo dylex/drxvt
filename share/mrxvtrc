@@ -71,6 +71,9 @@ Mrxvt.highlightColor:   #303060
 Mrxvt.bottomTabbar:     True
 Mrxvt.scrollbarRight:   True
 
+# Default shading to use when run with -tr
+Mrxvt.shading:		80
+
 # NOTE: Macros defined with class Mrxvt or XTerm will NOT replace existing
 # macros. So user macros will not be replaced.
 
