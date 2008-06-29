@@ -53,6 +53,11 @@
 {Show right tab}{Ctrl-Shift-l}	    GotoTab +1
 ./Switch to tab/*
 ../
+./Monitor tab/*
+{Activity}			    MonitorTab ACTIVITY
+{Inactivity}			    MonitorTab INACTIVITY
+{Automatic}			    MonitorTab AUTO
+../
 {-}
 {Move tab left}{Ctrl-Shift-<}	    MoveTab -1
 {Move tab right}{Ctrl-Shift->}	    MoveTab +1

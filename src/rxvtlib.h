@@ -716,6 +716,14 @@ typedef struct {
 					   that have scrolled without a refresh
 					   request */
 
+    short	    monitor_tab;	/* monitor tab status value, 
+                               * see TAB_MON_* constants for possible values 
+                               */
+
+    int		    monitor_nbytes_read;	/* number of bytes read since monitor-start */
+    struct	    timeval monitor_start;	/* epoch time of monitor starttime of the tab */
+
+
     /*
      * Moved from hidden: want_refresh needs to be local to each tab.
      * want_full_refresh, refresh_type (except for SMOOTH_REFRESH), and
@@ -746,6 +754,12 @@ typedef struct {
 		    *cmdbuf_endp;	/* End of read child's output */
     unsigned char   cmdbuf_base[BUFSIZ];
 } term_t;
+
+#define TAB_MON_OFF 0            /* tab monitoring off */
+#define TAB_MON_ACTIVITY 1       /* monitor for activity */
+#define TAB_MON_INACTIVITY 2     /* monitor for inactivity */
+#define TAB_MON_AUTO 3           /* automatic discovery of monitor type */
+#define TAB_MON_NOTIFICATION 4   /* inactivity/activity detected, notification needed */
 
 
 /* Possible values for macros.modFlags */
@@ -788,6 +802,7 @@ enum {
     MacroFnCopy,
     MacroFnPaste,
     MacroFnPasteFile,
+    MacroFnMonitorTab,
     MacroFnToggleSubwin,
     MacroFnFont,
     MacroFnToggleVeryBold,

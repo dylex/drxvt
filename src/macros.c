@@ -42,6 +42,7 @@ static const char *const macroNames[] =
     "Copy",		    /* Copy selection */
     "Paste",		    /* Paste selection */
     "PasteFile",	    /* Paste the content of a file */
+    "MonitorTab",	    /* Monitor tab for activity/inactivity */
     "ToggleSubwin",	    /* Toggle subwindows (scroll / menu / tabbar) */
     "ResizeFont",	    /* Resize terminal font */
     "ToggleVeryBold",	    /* Toggle use of bold font for colored text */
@@ -1076,6 +1077,67 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	   break;
 	}
 
+	case MacroFnMonitorTab:
+	{
+	    if (NOT_NULL(ev))
+	    {
+		if( NOT_NULL(astr) && *astr )
+		{
+		    short doit = 0;
+
+		    /* which monitoring type do we need ? */
+		    if(strcmp ("ACTIVITY", astr) == 0)
+		    {
+		      AVTS(r)->monitor_tab = 
+			  (AVTS(r)->monitor_tab == TAB_MON_ACTIVITY ) ? TAB_MON_OFF : TAB_MON_ACTIVITY;
+		      doit = 1;
+		      rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro %s ACTIVITY : activity monitoring request on tab %i.",
+			macroNames[action->type], AVTS(r)->vts_idx );
+		    }
+		    else if (strcmp ("INACTIVITY", astr) == 0)
+		    {
+		      AVTS(r)->monitor_tab = 
+			  (AVTS(r)->monitor_tab == TAB_MON_INACTIVITY) ? TAB_MON_OFF : TAB_MON_INACTIVITY;
+		      doit = 1;
+		      rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro %s INACTIVITY : inactivity monitoring request on tab %i.",
+		 	 macroNames[action->type], AVTS(r)->vts_idx );
+		    }
+		    else if (strcmp ("AUTO", astr) == 0)
+		    {
+		      AVTS(r)->monitor_tab = 
+			  (AVTS(r)->monitor_tab == TAB_MON_AUTO) ? TAB_MON_OFF : TAB_MON_AUTO;
+		      doit = 1;
+		      rxvt_msg (DBG_INFO, DBG_MACROS,  
+			 "Macro %s AUTO : request for automatic (in-)activity monitoring on tab %i.",
+		 	 macroNames[action->type], AVTS(r)->vts_idx );
+		    }
+		    else
+		    {
+		      rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro %s requires argument or invalid argument provided.",
+		 	 macroNames[action->type] );
+		      break;
+		    }
+		    /* activating/deactivating the macro */
+		    if (doit != 0)
+		    {
+		      if (AVTS(r)->monitor_tab == TAB_MON_OFF )
+		      {
+			  rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro %s was already active, deactivating previous macro call.",
+			     macroNames[action->type] );
+		      }else
+		      {
+			  AVTS(r)->monitor_nbytes_read = 0;
+			  gettimeofday( &AVTS(r)->monitor_start , NULL);
+		      }
+		    }
+		}
+	    }
+	    else
+	    {
+		retval = -1;
+	    }
+	    break;
+	}
 
 	case MacroFnToggleSubwin:
 	    rxvt_toggle_subwin( r, (unsigned char*) astr);

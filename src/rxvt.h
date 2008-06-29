@@ -1184,6 +1184,8 @@ enum {
     Rs_bellCommand,
     Rs_vBellDuration,
 #endif
+    Rs_monitorCommand,
+    Rs_monitorTimeout,
     Rs_desktop,
 #ifndef NO_BACKSPACE_KEY
     Rs_backspace_key,

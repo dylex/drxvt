@@ -245,6 +245,10 @@ static const struct {
 	    "Duration (ms) of the visual bell", 0),
     STRG( Rs_bellCommand, "bellCommand", "blc",
 	"string", "command to execute instead of beeping", 0),
+    STRG( Rs_monitorCommand, "monitorCommand", "mcmd",
+	"string", "command to execute if activity/inactivity was detected while monitoring", 0),
+    STRG( Rs_monitorTimeout, "monitorTimeout", "mto", "number",
+	"timeout in milliseconds for tab-monitoring", 0),
 # if ! defined(NO_MAPALERT) && defined(MAPALERT_OPTION)
     BOOL( "mapAlert", NULL, Opt_mapAlert, NULL ),
 # endif

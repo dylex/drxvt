@@ -709,8 +709,26 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 	XArc	 	arcs[2];
 	XPoint	 	points[8];
 
-	if( page == ATAB(r) )
+	/*
+	 * Color the tab as active if the tab is active 
+	 * or
+	 * activity/inactivity is detected by the MonitorTab macro
+	 */
+
+	if( (page == ATAB(r)) || 
+ 	    ((NOT_NULL(&PVTS(r, page)->monitor_tab)) && 
+	     (PVTS(r,page)->monitor_tab == TAB_MON_NOTIFICATION)) 
+	  )
 	{
+	    /* 
+	     * disable activity/inactivity notification if current tab is
+	     * active tab
+	     */
+	    if ((page == ATAB(r)) && (PVTS(r,page)->monitor_tab == TAB_MON_NOTIFICATION))
+	    {
+	      rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: monitored tab %i is now the active tab", page);
+	      PVTS(r,page)->monitor_tab = TAB_MON_OFF;
+            }
 	    /*
 	     * Draw the active tab, and bottom line of the tabbar.
 	     */
@@ -778,18 +796,12 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 
 #ifdef BACKGROUND_IMAGE
 	    if( r->tabBar.hasPixmap  && ISSET_OPTION(r, Opt_tabPixmap))
-	    {
-                rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Disabling background filling of active tab, background image is enabled"));
 		clear = 1;  /* use background image */
-	    }
 #endif
 #ifdef TRANSPARENT
 	    if ( ( r->h->am_transparent || r->h->am_pixmap_trans ) &&
 		ISSET_OPTION(r, Opt_transparent_tabbar))
-	    {
-                rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "Disabling background filling of active tab, transparentTabbar is enabled"));
 		clear = 1;  /* transparent override background image */
-	    }
 #endif
 
 	    if( !clear )

@@ -31,7 +31,6 @@ Windows and tabs:
 
 Core:
 9   UTF-8 support.
-9   Monitor tabs for output / silence (very easy as of 2006-09-02).
 8   Better performance with vttest.
 7   I18N support
 7   regexp based selection, and URL highlighting

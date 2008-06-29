@@ -251,6 +251,13 @@ Mrxvt.macro.Ctrl+Shift+c:		Paste CLIPBOARD
 
 Mrxvt.macro.Shift+Delete:		SetTitle
 
+# Monitor tabs for activity or inactivity
+# (valid arguments for MonitorTab macro : "INACTIVITY", "ACTIVITY" and "AUTO")
+Mrxvt.macro.Ctrl+Shift+w:	MonitorTab AUTO
+#Mrxvt.monitorTimeout:          2000
+#Mrxvt.monitorCommand:          play ~/.ding_sound.wav
+
+             
 #
 # Mrxvt Console: Enable the useFifo option, and then open a console in a new
 # tab. Anything typed there is executed as a macro. When done (on clean exit),

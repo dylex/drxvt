@@ -62,7 +62,7 @@ aims to be light, fast, flexible and desktop independent, thus KDE or GNOME are 
 .Pp
 The primary features of
 .Nm
-include (but are not limited to) multiple tabs, dynamically changeable tab titles, customisable command for each tab, input broadcasting, true translucent window, fast pseudo transparency with tinting, user supplied background images (XPM, JPEG, PNG), off-focus fading, text shadow, multiple style (NeXT, Rxvt, Xterm, SGI, Plain) scrollbars, XIM, multi-language support (Chinese, Korean, Japanese), freetype font and logging.
+include (but are not limited to) multiple tabs, dynamically changeable tab titles, customizable command for each tab, input broadcasting, true translucent window, fast pseudo transparency with tinting, user supplied background images (XPM, JPEG, PNG), off-focus fading, text shadow, multiple style (NeXT, Rxvt, Xterm, SGI, Plain) scrollbars, XIM, multi-language support (Chinese, Korean, Japanese), freetype font, logging and (in-)activity monitoring.
 .Pp
 .
 The default
@@ -1198,6 +1198,19 @@ The meaning and syntax of this option might change in future versions.
 .It Cm vBellDuration Ar ms
 Amount of time (in milliseconds) to flash the screen if using a visual bell.
 .
+.It Cm monitorTimeout Ar ms
+Amount of time (in milliseconds) to detect the type of monitoring type or tab-inactivity.
+Default value is 2000 ms this causes that mrxvt is waiting 2 seconds after invoking the 
+.Ic MonitorTab
+macro with argument "AUTO" or "INACTIVITY" to determine if or what type a notification is 
+needed. The detection of "ACTIVITY" does not make use of the configuration value.
+.
+.It Cm monitorCommand Ar command
+Specifies a command which will be executed if a activity or inactivity event is raised
+by the
+.Ic MonitorTab
+macro.
+.
 .It Cm veryBright Ar True Ns | Ns Ar False
 If true, and if
 .Cm boldColors
@@ -1704,6 +1717,21 @@ to the currently active tab. This can be used to input text-snippets to a shell
 or any other terminal based program (i.e. somthing like a bash-profile
 or sequence of administration commands).
 .\" ------------------------------------------------------------
+.It Ic MonitorTab Ar [ACTIVITY|INACTIVITY|AUTO]
+Monitor the current tab-window for  
+.Ar ACTIVITY
+or
+.Ar INACTIVITY
+or automatically detect the type of monitoring using the 
+.Ar AUTO
+option. The amount time which is used to detect the type of monitoring or tab-inactivity
+can be specified by the
+.Ic monitorTimeout
+option. The detection of activity or inactivity is signaled by highlighting the tab of the event and ringing
+the system bell. Additionally it is possible to execute a dedicated command using the
+.Ic monitorCommand
+option.
+.\" ------------------------------------------------------------
 .It Ic ToggleSubwin Op Oo Ar + Ns | Ns Ar - Oc Ns Op Ar b Ns | Ns Ar m Ns | Ns Ar s Ns | Ns Ar t
 Toggle visibility of sub-windows. If the argument begins with a
 .Sq +
@@ -2049,5 +2077,6 @@ or
 .
 .An "Terminator" < Ns Mt jimmyzhou@users.sourceforge.net Ns >
 .An "Gautam Iyer" < Ns Mt gi1242@users.sourceforge.net Ns >
+.An "Marc Schoechlin" < Ns Mt mschoechlin@users.sourceforge.net Ns >
 .
 .
