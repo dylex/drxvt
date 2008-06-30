@@ -724,9 +724,11 @@ void rxvt_draw_tabs (rxvt_t* r, Region region)
 	     * disable activity/inactivity notification if current tab is
 	     * active tab
 	     */
-	    if ((page == ATAB(r)) && (PVTS(r,page)->monitor_tab == TAB_MON_NOTIFICATION))
+	    if ((page == ATAB(r)) && 
+		(PVTS(r,page)->monitor_tab == TAB_MON_NOTIFICATION))
 	    {
-	      rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: monitored tab %i is now the active tab", page);
+	      rxvt_msg (DBG_INFO, DBG_MACROS,  
+		      "Macro MonitorTab: monitored tab %i is now the active tab", page);
 	      PVTS(r,page)->monitor_tab = TAB_MON_OFF;
             }
 	    /*

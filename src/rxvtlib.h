@@ -717,12 +717,13 @@ typedef struct {
 					   request */
 
     short	    monitor_tab;	/* monitor tab status value, 
-                               * see TAB_MON_* constants for possible values 
-                               */
+	                                 * see TAB_MON_* constants for possible values 
+					 */
 
-    int		    monitor_nbytes_read;	/* number of bytes read since monitor-start */
-    struct	    timeval monitor_start;	/* epoch time of monitor starttime of the tab */
-
+    int		    monitor_nbytes_read;    /* number of bytes read since 
+                                               monitor-start */
+    struct	    timeval monitor_start;  /* epoch time of monitor starttime
+					       of the tab */
 
     /*
      * Moved from hidden: want_refresh needs to be local to each tab.

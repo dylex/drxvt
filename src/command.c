@@ -1830,7 +1830,8 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
     if (bread != 0)
     {
      gettimeofday( &tp, NULL);
-     rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "output produced on epoch %i\n", tp.tv_sec));
+     rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  
+                   "output produced on epoch %i\n", tp.tv_sec));
     }
     PVTS(r, page)->monitor_nbytes_read += bread;
     PVTS(r, page)->nbytes_last_read = bread;
@@ -1860,23 +1861,27 @@ rxvt_monitor_tab(rxvt_t* r,int i)
 	monitor_timeout = atoi( r->h->rs[Rs_monitorTimeout] );
 
     monitor_timeout_time.tv_sec += (int) monitor_timeout/1000;
-    monitor_timeout_time.tv_usec += (monitor_timeout - (((int) monitor_timeout/1000) * 1000)) * 1000;
+    monitor_timeout_time.tv_usec += 
+       (monitor_timeout - (((int) monitor_timeout/1000) * 1000)) * 1000;
 
     /* get current epoch time */
     gettimeofday( &tp, NULL);
 
     /* monitor-type "AUTO" : determine which type of monitoring is needed */
-    if ((PVTS(r, i)->monitor_tab == TAB_MON_AUTO) && (timercmp(&monitor_timeout_time,&tp, <)))
+    if ((PVTS(r, i)->monitor_tab == TAB_MON_AUTO) && 
+	(timercmp(&monitor_timeout_time,&tp, <)))
     {
        if(PVTS(r, i)->monitor_nbytes_read > 0)
        {
 	   PVTS(r, i)->monitor_tab = TAB_MON_INACTIVITY;
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: decided to monitor inactivity on tab %i", i);
+	   rxvt_msg (DBG_INFO, DBG_MACROS,  
+ 	     "Macro MonitorTab: decided to monitor inactivity on tab %i", i);
        }
        else
        {
 	   PVTS(r, i)->monitor_tab = TAB_MON_ACTIVITY;
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: decided to monitor activity on tab %i", i);
+	   rxvt_msg (DBG_INFO, DBG_MACROS,  
+	      "Macro MonitorTab: decided to monitor activity on tab %i", i);
        }
        PVTS(r, i)->monitor_nbytes_read = 0 ;
        PVTS(r, i)->monitor_start = tp;
@@ -1888,13 +1893,15 @@ rxvt_monitor_tab(rxvt_t* r,int i)
 	    /* inactivity detected */
 	    if (PVTS( r, i)->monitor_nbytes_read == 0)
 	    {
-	       rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: detected inactivity on tab %i", i);
+	       rxvt_msg (DBG_INFO, DBG_MACROS,  
+	          "Macro MonitorTab: detected inactivity on tab %i", i);
 	       execute_action = 1;
 	    }
 	    /* activity detected, restarting monitoring */
 	    else
 	    {
-	       rxvt_msg (DBG_DEBUG, DBG_MACROS,  "Macro MonitorTab: NOT detected inactivity on tab %i / %i ", 
+	       rxvt_msg (DBG_DEBUG, DBG_MACROS,  
+		   "Macro MonitorTab: NOT detected inactivity on tab %i / %i ", 
 		       i, PVTS(r,i)->monitor_nbytes_read);
 	       PVTS(r, i)->monitor_start = tp;
 	       PVTS(r, i)->monitor_nbytes_read = 0 ;
@@ -1904,7 +1911,8 @@ rxvt_monitor_tab(rxvt_t* r,int i)
     else if ((PVTS(r, i)->monitor_tab == TAB_MON_ACTIVITY) &&
 	     (PVTS( r, i)->monitor_nbytes_read != 0))
     {
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  "Macro MonitorTab: detected activity on tab %i", i);
+	   rxvt_msg (DBG_INFO, DBG_MACROS,  
+	      "Macro MonitorTab: detected activity on tab %i", i);
 	   execute_action = 1;
     }
 
@@ -1933,18 +1941,19 @@ rxvt_monitor_tab(rxvt_t* r,int i)
 #ifdef BACKGROUND_IMAGE
 	if( r->tabBar.hasPixmap  && ISSET_OPTION(r, Opt_tabPixmap))
 	{
-	     PVTS(r, i)->monitor_tab = TAB_MON_OFF;
-             rxvt_dbgmsg ((DBG_INFO, DBG_TABBAR, 
-	       "Disabling background filling of active tab, background image is activated"));
+	 PVTS(r, i)->monitor_tab = TAB_MON_OFF;
+         rxvt_dbgmsg ((DBG_INFO, DBG_TABBAR, 
+	  "Disabling background filling, background image is activated"));
 	}
 #endif
 #ifdef TRANSPARENT
 	if ( ( r->h->am_transparent || r->h->am_pixmap_trans ) &&
 	    ISSET_OPTION(r, Opt_transparent_tabbar))
 	{
-	     PVTS(r, i)->monitor_tab = TAB_MON_OFF;
-             rxvt_dbgmsg ((DBG_INFO, DBG_TABBAR, 
-	        "Disabling background filling of active tab, option 'transparentTabbar' is enabled"));
+	 PVTS(r, i)->monitor_tab = TAB_MON_OFF;
+         rxvt_dbgmsg ((DBG_INFO, DBG_TABBAR, 
+	  "Disabling background filling, option 'transparentTabbar' is enabled"
+	  ));
 	}
 #endif
 	rxvt_tabbar_expose (r, NULL);
