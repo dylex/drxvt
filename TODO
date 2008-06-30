@@ -117,7 +117,16 @@ WRITING CODE FOR MRXVT
        use Vim, and want to edit the code PLEASE USE
 
 	   :set sts=4 ts=8 sw=4 autoindent cindent noet tw=80
+       
+       If you don't use Vim, this roughly translates to:
+	- Make tabs 8 characters wide (and don't expand them into spaces)
+	- Indent four spaces for every level
+	- Wrap your lines at 80 characters
+	- Follow the brace, indent and comment style in the code.
 
+       It's not the end of the world if you don't wrap lines at 80 characters
+       (though we strongly urge you to). But if you break the indent, brace, or
+       comment style you will get flamed by me (gi1242).
     2. You're probably aware of our design goals: Small, light, and CPU
        friendly. Don't bend this one too much, otherwise you will get flamed
     3. Don't add dependencies unless you ABSOLUTELY have to. Even then, discuss
