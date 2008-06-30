@@ -116,7 +116,7 @@ WRITING CODE FOR MRXVT
        With Vim 7 and syntax folding (fdm=syntax), it looks quite nice! If you
        use Vim, and want to edit the code PLEASE USE
 
-	   :set sts=4 ts=8 sw=4 autoindent cindent noet
+	   :set sts=4 ts=8 sw=4 autoindent cindent noet tw=80
 
     2. You're probably aware of our design goals: Small, light, and CPU
        friendly. Don't bend this one too much, otherwise you will get flamed
