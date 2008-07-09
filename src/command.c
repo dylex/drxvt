@@ -1870,20 +1870,20 @@ rxvt_monitor_tab(rxvt_t* r,int i)
     if ((PVTS(r, i)->monitor_tab == TAB_MON_AUTO) && 
 	(timercmp(&monitor_timeout_time,&tp, <)))
     {
-       if(PVTS(r, i)->monitor_nbytes_read > 0)
-       {
-	   PVTS(r, i)->monitor_tab = TAB_MON_INACTIVITY;
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  
- 	     "Macro MonitorTab: decided to monitor inactivity on tab %i", i);
-       }
-       else
-       {
-	   PVTS(r, i)->monitor_tab = TAB_MON_ACTIVITY;
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  
-	      "Macro MonitorTab: decided to monitor activity on tab %i", i);
-       }
-       PVTS(r, i)->monitor_nbytes_read = 0 ;
-       PVTS(r, i)->monitor_start = tp;
+	if(PVTS(r, i)->monitor_nbytes_read > 0)
+	{
+	    PVTS(r, i)->monitor_tab = TAB_MON_INACTIVITY;
+	    rxvt_msg (DBG_INFO, DBG_MACROS,  
+	      "Macro MonitorTab: decided to monitor inactivity on tab %i", i);
+	}
+	else
+	{
+	    PVTS(r, i)->monitor_tab = TAB_MON_ACTIVITY;
+	    rxvt_msg (DBG_INFO, DBG_MACROS,  
+	       "Macro MonitorTab: decided to monitor activity on tab %i", i);
+	}
+	PVTS(r, i)->monitor_nbytes_read = 0 ;
+	PVTS(r, i)->monitor_start = tp;
     }
     /* monitor-type "INACTIVITY" : detect inactivity */
     else if ((PVTS(r, i)->monitor_tab == TAB_MON_INACTIVITY) && 
@@ -1901,7 +1901,7 @@ rxvt_monitor_tab(rxvt_t* r,int i)
 	{
 	   rxvt_msg (DBG_DEBUG, DBG_MACROS,  
 	       "Macro MonitorTab: NOT detected inactivity on tab %i / %i ", 
-	           i, PVTS(r,i)->monitor_nbytes_read);
+		   i, PVTS(r,i)->monitor_nbytes_read);
 	   PVTS(r, i)->monitor_start = tp;
 	   PVTS(r, i)->monitor_nbytes_read = 0 ;
 	}
@@ -1910,9 +1910,9 @@ rxvt_monitor_tab(rxvt_t* r,int i)
     else if ((PVTS(r, i)->monitor_tab == TAB_MON_ACTIVITY) &&
 	     (PVTS( r, i)->monitor_nbytes_read != 0))
     {
-	   rxvt_msg (DBG_INFO, DBG_MACROS,  
-	      "Macro MonitorTab: detected activity on tab %i", i);
-	   execute_action = 1;
+	rxvt_msg (DBG_INFO, DBG_MACROS,  
+	   "Macro MonitorTab: detected activity on tab %i", i);
+	execute_action = 1;
     }
 
     /* stop execution of this function if no activity/inactivity 
@@ -1921,9 +1921,17 @@ rxvt_monitor_tab(rxvt_t* r,int i)
     if (execute_action == 0)
 	return;
 
+    const int   maxLen = 1024;
+    char        expstr[maxLen];
+
     /* execute a command if configured */
-    if( r->h->rs[Rs_monitorCommand] && *r->h->rs[Rs_monitorCommand] )
-      rxvt_async_exec( r, r->h->rs[Rs_monitorCommand] );
+    if( r->h->rs[Rs_monitorCommand] && *r->h->rs[Rs_monitorCommand] ){
+	/* interpolate percent arguments */
+	rxvt_percent_interpolate( r, i, (char *) r->h->rs[Rs_monitorCommand],
+	  STRLEN(r->h->rs[Rs_monitorCommand]), (char*) expstr, maxLen );
+
+	rxvt_async_exec( r, expstr );
+    }
 
     /* ding - ring the system bell */
     rxvt_scr_bell(r,i);

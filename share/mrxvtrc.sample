@@ -73,10 +73,11 @@ Mrxvt.tabForeground:		#9a9a9a
 
 # Monitor tabs for activity or inactivity
 # (alternate arguments for MonitorTab macro : "INACTIVITY" / "ACTIVITY")
-#Mrxvt.macro.Ctrl+Shift+w:   MonitorTab AUTO
-#Mrxvt.monitorTimeout:          2000
-#Mrxvt.monitorCommand:          play ~/.ding_sound.wav
-
+Mrxvt.macro.Ctrl+Shift+g:		MonitorTab AUTO
+#Mrxvt.monitorTimeout:		 2000
+#Mrxvt.monitorCommand:           play ~/.ding_sound.wav
+#Mrxvt.monitorCommand:           aosd_cat --fontdesc="Trebuchet 20" --ypos=50 --delay=4000 Alert on tab %n :: %t
+#Mrxvt.monitorCommand:           xmessage Monitor alert on tab %n
 
 #
 # ---------------------- SCROLLING / SCROLLBAR OPTIONS ----------------------- #
