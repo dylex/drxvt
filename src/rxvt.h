@@ -219,7 +219,6 @@ typedef struct {
 #endif
 
 
-#ifdef HAVE_LIBX11
 # include <X11/Xlib.h>
 # include <X11/X.h>
 # include <X11/Xutil.h>
@@ -246,7 +245,6 @@ typedef struct {
 # ifdef HAVE_X11_SM_SMLIB_H
 #  include <X11/SM/SMlib.h>
 # endif
-#endif
 
 /* Macros to check X Window IDs. Notice that we can use only one macro
 ** to check all different type of IDs such as Window and Pixmap. But it
@@ -351,14 +349,12 @@ typedef char*	    XPointer;
 
 /* Xft.h seems to conflict with png.h. So we must include it
 ** after pnt.h */
-#ifdef HAVE_LIBX11
 # ifdef XFT_SUPPORT
 #  include <X11/Xft/Xft.h>
 # endif
 # ifdef HAVE_ICONV_H
 #  include <iconv.h>
 # endif
-#endif
 
 /*
 ** It seems Mac OS X's fontconfig does not have following definitions
