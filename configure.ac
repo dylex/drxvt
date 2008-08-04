@@ -25,8 +25,8 @@ dnl#
 dnl 2006-02-20 gi1242: If the version contains a letter, then it sometimes
 dnl produces spurious results when programs use an escape sequence to query the
 dnl terminal version.
-AC_INIT(mrxvt, 0.5.4, [jimmyzhou@users.sourceforge.net])
-AM_INIT_AUTOMAKE(mrxvt, 0.5.4)
+AC_INIT(mrxvt, 0.5.5, [jimmyzhou@users.sourceforge.net])
+AM_INIT_AUTOMAKE(mrxvt, 0.5.5)
 
 AM_CONFIG_HEADER(config.h)
 AC_CONFIG_SRCDIR([src/main.c])
