@@ -314,11 +314,11 @@ typedef struct {
 #undef NOT_KEYSYM
 #undef UNSET_KEYSYM
 #define IS_KEYSYM(KEYSYM_ID)	\
-    (None != (KEYSYM_ID))
+    (NoSymbol != (KEYSYM_ID))
 #define NOT_KEYSYM(KEYSYM_ID)	\
-    (None == (KEYSYM_ID))
+    (NoSymbol == (KEYSYM_ID))
 #define UNSET_KEYSYM(KEYSYM_ID)	\
-    ((KEYSYM_ID) = None)
+    ((KEYSYM_ID) = NoSymbol)
 
 
 #ifndef HAVE_XPOINTER
