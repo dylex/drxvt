@@ -334,7 +334,7 @@ rxvt_parse_macros( rxvt_t *r, const char *str, const char *arg,
     }
 
     /*
-     * Always store the keysym as upper case. That way we can treat shift
+     * Always store the keysym as lower case. That way we can treat shift
      * correctly even when Caps Lock is pressed.
      */
     {
@@ -743,7 +743,7 @@ rxvt_process_macros( rxvt_t *r, KeySym keysym, XKeyEvent *ev)
     if (ev->state & ControlMask)	    ck.modFlags |= MACRO_CTRL;
     if (ev->state & r->h->ModMetaMask)	    ck.modFlags |= MACRO_META;
 
-    /* Use uppercase version so we can ignore caps lock */
+    /* Use lowercase version so we can ignore caps lock */
     {
         KeySym upper;
         XConvertCase(keysym, &ck.keysym, &upper);
