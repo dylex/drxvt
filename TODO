@@ -28,6 +28,7 @@ Windows and tabs:
 5   Add separate colors for tabbar background, menubar fg/bg
 5   Searching scroll buffer support: We should pipe the scroll-back to less
     directly, and open it in the *same* tab. (Ugly hack possible using macros)
+5   Option to select a different font on each tab.
 
 Core:
 9   UTF-8 support.
@@ -65,6 +66,8 @@ Code Cleanup:
     CPU cycles... NOTE: Only happens with -tr
 8   When sending escape sequences to mrxvt via macros, make sure we are not
     disrupting processing of another escape sequence.
+5   Highlighting (with the mouse) already highlight text does not toggle (like
+    xterm or rxvt).
 1   PNG and JPEG background support on Solaris looks broken
 
 --------------------------------------------------------------------------------
@@ -73,10 +76,10 @@ Code Cleanup:
 
 If you want to contribute code to mrxvt, PLEASE PLEASE follow these guidelines.
 
-Right now we only have two regular developers, who are extremely busy. We could
-use your help. If you want to help, do anything on the above list and send us a
-patch. Or do something useful (and not contradictory to mrxvt's design goals),
-and send us a patch.
+We are extremely short staffed, and we certainly would appreciate your help. If
+you want to help, do anything on the above list and send us a patch. Or do
+something useful (and not contradictory to mrxvt's design goals), and send us a
+patch. (Send patches to the dev list).
 
 If you send us patches regularly, then we will probably give you subversion
 access.
