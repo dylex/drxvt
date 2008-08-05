@@ -1008,12 +1008,13 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 	    /* Scroll by an amount specified in astr */
 	    if( alen > 1 )
 	    {
-		int		amount	    = abs( atoi( (char*) astr ));
+		char	*suffix;
+		int	amount = abs(strtol( astr, &suffix, 0 ));
 		enum page_dirn	direction   = (*(astr) == '-' ? UP : DN);
 
 		rxvt_dbgmsg ((DBG_DEBUG, DBG_MACROS, "astr: '%s', alen: %d\n", astr, alen));
 
-		if( tolower( astr[ alen - 2] ) == 'p' )
+		if( tolower( *suffix ) == 'p' )
 		    /* scroll pages */
 		    amount *=
 #ifdef PAGING_CONTEXT_LINES
@@ -1022,8 +1023,15 @@ rxvt_dispatch_action( rxvt_t *r, action_t *action, XEvent *ev)
 				r->TermWin.nrow * 4 / 5
 #endif
 		    ;
+		else if( tolower( *suffix ) == '%' )
+		    /*
+		     * 2008-08-04 Jim Diamond: Scroll as a perCent of the
+		     * current window size.
+		     */
+		    amount = amount * r->TermWin.nrow / 100;
 
-		rxvt_scr_page( r, ATAB(r), direction, amount);
+		rxvt_scr_page(r, ATAB(r), direction, amount);
+
 #  ifdef HAVE_SCROLLBARS
 		rxvt_scrollbar_update(r, 1);
 #  endif    /* HAVE_SCROLLBARS */

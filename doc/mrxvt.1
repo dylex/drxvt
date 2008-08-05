@@ -1694,13 +1694,23 @@ is relative to the current tab.
 .It Ic Scroll Ar amount
 Scroll the active tab by
 .Ar amount
-lines (negative values mean scroll backward). If
+lines (negative values mean scroll backward).  If
 .Ar amount
 ends with
 .Sq p
 then scroll
 .Ar amount
-pages instead of lines.
+pages instead of lines.  If
+.Ar amount
+ends with
+.Sq %%
+then scroll 
+.Ar amount
+percent of a page.  For example, 
+.Ar -50%%
+would scroll backwards one half of the current page size. (Note, we need to use two percent signs, as macro arguments are percent interpolated. Thus putting only one percent sign, will work, but cause
+.Nm
+to print a warning about an unrecognized flag)
 .\" ------------------------------------------------------------
 .It Ic Copy
 Copy selection into clipboard (not implemented).
