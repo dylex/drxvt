@@ -128,6 +128,8 @@ static const struct {
     STRG(Rs_maxTabWidth, "maxTabWidth", "mtw", "number", "maximum (char) title width of all tabs", 0),
     STRG(Rs_minVisibleTabs, "minVisibleTabs", "mvt", "number",
 	    "minimum # of tabs to keep visible (requires xftpfn)", 0),
+    BOOL( "chopEnd", "ce", Opt3_chopEnd,
+	"Chop right end of tab titles. (If false, chop left end)" ),
     BOOL( "highlightTabOnBell", "htb", Opt2_hlTabOnBell,
 	    "highlighting inactive tabs only when bell sounds" ),
     BOOL( "syncTabTitle", "stt", Opt2_syncTabTitle,

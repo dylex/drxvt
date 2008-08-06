@@ -540,8 +540,25 @@ draw_title (rxvt_t* r, int x, int y, int tnum, Region region)
 	 * If % interpolation was not possible, or returned a 1 byte long
 	 * string, then just copy the title over.
 	 */
-	STRNCPY( str, PVTS(r,tnum)->tab_title , r->TermWin.maxTabWidth );
-	str[r->TermWin.maxTabWidth] = '\0';
+        /*
+	 * Change by Jim Diamond (2008/08/04):
+	 * show the suffix of the title, not the prefix, if chopEnd
+	 * was set to "start" in .mrxvtrc (or '-ce start' was given).
+	 * This only affects the non-xft case.
+	 */
+	if( ISSET_OPTION( r, Opt3_chopEnd ) )
+	{
+	    STRNCPY( str, PVTS(r,tnum)->tab_title , r->TermWin.maxTabWidth );
+	    str[r->TermWin.maxTabWidth] = '\0';
+	}
+	else
+	{
+	    int title_len = STRLEN(PVTS(r,tnum)->tab_title);
+	    int excess = max(title_len - r->TermWin.maxTabWidth, 0);
+
+	    STRNCPY( str, PVTS(r,tnum)->tab_title + excess,
+		     r->TermWin.maxTabWidth + 1 );  /* + 1 ensures we get \0 */
+	}
     }
 
 

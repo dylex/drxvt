@@ -354,8 +354,11 @@ typedef enum {
     (Opt2_veryBold | Opt2_smartResize)
 #endif
 
+#define Opt3_chopEnd		    ((1LU<<2) | IS_OPTION3)
+
 #define DEFAULT_OPTIONS3    \
-    (IS_OPTION3)
+    (Opt3_chopEnd | IS_OPTION3)
+
 #define DEFAULT_OPTIONS4    \
     (IS_OPTION4)
 

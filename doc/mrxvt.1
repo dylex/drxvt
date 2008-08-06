@@ -587,7 +587,7 @@ option must be enabled.
 .Bl -tag -width 4n
 .
 .It Fl aht
-Automatically hide or show the tab bar depending on the number of tabs. On startup, the tabbar is shown only if there are more than one tabs present. If there is only one tab, and a new one is created, then the tabbar is shown. If there are two tabs and one is closed, then the tabbar is hidden. A keyboard shortcut used at any time to hide / show the tabbar.
+Automatically hide or show the tab bar depending on the number of tabs.  On startup, the tabbar is shown only if there are more than one tabs present.  If there is only one tab, and a new one is created, then the tabbar is shown. If there are two tabs and one is closed, then the tabbar is hidden.  A keyboard shortcut used at any time to hide / show the tabbar.
 .Op Cm autohideTabbar
 .BO at
 Run command specified with
@@ -605,10 +605,14 @@ macro is honored.
 Show tabbar at bottom.
 .Op Cm bottomTabbar
 .
+.BO ce
+If a tab title is too long to fit in the space provided, then truncate the end (default). If this option is unset, then truncate the start. This only has effect when Xft is not used.
+.Op Cm chopEnd
+.
 .It Fl e Op Ar arguments ...
 Specifies the program (and its command line arguments) to be run in the
 .Nm
-window. By default this command is only run initially, and all tabs created after startup will run the default shell (or program supplied by
+window.  By default this command is only run initially, and all tabs created after startup will run the default shell (or program supplied by 
 .Fl profile Ns Ar %d Ns ). This behaviour can be overridden with the
 .Fl at
 option.
@@ -1704,13 +1708,13 @@ pages instead of lines.  If
 .Ar amount
 ends with
 .Sq %%
-then scroll 
+then scroll
 .Ar amount
-percent of a page.  For example, 
+percent of a page.  For example,
 .Ar -50%%
-would scroll backwards one half of the current page size. (Note, we need to use two percent signs, as macro arguments are percent interpolated. Thus putting only one percent sign, will work, but cause
+would scroll backwards one half of the current page size.  (Note, we need to use two percent signs, as macro arguments are percent interpolated. Thus putting only one percent sign, will work, but cause
 .Nm
-to print a warning about an unrecognized flag)
+to print a warning about an unrecognized flag.)
 .\" ------------------------------------------------------------
 .It Ic Copy
 Copy selection into clipboard (not implemented).
