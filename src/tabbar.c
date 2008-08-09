@@ -539,12 +539,9 @@ draw_title (rxvt_t* r, int x, int y, int tnum, Region region)
 	/*
 	 * If % interpolation was not possible, or returned a 1 byte long
 	 * string, then just copy the title over.
-	 */
-        /*
-	 * Change by Jim Diamond (2008/08/04):
-	 * show the suffix of the title, not the prefix, if chopEnd
-	 * was set to "start" in .mrxvtrc (or '-ce start' was given).
-	 * This only affects the non-xft case.
+	 *
+	 * 2008-08-04 Jim Diamond: Show the suffix of the title, not the prefix,
+	 * if chopEnd is enabled. This only affects the non-xft case.
 	 */
 	if( ISSET_OPTION( r, Opt3_chopEnd ) )
 	{
