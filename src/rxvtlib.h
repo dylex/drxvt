@@ -743,20 +743,20 @@ typedef struct {
      * Data we want to write into cmd_fd is buffered in here, before being
      * written by rxvt_tt_write(). [Child's input buffer]
      */
-    unsigned char   *v_buffer,		/* pointer to physical buffer */
-		    *v_bufstr,		/* beginning of area to write */
-		    *v_bufptr,		/* end of area to write */
-		    *v_bufend;		/* end of physical buffer */
+    unsigned char   *inbuf_base,		/* pointer to physical buffer */
+		    *inbuf_start,		/* beginning of area to write */
+		    *inbuf_end;		/* end of area to write */
+	 int inbuf_room; /* Remaining room at the end of the buffer */
 
     /*
      * Data read from cmd_fd is buffered in here [Child's output buffer]
      */
-    unsigned char   *cmdbuf_escstart,	/* Start of an escape sequence */
-		    *cmdbuf_escfail,	/* Position where processing of an
+    unsigned char   *outbuf_escstart,	/* Start of an escape sequence */
+		    *outbuf_escfail,	/* Position where processing of an
 					   escape sequence last failed */
-		    *cmdbuf_ptr,	/* current char */
-		    *cmdbuf_endp;	/* End of read child's output */
-    unsigned char   cmdbuf_base[BUFSIZ];
+		    *outbuf_start,	/* current char */
+		    *outbuf_end;	/* End of read child's output */
+    unsigned char   outbuf_base[BUFSIZ];
 } term_t;
 
 #define TAB_MON_OFF 0            /* tab monitoring off */

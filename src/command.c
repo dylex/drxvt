@@ -1301,14 +1301,14 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
 	unsigned int count)
 {
     unsigned int    n, s;
-    unsigned char   *cmdbuf_base = PVTS(r, page)->cmdbuf_base,
-                    *cmdbuf_endp = PVTS(r, page)->cmdbuf_endp,
-                    *cmdbuf_ptr	= PVTS(r, page)->cmdbuf_escstart ? 
-			    PVTS(r, page)->cmdbuf_escstart :
-			    PVTS(r, page)->cmdbuf_ptr;
+    unsigned char   *outbuf_base = PVTS(r, page)->outbuf_base,
+                    *outbuf_end = PVTS(r, page)->outbuf_end,
+                    *outbuf_start	= PVTS(r, page)->outbuf_escstart ? 
+			    PVTS(r, page)->outbuf_escstart :
+			    PVTS(r, page)->outbuf_start;
 
-    n = cmdbuf_ptr - cmdbuf_base;
-    s = cmdbuf_base + (BUFSIZ - 1) - cmdbuf_endp;
+    n = outbuf_start - outbuf_base;
+    s = outbuf_base + (BUFSIZ - 1) - outbuf_end;
 
     /*
      * If there is not enough space to write our data, try using the unused
@@ -1316,19 +1316,19 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
      */
     if (n > 0 && s < count)
     {
-	MEMMOVE(cmdbuf_base, cmdbuf_ptr,
-	    (unsigned int)(cmdbuf_endp - cmdbuf_ptr));
+	MEMMOVE(outbuf_base, outbuf_start,
+	    (unsigned int)(outbuf_end - outbuf_start));
 
-	cmdbuf_ptr  -= n;
-	cmdbuf_endp -= n;
+	outbuf_start  -= n;
+	outbuf_end -= n;
 	s += n;
 
-	if( PVTS(r, page)->cmdbuf_escstart )
-	    PVTS(r, page)->cmdbuf_escstart -= n;
-	if( PVTS(r, page)->cmdbuf_escfail )
-	    PVTS(r, page)->cmdbuf_escfail -= n;
+	if( PVTS(r, page)->outbuf_escstart )
+	    PVTS(r, page)->outbuf_escstart -= n;
+	if( PVTS(r, page)->outbuf_escfail )
+	    PVTS(r, page)->outbuf_escfail -= n;
 
-	PVTS(r, page)->cmdbuf_ptr = cmdbuf_ptr;
+	PVTS(r, page)->outbuf_start = outbuf_start;
     }
 
     if (count > s)
@@ -1338,11 +1338,11 @@ rxvt_cmd_write( rxvt_t* r, int page, const unsigned char *str,
     }
 
     for (; count--;)
-	*cmdbuf_endp++ = *str++;
+	*outbuf_end++ = *str++;
 
-    PVTS(r, page)->cmdbuf_endp = cmdbuf_endp;
+    PVTS(r, page)->outbuf_end = outbuf_end;
 
-    assert (PVTS(r, page)->cmdbuf_base <= PVTS(r, page)->cmdbuf_endp);
+    assert (PVTS(r, page)->outbuf_base <= PVTS(r, page)->outbuf_end);
 }
 
 
@@ -1541,41 +1541,41 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		    /*
 		     * Process information in the child's output buffer.
 		     */
-		    while( PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp )
+		    while( PVTS(r, i)->outbuf_start < PVTS(r, i)->outbuf_end )
 		    {
-			rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
+			rxvt_process_getc( r, i, *(PVTS(r,i)->outbuf_start++) );
 
 			/* Incomplete escape sequence. */
-			if( PVTS(r, i)->cmdbuf_escfail )
+			if( PVTS(r, i)->outbuf_escfail )
 			{
 			    /*
 			     * See if reading from the child's fd will complete
 			     * this escape seqeunce.
 			     */
 			    if( IS_NULL( last_escfail ) )
-				last_escfail = PVTS(r, i)->cmdbuf_escfail;
+				last_escfail = PVTS(r, i)->outbuf_escfail;
 
 			    else
 			    {
 				/* Really incomplete escape sequence */
 				rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "Incomplete escape sequence '%.*s'\n", 
-					      PVTS(r, i)->cmdbuf_escfail - PVTS(r, i)->cmdbuf_escstart + 1, 
-					      PVTS(r, i)->cmdbuf_escstart+1));
+					      PVTS(r, i)->outbuf_escfail - PVTS(r, i)->outbuf_escstart + 1, 
+					      PVTS(r, i)->outbuf_escstart+1));
 
 				SET_NULL( last_escfail );
-				SET_NULL( PVTS(r, i)->cmdbuf_escstart );
-				SET_NULL( PVTS(r, i)->cmdbuf_escfail );
+				SET_NULL( PVTS(r, i)->outbuf_escstart );
+				SET_NULL( PVTS(r, i)->outbuf_escfail );
 
 				/* Skip the escape char */
-				PVTS(r, i)->cmdbuf_ptr++;
+				PVTS(r, i)->outbuf_start++;
 			    }
-			} /* if( PVTS(r, i)->cmdbuf_escfail ) */
+			} /* if( PVTS(r, i)->outbuf_escfail ) */
 		    }
 
 		    /*
 		     * Write out pending data in the child's input buffer.
 		     */
-		    if (PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr)
+		    if (PVTS(r, i)->inbuf_start < PVTS(r, i)->inbuf_end)
 			rxvt_cmd_write(r, i, NULL, 0);
 
 		    /* Make place for new data */
@@ -1584,8 +1584,8 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		    /* Read any remaining data from childs fd */
 		    rxvt_read_child_cmdfd( r, i,
 			    BUFSIZ - 1 -
-				(PVTS(r, i)->cmdbuf_endp
-					- PVTS(r, i)->cmdbuf_base) );
+				(PVTS(r, i)->outbuf_end
+					- PVTS(r, i)->outbuf_base) );
 		  }
 		while( rxvt_cmdbuf_has_input( r, i) );
 
@@ -1606,8 +1606,8 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 		    rxvt_cmd_write(r, i, buffer, len );
 
-		    if( PVTS(r, i)->cmdbuf_ptr < PVTS(r, i)->cmdbuf_endp )
-			rxvt_process_getc( r, i, *(PVTS(r,i)->cmdbuf_ptr++) );
+		    if( PVTS(r, i)->outbuf_start < PVTS(r, i)->outbuf_end )
+			rxvt_process_getc( r, i, *(PVTS(r,i)->outbuf_start++) );
 		}
 
 		/*
@@ -1640,9 +1640,9 @@ rxvt_clean_cmd_page (rxvt_t* r)
 int static inline
 rxvt_cmdbuf_has_input( rxvt_t *r, int page )
 {
-    return PVTS(r, page)->cmdbuf_escfail ?
-	PVTS(r, page)->cmdbuf_escfail < PVTS(r, page)->cmdbuf_endp	    :
-	PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp;
+    return PVTS(r, page)->outbuf_escfail ?
+	PVTS(r, page)->outbuf_escfail < PVTS(r, page)->outbuf_end	    :
+	PVTS(r, page)->outbuf_start < PVTS(r, page)->outbuf_end;
 }
 
 /*
@@ -1681,7 +1681,7 @@ rxvt_find_cmd_child (rxvt_t* r)
 	if( k > LTAB(r) )	/* round-robin */
 	    k = 0;
 
-	assert( PVTS(r, k)->cmdbuf_base <= PVTS(r, k)->cmdbuf_endp );
+	assert( PVTS(r, k)->outbuf_base <= PVTS(r, k)->outbuf_end );
 
 	/* already have something in some page's buffer */
 	if( rxvt_cmdbuf_has_input(r, k) )
@@ -1701,29 +1701,29 @@ rxvt_find_cmd_child (rxvt_t* r)
 void
 rxvt_check_cmdbuf (rxvt_t* r, int page)
 {
-    assert( PVTS(r, page)->cmdbuf_base <= PVTS(r, page)->cmdbuf_endp );
+    assert( PVTS(r, page)->outbuf_base <= PVTS(r, page)->outbuf_end );
 
     if(
-	  IS_NULL( PVTS(r, page)->cmdbuf_escstart )		    &&
-	  PVTS(r, page)->cmdbuf_ptr == PVTS(r, page)->cmdbuf_endp
+	  IS_NULL( PVTS(r, page)->outbuf_escstart )		    &&
+	  PVTS(r, page)->outbuf_start == PVTS(r, page)->outbuf_end
       )
     {
 	/*
 	 * If there is no data in the buffer, reset it to the beginning
 	 * of the buffer.
 	 */
-	PVTS(r, page)->cmdbuf_ptr   = PVTS(r, page)->cmdbuf_endp
-				    = PVTS(r, page)->cmdbuf_base;
+	PVTS(r, page)->outbuf_start   = PVTS(r, page)->outbuf_end
+				    = PVTS(r, page)->outbuf_base;
 
     }
 
     else if(
-	     (PVTS(r, page)->cmdbuf_endp - PVTS(r, page)->cmdbuf_base)
+	     (PVTS(r, page)->outbuf_end - PVTS(r, page)->outbuf_base)
 		== (BUFSIZ-1)						 &&
 	     (
-	       PVTS(r, page)->cmdbuf_escstart ?
-		(PVTS(r, page)->cmdbuf_escstart > PVTS(r,page)->cmdbuf_base) :
-		(PVTS(r, page)->cmdbuf_ptr > PVTS(r, page)->cmdbuf_base)
+	       PVTS(r, page)->outbuf_escstart ?
+		(PVTS(r, page)->outbuf_escstart > PVTS(r,page)->outbuf_base) :
+		(PVTS(r, page)->outbuf_start > PVTS(r, page)->outbuf_base)
 	     )
 	   )
     {
@@ -1734,24 +1734,24 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 	unsigned char	*start;
 	unsigned int	n, len;
 
-	start = PVTS(r, page)->cmdbuf_escstart ?
-	    PVTS(r, page)->cmdbuf_escstart : PVTS(r, page)->cmdbuf_ptr;
+	start = PVTS(r, page)->outbuf_escstart ?
+	    PVTS(r, page)->outbuf_escstart : PVTS(r, page)->outbuf_start;
 
 
-	n   = start - PVTS(r, page)->cmdbuf_base;
-	len = PVTS(r, page)->cmdbuf_endp - start;
+	n   = start - PVTS(r, page)->outbuf_base;
+	len = PVTS(r, page)->outbuf_end - start;
 
 	assert( n == BUFSIZ - 1 - len );
-	assert( start < PVTS(r, page)->cmdbuf_endp );
+	assert( start < PVTS(r, page)->outbuf_end );
 
-	MEMMOVE( PVTS(r, page)->cmdbuf_base, start, len );
+	MEMMOVE( PVTS(r, page)->outbuf_base, start, len );
 
-	PVTS(r, page)->cmdbuf_ptr   -= n;
-	PVTS(r, page)->cmdbuf_endp  -= n;
-	if( PVTS(r, page)->cmdbuf_escstart )
-	    PVTS(r, page)->cmdbuf_escstart -= n;
-	if( PVTS(r, page)->cmdbuf_escfail )
-	    PVTS(r, page)->cmdbuf_escfail -= n;
+	PVTS(r, page)->outbuf_start   -= n;
+	PVTS(r, page)->outbuf_end  -= n;
+	if( PVTS(r, page)->outbuf_escstart )
+	    PVTS(r, page)->outbuf_escstart -= n;
+	if( PVTS(r, page)->outbuf_escfail )
+	    PVTS(r, page)->outbuf_escfail -= n;
     }
 }
 
@@ -1777,7 +1777,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	 * calls to read() blocking.
 	 */
 	errno = PVTS(r, page)->gotEIO = 0;
-	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->cmdbuf_endp, count );
+	n = read( PVTS(r, page)->cmd_fd, PVTS(r, page)->outbuf_end, count );
 	readErrno = errno;
 
 	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "read %d bytes\n", n));
@@ -1787,7 +1787,7 @@ rxvt_read_child_cmdfd (rxvt_t* r, int page, unsigned int count)
 	    /* Update count and buffer pointer */
 	    count -= n;
 	    bread += n;
-	    PVTS(r, page)->cmdbuf_endp += n;
+	    PVTS(r, page)->outbuf_end += n;
 	}
 
 	else if (0 == n)
@@ -2006,7 +2006,7 @@ rxvt_process_children_cmdfd( rxvt_t* r, fd_set* p_readfds )
 
 	/* The buffer size is the buffer length - used length */
 	count = bufsiz = (BUFSIZ - 1) -
-	    (PVTS(r, i)->cmdbuf_endp - PVTS(r, i)->cmdbuf_base);
+	    (PVTS(r, i)->outbuf_end - PVTS(r, i)->outbuf_base);
 
 	/* read data from the command fd into buffer */
 	count -= rxvt_read_child_cmdfd (r, i, count);
@@ -2014,7 +2014,7 @@ rxvt_process_children_cmdfd( rxvt_t* r, fd_set* p_readfds )
 #if 0
 	/* check if a child died */
 	if( PVTS(r, i)->dead && errno == EIO )
-	    *PVTS(r, i)->cmdbuf_endp = (char) 0;
+	    *PVTS(r, i)->outbuf_end = (char) 0;
 #endif
 
 	/* highlight inactive tab if there is some input */
@@ -2260,7 +2260,7 @@ rxvt_refresh_vtscr_if_needed( rxvt_t *r )
 	 && AVTS(r)->mapped && r->h->refresh_type != NO_REFRESH
       )
     {
-	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%lu: ATAB(%d) produced %d bytes (%d in buffer)\n", time(NULL), ATAB(r), AVTS(r)->nbytes_last_read, AVTS(r)->cmdbuf_endp - AVTS(r)->cmdbuf_base ));
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "%lu: ATAB(%d) produced %d bytes (%d in buffer)\n", time(NULL), ATAB(r), AVTS(r)->nbytes_last_read, AVTS(r)->outbuf_end - AVTS(r)->outbuf_base ));
 
 	rxvt_scr_refresh(r, ATAB(r), r->h->refresh_type);
 
@@ -2412,7 +2412,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	 * pending in our input buffer.
 	 */
 	if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
-	    return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+	    return *(PVTS(r, selpage)->outbuf_start)++;
 
 	if( selpage == -1 && -1 != (retpage = rxvt_find_cmd_child (r)) )
 	{
@@ -2424,7 +2424,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_find_cmd_child: find %d\n", retpage));
 
 	    *p_page = retpage;
-	    return *(PVTS(r, *p_page)->cmdbuf_ptr)++;
+	    return *(PVTS(r, *p_page)->outbuf_start)++;
 	}
 
 
@@ -2487,7 +2487,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	    FD_SET(PVTS(r, i)->cmd_fd, &readfds);
 
 	    /* Write out any pending output to child */
-	    if( PVTS(r, i)->v_bufstr < PVTS(r, i)->v_bufptr )
+	    if( PVTS(r, i)->inbuf_start < PVTS(r, i)->inbuf_end )
 		rxvt_tt_write(r, i, NULL, 0);
 	}
 
@@ -2618,7 +2618,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 	     * Now figure out if we have something to return.
 	     */
 	    if( selpage != -1 && rxvt_cmdbuf_has_input(r, selpage) )
-		return *(PVTS(r, selpage)->cmdbuf_ptr)++;
+		return *(PVTS(r, selpage)->outbuf_start)++;
 
 	    /* No input from specified child. Try others. */
 	    else if( (retpage = rxvt_find_cmd_child (r)) != -1 )
@@ -2638,7 +2638,7 @@ rxvt_cmd_getc(rxvt_t *r, int* p_page)
 		{
 		    /* No child specified, and we have input from some child */
 		    *p_page = retpage;
-		    return *(PVTS(r, retpage)->cmdbuf_ptr)++;
+		    return *(PVTS(r, retpage)->outbuf_start)++;
 		}
 	    } /* else if( (retpage = rxvt_find_cmd_child (r)) != -1 ) */
 	} /* if( select_res >= 0 ) */
@@ -4735,32 +4735,32 @@ enum {
 /* *INDENT-ON* */
 
 /*
- * Set cmdbuf_escfail to the place where processing an escape sequence failed.
+ * Set outbuf_escfail to the place where processing an escape sequence failed.
  * nchars is the minimum number of chars needed to be read
  */
 /* INTPROTO */
 void
 rxvt_set_escfail( rxvt_t *r, int page, int nchars )
 {
-    assert( PVTS(r, page)->cmdbuf_escstart );
+    assert( PVTS(r, page)->outbuf_escstart );
 
     rxvt_check_cmdbuf( r, page );
-    PVTS(r, page)->cmdbuf_escfail = PVTS(r, page)->cmdbuf_ptr + nchars - 1;
+    PVTS(r, page)->outbuf_escfail = PVTS(r, page)->outbuf_start + nchars - 1;
 
-    if( PVTS(r, page)->cmdbuf_escfail > PVTS(r, page)->cmdbuf_base + BUFSIZ-3 )
+    if( PVTS(r, page)->outbuf_escfail > PVTS(r, page)->outbuf_base + BUFSIZ-3 )
     {
 	/*
 	 * Escape sequence was longer than BUFSIZ. Just skip the escape
 	 * character and go on like normal
 	 */
-	PVTS(r, page)->cmdbuf_ptr = PVTS(r, page)->cmdbuf_escstart + 1;
-	SET_NULL( PVTS(r, page)->cmdbuf_escstart );
-	SET_NULL( PVTS(r, page)->cmdbuf_escfail );
+	PVTS(r, page)->outbuf_start = PVTS(r, page)->outbuf_escstart + 1;
+	SET_NULL( PVTS(r, page)->outbuf_escstart );
+	SET_NULL( PVTS(r, page)->outbuf_escfail );
     }
 
     else
 	/* Fall back to start of escape sequence */
-	PVTS(r, page)->cmdbuf_ptr = PVTS(r, page)->cmdbuf_escstart;
+	PVTS(r, page)->outbuf_start = PVTS(r, page)->outbuf_escstart;
 }
 
 /*{{{ process non-printing single characters */
@@ -6753,10 +6753,10 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 	     * point `str' to the start of the string, decrement first since
 	     * it was post incremented in rxvt_cmd_getc()
 	     */
-	    str = --(PVTS(r, page)->cmdbuf_ptr);
-	    while (PVTS(r, page)->cmdbuf_ptr < PVTS(r, page)->cmdbuf_endp)
+	    str = --(PVTS(r, page)->outbuf_start);
+	    while (PVTS(r, page)->outbuf_start < PVTS(r, page)->outbuf_end)
 	    {
-		ch = *(PVTS(r, page)->cmdbuf_ptr)++;
+		ch = *(PVTS(r, page)->outbuf_start)++;
 		
 		if (ch == '\n')
 		{
@@ -6768,10 +6768,10 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 		else if (ch < ' ' && ch != '\t' && ch != '\r')
 		{
 		    /*
-		     * Unprintable. Reduce cmdbuf_ptr so that this character
+		     * Unprintable. Reduce outbuf_start so that this character
 		     * will be processed later.
 		     */
-		    PVTS(r, page)->cmdbuf_ptr--;
+		    PVTS(r, page)->outbuf_start--;
 		    break;
 		}
 
@@ -6791,14 +6791,14 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 		}
 	    }
 
-	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "\e[31mAdding %d chars %d lines in tab %d\e[0m\n%.*s\n", PVTS(r, page)->cmdbuf_ptr - str, nlines, page, PVTS(r, page)->cmdbuf_ptr - str, str));
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND, "\e[31mAdding %d chars %d lines in tab %d\e[0m\n%.*s\n", PVTS(r, page)->outbuf_start - str, nlines, page, PVTS(r, page)->outbuf_start - str, str));
 
 	    /*
 	     * NOTE: nlines can not be MORE than the number of lines we will
 	     * actually add!
 	     */
 	    rxvt_scr_add_lines(r, page, str, nlines,
-		(PVTS(r, page)->cmdbuf_ptr - str));
+		(PVTS(r, page)->outbuf_start - str));
 
 	    /*
 	     * Only refresh the screen if we've scrolled more than
@@ -6832,19 +6832,19 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 	else if( ch == C0_ESC )
 	{
 	    /* Save the start of the escape sequence */
-	    if( IS_NULL( PVTS(r, page)->cmdbuf_escstart ) )
-		PVTS(r, page)->cmdbuf_escstart =
-		    PVTS(r, page)->cmdbuf_ptr-1;
+	    if( IS_NULL( PVTS(r, page)->outbuf_escstart ) )
+		PVTS(r, page)->outbuf_escstart =
+		    PVTS(r, page)->outbuf_start-1;
 
 	    /* Forget the previous escape sequence failure (if any) */
-	    SET_NULL( PVTS(r, page)->cmdbuf_escfail );
+	    SET_NULL( PVTS(r, page)->outbuf_escfail );
 
 	    /* Attempt to process the escape sequence */
 	    rxvt_process_escape_seq(r, page);
 
 	    /* If we succeeded, then clear the start. */
-	    if( IS_NULL( PVTS(r, page)->cmdbuf_escfail ) )
-		SET_NULL( PVTS(r, page)->cmdbuf_escstart );
+	    if( IS_NULL( PVTS(r, page)->outbuf_escfail ) )
+		SET_NULL( PVTS(r, page)->outbuf_escstart );
 	    else
 		/* Otherwise don't process any more data from this tab */
 		break;
@@ -6868,7 +6868,7 @@ rxvt_process_getc( rxvt_t *r, int page, unsigned char ch )
 	 * on screen refreshes or in rxvt_cmd_getc().
 	 */
 	if( rxvt_cmdbuf_has_input( r, page ) )
-	    ch = *PVTS(r,page)->cmdbuf_ptr++;
+	    ch = *PVTS(r,page)->outbuf_start++;
 	else
 	    break;
     } /* for(;;) */
@@ -6995,30 +6995,30 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	int		riten;
 	int		p;
 	/* start of physical buffer	*/
-	unsigned char*	v_buffer;
+	unsigned char*	inbuf_base;
 	/* start of current buffer pending */
-	unsigned char*	v_bufstr;
+	unsigned char*	inbuf_start;
 	/* end of current buffer pending   */
-	unsigned char*	v_bufptr;
-	/* end of physical buffer	  */
-	unsigned char*	v_bufend;
+	unsigned char*	inbuf_end;
+	/* remaining room in physical buffer	  */
+	int inbuf_room;
 
 	rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "rxvt_tt_write %d (%s)\n", k, d ? (char*) d: "nil"));
 
-	if (IS_NULL(PVTS(r, k)->v_bufstr) && len > 0)
+	if (IS_NULL(PVTS(r, k)->inbuf_start) && len > 0)
 	{
 	    p = (len / MAX_PTY_WRITE + 1) * MAX_PTY_WRITE;
 	    if (p <= 0) /* possible integer overflow */
 		return ;
-	    v_buffer = v_bufstr = v_bufptr = rxvt_malloc(p);
-	    v_bufend = v_buffer + p;
+	    inbuf_base = inbuf_start = inbuf_end = rxvt_malloc(p);
+	    inbuf_room = p;
 	}
 	else
 	{
-	    v_buffer = PVTS(r, k)->v_buffer;
-	    v_bufstr = PVTS(r, k)->v_bufstr;
-	    v_bufptr = PVTS(r, k)->v_bufptr;
-	    v_bufend = PVTS(r, k)->v_bufend;
+	    inbuf_base = PVTS(r, k)->inbuf_base;
+	    inbuf_start = PVTS(r, k)->inbuf_start;
+	    inbuf_end = PVTS(r, k)->inbuf_end;
+	    inbuf_room = PVTS(r, k)->inbuf_room;
 	}
 
 	/*
@@ -7029,32 +7029,32 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	 */
 	if (len > 0)
 	{
-	    if (v_bufend < v_bufptr + len)
+	    if (inbuf_room < len)
 	    {
 		/* run out of room */
-		if (v_bufstr != v_buffer)
+		if (inbuf_start != inbuf_base)
 		{
 		    /* there is unused space, move everything down */
-		    MEMMOVE(v_buffer, v_bufstr,
-			(unsigned int)(v_bufptr - v_bufstr));
-		    v_bufptr -= v_bufstr - v_buffer;
-		    v_bufstr = v_buffer;
+		    MEMMOVE(inbuf_base, inbuf_start,
+			(unsigned int)(inbuf_end - inbuf_start));
+		    inbuf_end -= inbuf_start - inbuf_base;
+		    inbuf_start = inbuf_base;
 		}
-		if (v_bufend < v_bufptr + len)
+		if (inbuf_room < len)
 		{
 		    /* still won't fit: get more space, use most basic
 		    ** realloc because an error is not fatal. */
-		    unsigned int    size = v_bufptr - v_buffer;
+		    unsigned int    size = inbuf_end - inbuf_base;
 		    unsigned int    reallocto;
 
 		    reallocto = ((size+len) / MAX_PTY_WRITE + 1) *MAX_PTY_WRITE;
-		    v_buffer = rxvt_realloc(v_buffer, reallocto);
+		    inbuf_base = rxvt_realloc(inbuf_base, reallocto);
 		    /* save across realloc */
-		    if (v_buffer)
+		    if (inbuf_base)
 		    {
-			v_bufstr = v_buffer;
-			v_bufptr = v_buffer + size;
-			v_bufend = v_buffer + reallocto;
+			inbuf_start = inbuf_base;
+			inbuf_end = inbuf_base + size;
+			inbuf_room = reallocto - size;
 		    }
 		    else
 		    {
@@ -7062,15 +7062,15 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 			rxvt_msg (DBG_ERROR, DBG_COMMAND, 
 				"data loss: cannot allocate buffer space");
 			/* restore clobbered pointer */
-			v_buffer = v_bufstr;
+			inbuf_base = inbuf_start;
 		    }
 		}
 	    }
-	    if (v_bufend >= v_bufptr + len)
+	    if (inbuf_room >= len)
 	    {
 		/* new stuff will fit */
-		MEMCPY(v_bufptr, d, len);
-		v_bufptr += len;
+		MEMCPY(inbuf_end, d, len);
+		inbuf_end += len;
 	    }
 	}
 
@@ -7088,46 +7088,46 @@ rxvt_tt_write(rxvt_t* r, int page, const unsigned char *d, int len)
 	 * forgiving.)
 	 */
 
-	if ((p = v_bufptr - v_bufstr) > 0)
+	if ((p = inbuf_end - inbuf_start) > 0)
 	{
-	    riten = write(PVTS(r, k)->cmd_fd, v_bufstr, min(p, MAX_PTY_WRITE));
+	    riten = write(PVTS(r, k)->cmd_fd, inbuf_start, min(p, MAX_PTY_WRITE));
 	    rxvt_dbgmsg ((DBG_DEBUG, DBG_COMMAND,  "tt_write %d chars to vts[%d].cmd_fd = %d\n", riten, k, PVTS(r, k)->cmd_fd));
 	    if (riten < 0)
 		riten = 0;
-	    v_bufstr += riten;
-	    if (v_bufstr >= v_bufptr)	/* we wrote it all */
-		v_bufstr = v_bufptr = v_buffer;
+	    inbuf_start += riten;
+	    if (inbuf_start >= inbuf_end)	/* we wrote it all */
+		inbuf_start = inbuf_end = inbuf_base;
 	}
 
 	/*
 	 * If we have lots of unused memory allocated, return it
 	 */
-	if (v_bufend - v_bufptr > MAX_PTY_WRITE * 8)
+	if (inbuf_room > MAX_PTY_WRITE * 8)
 	{
 	    /* arbitrary hysteresis, save pointers across realloc */
-	    unsigned int    start = v_bufstr - v_buffer;
-	    unsigned int    size = v_bufptr - v_buffer;
+	    unsigned int    start = inbuf_start - inbuf_base;
+	    unsigned int    size = inbuf_end - inbuf_base;
 	    unsigned int    reallocto;
 
 	    reallocto = (size / MAX_PTY_WRITE + 1) * MAX_PTY_WRITE;
-	    v_buffer = rxvt_realloc(v_buffer, reallocto);
-	    if (v_buffer)
+	    inbuf_base = rxvt_realloc(inbuf_base, reallocto);
+	    if (inbuf_base)
 	    {
-		v_bufstr = v_buffer + start;
-		v_bufptr = v_buffer + size;
-		v_bufend = v_buffer + reallocto;
+		inbuf_start = inbuf_base + start;
+		inbuf_end = inbuf_base + size;
+		inbuf_room = reallocto - size;
 	    }
 	    else
 	    {
 		/* should we print a warning if couldn't return memory? */
 		/* restore clobbered pointer */
-		v_buffer = v_bufstr - start;
+		inbuf_base = inbuf_start - start;
 	    }
 	}
-	PVTS(r, k)->v_buffer = v_buffer;
-	PVTS(r, k)->v_bufstr = v_bufstr;
-	PVTS(r, k)->v_bufptr = v_bufptr;
-	PVTS(r, k)->v_bufend = v_bufend;
+	PVTS(r, k)->inbuf_base = inbuf_base;
+	PVTS(r, k)->inbuf_start = inbuf_start;
+	PVTS(r, k)->inbuf_end = inbuf_end;
+	PVTS(r, k)->inbuf_room = inbuf_room;
     }	/* for */
 }
 /*----------------------- end-of-file (C source) -----------------------*/

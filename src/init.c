@@ -709,7 +709,7 @@ rxvt_init_vars(rxvt_t *r)
 # ifdef USE_XIM
     SET_NULL(h->Input_Context);
 # endif
-    /* SET_NULL(h->v_bufstr); */
+    /* SET_NULL(h->inbuf_start); */
     SET_NULL(h->buffer);
 
 # ifdef TRANSPARENT
@@ -2914,14 +2914,14 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 #endif
 
     /* Initialize input buffer */
-    PVTS(r, page)->cmdbuf_ptr	= PVTS(r, page)->cmdbuf_endp
-				= PVTS(r, page)->cmdbuf_base;
+    PVTS(r, page)->outbuf_start	= PVTS(r, page)->outbuf_end
+				= PVTS(r, page)->outbuf_base;
     
     /* Initialize write out buffer */
-    SET_NULL(PVTS(r, page)->v_buffer);
-    SET_NULL(PVTS(r, page)->v_bufstr);
-    SET_NULL(PVTS(r, page)->v_bufptr);
-    SET_NULL(PVTS(r, page)->v_bufend);
+    SET_NULL(PVTS(r, page)->inbuf_base);
+    SET_NULL(PVTS(r, page)->inbuf_start);
+    SET_NULL(PVTS(r, page)->inbuf_end);
+	 PVTS(r, page)->inbuf_room = 0;
 
     /* Set screen structure initialization flag */
     PVTS(r, page)->init_screen = 0;

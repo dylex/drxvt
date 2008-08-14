@@ -1680,9 +1680,9 @@ struct rxvt_hidden {
     char*	    locale;
 
 #if 0
-    unsigned char*  v_buffer;
-    unsigned char*  v_bufstr;
-    unsigned char*  v_bufptr;
+    unsigned char*  inbuf_base;
+    unsigned char*  inbuf_start;
+    unsigned char*  inbuf_end;
     unsigned char*  v_bufend;
 #endif
 
@@ -1690,8 +1690,8 @@ struct rxvt_hidden {
     const char*	    rs[NUM_RESOURCES];
 
 #if 0    /* command input buffering */
-    unsigned char*  cmdbuf_ptr, *cmdbuf_endp;
-    unsigned char   cmdbuf_base[BUFSIZ];
+    unsigned char*  outbuf_start, *outbuf_end;
+    unsigned char   outbuf_base[BUFSIZ];
     unsigned char   kbuf[KBUFSZ];
 #endif
 

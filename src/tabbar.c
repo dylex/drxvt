@@ -1489,10 +1489,10 @@ rxvt_remove_page (rxvt_t* r, short page)
     assert (PVTS(r, page)->cmd_fd >= 0);
     close (PVTS(r, page)->cmd_fd);
 
-    if (PVTS(r, page)->v_buffer)
+    if (PVTS(r, page)->inbuf_base)
     {
-	rxvt_free (PVTS(r, page)->v_buffer);
-	PVTS(r, page)->v_buffer = NULL;
+	rxvt_free (PVTS(r, page)->inbuf_base);
+	PVTS(r, page)->inbuf_base = NULL;
     }
 
     /* free screen structure */
