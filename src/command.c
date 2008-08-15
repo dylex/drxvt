@@ -20,6 +20,7 @@
  *				<johann@myrkraverk.com>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
+ * Copyright (C) 2008		  Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1698,6 +1699,9 @@ rxvt_find_cmd_child (rxvt_t* r)
 
 
 /* INTPROTO */
+/* rxvt_check_cmdbuf (r, p) manage the free space in the buffer of the page p.
+ * It will move the used space in it to the beginning when needed.
+ */
 void
 rxvt_check_cmdbuf (rxvt_t* r, int page)
 {
@@ -1758,6 +1762,9 @@ rxvt_check_cmdbuf (rxvt_t* r, int page)
 
 /*
  * This function returns the number of bytes being read from a child
+ * - r is the mrxvt state;
+ * - page is the tab number you want to read the child output from;
+ * - count is the maximum number of bytes you want to read.
  */
 /* INTPROTO */
 int

@@ -12,6 +12,7 @@
  * Copyright (c) 2003-2004  Marc Lehmann <pcg@goof.com>
  * Copyright (c) 2004-2006  Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006  Gautam Iyer <gi1242@users.sourceforge.net>
+ * Copyright (C) 2008		 Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -635,6 +636,12 @@ rxvt_getdtablesize(void)
 
 
 /* EXTPROTO */
+/* This initialization function sets all variable in the mrxvt structure
+ * to their "neutral" value.
+ * It is run by rxvt_init and returns 0
+ * (no failure possible unless the memory allocation for mrxvt structure has failed
+ * in rxvt_init).
+ */
 int
 rxvt_init_vars(rxvt_t *r)
 {
