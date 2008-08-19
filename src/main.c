@@ -14,6 +14,7 @@
  * Copyright (c) 2005        Burgers A.R. <burgers@ecn.nl>
  * Copyright (c) 2004-2006   Jingmin Zhou <jimmyzhou@users.sourceforge.net>
  * Copyright (c) 2005-2006   Gautam Iyer <gi1242@users.sourceforge.net>
+ * Copyright (C) 2008		  Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -140,8 +141,14 @@ rxvt_pre_show_init( rxvt_t *r )
 
 /* rxvt_init() */
 /* LIBPROTO */
-rxvt_t		*
-rxvt_init(int argc, const char *const *argv)
+/*
+ * The main initialization function called from main with the command line parameters.
+ *  If it fails, it will return NULL (hence mrxvt will stop with failure).
+ *  Otherwise it will return the mrxvt structure (rxvt_t) which keeps the status of mrxvt
+ *  during the whole runtime (must be passed to all functions).
+ */
+rxvt_t *
+rxvt_init (int argc, const char *const *argv)
 {
     register int    i;
     register int    itnum; /* initial terminal number */
