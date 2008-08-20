@@ -5,6 +5,7 @@
  * All portions of code are copyright by their respective author/s.
  * Copyright (c) 1999         Felix Bellaby <felix@pooh.u-net.com>
  * Copyright (c) 2004         Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+ * Copyright (C) 2008		   Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -137,7 +138,11 @@ callback_save_yourself (SmcConn smc_conn, SmPointer client_data, int save_style,
 	char		restart_style = SmRestartIfRunning;
 	struct passwd*	pw = NULL;
 	int		n = 0, i;
-	char		initprof[(32+1) * MAX_PAGES];
+	//char		initprof[(32+1) * MAX_PAGES];
+	char		initprof[(32+1) * (LTAB(r) + 1)];
+	/* TODO Jehan: check the meaning of this initprof save.
+	 * What is the right variable to replace MAX_PAGES?
+	 */
 	char		desktop[32 + 1];
 	char		geometry[(32+1)*4];
 	int		x, y;

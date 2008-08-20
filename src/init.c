@@ -653,13 +653,7 @@ rxvt_init_vars(rxvt_t *r)
 
     h = r->h = (struct rxvt_hidden *)rxvt_calloc(1, sizeof(struct rxvt_hidden));
 
-    for (i = 0; i < MAX_PAGES; i ++)
-    {
-	/* Initialize vts_idx for each term_t structure */
-	r->vterm[i].vts_idx = -1;
-	/* Initialize each vts pointer */
-	SET_NULL(r->vts[i]);
-    }
+	 SET_NULL (r->vts);
 
     SET_NULL(r->Xdisplay);
 #ifdef USE_XIM
@@ -1132,7 +1126,7 @@ rxvt_init_resources(rxvt_t* r, int argc, const char *const *argv)
     if( rs[Rs_minVisibleTabs] )
     {
 	register int	n = atoi( rs[Rs_minVisibleTabs] );
-	r->TermWin.minVisibleTabs = (n >= 2 && n <= MAX_PAGES) ?
+	r->TermWin.minVisibleTabs = (n >= 2) ?
 	    n : DEFAULT_MIN_VISIBLE_TABS;
     }
     else r->TermWin.minVisibleTabs = DEFAULT_MIN_VISIBLE_TABS;
@@ -2775,166 +2769,193 @@ rxvt_get_termenv( const char *env )
 
 
 /* INTPROTO */
-void
+/*
+ * rxvt_init_vts (r, page, profile) will initialize a new page (term_t),
+ * accessible at r->vts[page] and set with 'profile'.
+ * It returns 1 on success, 0 on failure.
+ * Cases of failure can be:
+ * - The (vts) array's size could not be increased (allocation problem);
+ * - The term_t vts[page] could not be allocated;
+ * - 'page' is not valid: it must be between 0 and the last page + 1.
+ *   If it is less than the last page + 1, then all pages >= page are moved up.
+ */
+int
 rxvt_init_vts( rxvt_t *r, int page, int profile )
 {
 #ifdef TTY_GID_SUPPORT
-    struct group*   gr = getgrnam( "tty" );
+	struct group*   gr = getgrnam( "tty" );
 #endif
-    register int    i;
+	if (page < 0 || page > LTAB(r) + 1)
+		return 0;
 
+	LTAB(r)++;
+	{
+		/*
+		 * I increase vts's size and place the new page at the right place in it.
+		 */
+		term_t** temp_vts;
+		term_t* temp_vts_page;
 
-    assert( page < MAX_PAGES );
+		if ((temp_vts_page = rxvt_malloc (sizeof (term_t))) == NULL)
+		{
+			LTAB(r)--;
+			return 0;
+		}
 
-    /* look for an unused term_t structure */
-    for( i = 0; i < MAX_PAGES; i ++ )
-	if( -1 == r->vterm[i].vts_idx )
-	    break;
-    assert( i != MAX_PAGES );
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "Find vterm[%d] for pointer vts[%d]\n", i, page));
+		if ((temp_vts = rxvt_realloc (r->vts, (LTAB (r) + 1) * sizeof (term_t*))) == NULL)
+		{
+			LTAB(r)--;
+			rxvt_free (temp_vts_page);
+			return 0;
+		}
 
-    /* clear the term_t structure */
-    r->vts[page] = &(r->vterm[i]);
-    MEMSET( r->vts[page], 0, sizeof( r->vterm[0] ) );
+		r->vts = temp_vts;
 
-    /* set vts_idx for the vterm */
-    PVTS(r, page)->vts_idx = i;
+		if (page != LTAB (r))
+			MEMMOVE (r->vts[page + 1], r->vts[page], (LTAB(r) - page) * sizeof (term_t*));
 
-    /* Set the profile number */
-    PVTS(r, page)->profileNum	= profile;
+		r->vts[page] = temp_vts_page;
+	}
 
-    /* Save the "static" number of this tab */
-    PVTS(r, page)->globalTabNum	= r->ntabs++;
+	PVTS(r, page)->vts_idx = page;
+	MEMSET( r->vts[page], 0, sizeof(term_t)); //r->vterm[0] ) );
+
+	/* Set the profile number */
+	PVTS(r, page)->profileNum	= profile;
+
+	/* Save the "static" number of this tab */
+	PVTS(r, page)->globalTabNum	= r->ntabs++;
 
 #ifdef TTY_GID_SUPPORT
-    /* change group ownership of tty to "tty" */
-    if (gr)
-    {
-	PVTS(r, page)->ttymode = S_IRUSR | S_IWUSR | S_IWGRP;
-    }
-    else
+	/* change group ownership of tty to "tty" */
+	if (gr)
+	{
+		PVTS(r, page)->ttymode = S_IRUSR | S_IWUSR | S_IWGRP;
+	}
+	else
 #endif	    /* TTY_GID_SUPPORT */
-    {
-	PVTS(r, page)->ttymode = S_IRUSR | S_IWUSR | S_IWGRP | S_IWOTH;
-    }
+	{
+		PVTS(r, page)->ttymode = S_IRUSR | S_IWUSR | S_IWGRP | S_IWOTH;
+	}
 
-    /* Initialize term_t (vts) structure */
-    PVTS( r, page )->saveLines = r->profile[profile].saveLines;
+	/* Initialize term_t (vts) structure */
+	PVTS( r, page )->saveLines = r->profile[profile].saveLines;
 
-    /* will be set in rxvt_create_termwin */
-    UNSET_WIN(PVTS(r, page)->vt);
+	/* will be set in rxvt_create_termwin */
+	UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef XFT_SUPPORT
-    SET_NULL(PVTS(r, page)->xftvt);
+	SET_NULL(PVTS(r, page)->xftvt);
 #endif
-    SET_NULL(PVTS(r, page)->tab_title);
+	SET_NULL(PVTS(r, page)->tab_title);
 
-    /*
-     * Set the tab title format, and window title format. getProfileOption
-     * returns a static string, so duplicate it here
-     */
-    {
-	const char *stf = getProfileOption( r, profile, Rs_titleFormat );
-	PVTS(r, page)->title_format = NOT_NULL(stf) ? STRDUP(stf) : NULL;
-    }
+	/*
+	 * Set the tab title format, and window title format. getProfileOption
+	 * returns a static string, so duplicate it here
+	 */
+	{
+		const char *stf = getProfileOption( r, profile, Rs_titleFormat );
+		PVTS(r, page)->title_format = NOT_NULL(stf) ? STRDUP(stf) : NULL;
+	}
 
-    {
-	const char *wtf = getProfileOption( r, profile, Rs_winTitleFormat );
-	PVTS(r, page)->winTitleFormat = NOT_NULL(wtf) ? STRDUP(wtf) : NULL;
-    }
+	{
+		const char *wtf = getProfileOption( r, profile, Rs_winTitleFormat );
+		PVTS(r, page)->winTitleFormat = NOT_NULL(wtf) ? STRDUP(wtf) : NULL;
+	}
 
 #ifdef BACKGROUND_IMAGE
-    UNSET_PIXMAP(PVTS(r, page)->pixmap);
-    UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
-    PVTS(r, page)->bg.x = PVTS(r, page)->bg.y = 50;
+	UNSET_PIXMAP(PVTS(r, page)->pixmap);
+	UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
+	PVTS(r, page)->bg.x = PVTS(r, page)->bg.y = 50;
 #endif
-    PVTS(r, page)->cmd_pid = -1;
-    PVTS(r, page)->cmd_fd = PVTS(r, page)->tty_fd = -1;
+	PVTS(r, page)->cmd_pid = -1;
+	PVTS(r, page)->cmd_fd = PVTS(r, page)->tty_fd = -1;
 #ifdef UTMP_SUPPORT
-    PVTS(r, page)->next_utmp_action = SAVE;
+	PVTS(r, page)->next_utmp_action = SAVE;
 #endif
 #ifndef NO_SETOWNER_TTYDEV
-    PVTS(r, page)->next_tty_action = SAVE;
+	PVTS(r, page)->next_tty_action = SAVE;
 #endif
 
-    PVTS(r, page)->holdOption = r->profile[profile].holdOption;
+	PVTS(r, page)->holdOption = r->profile[profile].holdOption;
 
-    PVTS(r, page)->status = 0;
-    PVTS(r, page)->hold = 0;	    /* clear hold flag */
-    PVTS(r, page)->dead = 0;	    /* clear dead flag */
-    PVTS(r, page)->highlight = 0;   /* clear highlight flag */
+	PVTS(r, page)->status = 0;
+	PVTS(r, page)->hold = 0;	    /* clear hold flag */
+	PVTS(r, page)->dead = 0;	    /* clear dead flag */
+	PVTS(r, page)->highlight = 0;   /* clear highlight flag */
 
-    /* Get term_env type */
-    PVTS(r, page)->termenv = rxvt_get_termenv (
-	r->h->rs[Rs_term_name] ? r->h->rs[Rs_term_name] : TERMENV);
+	/* Get term_env type */
+	PVTS(r, page)->termenv = rxvt_get_termenv (
+			r->h->rs[Rs_term_name] ? r->h->rs[Rs_term_name] : TERMENV);
 
-    /* Initialize PrivateModes and SavedModes */
-    PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
-	PrivMode_Default;
-    if (ISSET_OPTION(r, Opt_scrollTtyOutputInhibit))
-	SET_PMODE(r, page, PrivMode_TtyOutputInh);
-    if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
-	SET_PMODE(r, page, PrivMode_Keypress);
-    if( r->h->skip_pages > 1 /* jump scroll is unset */ )
-	SET_PMODE(r, page, PrivMode_smoothScroll);
+	/* Initialize PrivateModes and SavedModes */
+	PVTS(r, page)->PrivateModes = PVTS(r, page)->SavedModes =
+		PrivMode_Default;
+	if (ISSET_OPTION(r, Opt_scrollTtyOutputInhibit))
+		SET_PMODE(r, page, PrivMode_TtyOutputInh);
+	if (ISSET_OPTION(r, Opt_scrollTtyKeypress))
+		SET_PMODE(r, page, PrivMode_Keypress);
+	if( r->h->skip_pages > 1 /* jump scroll is unset */ )
+		SET_PMODE(r, page, PrivMode_smoothScroll);
 #ifndef NO_BACKSPACE_KEY
-    if (STRCMP(r->h->key_backspace, "DEC") == 0)
-	SET_PMODE(r, page, PrivMode_HaveBackSpace);
+	if (STRCMP(r->h->key_backspace, "DEC") == 0)
+		SET_PMODE(r, page, PrivMode_HaveBackSpace);
 #endif
 #ifdef HAVE_SCROLLBARS
-    if (rxvt_scrollbar_visible(r))
-    {
-	SET_PMODE(r, page, PrivMode_scrollBar);
-	SET_SMODE(r, page, PrivMode_scrollBar);
-    }
+	if (rxvt_scrollbar_visible(r))
+	{
+		SET_PMODE(r, page, PrivMode_scrollBar);
+		SET_SMODE(r, page, PrivMode_scrollBar);
+	}
 #endif
 #ifdef HAVE_MENUBAR
-    if (rxvt_menubar_visible(r))
-    {
-	SET_PMODE(r, page, PrivMode_menuBar);
-	SET_SMODE(r, page, PrivMode_menuBar);
-    }
+	if (rxvt_menubar_visible(r))
+	{
+		SET_PMODE(r, page, PrivMode_menuBar);
+		SET_SMODE(r, page, PrivMode_menuBar);
+	}
 #endif
 
-    /* Now set VT fg/bg color */
-    PVTS(r, page)->p_fg = VTFG(r, profile);
-    PVTS(r, page)->p_bg = VTBG(r, profile);
-
-    if( r->TermWin.fade )
-    {
-	PVTS(r, page)->p_fgfade = VTFG_FADE(r, profile);
-	PVTS(r, page)->p_bgfade = VTBG_FADE(r, profile);
-    }
-
-#ifdef XFT_SUPPORT
-    if( ISSET_OPTION( r, Opt_xft ) )
-    {
-	PVTS(r, page)->p_xftfg = VTXFTFG(r, profile);
-	PVTS(r, page)->p_xftbg = VTXFTBG(r, profile);
+	/* Now set VT fg/bg color */
+	PVTS(r, page)->p_fg = VTFG(r, profile);
+	PVTS(r, page)->p_bg = VTBG(r, profile);
 
 	if( r->TermWin.fade )
 	{
-	    PVTS(r, page)->p_xftfgfade = VTXFTFG_FADE(r, profile);
-	    PVTS(r, page)->p_xftbgfade = VTXFTBG_FADE(r, profile);
+		PVTS(r, page)->p_fgfade = VTFG_FADE(r, profile);
+		PVTS(r, page)->p_bgfade = VTBG_FADE(r, profile);
 	}
-    }
+
+#ifdef XFT_SUPPORT
+	if( ISSET_OPTION( r, Opt_xft ) )
+	{
+		PVTS(r, page)->p_xftfg = VTXFTFG(r, profile);
+		PVTS(r, page)->p_xftbg = VTXFTBG(r, profile);
+
+		if( r->TermWin.fade )
+		{
+			PVTS(r, page)->p_xftfgfade = VTXFTFG_FADE(r, profile);
+			PVTS(r, page)->p_xftbgfade = VTXFTBG_FADE(r, profile);
+		}
+	}
 #endif
 
-    /* Initialize input buffer */
-    PVTS(r, page)->outbuf_start	= PVTS(r, page)->outbuf_end
-				= PVTS(r, page)->outbuf_base;
-    
-    /* Initialize write out buffer */
-    SET_NULL(PVTS(r, page)->inbuf_base);
-    SET_NULL(PVTS(r, page)->inbuf_start);
-    SET_NULL(PVTS(r, page)->inbuf_end);
-	 PVTS(r, page)->inbuf_room = 0;
+	/* Initialize input buffer */
+	PVTS(r, page)->outbuf_start	= PVTS(r, page)->outbuf_end
+		= PVTS(r, page)->outbuf_base;
 
-    /* Set screen structure initialization flag */
-    PVTS(r, page)->init_screen = 0;
+	/* Initialize write out buffer */
+	SET_NULL(PVTS(r, page)->inbuf_base);
+	SET_NULL(PVTS(r, page)->inbuf_start);
+	SET_NULL(PVTS(r, page)->inbuf_end);
+	PVTS(r, page)->inbuf_room = 0;
 
-    /* Request a refresh */
-    PVTS(r, page)->want_refresh = 1;
+	/* Set screen structure initialization flag */
+	PVTS(r, page)->init_screen = 0;
+
+	/* Request a refresh */
+	PVTS(r, page)->want_refresh = 1;
+	return 1;
 }
 
 
@@ -2944,149 +2965,166 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 void
 rxvt_destroy_termwin( rxvt_t *r, int page )
 {
-    assert (page < MAX_PAGES);
-    assert (PVTS(r, page)->tab_title);
+	assert (page <= LTAB(r));
+	assert (PVTS(r, page)->tab_title);
 
-    rxvt_free (PVTS(r, page)->tab_title);
-    SET_NULL(PVTS(r, page)->tab_title);
+	rxvt_free (PVTS(r, page)->tab_title);
+	SET_NULL(PVTS(r, page)->tab_title);
 
-    rxvt_free( PVTS(r, page)->title_format );
-    SET_NULL( PVTS(r, page)->title_format );
+	rxvt_free( PVTS(r, page)->title_format );
+	SET_NULL( PVTS(r, page)->title_format );
 
 #ifdef XFT_SUPPORT
-    if (ISSET_OPTION(r, Opt_xft))
-    {
-	if (PVTS(r, page)->xftvt)
-	    XftDrawDestroy (PVTS(r, page)->xftvt);
-	SET_NULL(PVTS(r, page)->xftvt);
-    }
+	if (ISSET_OPTION(r, Opt_xft))
+	{
+		if (PVTS(r, page)->xftvt)
+			XftDrawDestroy (PVTS(r, page)->xftvt);
+		SET_NULL(PVTS(r, page)->xftvt);
+	}
 #endif
-    assert (IS_WIN(PVTS(r, page)->vt));
-    XDestroyWindow (r->Xdisplay, PVTS(r, page)->vt);
-    UNSET_WIN(PVTS(r, page)->vt);
+	assert (IS_WIN(PVTS(r, page)->vt));
+	XDestroyWindow (r->Xdisplay, PVTS(r, page)->vt);
+	UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef BACKGROUND_IMAGE
-    if (IS_PIXMAP(PVTS(r, page)->pixmap))
-    {
-	XFreePixmap (r->Xdisplay, PVTS(r, page)->pixmap);
-	UNSET_PIXMAP(PVTS(r, page)->pixmap);
-    }
-    if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
-    {
-	XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
-	UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
-    }
+	if (IS_PIXMAP(PVTS(r, page)->pixmap))
+	{
+		XFreePixmap (r->Xdisplay, PVTS(r, page)->pixmap);
+		UNSET_PIXMAP(PVTS(r, page)->pixmap);
+	}
+	if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
+	{
+		XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
+		UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
+	}
 #endif
 
-    /* Set vterm index to -1, so that we know it's unused */
-    PVTS(r, page)->vts_idx = -1;
+	rxvt_free (PVTS(r, page));
+	if (page < LTAB (r))
+		MEMMOVE (r->vts[page], r->vts[page + 1], (LTAB(r) - page) * sizeof (term_t*));
+
+	{
+		if (LTAB (r) == 0)
+		{
+			rxvt_free (r->vts);
+			SET_NULL (r->vts);
+		}
+		else
+		{
+			term_t** temp_vts = rxvt_realloc (r->vts, LTAB (r) * sizeof (term_t*));
+			if (temp_vts)
+				r->vts = temp_vts;
+			// if the realloc fails, this is not fatale as we can imagine it may be reallocated
+			// at the next change on tabs.
+		}
+	}
+	LTAB(r)--;
 }
 
 
 
 /* rxvt_create_termwin() - create a terminal window */
 /* EXTPROTO */
-void
+int
 rxvt_create_termwin( rxvt_t *r, int page, int profile,
 	const char TAINTED *title )
 {
-    long	    vt_emask;
+	long	    vt_emask;
 
+	if (!rxvt_init_vts (r, page, profile))
+			return 0;
 
-    assert( page < MAX_PAGES );
-
-    rxvt_init_vts( r, page, profile );
-
-    /*
-     * Set the tab title
-     */
-    if (IS_NULL(title))
-	title = DEFAULT_TAB_TITLE;
-    PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP( title, MAX_TAB_TXT );
+	/*
+	 * Set the tab title
+	 */
+	if (IS_NULL(title))
+		title = DEFAULT_TAB_TITLE;
+	PVTS(r, page)->tab_title = (char UNTAINTED *) STRNDUP( title, MAX_TAB_TXT );
 
 #ifdef HAVE_PUTENV
-    /* Set environment variable of tab title */
-    sprintf (r->h->env_tabtitle, TABTITLEENV "%s", PVTS(r, page)->tab_title);
-    putenv (r->h->env_tabtitle);
+	/* Set environment variable of tab title */
+	sprintf (r->h->env_tabtitle, TABTITLEENV "%s", PVTS(r, page)->tab_title);
+	putenv (r->h->env_tabtitle);
 #endif
 
-    PVTS(r, page)->tab_width = rxvt_tab_width (r, PVTS(r, page)->tab_title);
+	PVTS(r, page)->tab_width = rxvt_tab_width (r, PVTS(r, page)->tab_title);
 
-    /*
-     * Now switch fg/bg colors before creating VT because this will use the
-     * fg/bg colors
-     */
-    rxvt_set_vt_colors( r, page );
+	/*
+	 * Now switch fg/bg colors before creating VT because this will use the
+	 * fg/bg colors
+	 */
+	rxvt_set_vt_colors( r, page );
 
-    /* create the terminal window */
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n", page, r->h->window_vt_x, r->h->window_vt_y, VT_WIDTH(r), VT_HEIGHT(r), r->pixColors[Color_fg], r->pixColors[Color_bg]));
+	/* create the terminal window */
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "Create VT %d (%dx%d+%dx%d) fg=%06lx, bg=%06lx\n", page, r->h->window_vt_x, r->h->window_vt_y, VT_WIDTH(r), VT_HEIGHT(r), r->pixColors[Color_fg], r->pixColors[Color_bg]));
 
-    PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
-				r->h->window_vt_x, r->h->window_vt_y,
-				VT_WIDTH(r), VT_HEIGHT(r),
-				0,
-				r->pixColors[Color_fg],
-				r->pixColors[Color_bg]);
-    assert (IS_WIN(PVTS(r, page)->vt));
+	PVTS(r, page)->vt = XCreateSimpleWindow (r->Xdisplay, r->TermWin.parent,
+			r->h->window_vt_x, r->h->window_vt_y,
+			VT_WIDTH(r), VT_HEIGHT(r),
+			0,
+			r->pixColors[Color_fg],
+			r->pixColors[Color_bg]);
+	assert (IS_WIN(PVTS(r, page)->vt));
 #ifdef XFT_SUPPORT
-    if (ISSET_OPTION(r, Opt_xft))
-    {
-	PVTS(r, page)->xftvt = XftDrawCreate (r->Xdisplay,
-	    PVTS(r, page)->vt, XVISUAL, XCMAP);
-	assert (NOT_NULL(PVTS(r, page)->xftvt));
-    }
+	if (ISSET_OPTION(r, Opt_xft))
+	{
+		PVTS(r, page)->xftvt = XftDrawCreate (r->Xdisplay,
+				PVTS(r, page)->vt, XVISUAL, XCMAP);
+		assert (NOT_NULL(PVTS(r, page)->xftvt));
+	}
 #endif
 
 
-    /* define cursor for the terminal window */
-    rxvt_pointer_unblank(r, page);
+	/* define cursor for the terminal window */
+	rxvt_pointer_unblank(r, page);
 
-    /* define event mask fo the terminal window */
-    vt_emask = (ExposureMask | ButtonPressMask | ButtonReleaseMask
-	| PropertyChangeMask);
+	/* define event mask fo the terminal window */
+	vt_emask = (ExposureMask | ButtonPressMask | ButtonReleaseMask
+			| PropertyChangeMask);
 #ifdef POINTER_BLANK
-    if (ISSET_OPTION(r, Opt_pointerBlank))
-	vt_emask |= PointerMotionMask;
-    else
+	if (ISSET_OPTION(r, Opt_pointerBlank))
+		vt_emask |= PointerMotionMask;
+	else
 #endif
-	vt_emask |= (Button1MotionMask | Button3MotionMask);
-    XSelectInput(r->Xdisplay, PVTS(r, page)->vt, vt_emask);
+		vt_emask |= (Button1MotionMask | Button3MotionMask);
+	XSelectInput(r->Xdisplay, PVTS(r, page)->vt, vt_emask);
 
 #ifdef TRANSPARENT
-    /* Set transparent background */
-    if (ISSET_OPTION(r, Opt_transparent))
-    {
-	XSetWindowBackgroundPixmap (r->Xdisplay, PVTS(r, page)->vt,
-	    ParentRelative);
-    }
+	/* Set transparent background */
+	if (ISSET_OPTION(r, Opt_transparent))
+	{
+		XSetWindowBackgroundPixmap (r->Xdisplay, PVTS(r, page)->vt,
+				ParentRelative);
+	}
 #endif
 
-    /*
-     * Load the background image for terminal window when not transparent
-     */
+	/*
+	 * Load the background image for terminal window when not transparent
+	 */
 #ifdef BACKGROUND_IMAGE
 # ifdef TRANSPARENT
-    if( NOTSET_OPTION(r,  Opt_transparent) )
+	if( NOTSET_OPTION(r,  Opt_transparent) )
 # endif
-    {
-	const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
-	if (NOT_NULL(pf))
 	{
-	    /* Load pixmap for each individual tab */
-	    const char *p = pf;
+		const char *pf = getProfileOption( r, profile, Rs_backgroundPixmap );
+		if (NOT_NULL(pf))
+		{
+			/* Load pixmap for each individual tab */
+			const char *p = pf;
 
-	    if (NOT_NULL(p = STRCHR(p, ';')))
-	    {
-		p++;
-		rxvt_scale_pixmap(r, page, p);
-	    }
-	    rxvt_load_bg_pixmap(r, page, pf);
-	    /* rxvt_scr_touch(r, page, True); */
-	}
-    } /* if( NOTSET_OPTION(r,  Opt_transparent) ) */
+			if (NOT_NULL(p = STRCHR(p, ';')))
+			{
+				p++;
+				rxvt_scale_pixmap(r, page, p);
+			}
+			rxvt_load_bg_pixmap(r, page, pf);
+			/* rxvt_scr_touch(r, page, True); */
+		}
+	} /* if( NOTSET_OPTION(r,  Opt_transparent) ) */
 #endif
 
-    XMapWindow (r->Xdisplay, PVTS(r, page)->vt);
+	XMapWindow (r->Xdisplay, PVTS(r, page)->vt);
+	return 1;
 }
 
 

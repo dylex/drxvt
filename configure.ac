@@ -773,14 +773,6 @@ AC_DEFINE_UNQUOTED(MAX_PROFILES, $max_prof_option, [the max number of profiles])
 
 
 AC_ARG_WITH(
-    max-term,
-    AC_HELP_STRING([--with-max-term=NUM],[set the max number of terminal [[15]]]),
-    [max_term_option=$withval],
-    [max_term_option=15]
-)
-AC_DEFINE_UNQUOTED(MAX_PAGES, $max_term_option, [the max number of vt that can be open])
-
-AC_ARG_WITH(
 	atab-extra,
 	AC_HELP_STRING( [--with-atab-extra=%], [The extra height (as a % of the font height) active tabs should have] ),
 	[atab_extra_option=$withval],
@@ -1554,7 +1546,6 @@ echo
 echo "Options:"
 echo "Terminal name               : $term_name_option"
 echo "Maximal profiles            : $max_prof_option"
-echo "Maximal tabs                : $max_term_option"
 echo "Extra height% of active tab : $atab_extra_option"
 echo "Radius% of tab corners      : $tab_radius_option"
 if test "x$support_linespace" = "xyes"; then

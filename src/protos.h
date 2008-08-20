@@ -6,6 +6,7 @@
  * Copyright (c) 1997-2001   Geoff Wing <gcw@pobox.com>
  * Copyright (c) 2004        Sergey Popov <p_sergey@jungo.com>
  * Copyright (c) 2004        Jingmin Zhou <jimmyzhou@users.sourceforge.net>
+ * Copyright (C) 2008		  Jehan Hysseo <hysseo@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -102,7 +103,7 @@ void             rxvt_init_command                __PROTO((rxvt_t* r));
 CARD32           rxvt_get_desktop                 __PROTO((rxvt_t* r));
 void             rxvt_create_show_windows         __PROTO((rxvt_t* r, int argc, const char* const *argv));
 void             rxvt_destroy_termwin             __PROTO((rxvt_t* r, int page));
-void             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
+int             rxvt_create_termwin              __PROTO((rxvt_t* r, int page, int profile,  const char TAINTED * title));
 const char*	 getProfileOption		  __PROTO(( rxvt_t *r, int profile, int resource ));
 Status		 ewmh_message			  __PROTO(( Display *, Window, Window, Atom, long, long, long, long, long));
 int		 rxvt_async_exec		  __PROTO((rxvt_t*, const char *));

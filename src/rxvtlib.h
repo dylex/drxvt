@@ -940,9 +940,9 @@ typedef struct rxvt_vars {
      * 2006-08-18 gi1242 TODO: This should be an array that grows dynamically in
      * size. Plus we should only reserve enough memory for a our currently
      * displayed term structures.
+	  * 2008-08-08 Jehan: done!
      */
-    term_t	    vterm[MAX_PAGES];
-    term_t*	    vts[MAX_PAGES];
+    term_t**	    vts;
 
     short	    tabClicked;		    /* Tab clicked by user. Used for
 					       moving tabs by drag and drop. */
