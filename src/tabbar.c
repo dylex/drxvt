@@ -1467,9 +1467,7 @@ rxvt_remove_page (rxvt_t* r, short page)
 {
     register int    i;
 
-
-    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"remove_page(%d)\n", page));
-
+    rxvt_dbgmsg ((DBG_VERBOSE, DBG_TABBAR,"rxvt_remove_page (r, %d)\n", page));
 
     /* clean utmp/wtmp entry */
 #ifdef UTMP_SUPPORT
@@ -1496,18 +1494,39 @@ rxvt_remove_page (rxvt_t* r, short page)
     /* destroy the virtual terminal window */
     rxvt_destroy_termwin (r, page);
 
-    /* update total number of tabs */
-    //LTAB(r)--;
-
-    /* quit the last the terminal, exit the application */
-    if( LTAB(r) < 0 )
+    if (LTAB (r) == 0)
+    {
+	/* quit the last the terminal, exit the application */
+	rxvt_free (r->vts);
+	SET_NULL (r->vts);
 	rxvt_clean_exit (r);
+    }
 
+    /* update total number of tabs */
+    LTAB(r)--;
+
+    if (FVTAB(r) > page)
+	FVTAB(r)--;
+    if (LVTAB(r) > page)
+	LVTAB(r)--;
+    /* Reorganize the tabs array. */
     /* update TermWin and tab_widths */
     for (i = page; i <= LTAB(r); i++)
     {
 	PVTS(r, i) = PVTS(r, i+1);
+	PVTS(r, i)->vts_idx = i;
 	refresh_tabbar_tab( r, i);
+    }
+
+    //if (page < LTAB (r))
+	//MEMMOVE (r->vts[page], r->vts[page + 1], (LTAB(r) - page) * sizeof (term_t*));
+
+    {
+	term_t** temp_vts = rxvt_realloc (r->vts, (LTAB (r) + 1) * sizeof (term_t*));
+	if (temp_vts)
+	    r->vts = temp_vts;
+	// if the realloc failed, this is not fatale as we can imagine it may be reallocated
+	// at the next change on tabs.
     }
 
     /* update selection */
@@ -1521,9 +1540,11 @@ rxvt_remove_page (rxvt_t* r, short page)
      * Must be careful here!!!
      */
     /* update previous active tab */
-    if (PTAB(r) > page) PTAB(r)--;
+    if (PTAB(r) > page)
+	PTAB(r)--;
     /* in case PTAB is invalid */
-    if (PTAB(r) > LTAB(r)) PTAB(r) = LTAB(r);
+    if (PTAB(r) > LTAB(r))
+	PTAB(r) = LTAB(r);
 
     /* update active tab */
     if( ATAB(r) == page )
@@ -1532,10 +1553,13 @@ rxvt_remove_page (rxvt_t* r, short page)
 	ATAB(r) = PTAB(r);
 
 	/* Make the previous active tab the previous / next tab if possible. */
-	if( PTAB(r) > 0 ) PTAB(r)--;
-	else if (PTAB(r) < LTAB(r) ) PTAB(r)++;
+	if( PTAB(r) > 0 )
+	    PTAB(r)--;
+	else if (PTAB(r) < LTAB(r) )
+	    PTAB(r)++;
     }
-    else if( ATAB(r) > page) ATAB(r)--;
+    else if( ATAB(r) > page)
+	ATAB(r)--;
 
     /* always set mapped flag */
     AVTS(r)->mapped = 1;

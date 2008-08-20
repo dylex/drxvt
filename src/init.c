@@ -2965,60 +2965,41 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 void
 rxvt_destroy_termwin( rxvt_t *r, int page )
 {
-	assert (page <= LTAB(r));
-	assert (PVTS(r, page)->tab_title);
+    assert (page <= LTAB(r));
+    assert (PVTS(r, page)->tab_title);
 
-	rxvt_free (PVTS(r, page)->tab_title);
-	SET_NULL(PVTS(r, page)->tab_title);
+    rxvt_free (PVTS(r, page)->tab_title);
+    SET_NULL(PVTS(r, page)->tab_title);
 
-	rxvt_free( PVTS(r, page)->title_format );
-	SET_NULL( PVTS(r, page)->title_format );
+    rxvt_free( PVTS(r, page)->title_format );
+    SET_NULL( PVTS(r, page)->title_format );
 
 #ifdef XFT_SUPPORT
-	if (ISSET_OPTION(r, Opt_xft))
-	{
-		if (PVTS(r, page)->xftvt)
-			XftDrawDestroy (PVTS(r, page)->xftvt);
-		SET_NULL(PVTS(r, page)->xftvt);
-	}
+    if (ISSET_OPTION(r, Opt_xft))
+    {
+	if (PVTS(r, page)->xftvt)
+	    XftDrawDestroy (PVTS(r, page)->xftvt);
+	SET_NULL(PVTS(r, page)->xftvt);
+    }
 #endif
-	assert (IS_WIN(PVTS(r, page)->vt));
-	XDestroyWindow (r->Xdisplay, PVTS(r, page)->vt);
-	UNSET_WIN(PVTS(r, page)->vt);
+    assert (IS_WIN(PVTS(r, page)->vt));
+    XDestroyWindow (r->Xdisplay, PVTS(r, page)->vt);
+    UNSET_WIN(PVTS(r, page)->vt);
 
 #ifdef BACKGROUND_IMAGE
-	if (IS_PIXMAP(PVTS(r, page)->pixmap))
-	{
-		XFreePixmap (r->Xdisplay, PVTS(r, page)->pixmap);
-		UNSET_PIXMAP(PVTS(r, page)->pixmap);
-	}
-	if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
-	{
-		XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
-		UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
-	}
+    if (IS_PIXMAP(PVTS(r, page)->pixmap))
+    {
+	XFreePixmap (r->Xdisplay, PVTS(r, page)->pixmap);
+	UNSET_PIXMAP(PVTS(r, page)->pixmap);
+    }
+    if (IS_PIXMAP(PVTS(r, page)->bg.pixmap))
+    {
+	XFreePixmap (r->Xdisplay, PVTS(r, page)->bg.pixmap);
+	UNSET_PIXMAP(PVTS(r, page)->bg.pixmap);
+    }
 #endif
 
-	rxvt_free (PVTS(r, page));
-	if (page < LTAB (r))
-		MEMMOVE (r->vts[page], r->vts[page + 1], (LTAB(r) - page) * sizeof (term_t*));
-
-	{
-		if (LTAB (r) == 0)
-		{
-			rxvt_free (r->vts);
-			SET_NULL (r->vts);
-		}
-		else
-		{
-			term_t** temp_vts = rxvt_realloc (r->vts, LTAB (r) * sizeof (term_t*));
-			if (temp_vts)
-				r->vts = temp_vts;
-			// if the realloc fails, this is not fatale as we can imagine it may be reallocated
-			// at the next change on tabs.
-		}
-	}
-	LTAB(r)--;
+    rxvt_free (PVTS(r, page));
 }
 
 

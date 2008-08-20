@@ -50,7 +50,8 @@ typedef uint32_t	unicode_t;
 struct rxvt_vars;	/* defined later on */
 struct rxvt_hidden;	/* not defined here */
 
-typedef struct {
+typedef struct
+{
     int32_t         row;
     int32_t         col;
 } row_col_t;
@@ -74,7 +75,8 @@ typedef unsigned char text_t;
  *  view_start: 0 <= view_start <= nscrolled
  */
 
-typedef struct {
+typedef struct
+{
     uint16_t	    fwidth,	/* font width  [pixels] */
 		    fheight;	/* font height [pixels] */
 #ifdef XFT_SUPPORT
@@ -206,7 +208,8 @@ typedef struct {
  *   Rows [TermWin.saveLines] ... [TermWin.saveLines + TermWin.nrow - 1]
  *     normal `unscrolled' screen region
  */
-typedef struct {
+typedef struct
+{
     text_t**	    text;	/* _all_ the text */
     int16_t*	    tlen;	/* length of each text line */
     rend_t**	    rend;	/* rendition, uses RS_ flags */
@@ -222,7 +225,8 @@ typedef struct {
 } screen_t;
 
 
-typedef struct {
+typedef struct
+{
     unsigned char*  text;   /* selected text */
     uint32_t	    len;    /* length of selected text */
     enum {
@@ -240,7 +244,8 @@ typedef struct {
     row_col_t       end;    /* one character past end point */
 } selection_t;
 
-typedef enum {
+typedef enum
+{
     OLD_SELECT, OLD_WORD_SELECT, NEW_SELECT
 } sstyle_t;
 
@@ -416,7 +421,8 @@ typedef enum {
 /* ------------------------------------------------------------------------- */
 
 #ifdef HAVE_MENUBAR
-typedef struct {
+typedef struct
+{
     short           state;
     Window          win;
     GC		    gc;
@@ -437,7 +443,8 @@ typedef struct {
 
 
 #ifdef HAVE_SCROLLBARS
-typedef struct {
+typedef struct
+{
     char            state;  /* scrollbar state */
     char            init;   /* scrollbar has been initialised */
     short           beg;    /* slider sub-window begin height */
@@ -501,7 +508,8 @@ typedef struct {
 #endif	/* HAVE_SCROLLBARS */
 
 
-typedef struct {
+typedef struct
+{
     char	state;	/* tabbar state */
 
     short	ltab;	/* last tab */
@@ -534,7 +542,8 @@ typedef struct {
 
 
 #ifdef BACKGROUND_IMAGE
-typedef struct {
+typedef struct
+{
     short           w, h, x, y;
     Pixmap          pixmap; 
 } bgPixmap_t;
@@ -550,7 +559,8 @@ typedef struct {
 #  define XpmDepth	    (0)
 #  define XpmSize	    (0)
 #  define XpmReturnPixels   (0)
-typedef struct {
+typedef struct
+{
     unsigned long   valuemask;
     Visual*	    visual;
     Colormap	    colormap;
@@ -563,7 +573,8 @@ typedef struct {
 #endif	/* BACKGROUND_IMAGE */
 
 
-typedef enum {
+typedef enum
+{
     TERMENV_XTERM = 0,
     TERMENV_RXVT,
     TERMENV_VT102,
@@ -573,7 +584,8 @@ typedef enum {
 } termenv_t;
 
 struct term_t;
-typedef struct {
+typedef struct
+{
     /*
      * Index to vts. If it's -1, then this term_t structure is not used.
      * Otherwise, it is used by pointer vts[vts_idx]. This is to improve destroy
@@ -787,14 +799,16 @@ typedef struct {
 /*
  * Action to take when a macro is called / menu item is selected.
  */
-typedef struct {
+typedef struct
+{
     unsigned short  type;   /* must not be changed; first element */
     unsigned short  len;    /* strlen (str) */
     unsigned char   *str;   /* action to take */
 } action_t;
 
 /* Values for macro_t.type. Must sync this with macroNames from macros.c */
-enum {
+enum
+{
     MacroFnDummy=0,
     MacroFnEsc,
     MacroFnStr,
@@ -827,7 +841,8 @@ enum {
 } macroFnNames;
 
 typedef unsigned char macro_priority_t;
-typedef struct {
+typedef struct
+{
     KeySym		keysym;
     unsigned char	modFlags;	/* First 4 bits are the action order
 					   number. Last four bits are the
@@ -867,7 +882,8 @@ typedef struct _profile_t
 } profile_t;
 
 
-typedef struct rxvt_vars {
+typedef struct rxvt_vars
+{
     /*
      * These ``hidden'' items are not for public consumption and must not be
      * accessed externally
@@ -988,7 +1004,8 @@ typedef struct rxvt_vars {
 } rxvt_t;
 
 
-typedef enum {
+typedef enum
+{
     HIDE_MENUBAR = 0,
     SHOW_MENUBAR,
     HIDE_TABBAR,
