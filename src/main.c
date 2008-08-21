@@ -845,7 +845,7 @@ rxvt_init_bfont_xft (rxvt_t* r, XftPattern* xpold)
 			r->TermWin.xftfont->height,
 			r->TermWin.xftbfont->max_advance_width,
 			r->TermWin.xftfont->max_advance_width));
-#ifdef DEBUG
+#if 0 /* was defined(DEBUG) */
 	    FcPatternPrint( xftbpattern );
 #endif
 	    /*
@@ -981,7 +981,7 @@ rxvt_init_mfont_xft (rxvt_t* r, XftPattern* xp, const char* ofname)
 	XftPatternAddBool (r->TermWin.xftmpattern, FC_GLOBAL_ADVANCE, FcTrue);
     }
 
-#  ifdef DEBUG
+#  if 0 /* was defined(DEBUG) */
     FcPatternPrint (r->TermWin.xftmpattern);
 #  endif
 
@@ -1234,7 +1234,7 @@ rxvt_init_font_xft (rxvt_t* r)
 	XftPatternAddBool (r->TermWin.xftpattern, FC_GLOBAL_ADVANCE, FcTrue);
     }
 
-# ifdef DEBUG
+# if 0 /* was defined(DEBUG) */
     FcPatternPrint (r->TermWin.xftpattern);
 # endif
 
