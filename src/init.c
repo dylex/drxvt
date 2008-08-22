@@ -2788,6 +2788,7 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     if (page < 0 || page > LTAB(r) + 1)
 	return 0;
 
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "rxvt_init_vts (r, %d)\n", page));
     LTAB(r)++;
     {
 	/*
@@ -2799,17 +2800,23 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 	if ((temp_vts_page = rxvt_malloc (sizeof (term_t))) == NULL)
 	{
 	    LTAB(r)--;
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tThe terminal allocation failed. Returning. Last tab is %d.\n", LTAB(r)));
 	    return 0;
 	}
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tA new terminal has been allocated.\n"));
 
 	if ((temp_vts = rxvt_realloc (r->vts, (LTAB (r) + 1) * sizeof (term_t*))) == NULL)
 	{
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tThe terminal array's reallocation to (%d * sizeof (term_t*)) failed.\n", LTAB(r) + 1));
 	    LTAB(r)--;
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tLast tab is now %d.\n", LTAB(r)));
 	    rxvt_free (temp_vts_page);
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tPreviously allocated terminal freed. Returning.\n"));
 	    return 0;
 	}
 
 	r->vts = temp_vts;
+	rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tThe terminal array has been reallocated to (%d * sizeof (term_t*)). The last tab is now %d.\n", LTAB(r) + 1, LTAB(r)));
 
 	if (page != LTAB (r))
 	    MEMMOVE (r->vts[page + 1], r->vts[page], (LTAB(r) - page) * sizeof (term_t*));
@@ -2965,6 +2972,7 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
 void
 rxvt_destroy_termwin( rxvt_t *r, int page )
 {
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "rxvt_destroy_termwin (r, %d)\n", page));
     assert (page <= LTAB(r));
     assert (PVTS(r, page)->tab_title);
 
@@ -3000,6 +3008,7 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
 #endif
 
     rxvt_free (PVTS(r, page));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tThe terminal %d has been successfully freed.\n", page));
 }
 
 

@@ -587,10 +587,9 @@ struct term_t;
 typedef struct
 {
     /*
-     * Index to vts. If it's -1, then this term_t structure is not used.
-     * Otherwise, it is used by pointer vts[vts_idx]. This is to improve destroy
-     * performance so that we only need to do (i = page..ltab) vts[i] = vts[i+1]
-     * instead of vterm[i] = vterm[i+1].
+     * Index to vts.
+     * This term_t can be accessed through pointer vts[vts_idx].
+     * It is also the order in the tabbar.
      */
     short	    vts_idx;
 

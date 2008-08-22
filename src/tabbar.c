@@ -1395,9 +1395,9 @@ rxvt_append_page( rxvt_t* r, int profile,
     assert( -1 != LVTS(r)->cmd_fd );
     if (-1 == LVTS(r)->cmd_fd)
     {
-	rxvt_destroy_termwin (r, LTAB(r));
 	rxvt_dbgmsg ((DBG_WARN, DBG_TABBAR,
 		    "\tThe command failed.\n"));
+	rxvt_destroy_termwin (r, LTAB(r));
 	return;
     }
     rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR,"page %d's cmd_fd is %d\n", LTAB(r), LVTS(r)->cmd_fd));
@@ -1509,6 +1509,7 @@ rxvt_remove_page (rxvt_t* r, short page)
 
     /* update total number of tabs */
     LTAB(r)--;
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR, "\tThe last tab is %d.", LTAB(r)));
 
     if (FVTAB(r) > page)
 	FVTAB(r)--;
@@ -1526,7 +1527,11 @@ rxvt_remove_page (rxvt_t* r, short page)
     {
 	term_t** temp_vts = rxvt_realloc (r->vts, (LTAB (r) + 1) * sizeof (term_t*));
 	if (temp_vts)
+	{
 	    r->vts = temp_vts;
+	    rxvt_dbgmsg ((DBG_DEBUG, DBG_TABBAR,
+			"\tThe tab array has been reallocated to (%d * sizeof (term_t*)).\n", LTAB(r) + 1));
+	}
 	else
 	    rxvt_dbgmsg ((DBG_WARN, DBG_TABBAR,
 			"\tAfter removing a tab, the tab array could not be reallocated. If you see often this message, this can be a problem.\n"));
