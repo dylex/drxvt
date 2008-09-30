@@ -360,23 +360,23 @@ draw_string (rxvt_t* r, Region clipRegion,
 		    && (iconv_t) -1 != r->TermWin.xfticonv
 	       )
 	    {
-		char		buf[1024];
+		text_t		buf[1024];
 		int		plen = 1023;
-		char*		pstr = buf;
+		text_t*		pstr = buf;
 		int		olen = len;
 		char*		ostr = str;
 
 		/* convert to UTF-8 */
 		iconv (r->TermWin.xfticonv, (char**) &ostr,
 		    (size_t*) &olen, &pstr, (size_t*) &plen);
-		*pstr = (char) 0;   /* set end of string */
+		*pstr = (text_t) 0;   /* set end of string */
 
 		rxvt_draw_string_xft (r, r->tabBar.win, r->tabBar.gc,
 			clipRegion, RS_None, 
 			active ? USE_BOLD_PFONT : USE_PFONT,
 			r->tabBar.xftwin,
 			active ? &(r->tabBar.xftfg) : &(r->tabBar.xftifg),
-			x, y, buf, len, XftDrawStringUtf8);
+			x, y, buf, len);
 		if( r->TermWin.xftpfont )
 		{
 		    XftTextExtentsUtf8( r->Xdisplay, r->TermWin.xftpfont,
@@ -394,7 +394,7 @@ draw_string (rxvt_t* r, Region clipRegion,
 			active ? USE_BOLD_PFONT : USE_PFONT,
 			r->tabBar.xftwin,
 			active ? &(r->tabBar.xftfg) : &(r->tabBar.xftifg),
-			x, y, str, len, XftDrawString8);
+			x, y, str, len);
 
 		if( r->TermWin.xftpfont )
 		{
@@ -439,7 +439,7 @@ draw_string (rxvt_t* r, Region clipRegion,
 		    active ? USE_BOLD_PFONT : USE_PFONT,
 		    r->tabBar.xftwin,
 		    active ? &(r->tabBar.xftfg) : &(r->tabBar.xftifg),
-		    x, y, str, len, XftDrawString8);
+		    x, y, str, len);
 
 	    if( r->TermWin.xftpfont )
 	    {

@@ -56,7 +56,18 @@ typedef struct
     int32_t         col;
 } row_col_t;
 
-typedef unsigned char text_t;
+//typedef unsigned char text_t;
+#ifdef HAVE_ICONV_H
+// With iconv, characters will be encoded in "UCS-4-INTERNAL", Full Unicode.
+typedef uint32_t text_t;
+#else
+/* Without iconv, characters will be converted to wchar_t, which is often
+ * Unicode on most platform, though it is not required by the Unicode standard.
+ * Hence if possible, using iconv is preferred.
+ */
+typedef wchar_t text_t;
+#endif
+
 #if defined(TTY_256COLOR) || defined(MULTICHAR_SET)
 # define rend_t	    uint32_t
 #else
@@ -763,12 +774,24 @@ typedef struct
     /*
      * Data read from cmd_fd is buffered in here [Child's output buffer]
      */
-    unsigned char   *outbuf_escstart,	/* Start of an escape sequence */
-		    *outbuf_escfail,	/* Position where processing of an
-					   escape sequence last failed */
+    unsigned char   //*outbuf_escstart,	/* Start of an escape sequence */
+		    //*outbuf_escfail,	/* Position where processing of an
+		//			   escape sequence last failed */
 		    *outbuf_start,	/* current char */
 		    *outbuf_end;	/* End of read child's output */
     unsigned char   outbuf_base[BUFSIZ];
+
+    text_t *textbuf_escstart,
+	    *textbuf_escfail,
+	    *textbuf_start,
+	    *textbuf_end;
+    text_t textbuf_base[BUFSIZ];
+
+#ifdef HAVE_ICONV_H
+    iconv_t	    shift_state; // Shift state when using iconv.
+#else
+    mbstate_t* shift_state; // Multi-bite Shift state in C99 standard.
+#endif
 } term_t;
 
 #define TAB_MON_OFF 0            /* tab monitoring off */

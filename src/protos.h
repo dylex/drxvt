@@ -221,13 +221,12 @@ int              rxvt_control_tty                 __PROTO((int fd_tty, const cha
 /* Begin prototypes of screen.c */
 void
 rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
-	int x, int y, char* str, int len, int (*draw_string)());
+	int x, int y, text_t* str, int len, int (*draw_string)());
 #ifdef XFT_SUPPORT
 void
 rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 	rend_t rend, int pfont,
-	XftDraw* win, XftColor* fore, int x, int y, char* str, int len,
-	void (*xftdraw_string)());
+	XftDraw* win, XftColor* fore, int x, int y, text_t* str, int len);
 #endif
 void             rxvt_init_screen                 __PROTO((rxvt_t* r));
 void             rxvt_scr_reset                   __PROTO((rxvt_t* r, int page));
@@ -238,7 +237,7 @@ int              rxvt_scr_change_screen           __PROTO((rxvt_t* r, int page, 
 void             rxvt_scr_color                   __PROTO((rxvt_t* r, int page, unsigned int color, int fgbg));
 void             rxvt_scr_rendition               __PROTO((rxvt_t* r, int page, int set, int style));
 int              rxvt_scroll_text                 __PROTO((rxvt_t* r, int page, int row1, int row2, int count, int spec));
-void             rxvt_scr_add_lines               __PROTO((rxvt_t* r, int page, const unsigned char* str, int nlines, int len));
+void             rxvt_scr_add_lines               __PROTO((rxvt_t* r, int page, text_t* str, int nlines, int len));
 void             rxvt_scr_backspace               __PROTO((rxvt_t* r, int page));
 void             rxvt_scr_tab                     __PROTO((rxvt_t* r, int page, int count));
 void             rxvt_scr_backindex               __PROTO((rxvt_t* r, int page));
