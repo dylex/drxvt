@@ -2951,19 +2951,6 @@ rxvt_init_vts( rxvt_t *r, int page, int profile )
     PVTS(r, page)->outbuf_start	= PVTS(r, page)->outbuf_end
 	= PVTS(r, page)->outbuf_base;
 
-    PVTS(r, page)->textbuf_start = PVTS(r, page)->textbuf_end
-	= PVTS(r, page)->textbuf_base;
-    SET_NULL( PVTS(r, page)->textbuf_escstart);
-    SET_NULL( PVTS(r, page)->textbuf_escfail);
-
-    /* Conversion state created and set to initial state. */
-#ifdef HAVE_ICONV_H
-    PVTS(r, page)->shift_state = iconv_open ("WCHAR_T", ""); // TODO Jehan: is "" enough to define locale encoding?
-#else
-    mbstate_t* mbst = PVTS(r, page)->shift_state = rxvt_malloc (sizeof (mbstate_t)); // TODO Jehan: test NULL?!
-    memset (mbst, 0, sizeof(mbst));
-#endif
-
     /* Initialize write out buffer */
     SET_NULL(PVTS(r, page)->inbuf_base);
     SET_NULL(PVTS(r, page)->inbuf_start);
@@ -3020,11 +3007,6 @@ rxvt_destroy_termwin( rxvt_t *r, int page )
     }
 #endif
 
-#ifdef HAVE_ICONV_H
-    iconv_close (PVTS(r, page)->shift_state);
-#else
-    rxvt_free (PVTS(r, page)->shift_state);
-#endif
     rxvt_free (PVTS(r, page));
     rxvt_dbgmsg ((DBG_DEBUG, DBG_INIT, "\tThe terminal %d has been successfully freed.\n", page));
 }

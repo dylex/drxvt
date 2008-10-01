@@ -175,7 +175,7 @@ void static inline rxvt_clear_area       (rxvt_t*, int page, int x, int y, unsig
 void static inline rxvt_fill_rectangle   (rxvt_t*, int page, int x, int y, unsigned int w, unsigned int h);
 void
 rxvt_scr_draw_string (rxvt_t* r, int page,
-	int x, int y, text_t* str, int len, int drawfunc,
+	int x, int y, char* str, int len, int drawfunc,
 	uint16_t fore, uint16_t back,
 	__attribute__((unused)) rend_t rend, Region refreshRegion);
 void rxvt_scr_adjust_col          (rxvt_t*, int, unsigned int);
@@ -232,7 +232,6 @@ void
 rxvt_blank_screen_mem(rxvt_t* r, int page, text_t **tp, rend_t **rp,
 	unsigned int row, rend_t efs)
 {
-    int col;
     int		 width = r->TermWin.ncol;
     rend_t	 *er;
 
@@ -246,12 +245,10 @@ rxvt_blank_screen_mem(rxvt_t* r, int page, text_t **tp, rend_t **rp,
 
     if (tp[row] == NULL)
     {
-	tp[row] = rxvt_malloc (sizeof(text_t) * width);
-	rp[row] = rxvt_malloc (sizeof(rend_t) * width);
+	tp[row] = rxvt_malloc(sizeof(text_t) * width);
+	rp[row] = rxvt_malloc(sizeof(rend_t) * width);
     }
-    for (col = 0; col < width; col++)
-	tp[row][col] = ' ';
-    //MEMSET(tp[row], 0, sizeof (text_t) * width);//' ', width);
+    MEMSET(tp[row], ' ', width);
     efs &= ~RS_baseattrMask;
     for (er = rp[row]; width--;)
 	*er++ = efs;
@@ -1079,11 +1076,11 @@ adjust_view_start( rxvt_t *r, int page, int nlines)
  */
 /* EXTPROTO */
 void
-rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
+rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 	int len)
 {
     unsigned char   checksel, clearsel;
-    text_t c;
+    char	    c;
     int		 i, row, last_col;
     text_t	 *stp;
     rend_t	 *srp;
@@ -1147,7 +1144,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
     stp = PSCR(r, page).text[row];
     srp = PSCR(r, page).rend[row];
 
-#if 0
 #ifdef MULTICHAR_SET
     if(
 	 PVTS(r, page)->lost_multi && CURCOL > 0 &&
@@ -1157,7 +1153,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
     {
 	PVTS(r, page)->chstat = WBYTE;
     }
-#endif
 #endif
 
     for (i = 0; i < len;)
@@ -1201,7 +1196,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
 		continue;
 
 	    default:
-#if 0
 #ifdef MULTICHAR_SET
 		if (r->encoding_method == ENC_NOENC)
 		{
@@ -1274,7 +1268,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
 		}
 		else
 #endif
-#endif
 		if (c == 127)
 		    continue;	/* yummmm..... */
 		break;
@@ -1310,7 +1303,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
 	if (PSCR(r, page).flags & Screen_Insert)
 	    rxvt_scr_insdel_chars(r, page, 1, INSERT);
 
-#if 0
 #ifdef MULTICHAR_SET
 	if (
 	      IS_MULTI1(PVTS(r, page)->rstyle)
@@ -1330,7 +1322,6 @@ rxvt_scr_add_lines(rxvt_t* r, int page, text_t* str, int nlines,
 	    stp[CURCOL + 1] = ' ';
 	    srp[CURCOL + 1] &= ~RS_multiMask;
 	}
-#endif
 #endif
 
 	stp[CURCOL] = c;
@@ -2792,7 +2783,6 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
  */
 
 
-//#if 0
 #define X11_DRAW_STRING_8	    (1)
 #define X11_DRAW_STRING_16	    (2)
 #define X11_DRAW_IMAGE_STRING_8	    (3)
@@ -2805,11 +2795,6 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
 #define XFT_DRAW_IMAGE_STRING_16    (10)
 #define XFT_DRAW_IMAGE_STRING_32    (11)
 #define XFT_DRAW_IMAGE_STRING_UTF8  (12)
-//#endif
-#define X11_DRAW_STRING		    (1)
-#define X11_DRAW_IMAGE_STRING	    (3)
-#define XFT_DRAW_STRING		    (5)
-#define XFT_DRAW_IMAGE_STRING    (11)
 
 #ifdef XFT_SUPPORT
 #define XFTDRAW_STRING(xdraw, color, font, x, y, str, len)		    \
@@ -2832,7 +2817,8 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
 void
 rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 	rend_t rend, int pfont,
-	XftDraw* win, XftColor* fore, int x, int y, text_t* str, int len)
+	XftDraw* win, XftColor* fore, int x, int y, char* str, int len,
+	void (*xftdraw_string)())
 {
     XftFont *font;
 
@@ -2847,12 +2833,17 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 	    r->TermWin.xftPfont : r->TermWin.xftpfont;
     }
 #ifdef MULTICHAR_SET
-    else
+    else if( xftdraw_string == XftDrawStringUtf8 )
 	font = r->TermWin.xftmfont;
 #endif
- //   else font = r->TermWin.xftfont;
+    else font = r->TermWin.xftfont;
 
     rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "Draw: 0x%8x %p: '%.40s'\n", rend, font, str ));
+
+#ifdef MULTICHAR_SET
+    if( xftdraw_string == XftDrawStringUtf8 )
+	len = STRLEN( str);
+#endif
 
 # ifdef TEXT_SHADOW
     if (r->h->rs[Rs_textShadow] && SHADOW_NONE != r->TermWin.shadow_mode)
@@ -2860,25 +2851,36 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 	/*
 	 * Get the bounding box of the rectangle we would draw, and clip to it.
 	 */
+	void	    (*xftTextExtents)() = NULL; /* Suppress compile warning */
 	XGlyphInfo  extents;
+
 	int	sx, sy;	/* Shadow offsets */
 
 	rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "handling text shadow for %s (%d)\n", str, len));
 
-	XftTextExtents32 (r->Xdisplay, font, (FcChar32*) str, len, &extents);
+	if( xftdraw_string == XftDrawString8 )
+	    xftTextExtents = XftTextExtents8;
+	else if( xftdraw_string == XftDrawString16)
+	    xftTextExtents = XftTextExtents16;
+	else if( xftdraw_string == XftDrawString32)
+	    xftTextExtents = XftTextExtents32;
+	else if( xftdraw_string == XftDrawStringUtf8)
+	    xftTextExtents = XftTextExtentsUtf8;
+	else
+	    assert(0); /* Shouldn't happen */
+
+	xftTextExtents( r->Xdisplay, font, str, len, &extents);
 
 	/*
 	 * We should ignore extents.height. The height of the drawn text might
 	 * be much smaller than the height of the font (which is really what
 	 * we've reserved space for.
 	 */
-	rxvt_set_clipping (r, win, gc, refreshRegion,
+	rxvt_set_clipping( r, win, gc, refreshRegion,
 		x, y - font->ascent, extents.width - extents.x, font->height,
 		&sx, &sy);
 
-	/*XFTDRAW_STRING (win, &(r->TermWin.xftshadow),
-	    font, x+sx, y+sy, str, len);*/
-	XftDrawString32 (win, &(r->TermWin.xftshadow),
+	XFTDRAW_STRING (win, &(r->TermWin.xftshadow),
 	    font, x+sx, y+sy, str, len);
 	/*
 	 * We need to free clipping area, otherwise text on screen may be
@@ -2889,7 +2891,7 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
     }
 # endif	/* TEXT_SHADOW */
 
-    XftDrawString32 (win, fore, font, x, y, (FcChar32*) str, len);
+    XFTDRAW_STRING (win, fore, font, x, y, str, len);
 }
 #undef XFTDRAW_STRING
 #endif	/* XFT_SUPPORT */
@@ -2901,18 +2903,17 @@ rxvt_draw_string_xft (rxvt_t* r, Drawable d, GC gc, Region refreshRegion,
 /* EXTPROTO */
 void
 rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
-	int x, int y, text_t* str, int len, int (*draw_string)())
+	int x, int y, char* str, int len, int (*draw_string)())
 {
 # ifdef TEXT_SHADOW
     while (r->h->rs[Rs_textShadow] && SHADOW_NONE != r->TermWin.shadow_mode)
     {
-	int escapement;
 	int	sx, sy;
 	XGCValues   gcvalue;
 
 	int	    (*xtextextents)();
 	int	    unused_dir, ascent, descent;
-	//XCharStruct charstruct;
+	XCharStruct charstruct;
 	GContext    gid = XGContextFromGC( gc );
 	XFontStruct *font = XQueryFont( r->Xdisplay, gid);
 
@@ -2928,10 +2929,16 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 	/*
 	 * Get the bounding box of the rectangle we would draw, and clip to it.
 	 */
-	//xtextextents( font, str, len,
-	//	&unused_dir, &ascent, &descent, &charstruct);
-	// XwcTextExtents ??!
-	escapement = XwcTextEscapement (r->TermWin.fontset, (wchar_t*) str, len);
+	if( draw_string == XDrawImageString || draw_string == XDrawString)
+	    xtextextents = XTextExtents;
+	else if ( draw_string == XDrawImageString16 ||
+		draw_string == XDrawString16)
+	    xtextextents = XTextExtents16;
+	else
+		assert(0); /* Shouldn't happen */
+
+	xtextextents( font, str, len,
+		&unused_dir, &ascent, &descent, &charstruct);
 
 	/*
 	 * If we're using XDrawImageString, then when we draw the actual text,
@@ -2945,29 +2952,27 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 	    XSetFillStyle( r->Xdisplay, gc, FillSolid);
 	    XFillRectangle( r->Xdisplay, win, gc,
 		    x, y - font->ascent,
-		    escapement, font->ascent + font->descent);
-		    //charstruct.width, font->ascent + font->descent);
+		    charstruct.width, font->ascent + font->descent);
 
 	    if( draw_string == XDrawImageString )
 		draw_string = XDrawString;
 	    else draw_string = XDrawString16;
 	}
 
+
 	/*
 	 * Restrict output to the above bounding box.
 	 */
 	rxvt_set_clipping( r, NULL, gc, refreshRegion,
 		x, y - font->ascent,
-		//charstruct.width, font->ascent + font->descent,
-		escapement, font->ascent + font->descent,
+		charstruct.width, font->ascent + font->descent,
 		&sx, &sy);
 
 	/*
 	 * Draw the shadow at the appropriate offset.
 	 */
 	XSetForeground (r->Xdisplay, gc, r->TermWin.shadow);
-	//draw_string (r->Xdisplay, win, gc, x+sx, y+sy, str, len);
-	XwcDrawString (r->Xdisplay, win, r->TermWin.fontset, gc, x+sx, y+sy, (wchar_t *) str, len);
+	draw_string (r->Xdisplay, win, gc, x+sx, y+sy, str, len);
 
 	/*
 	 * Restore old GC values.
@@ -2987,8 +2992,7 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 # endif	/* TEXT_SHADOW */
 
     rxvt_dbgmsg ((DBG_DEBUG, DBG_SCREEN, "output entire string: %s\n", str));
-    //draw_string (r->Xdisplay, win, gc, x, y, str, len);
-    XwcDrawString (r->Xdisplay, win, r->TermWin.fontset, gc, x, y, (wchar_t *) str, len);
+    draw_string (r->Xdisplay, win, gc, x, y, str, len);
 }
 
 
@@ -3007,67 +3011,95 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 /* INTPROTO */
 void
 rxvt_scr_draw_string (rxvt_t* r, int page,
-	int x, int y, text_t* str, int len, int drawfunc,
+	int x, int y, char* str, int len, int drawfunc,
 	uint16_t fore, uint16_t back,
 	__attribute__((unused)) rend_t rend, Region refreshRegion)
 {
 #ifdef XFT_SUPPORT
     int	    fillback = 0;
+    int	    adjust;
     void    (*xftdraw_string) () = NULL;
 
-    /*switch (drawfunc)
+    switch (drawfunc)
     {
 	case	XFT_DRAW_IMAGE_STRING_8:
+	    fillback = 1;
+	case	XFT_DRAW_STRING_8:
+	    xftdraw_string = XftDrawString8; break;
+
 	case	XFT_DRAW_IMAGE_STRING_16:
 	    fillback = 1;
-	    break;
-    }*/
-    if (drawfunc == XFT_DRAW_IMAGE_STRING)
-	fillback = 1;
+	case	XFT_DRAW_STRING_16:
+	    xftdraw_string = XftDrawString16; break;
+    }
 
-    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)// && xftdraw_string)
+    /*
+     * adjust is a variable that records whether each character of the string is
+     * 8 bits or 16 bits
+     */
+    adjust = (XftDrawString8 == xftdraw_string) ? 0 : 1;
+
+    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt && xftdraw_string)
     {
-	//register int	loop;	    /* loop iteration number */
-	//register int	loopitem;   /* each iteration increasing # */
-	//register int	i;
+	register int	loop;	    /* loop iteration number */
+	register int	loopitem;   /* each iteration increasing # */
+	register int	i;
 	/*
 	** xft_draw_string_xft should call these two parameters
 	*/
-	//register text_t*	pstr;	    /* string to print */
-	//register int	plen;	    /* string length */
-	//text_t*		newstr;
-#if 0
+	register char*	pstr;	    /* string to print */
+	register int	plen;	    /* string length */
+	char*		newstr;
 #ifdef MULTICHAR_SET
 #  ifdef HAVE_ICONV_H
-	text_t		pbuf[1024]; /* buffer to save UTF-8 string */
+	char		pbuf[1024]; /* buffer to save UTF-8 string */
 #  endif
 #endif
-#endif
+
 
 	/*
 	 * Xft does not support XDrawImageString, so we need to clear the
 	 * background of text by ourselves.
 	 */
 	if (fillback)
-	{
-	    XGlyphInfo extents;
-	    XftTextExtents32 (r->Xdisplay, r->TermWin.xftmfont, (XftChar32*) str, len, &extents);
-	    XftDrawRect (PVTS(r, page)->xftvt, &(r->xftColors[back]),
-		    x, y, extents.width, extents.height);
-		    //Width2Pixel(len * (1 + adjust)), Height2Pixel(1));
-		    //Width2Pixel(len), Height2Pixel(1));
-	    // TODO: Nothing to free here?
-	    // TODO: extents.xOff?
-	}
+	    XftDrawRect( PVTS(r, page)->xftvt, &(r->xftColors[back]),
+		    x, y, Width2Pixel(len * (1 + adjust)), Height2Pixel(1));
 
 	/* We use TermWin.xftfont->ascent here */
 	y += r->TermWin.xftfont->ascent;
 
 	/*
+	 * Xft does not support XftDrawString16, so we need to convert the
+	 * string to UTF-8. Here we reencode the string before conversion
+	 */
+# ifdef MULTICHAR_SET
+#  ifdef HAVE_ICONV_H
+	if (adjust && (iconv_t) -1 != r->TermWin.xfticonv)
+	{
+	    register int    j, newlen = (len << 1);
+	    switch (r->encoding_method)
+	    {
+		case ENC_EUCJ:
+		case ENC_GB:
+		    for (j = 0; j < newlen; j ++)
+			str[j] |= 0x80;
+		    break;
+		case ENC_GBK:	/* need to do nothing */
+		case ENC_BIG5:	/* need to do nothing */
+		default:
+		    break;
+	    }
+	    /* we will use utf8 routine to draw string */
+	    xftdraw_string = XftDrawStringUtf8;
+	}
+#  endif
+# endif	/* MULTICHAR_SET */
+
+
+	/*
 	** If the font is monospace, we print the entire string once,
 	** otherwise, print the characters one by one
 	*/
-#if 0
 	if (r->TermWin.xftmono)
 	{
 	    /* print string once for mono font */
@@ -3086,8 +3118,8 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    ** to multiply loopitem by 2 because iconv need string
 	    ** length as parameter, not character number.
 	    */
-	    //if (XftDrawStringUtf8 == xftdraw_string)
-	//	loopitem <<= 1;
+	    if (XftDrawStringUtf8 == xftdraw_string)
+		loopitem <<= 1;
 	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire mono string\n"));
 	}
 	/*
@@ -3147,28 +3179,26 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	{
 	    /* print string one by one character */
 	    loop = len;
-	    loopitem = 1; //+ adjust;
+	    loopitem = 1 + adjust;
 	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output characters one by one\n"));
 	}
-#endif
 
 
-	//newstr = str;	/* string beginning in each iteration */
-	//for (i = 0; i < loop; i ++)
-	//{
-#if 0
+	newstr = str;	/* string beginning in each iteration */
+	for (i = 0; i < loop; i ++)
+	{
 # ifdef MULTICHAR_SET
 #  ifdef HAVE_ICONV_H
 	    if (XftDrawStringUtf8 == xftdraw_string)
 	    {
 		/* We should convert the string to UTF-8 */
-		text_t*	buf = pbuf;		/* always init it */
+		char*	buf = pbuf;		/* always init it */
 		int	buflen = sizeof(pbuf)-1;/* always init it */
 		int	newlen = loopitem;	/* always init it */
-		text_t*	oldstr = newstr;
+		char*	oldstr = newstr;
 		iconv (r->TermWin.xfticonv, (char**)(&newstr),
 		    (size_t*) &newlen, &buf, (size_t*) &buflen);
-		*buf = (text_t) 0;    /* set end of string */
+		*buf = (char) 0;    /* set end of string */
 		pstr = pbuf;
 		/*
 		 * we should use the length of original string, not UTF-8 string
@@ -3183,23 +3213,20 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    else
 #  endif
 # endif	/* MULTICHAR_SET */
-#endif
-#if 0
 	    {
 		/* We do not need to convert the string to UTF-8 */
-		pstr = str; //newstr;
+		pstr = newstr;
 		plen = loopitem;
 	    }
-#endif
 
-	    rxvt_draw_string_xft (r, PVTS( r, page)->vt, r->TermWin.gc,
+	    rxvt_draw_string_xft(r, PVTS( r, page)->vt, r->TermWin.gc,
 		    refreshRegion, rend, NO_PFONT,
 		    PVTS(r, page)->xftvt, &(r->xftColors[fore]),
-		    x, y, str, len); //pstr, plen);
+		    x, y, pstr, plen, xftdraw_string);
 
-	    //x += Width2Pixel (loopitem);
-	    //newstr += loopitem;	/* next string to display */
-	//}
+	    x += Width2Pixel (loopitem);
+	    newstr += loopitem;	/* next string to display */
+	}
     }
     else
 #endif	/* XFT_SUPPORT */
@@ -3323,7 +3350,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     rend_t*	srp;	    /* screen-rend-pointer */
     text_t*	dtp;	    /* drawn-text pointer */
     text_t*	stp;	    /* screen-text-pointer */
-    text_t*	buffer;	    /* local copy of r->h->buffer */ // Jehan
+    char*	buffer;	    /* local copy of r->h->buffer */
     /*
     int		(*drawfunc) () = XDrawString;
     int		(*image_drawfunc) () = XDrawImageString;
@@ -3381,7 +3408,7 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
     if (h->currmaxcol < r->TermWin.ncol)
     {
 	h->currmaxcol = r->TermWin.ncol;
-	h->buffer = rxvt_realloc(h->buffer, sizeof(text_t) * (h->currmaxcol + 1));
+	h->buffer = rxvt_realloc(h->buffer, sizeof(char) * (h->currmaxcol + 1));
     }
     buffer = h->buffer;
 

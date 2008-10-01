@@ -1677,7 +1677,7 @@ struct rxvt_hidden {
 							   variable
 							   MRXVT_TABTITLE*/
     char*	    env_colorfgbg;
-    text_t*	    buffer; // Jehan
+    char*	    buffer;
     char*	    locale;
 
 #if 0
