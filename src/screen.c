@@ -2792,6 +2792,7 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
  */
 
 
+//#if 0
 #define X11_DRAW_STRING_8	    (1)
 #define X11_DRAW_STRING_16	    (2)
 #define X11_DRAW_IMAGE_STRING_8	    (3)
@@ -2804,6 +2805,11 @@ rxvt_fill_rectangle (rxvt_t* r, int page, int x, int y, unsigned int w, unsigned
 #define XFT_DRAW_IMAGE_STRING_16    (10)
 #define XFT_DRAW_IMAGE_STRING_32    (11)
 #define XFT_DRAW_IMAGE_STRING_UTF8  (12)
+//#endif
+#define X11_DRAW_STRING		    (1)
+#define X11_DRAW_IMAGE_STRING	    (3)
+#define XFT_DRAW_STRING		    (5)
+#define XFT_DRAW_IMAGE_STRING    (11)
 
 #ifdef XFT_SUPPORT
 #define XFTDRAW_STRING(xdraw, color, font, x, y, str, len)		    \
@@ -3009,29 +3015,33 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
     int	    fillback = 0;
     void    (*xftdraw_string) () = NULL;
 
-    switch (drawfunc)
+    /*switch (drawfunc)
     {
 	case	XFT_DRAW_IMAGE_STRING_8:
 	case	XFT_DRAW_IMAGE_STRING_16:
 	    fillback = 1;
 	    break;
-    }
+    }*/
+    if (drawfunc == XFT_DRAW_IMAGE_STRING)
+	fillback = 1;
 
-    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt && xftdraw_string)
+    if (ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt)// && xftdraw_string)
     {
-	register int	loop;	    /* loop iteration number */
-	register int	loopitem;   /* each iteration increasing # */
-	register int	i;
+	//register int	loop;	    /* loop iteration number */
+	//register int	loopitem;   /* each iteration increasing # */
+	//register int	i;
 	/*
 	** xft_draw_string_xft should call these two parameters
 	*/
-	register text_t*	pstr;	    /* string to print */
-	register int	plen;	    /* string length */
-	text_t*		newstr;
+	//register text_t*	pstr;	    /* string to print */
+	//register int	plen;	    /* string length */
+	//text_t*		newstr;
+#if 0
 #ifdef MULTICHAR_SET
 #  ifdef HAVE_ICONV_H
 	text_t		pbuf[1024]; /* buffer to save UTF-8 string */
 #  endif
+#endif
 #endif
 
 	/*
@@ -3057,6 +3067,7 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	** If the font is monospace, we print the entire string once,
 	** otherwise, print the characters one by one
 	*/
+#if 0
 	if (r->TermWin.xftmono)
 	{
 	    /* print string once for mono font */
@@ -3075,8 +3086,8 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    ** to multiply loopitem by 2 because iconv need string
 	    ** length as parameter, not character number.
 	    */
-	    if (XftDrawStringUtf8 == xftdraw_string)
-		loopitem <<= 1;
+	    //if (XftDrawStringUtf8 == xftdraw_string)
+	//	loopitem <<= 1;
 	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output entire mono string\n"));
 	}
 	/*
@@ -3139,11 +3150,13 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    loopitem = 1; //+ adjust;
 	    rxvt_dbgmsg ((DBG_VERBOSE, DBG_SCREEN, "output characters one by one\n"));
 	}
+#endif
 
 
-	newstr = str;	/* string beginning in each iteration */
-	for (i = 0; i < loop; i ++)
-	{
+	//newstr = str;	/* string beginning in each iteration */
+	//for (i = 0; i < loop; i ++)
+	//{
+#if 0
 # ifdef MULTICHAR_SET
 #  ifdef HAVE_ICONV_H
 	    if (XftDrawStringUtf8 == xftdraw_string)
@@ -3170,20 +3183,23 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    else
 #  endif
 # endif	/* MULTICHAR_SET */
+#endif
+#if 0
 	    {
 		/* We do not need to convert the string to UTF-8 */
-		pstr = newstr;
+		pstr = str; //newstr;
 		plen = loopitem;
 	    }
+#endif
 
-	    rxvt_draw_string_xft(r, PVTS( r, page)->vt, r->TermWin.gc,
+	    rxvt_draw_string_xft (r, PVTS( r, page)->vt, r->TermWin.gc,
 		    refreshRegion, rend, NO_PFONT,
 		    PVTS(r, page)->xftvt, &(r->xftColors[fore]),
-		    x, y, pstr, plen);
+		    x, y, str, len); //pstr, plen);
 
-	    x += Width2Pixel (loopitem);
-	    newstr += loopitem;	/* next string to display */
-	}
+	    //x += Width2Pixel (loopitem);
+	    //newstr += loopitem;	/* next string to display */
+	//}
     }
     else
 #endif	/* XFT_SUPPORT */
