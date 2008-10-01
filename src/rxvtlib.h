@@ -769,7 +769,7 @@ typedef struct
     unsigned char   *inbuf_base,		/* pointer to physical buffer */
 		    *inbuf_start,		/* beginning of area to write */
 		    *inbuf_end;		/* end of area to write */
-	 int inbuf_room; /* Remaining room at the end of the buffer */
+    int inbuf_room; /* Remaining room at the end of the buffer */
 
     /*
      * Data read from cmd_fd is buffered in here [Child's output buffer]

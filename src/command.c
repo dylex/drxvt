@@ -1542,9 +1542,9 @@ rxvt_clean_cmd_page (rxvt_t* r)
 		    /*
 		     * Process information in the child's output buffer.
 		     */
-		    while( PVTS(r, i)->outbuf_start < PVTS(r, i)->outbuf_end )
+		    while( PVTS(r, i)->textbuf_start < PVTS(r, i)->textbuf_end )
 		    {
-			rxvt_process_getc( r, i, *(PVTS(r,i)->outbuf_start++) );
+			rxvt_process_getc( r, i, *(PVTS(r,i)->textbuf_start++) );
 
 			/* Incomplete escape sequence. */
 			if( PVTS(r, i)->textbuf_escfail )
@@ -1607,8 +1607,8 @@ rxvt_clean_cmd_page (rxvt_t* r)
 
 		    rxvt_cmd_write(r, i, buffer, len );
 
-		    if( PVTS(r, i)->outbuf_start < PVTS(r, i)->outbuf_end )
-			rxvt_process_getc( r, i, *(PVTS(r,i)->outbuf_start++) );
+		    if( PVTS(r, i)->textbuf_start < PVTS(r, i)->textbuf_end )
+			rxvt_process_getc( r, i, *(PVTS(r,i)->textbuf_start++) );
 		}
 
 		/*
@@ -1646,7 +1646,7 @@ rxvt_cmdbuf_has_input( rxvt_t *r, int page )
 	PVTS(r, page)->outbuf_start < PVTS(r, page)->outbuf_end;
 }
 
-/* Returns true if there is input pending in PVTS(r, page)->charbuf. */
+/* Returns true if there is input pending in PVTS(r, page)->textbuf. */
 int static inline
 //mrxvt_page_has_input ( rxvt_t *r, int page )
 rxvt_textbuf_has_input (rxvt_t *r, int page)
@@ -2159,7 +2159,7 @@ mrxvt_process_children_raw_output (rxvt_t* r, int page)
 	textbuf_room = BUFSIZ - (PVTS(r, i)->textbuf_end - PVTS(r, i)->textbuf_base);
 #endif
 
-	// Now I transform the byte output into at most charbuf_room meaningful characters.
+	// Now I transform the byte output into at most textbuf_room meaningful characters.
 	// mbsrtowcs is locale dependant.
 	// Let's trust this POSIX function for the encoding conversion to Unicode.
 #ifdef HAVE_ICONV_H
@@ -2182,7 +2182,7 @@ mrxvt_process_children_raw_output (rxvt_t* r, int page)
 		/*
 		 * The conversion to wide char has stopped on an invalid sequence.
 		 * In this case PVTS(r, i)->outbuf_start is left pointing to the invalid multibyte sequence.
-		 * PVTS(r, i)->charbuf_end is updated as wanted.
+		 * PVTS(r, i)->textbuf_end is updated as wanted.
 		 */
 		while ((PVTS(r, i)->outbuf_end - PVTS(r, i)->outbuf_start) > 4
 			&& countwc == -1
@@ -2213,11 +2213,11 @@ mrxvt_process_children_raw_output (rxvt_t* r, int page)
 		assert (0);
 	    }
 
-	    // PVTS(r, i)->charbuf_end - last_charbuf_end characters have been written to the buffer.
+	    // PVTS(r, i)->textbuf_end - last_textbuf_end characters have been written to the buffer.
 	    countwc = PVTS(r, i)->textbuf_end - last_textbuf_end;
 	}
 	/* 
-	 * The last case is when charbuf has been filled.
+	 * The last case is when textbuf has been filled.
 	 * In such case, nothing to do.
 	 * All pointers are well set by mbsrtowcs.
 	 */
