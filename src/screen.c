@@ -974,6 +974,13 @@ rxvt_scroll_text(rxvt_t* r, int page, int row1, int row2, int count, int spec)
 	    SEL(r).beg.row -= count;
 	    SEL(r).end.row -= count;
 	    SEL(r).mark.row -= count;
+
+	    if (SEL(r).mark.row < -SVLINES)
+		SEL(r).mark.row = -SVLINES;
+	    if (SEL(r).beg.row < -SVLINES)
+		SEL(r).beg.row = -SVLINES;
+	    if (SEL(r).end.row < -SVLINES)
+		SEL(r).end.row = -SVLINES;
 	}
     }
 
