@@ -1514,7 +1514,10 @@ rxvt_remove_page (rxvt_t* r, short page)
     if (FVTAB(r) > page)
 	FVTAB(r)--;
     if (LVTAB(r) > page)
+    {
+	refresh_tabbar_tab (r, LVTAB (r));
 	LVTAB(r)--;
+    }
     /* Reorganize the tabs array. */
     /* update TermWin and tab_widths */
     for (i = page; i <= LTAB(r); i++)
