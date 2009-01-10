@@ -3200,11 +3200,10 @@ rxvt_scr_draw_string (rxvt_t* r, int page,
 	    {
 		/* We should convert the string to UTF-8 */
 		char*	buf = pbuf;		/* always init it */
-		int	buflen = sizeof(pbuf)-1;/* always init it */
-		int	newlen = loopitem;	/* always init it */
+		size_t	buflen = sizeof(pbuf)-1;/* always init it */
+		size_t	newlen = loopitem;	/* always init it */
 		char*	oldstr = newstr;
-		iconv (r->TermWin.xfticonv, (char**)(&newstr),
-		    (size_t*) &newlen, &buf, (size_t*) &buflen);
+		iconv (r->TermWin.xfticonv, &newstr, &newlen, &buf, &buflen);
 		*buf = (char) 0;    /* set end of string */
 		pstr = pbuf;
 		/*
