@@ -190,7 +190,7 @@ expose_transparent_subwin( rxvt_t *r)
 /* {{{2 resetParentPixmap(r, rootw, rooth, rootd)
  *
  * Grabs the root background, shades it and sets as the windows background
- * pixmap. rwidth / height / depth are the respective attributes of the root
+ * pixmap. rootw / rooth / rootd are the respective attributes of the root
  * window.
  *
  * xerror_return must be set to Success before entering this function. (It's not

@@ -637,7 +637,7 @@ Hold the tab open after the child process in it exits.
 .Ar mask
 is the mask of flags which control weather the tab will be held open based on the exit status of the child process. If the lowest bit (0x01) of
 .Ar mask
-is set, then the tab will always be held open after the child exits. If the next bit (0x02) is set, then the tab will only be held open if the child exits abnormally (e.g. via
+is set, then the tab will always be held open after the child exits. If the next bit (0x02) is set, then the tab will be held open if the child exits abnormally (e.g. via
 .Xr abort 1 ) .
 If the third bit (0x04) is set, then the tab will be held open if the child exits with non-zero status.
 .Pp
