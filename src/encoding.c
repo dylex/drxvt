@@ -109,7 +109,7 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"ISO_8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
     {"ISO_8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
     {"ISO_8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
-    {"ISO_8859-1",  ENC_ISO8859_1,  rxvt_decode_dummy},
+    {"ISO-8859-1",  ENC_ISO8859_1,  rxvt_decode_dummy},
     {"ISO-8859-2",  ENC_ISO8859_2,  rxvt_decode_dummy},
     {"ISO-8859-3",  ENC_ISO8859_3,  rxvt_decode_dummy},
     {"ISO-8859-4",  ENC_ISO8859_4,  rxvt_decode_dummy},
