@@ -1204,12 +1204,14 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 
 	    default:
 #ifdef MULTICHAR_SET
-		if (r->encoding_method == ENC_NOENC)
+		if( r->encoding_method == ENC_NOENC )
 		{
+		    /* 2009-03-29 gi1242 TODO: Deal with ISO-8859 encodings. */
 		    if (c == 127)
 			continue;
 		    break;
 		}
+
 		PVTS(r, page)->rstyle &= ~RS_multiMask;
 
 		/* multibyte 2nd byte */
@@ -1274,7 +1276,7 @@ rxvt_scr_add_lines(rxvt_t* r, int page, const unsigned char *str, int nlines,
 		    }
 		}
 		else
-#endif
+#endif /*MULTICHAR_SET*/
 		if (c == 127)
 		    continue;	/* yummmm..... */
 		break;
@@ -3948,7 +3950,9 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 		}
 
 		if (buffer[0] & 0x80)
+		{
 		    (h->multichar_decode)( (unsigned char*) buffer, len);
+		}
 		wlen = len / 2;
 	    }
 	    else
@@ -3967,8 +3971,8 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 #ifdef XFT_SUPPORT
 		    if (!(ISSET_OPTION(r, Opt_xft) && r->TermWin.xftfont))
 #endif
-		    XSetFont(r->Xdisplay, r->TermWin.gc,
-			r->TermWin.font->fid);
+			XSetFont(r->Xdisplay, r->TermWin.gc,
+				r->TermWin.font->fid);
 #ifdef XFT_SUPPORT
 		    if ( ISSET_OPTION(r, Opt_xft) && PVTS(r, page)->xftvt )
 		    {
@@ -3982,9 +3986,9 @@ rxvt_scr_refresh(rxvt_t* r, int page, unsigned char refresh_type)
 			image_drawfunc = X11_DRAW_IMAGE_STRING_8;
 		    }
 		}   /* if (wbyte) */
-#else
+#else /*MULTICHAR_SET*/
 	    { /* add } for correct % bouncing */
-#endif
+#endif /*MULTICHAR_SET*/
 		if (!fprop)
 		{
 		    int echars;

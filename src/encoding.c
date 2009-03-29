@@ -64,6 +64,12 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"KOI8U",	    ENC_KOI8U,	    rxvt_decode_dummy},
     {"KOI8-U",	    ENC_KOI8U,	    rxvt_decode_dummy},
 
+    /*
+     * 2009-03-29 gi1242: These encodings are not handled yet! The current
+     * codebase thinks that any encoded text is 'multi-char', so it needs to be
+     * modified to handle these codepages.
+     */
+#if 0
     {"ISO8859-1",   ENC_ISO8859_1,  rxvt_decode_dummy},
     {"ISO8859-2",   ENC_ISO8859_2,  rxvt_decode_dummy},
     {"ISO8859-3",   ENC_ISO8859_3,  rxvt_decode_dummy},
@@ -109,13 +115,6 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"ISO_8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
     {"ISO_8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
     {"ISO_8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
-    /*
-     * 2009-03-28 gi1242: When encoding method is set to ENC_ISO8859_1--15,
-     * accented characters are not displayed properly. For now, commenting them
-     * sets the encoding to "noenc", which makes this problem go away for now.
-     * Some work needs to be done on this.
-     */
-#if 0
     {"ISO-8859-1",  ENC_ISO8859_1,  rxvt_decode_dummy},
     {"ISO-8859-2",  ENC_ISO8859_2,  rxvt_decode_dummy},
     {"ISO-8859-3",  ENC_ISO8859_3,  rxvt_decode_dummy},
@@ -384,8 +383,8 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     struct KNOWN_ENCODINGS* a;
 
     assert (NOT_NULL(str));
-    rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
-		"trying to set multichar encoding to %s\n", str));
+    rxvt_msg( DBG_INFO, DBG_ENCODING,
+		"trying to set multichar encoding to %s\n", str);
 
     a = (struct KNOWN_ENCODINGS*) known_encodings;
     for (; a->name; a++)
@@ -400,29 +399,38 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     /* not a known encoding method */
     if (IS_NULL(a->name))
     {
-	rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
-		    "... effectively set to noenc\n"));
+	rxvt_msg( DBG_INFO, DBG_ENCODING,
+		    "... effectively set to noenc\n");
 	r->encoding_method = ENC_NOENC;
 	r->h->multichar_decode = rxvt_decode_dummy;
     }
     else
-	rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
-		"... effectively set to %s\n", a->name));
+	rxvt_msg( DBG_INFO, DBG_ENCODING,
+		"... effectively set to %s\n", a->name);
 
 #ifdef XFT_SUPPORT
 # ifdef HAVE_ICONV_H
-    if ((iconv_t) -1 != r->TermWin.xfticonv)	{
+    if( (iconv_t) -1 != r->TermWin.xfticonv )
+    {
 	iconv_close (r->TermWin.xfticonv);
 	r->TermWin.xfticonv = (iconv_t) -1;
     }
     /*
-    ** If encoding method is set AND mfont is loaded, open the
-    ** iconv. Otherwise, xfticonv is -1
-    */
-    if (ENC_NOENC != r->encoding_method &&
-	NOTSET_OPTION(r, Opt2_xftNomFont))
+     * 2009-03-29 gi1242: Open the iconv only if encoding method is set AND
+     * mfont is loaded. However for ISO-8859 encodings, the regular font might
+     * have the font characters, so when we implement 8859 encodings, we have to
+     * change this.
+     */
+    if(
+	    r->encoding_method != ENC_NOENC
+	    && NOTSET_OPTION(r, Opt2_xftNomFont)
+      )
+    {
+	rxvt_dbgmsg(( DBG_DEBUG, DBG_ENCODING,
+		    "Setting xfticonv=%s", rxvt_encoding_name(r) ));
 	r->TermWin.xfticonv = iconv_open ("UTF-8",
 				rxvt_encoding_name(r));
+    }
 # endif
 #endif
 }
@@ -434,7 +442,8 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
 void
 rxvt_decode_dummy (unsigned char* str, int len)
 {
-    rxvt_dbgmsg ((DBG_DEBUG, DBG_ENCODING, "%s\n", __func__));
+    rxvt_dbgmsg ((DBG_DEBUG, DBG_ENCODING, "%s( %.*s, %d)\n", __func__,
+		len, str, len));
 }
 
 
@@ -561,45 +570,50 @@ rxvt_set_default_font_x11 (rxvt_t* r)
     register int    i;
 
 
-    rxvt_dbgmsg ((DBG_VERBOSE, DBG_ENCODING, "%s\n", __func__));
+    rxvt_dbgtmsg ((DBG_VERBOSE, DBG_ENCODING, "%s\n", __func__));
 
     /* Set default fonts */
     def_fontName = (char**) nfont_list[r->encoding_method].font;
 
 #ifdef MULTICHAR_SET
-    switch (r->encoding_method)	{
-    case ENC_SJIS :
-	def_mfontName = (char**) mfont_list[ENC_SJIS].mfont;
-	break;
-    case ENC_EUCJ :
-	def_mfontName = (char**) mfont_list[ENC_EUCJ].mfont;
-	break;
-    case ENC_GB   :
-	def_mfontName = (char**) mfont_list[ENC_GB].mfont;
-	break;
-    case ENC_GBK  :
-	def_mfontName = (char**) mfont_list[ENC_GBK].mfont;
-	break;
-    case ENC_GB18030  :
-	def_mfontName = (char**) mfont_list[ENC_GB18030].mfont;
-	break;
-    case ENC_BIG5 :
-	def_mfontName = (char**) mfont_list[ENC_BIG5].mfont;
-	break;
-    case ENC_EUCKR:
-	def_mfontName = (char**) mfont_list[ENC_EUCKR].mfont;
-	break;
-    default:
-	def_mfontName = (char**) mfont_list[r->encoding_method].mfont;
-	break;
+    switch (r->encoding_method)
+    {
+	case ENC_SJIS :
+	    def_mfontName = (char**) mfont_list[ENC_SJIS].mfont;
+	    break;
+	case ENC_EUCJ :
+	    def_mfontName = (char**) mfont_list[ENC_EUCJ].mfont;
+	    break;
+	case ENC_GB   :
+	    def_mfontName = (char**) mfont_list[ENC_GB].mfont;
+	    break;
+	case ENC_GBK  :
+	    def_mfontName = (char**) mfont_list[ENC_GBK].mfont;
+	    break;
+	case ENC_GB18030  :
+	    def_mfontName = (char**) mfont_list[ENC_GB18030].mfont;
+	    break;
+	case ENC_BIG5 :
+	    def_mfontName = (char**) mfont_list[ENC_BIG5].mfont;
+	    break;
+	case ENC_EUCKR:
+	    def_mfontName = (char**) mfont_list[ENC_EUCKR].mfont;
+	    break;
+	default:
+	    def_mfontName = (char**) mfont_list[r->encoding_method].mfont;
+	    break;
     }
 
     /* Found no mfont, fall back to ISO8859-X font */
-    if (IS_NULL(def_mfontName[0]))  {
-	for (i = 0; i < MAX_NFONTS; i ++)   {
+    if (IS_NULL(def_mfontName[0]))
+    {
+	for (i = 0; i < MAX_NFONTS; i ++)
+	{
 	    char*   ptr = rxvt_malloc (STRLEN(isofont[i])+4);
-	    if (r->encoding_method >= ENC_ISO8859_1 &&
-		r->encoding_method <= ENC_ISO8859_15)
+	    if(
+		    r->encoding_method >= ENC_ISO8859_1 &&
+		    r->encoding_method <= ENC_ISO8859_15
+	      )
 		sprintf (ptr, isofont[i],
 		    r->encoding_method - ENC_ISO8859_1 + 1);
 	    else
