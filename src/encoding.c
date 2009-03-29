@@ -109,6 +109,13 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"ISO_8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
     {"ISO_8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
     {"ISO_8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
+    /*
+     * 2009-03-28 gi1242: When encoding method is set to ENC_ISO8859_1--15,
+     * accented characters are not displayed properly. For now, commenting them
+     * sets the encoding to "noenc", which makes this problem go away for now.
+     * Some work needs to be done on this.
+     */
+#if 0
     {"ISO-8859-1",  ENC_ISO8859_1,  rxvt_decode_dummy},
     {"ISO-8859-2",  ENC_ISO8859_2,  rxvt_decode_dummy},
     {"ISO-8859-3",  ENC_ISO8859_3,  rxvt_decode_dummy},
@@ -124,6 +131,7 @@ static struct KNOWN_ENCODINGS known_encodings[] = {
     {"ISO-8859-13", ENC_ISO8859_13, rxvt_decode_dummy},
     {"ISO-8859-14", ENC_ISO8859_14, rxvt_decode_dummy},
     {"ISO-8859-15", ENC_ISO8859_15, rxvt_decode_dummy},
+#endif
 
     {"NOENC",	    ENC_NOENC,	    rxvt_decode_dummy},
     {"",	    ENC_NOENC,	    rxvt_decode_dummy},
@@ -376,24 +384,30 @@ rxvt_set_multichar_encoding (rxvt_t* r, const char* str)
     struct KNOWN_ENCODINGS* a;
 
     assert (NOT_NULL(str));
-    rxvt_msg (DBG_INFO, DBG_ENCODING, "trying to set multichar encoding to %s\n", str);
+    rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
+		"trying to set multichar encoding to %s\n", str));
 
     a = (struct KNOWN_ENCODINGS*) known_encodings;
-    for (; a->name; a++) {
-	if (0 == STRCASECMP (str, a->name)) {
+    for (; a->name; a++)
+    {
+	if (0 == STRCASECMP (str, a->name))
+	{
 	    r->encoding_method = a->method;
 	    r->h->multichar_decode = a->func;
 	    break;
 	}
     }
     /* not a known encoding method */
-    if (IS_NULL(a->name))   {
-	rxvt_msg (DBG_INFO, DBG_ENCODING, "... effectively set to noenc\n");
+    if (IS_NULL(a->name))
+    {
+	rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
+		    "... effectively set to noenc\n"));
 	r->encoding_method = ENC_NOENC;
 	r->h->multichar_decode = rxvt_decode_dummy;
     }
-	 else
-		rxvt_msg (DBG_INFO, DBG_ENCODING, "... effectively set to %s\n", a->name);
+    else
+	rxvt_dbgtmsg(( DBG_INFO, DBG_ENCODING,
+		"... effectively set to %s\n", a->name));
 
 #ifdef XFT_SUPPORT
 # ifdef HAVE_ICONV_H
@@ -445,7 +459,8 @@ rxvt_set_default_locale (rxvt_t* r)
 	locale = lc;
 #endif
 
-    rxvt_msg (DBG_INFO, DBG_ENCODING, "set default locale to %s\n", locale ? locale : "none");
+    rxvt_msg (DBG_INFO, DBG_ENCODING, "set default locale to %s\n",
+	    locale ? locale : "none");
     r->h->locale = locale;
 }
 
