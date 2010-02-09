@@ -33,6 +33,10 @@
 #define INTERN_SCREEN
 #include "rxvt.h"
 
+#ifdef HAVE_X11_XKBLIB_H
+#include <X11/XKBlib.h>
+#endif
+
 #ifdef XFT_SUPPORT
 # include <xftacs.h>
 #endif
@@ -2468,7 +2472,17 @@ rxvt_scr_bell(rxvt_t *r, int page)
 	rxvt_async_exec( r, r->h->rs[Rs_bellCommand] );
 
     else
+    {
+	/*
+	 * gi1242: With Xorg-1.7.4 and evdev keyboards, XBell is ignored. Use
+	 * XkbBell for now instead. See bug #24503 on freedesktop.
+	 */
+#ifdef HAVE_X11_XKBLIB_H
+	XkbBell( r->Xdisplay, PVTS(r, page)->vt, 0, None );
+#else
 	XBell(r->Xdisplay, 0);
+#endif
+    }
 #endif /* NO_BELL */
 }
 

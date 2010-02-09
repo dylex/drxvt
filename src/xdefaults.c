@@ -788,7 +788,7 @@ rxvt_usage(int type)
 #else
 	    for (i = 0; i < optList_size(); i++)
 		if (NOT_NULL(optList[i].kw))
-		    fprintf(stdout, "  %s: %*s%s\n",
+		    fprintf(stdout, "  %s: %s\n",
 			optList[i].kw,
 			(optList_isBool(i) ? "boolean" : optList[i].arg));
 #endif

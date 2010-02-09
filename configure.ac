@@ -869,6 +869,8 @@ AC_CHECK_LIB(
     AC_MSG_ERROR([Mrxvt requires the libX11 libraries.])
 )
 
+AC_CHECK_HEADERS(X11/XKBlib.h)
+
 dnl AC_CHECK_LIB(
 dnl     Xext,
 dnl     XextAddDisplay,
