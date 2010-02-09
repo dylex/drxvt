@@ -758,7 +758,7 @@ rxvt_usage(int type)
 
 		    fprintf(stdout, "  %s%s %-*s%s%s\n",
 			(optList_isBool(i) ? "-/+" : "-"), optList[i].opt,
-			(INDENT - STRLEN(optList[i].opt)
+			(INDENT - (int) STRLEN(optList[i].opt)
 			 + (optList_isBool(i) ? 0 : 2)),
 			(optList[i].arg ? optList[i].arg : ""),
 			(optList_isBool(i) ? "turn on/off " : ""),
@@ -790,7 +790,6 @@ rxvt_usage(int type)
 		if (NOT_NULL(optList[i].kw))
 		    fprintf(stdout, "  %s: %*s%s\n",
 			optList[i].kw,
-			(INDENT - STRLEN(optList[i].kw)), "", /* XXX */
 			(optList_isBool(i) ? "boolean" : optList[i].arg));
 #endif
 	    fprintf(stdout, "\n  -help to list options");

@@ -2944,7 +2944,10 @@ rxvt_draw_string_x11 (rxvt_t* r, Window win, GC gc, Region refreshRegion,
 		draw_string == XDrawString16)
 	    xtextextents = XTextExtents16;
 	else
-		assert(0); /* Shouldn't happen */
+	{
+	    xtextextents = NULL; /* Suppress gcc warning */
+	    assert(0); /* Shouldn't happen */
+	}
 
 	xtextextents( font, str, len,
 		&unused_dir, &ascent, &descent, &charstruct);
